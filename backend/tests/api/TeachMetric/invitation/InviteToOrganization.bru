@@ -1,0 +1,22 @@
+meta {
+  name: InviteToOrganization
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/invite-member
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "test2@te.com",
+    "role": 2
+  }
+}

@@ -1,0 +1,23 @@
+meta {
+  name: Link Module to Invitation
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/module-for-invitation/1
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "moduleIds": [2, 8, 11]
+  }
+}
+
+

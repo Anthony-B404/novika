@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
+    "test:frontend": "vitest",
+    "test:backend": "node ace test",
+    "test:backend:watch": "node ace test --watch",
+    "test:all": "npm run test:run && npm run test:backend",
+    "test:coverage:all": "npm run test:coverage && node ace test --coverage",
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write",
+    "tdd:status": "node .claude/hooks/tdd-status.js"
+  }
+}

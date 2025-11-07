@@ -1,0 +1,32 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "betteanthony73@gmail.com",
+    "password": "password123"
+  }
+  
+}
+
+tests {
+  test("should login successfully", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('token');
+    env.set('authToken', data.token);
+  });
+}

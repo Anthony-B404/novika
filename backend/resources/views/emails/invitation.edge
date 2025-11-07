@@ -1,0 +1,53 @@
+@mjml()
+  <mjml>
+    <mj-head>
+      <mj-title>
+        Log in with this magic link
+      </mj-title>
+      <mj-preview>
+        Log in with this magic link.
+      </mj-preview>
+      <mj-attributes>
+        <mj-all
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif"
+        />
+        <mj-text font-size="16px" line-height="26px" color="hsl(222.2, 84%, 4.9%)" />
+      </mj-attributes>
+    </mj-head>
+    <mj-body>
+      <mj-section>
+        <mj-column>
+          <mj-image width="48px" height="48px" src="{{ organizationLogo }}" alt="{{ organizationName }}" />
+          <mj-text font-size="28px" font-weight="bold" padding-top="48px">
+            👋 Vous avez reçu une invitation
+          </mj-text>
+          <mj-text>
+            Bonjour,<br />            <br />
+            Vous avez été invité à rejoindre {{ organizationName }}.
+          </mj-text>
+          <mj-button
+            href="http://localhost:3000/invitation/{{ identifier }}"
+            target="_blank"
+            background-color="hsl(221.2, 83.2%, 53.3%)"
+            color="hsl(210, 40%, 98%)"
+            border-radius="0.25rem"
+            padding-top="24px"
+          >
+            Accepter l'invitation
+          </mj-button>
+          <mj-text>
+            Cordialement,<br />- {{ organizationName }}
+          </mj-text>
+          <mj-divider border-color="hsl(214.3, 31.8%, 91.4%)" border-width="1px" padding-top="48px" />
+          <mj-image width="32px" height="32px" src="{{ organizationLogo }}" alt="{{ organizationName }}" />
+          <mj-text css-class="muted-text" font-size="12px" line-height="24px">
+            teachMetric
+          </mj-text>
+          <mj-text css-class="muted-text" font-size="12px" line-height="24px">
+            Chambéry, France
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-body>
+  </mjml>
+@end

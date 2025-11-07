@@ -1,0 +1,23 @@
+meta {
+  name: AcceptInvitation
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/accept-invitation
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "identifier": "b9a7a764-d362-44bd-9107-6733f6d2a778",
+    "fullName": "bruno test",
+    "password": "test"
+  }
+}

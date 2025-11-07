@@ -1,0 +1,21 @@
+meta {
+  name: CheckInvitation
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/check-invitation/b280ff2d-c4b1-457e-b365-e313babff71f
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "test2@te.co"
+  }
+}

@@ -1,0 +1,41 @@
+@mjml()
+  <mjml>
+    <mj-head>
+      <mj-title>
+        Vérifiez votre adresse email
+      </mj-title>
+      <mj-preview>
+        Vérifiez votre adresse email pour activer votre compte.
+      </mj-preview>
+      <mj-attributes>
+        <mj-all
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif"
+        />
+        <mj-text font-size="16px" line-height="26px" color="hsl(222.2, 84%, 4.9%)" />
+      </mj-attributes>
+    </mj-head>
+    <mj-body>
+      <mj-section>
+        <mj-column>
+          <mj-text font-size="28px" font-weight="bold" padding-top="48px">
+            Vérification de votre compte
+          </mj-text>
+          <mj-text>
+            Bonjour,<br />
+            Merci de votre inscription. Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous.
+          </mj-text>
+          <mj-button
+            href="http://localhost:3000/verify-email/{{ token }}"
+            target="_blank"
+            background-color="hsl(221.2, 83.2%, 53.3%)"
+            color="hsl(210, 40%, 98%)"
+            border-radius="0.25rem"
+            padding-top="24px"
+          >
+            Vérifier mon email
+          </mj-button>
+        </mj-column>
+      </mj-section>
+    </mj-body>
+  </mjml>
+@end

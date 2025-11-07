@@ -1,0 +1,14 @@
+meta {
+  name: Get Form Templates
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/form-templates
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

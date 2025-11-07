@@ -1,0 +1,15 @@
+meta {
+  name: CheckToken
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/check-token
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,35 @@
+meta {
+  name: getOrganizationWithUsers
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/organization
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Test Organization",
+    "logo": "https://example.com/logo.png",
+    "email": "test@example.com"
+  }
+}
+
+tests {
+  test("should create an organization", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(201);
+    expect(data).to.have.property('id');
+  });
+}

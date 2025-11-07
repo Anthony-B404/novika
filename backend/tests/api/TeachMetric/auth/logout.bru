@@ -1,0 +1,25 @@
+meta {
+  name: Logout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/logout
+  body: none
+  auth: bearer
+}
+
+headers {
+  ~Authorization: {{authToken}}
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("should logout successfully", function() {
+    expect(res.getStatus()).to.equal(204);
+  });
+}
