@@ -20,13 +20,18 @@ export default defineNuxtConfig({
     '@': fileURLToPath(new URL('./app', import.meta.url)),
   },
   modules: [
+    "@nuxt/ui",
     "@nuxtjs/color-mode",
     "@nuxtjs/i18n",
     "@pinia/nuxt",
+    "@vueuse/nuxt",
   ],
+  routeRules: {
+    '/': { prerender: true }
+  },
   i18n: {
     strategy: "prefix_and_default",
-    langDir: "./locales",
+    langDir: "locales",
     defaultLocale: "fr",
     lazy: true,
     locales: [

@@ -9,44 +9,45 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: t('seo.login.title'),
-  description: t('seo.login.description')
+  title: t('seo.signup.title'),
+  description: t('seo.signup.description')
 })
 
 const toast = useToast()
 
 const fields = computed(() => [{
+  name: 'name',
+  type: 'text' as const,
+  label: t('auth.signup.name'),
+  placeholder: t('auth.signup.namePlaceholder')
+}, {
   name: 'email',
   type: 'text' as const,
-  label: t('auth.login.email'),
-  placeholder: t('auth.login.emailPlaceholder'),
-  required: true
+  label: t('auth.signup.email'),
+  placeholder: t('auth.signup.emailPlaceholder')
 }, {
   name: 'password',
-  label: t('auth.login.password'),
+  label: t('auth.signup.password'),
   type: 'password' as const,
-  placeholder: t('auth.login.passwordPlaceholder')
-}, {
-  name: 'remember',
-  label: t('auth.login.rememberMe'),
-  type: 'checkbox' as const
+  placeholder: t('auth.signup.passwordPlaceholder')
 }])
 
 const providers = computed(() => [{
-  label: t('auth.login.providers.google'),
+  label: t('auth.signup.providers.google'),
   icon: 'i-simple-icons-google',
   onClick: () => {
-    toast.add({ title: t('auth.login.providers.google'), description: t('auth.login.providers.googleDescription') })
+    toast.add({ title: t('auth.signup.providers.google'), description: t('auth.signup.providers.googleDescription') })
   }
 }, {
-  label: t('auth.login.providers.github'),
+  label: t('auth.signup.providers.github'),
   icon: 'i-simple-icons-github',
   onClick: () => {
-    toast.add({ title: t('auth.login.providers.github'), description: t('auth.login.providers.githubDescription') })
+    toast.add({ title: t('auth.signup.providers.github'), description: t('auth.signup.providers.githubDescription') })
   }
 }])
 
 const schema = z.object({
+  name: z.string().min(1, t('auth.validation.nameRequired')),
   email: z.string().email(t('auth.validation.invalidEmail')),
   password: z.string().min(8, t('auth.validation.passwordMin'))
 })
@@ -63,26 +64,17 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
     :fields="fields"
     :schema="schema"
     :providers="providers"
-    :title="$t('auth.login.title')"
-    icon="i-lucide-lock"
+    :title="$t('auth.signup.title')"
+    :submit="{ label: $t('auth.signup.submit') }"
     @submit="onSubmit"
   >
     <template #description>
-      {{ $t('auth.login.description') }} <ULink
-        to="/signup"
+      {{ $t('auth.signup.description') }} <ULink
+        to="/login"
         class="font-medium"
       >
-        {{ $t('auth.login.signUpLink') }}
+        {{ $t('auth.signup.loginLink') }}
       </ULink>.
-    </template>
-
-    <template #password-hint>
-      <ULink
-        to="/forgot-password"
-        class="text-sm font-medium"
-      >
-        {{ $t('auth.login.forgotPassword') }}
-      </ULink>
     </template>
   </UAuthForm>
 </template>
