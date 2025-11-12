@@ -210,16 +210,18 @@
   },
   "auth": {
     "login": {
-      "title": "Bon retour",
-      "description": "Vous n'avez pas de compte ?",
-      "signUpLink": "S'inscrire",
+      "title": "Heureux de vous revoir",
+      "description": "Entrez votre email et nous vous enverrons un lien magique pour vous connecter. Vous n'avez pas de compte ?",
+      "signupLink": "S'inscrire",
       "email": "Email",
       "emailPlaceholder": "Entrez votre email",
-      "password": "Mot de passe",
-      "passwordPlaceholder": "Entrez votre mot de passe",
-      "rememberMe": "Se souvenir de moi",
-      "forgotPassword": "Mot de passe oublié ?",
-      "submit": "Se connecter",
+      "submitButton": "Envoyer le lien magique",
+      "success": "Lien magique envoyé !",
+      "successDescription": "Vérifiez votre email à {email} pour vous connecter",
+      "error": "Erreur",
+      "errorDescription": "Échec de l'envoi du lien magique. Veuillez réessayer.",
+      "footer": "En vous connectant, vous acceptez nos",
+      "termsOfService": "Conditions d'utilisation",
       "providers": {
         "google": "Google",
         "github": "GitHub",
@@ -229,26 +231,23 @@
     },
     "signup": {
       "title": "Créer un compte",
-      "description": "Vous avez déjà un compte ?",
+      "description": "Entrez vos informations et nous vous enverrons un lien magique pour finaliser l'inscription. Vous avez déjà un compte ?",
       "loginLink": "Se connecter",
       "name": "Nom",
       "namePlaceholder": "Entrez votre nom",
       "email": "Email",
       "emailPlaceholder": "Entrez votre email",
-      "password": "Mot de passe",
-      "passwordPlaceholder": "Entrez votre mot de passe",
-      "submit": "Créer un compte",
-      "providers": {
-        "google": "Google",
-        "github": "GitHub",
-        "googleDescription": "S'inscrire avec Google",
-        "githubDescription": "S'inscrire avec GitHub"
-      }
+      "submitButton": "Envoyer le lien magique",
+      "success": "Lien magique envoyé !",
+      "successDescription": "Vérifiez votre email à {email} pour finaliser l'inscription",
+      "error": "Erreur",
+      "errorDescription": "Échec de l'envoi du lien magique. Veuillez réessayer.",
+      "footer": "En vous inscrivant, vous acceptez nos",
+      "termsOfService": "Conditions d'utilisation"
     },
     "validation": {
       "nameRequired": "Le nom est requis",
-      "invalidEmail": "Email invalide",
-      "passwordMin": "Doit contenir au moins 8 caractères"
+      "invalidEmail": "Email invalide"
     }
   },
   "dashboard": {

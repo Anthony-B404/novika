@@ -217,5 +217,61 @@
     "chat": "Chat",
     "portfolio": "Portfolio",
     "changelog": "Changelog"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "description": "Enter your email and we'll send you a magic link to sign in. Don't have an account?",
+      "signupLink": "Sign up",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "submitButton": "Send magic link",
+      "success": "Magic link sent!",
+      "successDescription": "Check your email at {email} to complete login",
+      "error": "Error",
+      "errorDescription": "Failed to send magic link. Please try again.",
+      "footer": "By signing in, you agree to our",
+      "termsOfService": "Terms of Service",
+      "providers": {
+        "google": "Google",
+        "github": "GitHub",
+        "googleDescription": "Login with Google",
+        "githubDescription": "Login with GitHub"
+      }
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Enter your details and we'll send you a magic link to complete signup. Already have an account?",
+      "loginLink": "Login",
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "submitButton": "Send magic link",
+      "success": "Magic link sent!",
+      "successDescription": "Check your email at {email} to complete signup",
+      "error": "Error",
+      "errorDescription": "Failed to send magic link. Please try again.",
+      "footer": "By signing up, you agree to our",
+      "termsOfService": "Terms of Service"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "invalidEmail": "Invalid email"
+    }
+  },
+  "seo": {
+    "login": {
+      "title": "Login",
+      "description": "Login to your account to continue"
+    },
+    "signup": {
+      "title": "Sign up",
+      "description": "Create an account to get started"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Your application dashboard"
+    }
   }
 }

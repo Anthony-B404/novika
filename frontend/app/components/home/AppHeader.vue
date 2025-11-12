@@ -44,24 +44,53 @@ nuxtApp.hooks.hookOnce("page:finish", () => {
       </NuxtLink>
     </template>
 
+    <UNavigationMenu :items="items" variant="link" />
+
     <template #right>
-      <UNavigationMenu :items="items" variant="link" class="hidden lg:block" />
+      <UColorModeButton />
 
       <UButton
-        :label="$t('nav.downloadApp')"
-        variant="subtle"
-        class="hidden lg:block"
+        icon="i-lucide-log-in"
+        color="neutral"
+        variant="ghost"
+        :to="$localePath('login')"
+        class="lg:hidden"
       />
 
-      <UColorModeButton />
+      <UButton
+        label="Sign in"
+        color="neutral"
+        variant="outline"
+        :to="$localePath('login')"
+        class="hidden lg:inline-flex"
+      />
+
+      <UButton
+        label="Sign up"
+        color="neutral"
+        trailing-icon="i-lucide-arrow-right"
+        class="hidden lg:inline-flex"
+        :to="$localePath('signup')"
+      />
     </template>
 
     <template #body>
       <UNavigationMenu :items="items" orientation="vertical" class="-mx-2.5" />
+
+      <USeparator class="my-6" />
+
       <UButton
-        class="mt-4"
-        :label="$t('nav.downloadApp')"
+        label="Sign in"
+        color="neutral"
         variant="subtle"
+        :to="$localePath('login')"
+        block
+        class="mb-3"
+      />
+      <UButton
+        label="Sign up"
+        color="neutral"
+        :to="$localePath('signup')"
         block
       />
     </template>
