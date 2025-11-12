@@ -294,7 +294,7 @@ useSeoMeta({
       }"
     >
       <template #top>
-        <HomeHeroBackground />
+        <HeroBackground />
       </template>
     </UPageHero>
 
@@ -491,7 +491,7 @@ useSeoMeta({
         </div>
       </template>
 
-      <LazyHomeStarsBg />
+      <LazyStarsBg />
     </UPageCTA>
   </div>
 </template>

@@ -19,6 +19,8 @@ useHead({
 
 <template>
   <UApp :toaster="{ expand: false }">
+    <NuxtLoadingIndicator />
+
     <UMain>
       <NuxtLayout>
         <NuxtPage />

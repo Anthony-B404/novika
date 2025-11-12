@@ -40,7 +40,7 @@ nuxtApp.hooks.hookOnce("page:finish", () => {
   <UHeader>
     <template #left>
       <NuxtLink :to="$localePath('index')">
-        <HomeAppLogo class="h-8 w-32" />
+        <AppLogo class="h-8 w-32" />
       </NuxtLink>
     </template>
 
