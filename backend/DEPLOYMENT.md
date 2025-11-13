@@ -5,7 +5,7 @@
 Le système de rappels automatiques TeachMetric comprend :
 
 - **Migration de base de données** : Tables `email_logs` et `form_reminders`
-- **Models Lucid** : `EmailLog` et `FormReminder` 
+- **Models Lucid** : `EmailLog` et `FormReminder`
 - **Services** : `ReminderService` et `EmailErrorService`
 - **Commande AdonisJS** : `SendFormReminders`
 - **Webhooks Resend** : Gestion des bounces et erreurs
@@ -66,8 +66,8 @@ module.exports = {
       instances: 1,
       exec_mode: 'fork',
       env: {
-        NODE_ENV: 'production'
-      }
+        NODE_ENV: 'production',
+      },
     },
     {
       name: 'teachmetric-reminders',
@@ -78,10 +78,10 @@ module.exports = {
       cron_restart: '0 */1 * * *', // Toutes les heures
       autorestart: false,
       env: {
-        NODE_ENV: 'production'
-      }
-    }
-  ]
+        NODE_ENV: 'production',
+      },
+    },
+  ],
 }
 ```
 
@@ -102,6 +102,7 @@ CMD cron && npm start
 ```
 
 Fichier `cron-reminders` :
+
 ```
 0 */1 * * * root cd /app && node ace send:form-reminders >> /var/log/cron.log 2>&1
 ```
@@ -157,33 +158,33 @@ pm2 logs teachmetric-reminders
 
 ```sql
 -- Statistiques des rappels
-SELECT 
+SELECT
   reminder_level,
   COUNT(*) as total,
   COUNT(CASE WHEN sent = true THEN 1 END) as sent,
   COUNT(CASE WHEN sent = false AND scheduled_for < NOW() THEN 1 END) as overdue
-FROM form_reminders 
+FROM form_reminders
 GROUP BY reminder_level;
 
 -- Taux de livraison des emails
-SELECT 
+SELECT
   status,
   COUNT(*) as count,
   ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
-FROM email_logs 
+FROM email_logs
 GROUP BY status;
 
 -- Rappels en retard (à investiguer)
-SELECT 
+SELECT
   fr.*,
   fs.identifier,
   s.email,
   f.title
 FROM form_reminders fr
 JOIN form_submissions fs ON fr.form_submission_id = fs.id
-JOIN students s ON fs.student_id = s.id  
+JOIN students s ON fs.student_id = s.id
 JOIN forms f ON fs.form_id = f.id
-WHERE fr.sent = false 
+WHERE fr.sent = false
 AND fr.scheduled_for < NOW() - INTERVAL '1 hour';
 ```
 
@@ -195,13 +196,14 @@ Dans `FormReminder.getScheduleDelayForLevel()`, modifier :
 
 ```typescript
 case 1: return { days: 1 }    // Premier rappel après 1 jour
-case 2: return { days: 3 }    // Deuxième rappel après 3 jours  
+case 2: return { days: 3 }    // Deuxième rappel après 3 jours
 case 3: return { days: 7 }    // Dernier rappel après 7 jours
 ```
 
 ### 2. Personnalisation des templates
 
 Les templates MJML sont dans `resources/views/emails/` :
+
 - `form_reminder_1.edge` - Rappel amical
 - `form_reminder_2.edge` - Rappel insistant
 - `form_reminder_final.edge` - Rappel urgent
@@ -228,7 +230,7 @@ if (emails_sent_this_hour >= RATE_LIMIT) {
    - Vérifier les logs d'erreur
    - Tester la commande manuellement
 
-2. **Webhooks non reçus**  
+2. **Webhooks non reçus**
    - Vérifier l'URL webhook dans Resend
    - Vérifier `RESEND_WEBHOOK_SECRET`
    - Tester avec curl
@@ -265,7 +267,7 @@ node ace tinker
 ## 🔐 Sécurité
 
 - ✅ Validation webhook signatures
-- ✅ Rate limiting  
+- ✅ Rate limiting
 - ✅ Logs d'audit pour tous les emails
 - ✅ Pas de données sensibles dans les templates
 - ✅ Endpoints admin protégés par authentification

@@ -21,30 +21,35 @@
           <mj-text align="center" font-size="48px" padding-top="32px" padding-bottom="16px">
             ⏰
           </mj-text>
-          
+
           <mj-text font-size="28px" font-weight="bold" align="center" padding-bottom="8px">
             2ème rappel
           </mj-text>
-          
+
           <mj-text font-size="18px" align="center" color="hsl(35, 91%, 56%)" padding-bottom="32px">
             Action requise - Formulaire en attente
           </mj-text>
-          
+
           <!-- Contenu principal -->
           <mj-text>
-            Bonjour {{ studentName }},<br /><br />
-            
+            Bonjour {{ studentName }},<br />            <br />
+
             Nous vous avions envoyé un premier rappel concernant le formulaire 
             <strong>"{{ formTitle }}"</strong>, mais nous constatons qu'il n'a toujours pas été complété.
-            <br /><br />
-            
-            <strong>Votre participation est importante</strong> et nous avons besoin de vos réponses pour 
+            <br />            <br />
+
+            <strong>Votre participation est importante</strong>et nous avons besoin de vos réponses pour 
             avancer sur ce projet. Nous vous encourageons vivement à prendre quelques minutes 
             pour remplir ce formulaire.
           </mj-text>
-          
+
           <!-- Zone d'urgence -->
-          <mj-section background-color="hsl(48, 100%, 96%)" border="1px solid hsl(35, 91%, 56%)" border-radius="8px" padding="20px">
+          <mj-section
+            background-color="hsl(48, 100%, 96%)"
+            border="1px solid hsl(35, 91%, 56%)"
+            border-radius="8px"
+            padding="20px"
+          >
             <mj-column>
               <mj-text font-size="16px" font-weight="bold" color="hsl(35, 84%, 40%)" align="center">
                 ⚡ Action requise
@@ -54,7 +59,7 @@
               </mj-text>
             </mj-column>
           </mj-section>
-          
+
           <!-- Bouton d'action (plus visible) -->
           <mj-button
             href="{{ formUrl }}"
@@ -69,17 +74,17 @@
           >
             ⚡ Répondre maintenant
           </mj-button>
-          
+
           <!-- Information d'aide -->
           <mj-text font-size="14px" color="hsl(220, 14.3%, 45.9%)" align="center" padding-top="24px">
-            <strong>Besoin d'aide ?</strong><br />
+            <strong>Besoin d'aide ?</strong>            <br />
             Si vous rencontrez des difficultés techniques ou avez des questions, 
             contactez-nous immédiatement.
           </mj-text>
-          
+
           <!-- Séparateur -->
           <mj-divider border-color="hsl(214.3, 31.8%, 91.4%)" padding-top="32px" padding-bottom="24px" />
-          
+
           <!-- Footer -->
           <mj-text font-size="12px" color="hsl(220, 14.3%, 45.9%)" align="center">
             Ceci est le 2ème rappel concernant ce formulaire.<br />

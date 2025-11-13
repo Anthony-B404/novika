@@ -16,18 +16,14 @@ export default class SendFormReminders extends BaseCommand {
 
   async run() {
     this.logger.info('🔍 Recherche des rappels à envoyer...')
-    
+
     try {
       // Récupérer tous les rappels non envoyés qui sont dus
-      const dueReminders = await FormReminder
-        .query()
+      const dueReminders = await FormReminder.query()
         .where('sent', false)
         .where('scheduled_for', '<=', DateTime.now().toSQL())
         .preload('formSubmission', (query) => {
-          query
-            .where('is_responded', false)
-            .preload('student')
-            .preload('form')
+          query.where('is_responded', false).preload('student').preload('form')
         })
         .exec()
 
@@ -53,21 +49,19 @@ export default class SendFormReminders extends BaseCommand {
 
           await reminderService.sendReminder(reminder)
           sentCount++
-          
+
           this.logger.info(
             `✅ Rappel niveau ${reminder.reminderLevel} envoyé à ${reminder.formSubmission.student.email}`
           )
         } catch (error) {
           errorCount++
-          this.logger.error(
-            `❌ Erreur lors de l'envoi du rappel ${reminder.id}: ${error.message}`
-          )
+          this.logger.error(`❌ Erreur lors de l'envoi du rappel ${reminder.id}: ${error.message}`)
         }
       }
 
       // Rapport final
       this.logger.info('')
-      this.logger.info('📊 Rapport d\'envoi:')
+      this.logger.info("📊 Rapport d'envoi:")
       this.logger.info(`  ✅ Envoyés: ${sentCount}`)
       this.logger.info(`  ❌ Erreurs: ${errorCount}`)
       this.logger.info(`  📈 Total traités: ${sentCount + errorCount}`)
@@ -77,9 +71,8 @@ export default class SendFormReminders extends BaseCommand {
           `⚠️  ${errorCount} erreur(s) détectée(s). Consultez les logs pour plus de détails.`
         )
       }
-
     } catch (error) {
-      this.logger.error('❌ Erreur critique lors de l\'envoi des rappels:')
+      this.logger.error("❌ Erreur critique lors de l'envoi des rappels:")
       this.logger.error(error.message)
       this.logger.error(error.stack)
       process.exit(1)

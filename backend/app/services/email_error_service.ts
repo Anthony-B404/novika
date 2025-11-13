@@ -2,7 +2,14 @@ import EmailLog from '#models/email_log'
 import { DateTime } from 'luxon'
 
 interface ResendWebhookEvent {
-  type: 'email.sent' | 'email.delivered' | 'email.delivery_delayed' | 'email.complained' | 'email.bounced' | 'email.opened' | 'email.clicked'
+  type:
+    | 'email.sent'
+    | 'email.delivered'
+    | 'email.delivery_delayed'
+    | 'email.complained'
+    | 'email.bounced'
+    | 'email.opened'
+    | 'email.clicked'
   created_at: string
   data: {
     created_at: string
@@ -29,11 +36,9 @@ export default class EmailErrorService {
    */
   public async processResendWebhook(event: ResendWebhookEvent): Promise<void> {
     const { data } = event
-    
+
     // Trouver le log email correspondant
-    const emailLog = await EmailLog.query()
-      .where('resend_id', data.email_id)
-      .first()
+    const emailLog = await EmailLog.query().where('resend_id', data.email_id).first()
 
     if (!emailLog) {
       console.warn(`EmailLog non trouvé pour Resend ID: ${data.email_id}`)
@@ -73,7 +78,10 @@ export default class EmailErrorService {
   /**
    * Email livré avec succès
    */
-  private async handleEmailDelivered(emailLog: EmailLog, _event: ResendWebhookEvent): Promise<void> {
+  private async handleEmailDelivered(
+    emailLog: EmailLog,
+    _event: ResendWebhookEvent
+  ): Promise<void> {
     await emailLog.markAsDelivered()
   }
 
@@ -82,7 +90,7 @@ export default class EmailErrorService {
    */
   private async handleEmailBounced(emailLog: EmailLog, event: ResendWebhookEvent): Promise<void> {
     await emailLog.markAsBounced()
-    
+
     // Optionnel : désactiver l'email de l'étudiant si bounce permanent
     if (event.data.error?.name === 'hard_bounce') {
       await this.handleHardBounce(emailLog, event)
@@ -92,7 +100,10 @@ export default class EmailErrorService {
   /**
    * Email marqué comme spam
    */
-  private async handleEmailComplained(emailLog: EmailLog, event: ResendWebhookEvent): Promise<void> {
+  private async handleEmailComplained(
+    emailLog: EmailLog,
+    event: ResendWebhookEvent
+  ): Promise<void> {
     emailLog.status = 'failed'
     emailLog.errorMessage = 'Email marqué comme spam par le destinataire'
     await emailLog.save()
@@ -115,12 +126,12 @@ export default class EmailErrorService {
   private async handleHardBounce(emailLog: EmailLog, event: ResendWebhookEvent): Promise<void> {
     // Log pour monitoring
     console.warn(`Hard bounce détecté pour ${emailLog.emailTo}: ${event.data.error?.message}`)
-    
+
     // Ici on pourrait :
     // 1. Marquer l'étudiant comme ayant une adresse email invalide
     // 2. Envoyer une notification à l'admin
     // 3. Créer un système de quarantaine des emails
-    
+
     // Pour l'instant, on se contente de logger
     emailLog.errorMessage = `Hard bounce: ${event.data.error?.message}`
     await emailLog.save()
@@ -132,7 +143,7 @@ export default class EmailErrorService {
   private async handleSpamComplaint(emailLog: EmailLog, _event: ResendWebhookEvent): Promise<void> {
     // Log pour monitoring
     console.warn(`Plainte spam reçue pour ${emailLog.emailTo}`)
-    
+
     // Ici on pourrait :
     // 1. Ajouter l'email à une liste de suppression
     // 2. Notifier l'admin
@@ -155,9 +166,10 @@ export default class EmailErrorService {
       delivered: Number(deliveredEmails[0].$extras.total),
       failed: Number(failedEmails[0].$extras.total),
       bounced: Number(bouncedEmails[0].$extras.total),
-      deliveryRate: Number(totalEmails[0].$extras.total) > 0 
-        ? Number(deliveredEmails[0].$extras.total) / Number(totalEmails[0].$extras.total) * 100 
-        : 0
+      deliveryRate:
+        Number(totalEmails[0].$extras.total) > 0
+          ? (Number(deliveredEmails[0].$extras.total) / Number(totalEmails[0].$extras.total)) * 100
+          : 0,
     }
   }
 
@@ -188,8 +200,10 @@ export default class EmailErrorService {
         // Pour l'instant on se contente de mettre à jour le compteur
         emailLog.retryCount += 1
         await emailLog.save()
-        
-        console.log(`Email ${emailLog.id} programmé pour nouvelle tentative (${emailLog.retryCount}/${maxRetries})`)
+
+        console.log(
+          `Email ${emailLog.id} programmé pour nouvelle tentative (${emailLog.retryCount}/${maxRetries})`
+        )
       } catch (error) {
         console.error(`Erreur lors de la programmation de retry pour email ${emailLog.id}:`, error)
       }

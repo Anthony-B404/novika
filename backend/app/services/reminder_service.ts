@@ -24,9 +24,9 @@ export default class ReminderService {
         submissionIdentifier: formSubmission.identifier,
         formUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/fill-form?identifier=${formSubmission.identifier}`,
         reminderLevel: reminder.reminderLevel,
-        isReminder: true
+        isReminder: true,
       },
-      status: 'pending'
+      status: 'pending',
     })
 
     try {
@@ -44,7 +44,6 @@ export default class ReminderService {
 
       // Marquer le rappel comme envoyé
       await reminder.markAsSent(emailLog.id)
-
     } catch (error) {
       // Marquer le log comme échoué
       await emailLog.markAsFailed(error.message)
@@ -81,8 +80,7 @@ export default class ReminderService {
    * (utile quand un étudiant répond au formulaire)
    */
   public async cancelPendingReminders(formSubmissionId: number): Promise<void> {
-    await FormReminder
-      .query()
+    await FormReminder.query()
       .where('form_submission_id', formSubmissionId)
       .where('sent', false)
       .delete()
@@ -95,8 +93,7 @@ export default class ReminderService {
     const totalReminders = await FormReminder.query().count('* as total')
     const sentReminders = await FormReminder.query().where('sent', true).count('* as total')
     const pendingReminders = await FormReminder.query().where('sent', false).count('* as total')
-    const overdueReminders = await FormReminder
-      .query()
+    const overdueReminders = await FormReminder.query()
       .where('sent', false)
       .where('scheduled_for', '<', DateTime.now().toSQL())
       .count('* as total')
@@ -105,7 +102,7 @@ export default class ReminderService {
       total: Number(totalReminders[0].$extras.total),
       sent: Number(sentReminders[0].$extras.total),
       pending: Number(pendingReminders[0].$extras.total),
-      overdue: Number(overdueReminders[0].$extras.total)
+      overdue: Number(overdueReminders[0].$extras.total),
     }
   }
 
@@ -113,8 +110,7 @@ export default class ReminderService {
    * Obtenir les rappels en retard (pour monitoring)
    */
   public async getOverdueReminders(): Promise<FormReminder[]> {
-    return await FormReminder
-      .query()
+    return await FormReminder.query()
       .where('sent', false)
       .where('scheduled_for', '<', DateTime.now().minus({ hours: 1 }).toSQL())
       .preload('formSubmission', (query) => {

@@ -36,7 +36,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   */
   RESEND_API_KEY: Env.schema.string(),
   RESEND_WEBHOOK_SECRET: Env.schema.string.optional(),
-  
+
   /*
   |----------------------------------------------------------
   | Variables for frontend URL (used in email links)
