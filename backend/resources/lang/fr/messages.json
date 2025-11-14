@@ -1,0 +1,48 @@
+{
+  "welcome": "Bienvenue",
+  "hello": "Bonjour {name}",
+  "auth": {
+    "login_success": "Connexion réussie",
+    "logout_success": "Déconnexion réussie",
+    "invalid_credentials": "Identifiants invalides",
+    "unauthorized": "Non autorisé",
+    "email_not_verified": "Veuillez vérifier votre adresse email avant de continuer",
+    "verification_sent": "Un email de vérification a été envoyé",
+    "email_verified": "Email vérifié avec succès",
+    "token_valid": "Le token est valide"
+  },
+  "organization": {
+    "created": "Organisation créée avec succès",
+    "updated": "Organisation mise à jour avec succès",
+    "deleted": "Organisation supprimée avec succès",
+    "not_found": "Organisation introuvable"
+  },
+  "invitation": {
+    "sent": "Invitation envoyée avec succès",
+    "accepted": "Invitation acceptée avec succès",
+    "expired": "Cette invitation a expiré",
+    "invalid": "Invitation invalide",
+    "already_accepted": "Cette invitation a déjà été acceptée",
+    "deleted": "Invitation supprimée avec succès"
+  },
+  "user": {
+    "created": "Utilisateur créé avec succès",
+    "updated": "Utilisateur mis à jour avec succès",
+    "deleted": "Utilisateur supprimé avec succès",
+    "not_found": "Utilisateur introuvable"
+  },
+  "errors": {
+    "server_error": "Une erreur serveur s'est produite",
+    "not_found": "Ressource introuvable",
+    "validation_failed": "La validation a échoué",
+    "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action",
+    "organization_validation_failed": "Erreur de validation de l'organisation",
+    "user_validation_failed": "Erreur de validation de l'utilisateur",
+    "email_send_failed": "Erreur d'envoi de mail",
+    "invitation_validation_failed": "Erreur de validation de l'invitation",
+    "invitation_create_failed": "Erreur lors de la création de l'invitation",
+    "email_already_used": "Cette adresse email est déjà utilisée",
+    "invitation_delete_failed": "Erreur lors de la suppression de l'invitation",
+    "user_delete_failed": "Erreur lors de la suppression de l'utilisateur"
+  }
+}

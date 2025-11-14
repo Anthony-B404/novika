@@ -1,0 +1,48 @@
+{
+  "welcome": "Welcome",
+  "hello": "Hello {name}",
+  "auth": {
+    "login_success": "Login successful",
+    "logout_success": "Logout successful",
+    "invalid_credentials": "Invalid credentials",
+    "unauthorized": "Unauthorized",
+    "email_not_verified": "Please verify your email address before continuing",
+    "verification_sent": "A verification email has been sent",
+    "email_verified": "Email verified successfully",
+    "token_valid": "Token is valid"
+  },
+  "organization": {
+    "created": "Organization created successfully",
+    "updated": "Organization updated successfully",
+    "deleted": "Organization deleted successfully",
+    "not_found": "Organization not found"
+  },
+  "invitation": {
+    "sent": "Invitation sent successfully",
+    "accepted": "Invitation accepted successfully",
+    "expired": "This invitation has expired",
+    "invalid": "Invalid invitation",
+    "already_accepted": "This invitation has already been accepted",
+    "deleted": "Invitation deleted successfully"
+  },
+  "user": {
+    "created": "User created successfully",
+    "updated": "User updated successfully",
+    "deleted": "User deleted successfully",
+    "not_found": "User not found"
+  },
+  "errors": {
+    "server_error": "A server error occurred",
+    "not_found": "Resource not found",
+    "validation_failed": "Validation failed",
+    "unauthorized": "You are not authorized to perform this action",
+    "organization_validation_failed": "Organization validation failed",
+    "user_validation_failed": "User validation failed",
+    "email_send_failed": "Email sending failed",
+    "invitation_validation_failed": "Invitation validation failed",
+    "invitation_create_failed": "Error creating invitation",
+    "email_already_used": "This email address is already in use",
+    "invitation_delete_failed": "Error deleting invitation",
+    "user_delete_failed": "Error deleting user"
+  }
+}

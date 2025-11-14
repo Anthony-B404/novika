@@ -17,7 +17,7 @@ import { DateTime } from 'luxon'
 export default class OrganizationsController {
   private readonly LOGO_DIRECTORY = app.makePath('storage/organizations/logos')
 
-  public async signupWithOrganization({ request, response }: HttpContext) {
+  public async signupWithOrganization({ request, response, i18n }: HttpContext) {
     try {
       const organizationData = JSON.parse(request.input('organization'))
       const logo = request.file('logo')
@@ -32,7 +32,7 @@ export default class OrganizationsController {
       } catch (orgError) {
         return response
           .status(422)
-          .json({ message: "Erreur de validation de l'organisation", errors: orgError.messages })
+          .json({ message: i18n.t('messages.errors.organization_validation_failed'), errors: orgError.messages })
       }
 
       const userData = JSON.parse(request.input('user'))
@@ -47,7 +47,7 @@ export default class OrganizationsController {
       } catch (userError) {
         await organization.delete()
         return response.status(422).json({
-          message: "Erreur de validation de l'utilisateur",
+          message: i18n.t('messages.errors.user_validation_failed'),
           errors: userError.messages,
         })
       }
@@ -57,36 +57,37 @@ export default class OrganizationsController {
           message
             .to(user.email)
             .from('onboarding@resend.dev')
-            .subject('Verifiez votre adresse email')
+            .subject(i18n.t('emails.verification.subject'))
             .htmlView('emails/verify_email', {
               token: user.verificationToken,
+              i18n: i18n,
             })
         })
       } catch (errors) {
         await organization.delete()
         await user.delete()
         return response.status(422).json({
-          message: "Erreur d'envoie de mail",
+          message: i18n.t('messages.errors.email_send_failed'),
           errors: errors,
         })
       }
 
       return response.status(201).json({
-        message: 'Organisation créée avec succès',
+        message: i18n.t('messages.organization.created'),
       })
     } catch (error) {
-      return this.handleError(response, error)
+      return this.handleError(response, error, i18n)
     }
   }
 
-  public async getOrganizationWithUsers({ response, auth, bouncer }: HttpContext) {
+  public async getOrganizationWithUsers({ response, auth, bouncer, i18n }: HttpContext) {
     const authUser = auth.user
 
     if (
       await bouncer.with(OrganizationPolicy).denies('getOrganizationWithUsers' as never, authUser!)
     ) {
       return response.status(403).json({
-        message: "Vous n'avez pas les permissions pour accéder à cette ressource",
+        message: i18n.t('messages.errors.unauthorized'),
       })
     }
 
@@ -125,11 +126,11 @@ export default class OrganizationsController {
     return response.download(filePath)
   }
 
-  public async updateOrganization({ request, response, auth, bouncer }: HttpContext) {
+  public async updateOrganization({ request, response, auth, bouncer, i18n }: HttpContext) {
     const user = auth.user
     if (await bouncer.with(OrganizationPolicy).denies('updateOrganization' as never, user!)) {
       return response.status(403).json({
-        message: "Vous n'avez pas les permissions pour accéder à cette ressource",
+        message: i18n.t('messages.errors.unauthorized'),
       })
     }
 
@@ -154,7 +155,7 @@ export default class OrganizationsController {
 
       return response.json(updatedData)
     } catch (error) {
-      return this.handleError(response, error)
+      return this.handleError(response, error, i18n)
     }
   }
 
@@ -209,10 +210,10 @@ export default class OrganizationsController {
     }
   }
 
-  private handleError(response: HttpContext['response'], error: any) {
+  private handleError(response: HttpContext['response'], error: any, i18n: HttpContext['i18n']) {
     console.error(error)
     return response.status(500).json({
-      message: 'Une erreur inattendue est survenue',
+      message: i18n.t('messages.errors.server_error'),
       error: error.message,
     })
   }

@@ -10,6 +10,10 @@ post {
   auth: none
 }
 
+headers {
+  Accept-Language: en
+}
+
 body:multipart-form {
   user: {"fullName": "Bruno Test 4","email": "betteanthony73@gmail.com", "password": "password123", "role": 1, "organizationId": null, "isOwner": true}
   organization: {"name": "Bruno Organization 4","email": "betteanthony73@gmail.com","logo": null}

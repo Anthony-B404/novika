@@ -2,10 +2,10 @@
   <mjml>
     <mj-head>
       <mj-title>
-        Vérifiez votre adresse email
+        {{ i18n.t('emails.verification.subject') }}
       </mj-title>
       <mj-preview>
-        Vérifiez votre adresse email pour activer votre compte.
+        {{ i18n.t('emails.verification.preview') }}
       </mj-preview>
       <mj-attributes>
         <mj-all
@@ -18,11 +18,11 @@
       <mj-section>
         <mj-column>
           <mj-text font-size="28px" font-weight="bold" padding-top="48px">
-            Vérification de votre compte
+            {{ i18n.t('emails.verification.title') }}
           </mj-text>
           <mj-text>
-            Bonjour,<br />
-            Merci de votre inscription. Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous.
+            {{ i18n.t('emails.verification.greeting') }},<br />
+            {{ i18n.t('emails.verification.intro') }}
           </mj-text>
           <mj-button
             href="http://localhost:3000/verify-email/{{ token }}"
@@ -32,7 +32,7 @@
             border-radius="0.25rem"
             padding-top="24px"
           >
-            Vérifier mon email
+            {{ i18n.t('emails.verification.button') }}
           </mj-button>
         </mj-column>
       </mj-section>

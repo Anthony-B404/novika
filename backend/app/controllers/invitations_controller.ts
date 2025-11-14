@@ -9,18 +9,18 @@ import { randomUUID } from 'node:crypto'
 import { invitationValidator } from '#validators/invitation'
 
 export default class InvitationsController {
-  public async createInvitation({ request, response, auth, bouncer }: HttpContext) {
+  public async createInvitation({ request, response, auth, bouncer, i18n }: HttpContext) {
     const authUser = auth.user
 
     if (!authUser) {
       return response.status(401).json({
-        message: 'Vous devez être connecté pour créer une invitation',
+        message: i18n.t('messages.auth.unauthorized'),
       })
     }
 
     if (await bouncer.with(InvitationPolicy).denies('createInvitation' as never, authUser!)) {
       return response.status(403).json({
-        message: "Vous n'avez pas les permissions pour créer une invitation",
+        message: i18n.t('messages.errors.unauthorized'),
       })
     }
 
@@ -39,7 +39,7 @@ export default class InvitationsController {
       payload = await invitationValidator.validate(payload)
     } catch (error) {
       return response.status(422).json({
-        message: "Erreur de validation de l'invitation",
+        message: i18n.t('messages.errors.invitation_validation_failed'),
         errors: error.messages,
       })
     }
@@ -48,49 +48,51 @@ export default class InvitationsController {
 
     if (!organization) {
       return response.status(404).json({
-        message: "L'organisation n'existe pas",
+        message: i18n.t('messages.organization.not_found'),
       })
     }
 
     try {
       const invitation = await Invitation.create(payload)
-      console.log(invitation)
-      //   await mail.send((message) => {
-      //     message
-      //       .to(payload.email)
-      //       .from('onboarding@resend.dev')
-      //       .subject(`Invitation à rejoindre ${organization.name}`)
-      //       .htmlView('emails/invitation', {
-      //         identifier: payload.identifier,
-      //         organizationName: organization.name,
-      //         organizationLogo: organization.logo
-      //           ? `http://${process.env.APP_URL}/organization-logo/${organization.logo}`
-      //           : 'https://placehold.co/100',
-      //       })
-      //   })
+
+      await mail.send((message) => {
+        message
+          .to(payload.email)
+          .from('onboarding@resend.dev')
+          .subject(i18n.t('emails.invitation.subject', { organization: organization.name }))
+          .htmlView('emails/invitation', {
+            identifier: payload.identifier,
+            organizationName: organization.name,
+            organizationLogo: organization.logo
+              ? `http://${process.env.APP_URL}/organization-logo/${organization.logo}`
+              : 'https://placehold.co/100',
+            i18n: i18n,
+          })
+      })
+
       return response.status(201).json(invitation)
     } catch (error) {
       return response.status(500).json({
-        message: "Erreur lors de la création de l'invitation",
+        message: i18n.t('messages.errors.invitation_create_failed'),
         errors: error.messages,
       })
     }
   }
 
-  public async checkInvitation({ request, response }: HttpContext) {
+  public async checkInvitation({ request, response, i18n }: HttpContext) {
     const { identifier } = request.params()
 
     const invitation = await Invitation.findBy('identifier', identifier)
 
     if (!invitation) {
       return response.status(404).json({
-        message: 'Invitation non trouvée',
+        message: i18n.t('messages.invitation.invalid'),
       })
     }
 
     if (invitation.accepted) {
       return response.status(400).json({
-        message: 'Invitation déjà acceptée',
+        message: i18n.t('messages.invitation.already_accepted'),
       })
     }
 
@@ -104,14 +106,14 @@ export default class InvitationsController {
     })
   }
 
-  public async acceptInvitation({ request, response }: HttpContext) {
+  public async acceptInvitation({ request, response, i18n }: HttpContext) {
     const { identifier, fullName, password } = request.only(['identifier', 'fullName', 'password'])
 
     const invitation = await Invitation.findBy('identifier', identifier)
 
     if (!invitation) {
       return response.status(404).json({
-        message: 'Invitation non trouvée',
+        message: i18n.t('messages.invitation.invalid'),
       })
     }
 
@@ -119,7 +121,7 @@ export default class InvitationsController {
 
     if (user) {
       return response.status(400).json({
-        message: 'Cette email est déjà utilisé',
+        message: i18n.t('messages.errors.email_already_used'),
       })
     }
 
@@ -141,29 +143,29 @@ export default class InvitationsController {
       await invitation.save()
     } catch (error) {
       return response.status(422).json({
-        message: "Erreur de validation de l'utilisateur",
+        message: i18n.t('messages.errors.user_validation_failed'),
         errors: error.messages,
       })
     }
 
     return response.status(200).json({
-      message: 'Invitation acceptée avec succès',
+      message: i18n.t('messages.invitation.accepted'),
     })
   }
 
-  public async deleteInvitation({ params, response }: HttpContext) {
+  public async deleteInvitation({ params, response, i18n }: HttpContext) {
     const { id } = params
 
     const invitation = await Invitation.find(id)
     if (!invitation) {
-      return response.notFound({ message: 'Invitation not found' })
+      return response.notFound({ message: i18n.t('messages.invitation.invalid') })
     }
     try {
       await invitation.delete()
-      return response.ok({ message: 'Invitation deleted' })
+      return response.ok({ message: i18n.t('messages.invitation.deleted') })
     } catch (error) {
       return response.status(500).json({
-        message: "Erreur lors de la suppression de l'invitation",
+        message: i18n.t('messages.errors.invitation_delete_failed'),
         errors: error.messages,
       })
     }

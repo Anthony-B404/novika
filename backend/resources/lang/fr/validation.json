@@ -1,0 +1,15 @@
+{
+  "required": "Le champ {field} est requis",
+  "email": "Le champ {field} doit être une adresse email valide",
+  "minLength": "Le champ {field} doit contenir au moins {minLength} caractères",
+  "maxLength": "Le champ {field} ne peut pas dépasser {maxLength} caractères",
+  "unique": "Cette valeur pour {field} existe déjà",
+  "confirmed": "Le champ {field} ne correspond pas à la confirmation",
+  "enum": "La valeur sélectionnée pour {field} est invalide",
+  "number": "Le champ {field} doit être un nombre",
+  "boolean": "Le champ {field} doit être vrai ou faux",
+  "uuid": "Le champ {field} doit être un UUID valide",
+  "url": "Le champ {field} doit être une URL valide",
+  "date": "Le champ {field} doit être une date valide",
+  "string": "Le champ {field} doit être une chaîne de caractères"
+}

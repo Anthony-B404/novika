@@ -1,0 +1,30 @@
+{
+  "verification": {
+    "subject": "Vérifiez votre adresse email",
+    "preview": "Vérifiez votre adresse email pour activer votre compte",
+    "title": "Vérification de votre compte",
+    "greeting": "Bonjour",
+    "intro": "Merci de votre inscription. Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous.",
+    "button": "Vérifier mon email",
+    "outro": "Si vous n'avez pas créé de compte, aucune action supplémentaire n'est requise."
+  },
+  "invitation": {
+    "subject": "Invitation à rejoindre {organization}",
+    "preview": "Vous avez été invité à rejoindre {organization}",
+    "title": "👋 Vous avez reçu une invitation",
+    "greeting": "Bonjour",
+    "intro": "Vous avez été invité à rejoindre {organization}.",
+    "button": "Accepter l'invitation",
+    "closing": "Cordialement",
+    "outro": "Cette invitation expirera le {expiresAt}.",
+    "footer": "Si vous n'attendiez pas cette invitation, vous pouvez ignorer cet email."
+  },
+  "password_reset": {
+    "subject": "Réinitialisation de votre mot de passe",
+    "greeting": "Bonjour {name}",
+    "intro": "Vous recevez cet email car nous avons reçu une demande de réinitialisation de mot de passe pour votre compte.",
+    "button": "Réinitialiser le mot de passe",
+    "outro": "Ce lien de réinitialisation expirera dans {minutes} minutes.",
+    "footer": "Si vous n'avez pas demandé de réinitialisation de mot de passe, aucune action supplémentaire n'est requise."
+  }
+}

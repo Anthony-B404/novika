@@ -2,10 +2,10 @@
   <mjml>
     <mj-head>
       <mj-title>
-        Log in with this magic link
+        {{ i18n.t('emails.invitation.subject', { organization: organizationName }) }}
       </mj-title>
       <mj-preview>
-        Log in with this magic link.
+        {{ i18n.t('emails.invitation.preview', { organization: organizationName }) }}
       </mj-preview>
       <mj-attributes>
         <mj-all
@@ -19,11 +19,11 @@
         <mj-column>
           <mj-image width="48px" height="48px" src="{{ organizationLogo }}" alt="{{ organizationName }}" />
           <mj-text font-size="28px" font-weight="bold" padding-top="48px">
-            👋 Vous avez reçu une invitation
+            {{ i18n.t('emails.invitation.title') }}
           </mj-text>
           <mj-text>
-            Bonjour,<br />            <br />
-            Vous avez été invité à rejoindre {{ organizationName }}.
+            {{ i18n.t('emails.invitation.greeting') }},<br />            <br />
+            {{ i18n.t('emails.invitation.intro', { organization: organizationName }) }}
           </mj-text>
           <mj-button
             href="http://localhost:3000/invitation/{{ identifier }}"
@@ -33,10 +33,10 @@
             border-radius="0.25rem"
             padding-top="24px"
           >
-            Accepter l'invitation
+            {{ i18n.t('emails.invitation.button') }}
           </mj-button>
           <mj-text>
-            Cordialement,<br />- {{ organizationName }}
+            {{ i18n.t('emails.invitation.closing') }},<br />- {{ organizationName }}
           </mj-text>
           <mj-divider border-color="hsl(214.3, 31.8%, 91.4%)" border-width="1px" padding-top="48px" />
           <mj-image width="32px" height="32px" src="{{ organizationLogo }}" alt="{{ organizationName }}" />

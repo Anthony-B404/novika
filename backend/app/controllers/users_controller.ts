@@ -12,7 +12,7 @@ export default class AuthController {
     return response.created(user)
   }
 
-  public async login({ request, response }: HttpContext) {
+  public async login({ request, response, i18n }: HttpContext) {
     const { email, password } = request.only(['email', 'password'])
 
     try {
@@ -20,14 +20,14 @@ export default class AuthController {
       const token = await User.accessTokens.create(user)
       return response.ok({ user, token })
     } catch {
-      return response.unauthorized('Invalid credentials')
+      return response.unauthorized({ message: i18n.t('messages.auth.invalid_credentials') })
     }
   }
 
-  public async logout({ auth, response }: HttpContext) {
+  public async logout({ auth, response, i18n }: HttpContext) {
     const token = auth.user!.currentAccessToken
     await User.accessTokens.delete(auth.user!, token.identifier)
-    return response.ok({ message: 'Logged out' })
+    return response.ok({ message: i18n.t('messages.auth.logout_success') })
   }
 
   public async me({ auth, response }: HttpContext) {
@@ -35,15 +35,15 @@ export default class AuthController {
     return response.ok(user)
   }
 
-  public async checkToken({ response }: HttpContext) {
-    return response.ok({ message: 'Token is valid' })
+  public async checkToken({ response, i18n }: HttpContext) {
+    return response.ok({ message: i18n.t('messages.auth.token_valid') })
   }
 
-  public async verifyEmail({ params, response }: HttpContext) {
+  public async verifyEmail({ params, response, i18n }: HttpContext) {
     const { token } = params
     const user = await User.findBy('verification_token', token)
     if (!user) {
-      return response.notFound({ message: 'User not found' })
+      return response.notFound({ message: i18n.t('messages.user.not_found') })
     }
     user.verificationToken = null
     user.emailVerified = true
@@ -51,10 +51,10 @@ export default class AuthController {
     return response.ok({ user })
   }
 
-  public async resendVerification({ auth, response }: HttpContext) {
+  public async resendVerification({ auth, response, i18n }: HttpContext) {
     const user = await User.findBy('id', auth.user!.id)
     if (!user) {
-      return response.notFound({ message: 'User not found' })
+      return response.notFound({ message: i18n.t('messages.user.not_found') })
     }
 
     user.verificationToken = randomUUID()
@@ -65,19 +65,20 @@ export default class AuthController {
         message
           .to(user.email)
           .from('onboarding@resend.dev')
-          .subject('Verifiez votre adresse email')
+          .subject(i18n.t('emails.verification.subject'))
           .htmlView('emails/verify_email', {
             token: user.verificationToken,
+            i18n: i18n,
           })
       })
     } catch (errors) {
       return response.status(422).json({
-        message: "Erreur d'envoie de mail",
+        message: i18n.t('messages.errors.email_send_failed'),
         errors: errors,
       })
     }
 
-    return response.ok({ message: 'Verification email sent' })
+    return response.ok({ message: i18n.t('messages.auth.verification_sent') })
   }
 
   public async checkEmailVerification({ auth, response }: HttpContext) {
@@ -85,19 +86,19 @@ export default class AuthController {
     return response.ok({ emailVerified: user?.emailVerified })
   }
 
-  public async deleteMember({ params, response }: HttpContext) {
+  public async deleteMember({ params, response, i18n }: HttpContext) {
     const { id } = params
 
     const user = await User.find(id)
     if (!user) {
-      return response.notFound({ message: 'User not found' })
+      return response.notFound({ message: i18n.t('messages.user.not_found') })
     }
     try {
       await user.delete()
-      return response.ok({ message: 'Member deleted' })
+      return response.ok({ message: i18n.t('messages.user.deleted') })
     } catch (error) {
       return response.status(500).json({
-        message: "Erreur lors de la suppression de l'utilisateur",
+        message: i18n.t('messages.errors.user_delete_failed'),
         errors: error.messages,
       })
     }
