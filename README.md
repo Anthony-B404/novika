@@ -10,7 +10,7 @@ Un boilerplate moderne et prêt à l'emploi pour créer des applications SaaS mu
 - 👥 **Gestion des Invitations** - Inviter des membres à rejoindre une organisation
 - ✉️ **Vérification Email** - Processus de vérification des emails utilisateurs
 - 🎨 **UI Moderne** - Nuxt UI avec Tailwind CSS v4
-- 🌐 **Internationalisation** - @nuxtjs/i18n configuré en français par défaut
+- 🌐 **Internationalisation** - i18n frontend (@nuxtjs/i18n) et backend (@adonisjs/i18n) avec français et anglais
 - 📱 **Responsive** - Design adaptatif pour tous les écrans
 - 🔄 **State Management** - Pinia pour la gestion d'état
 - ✅ **Validation** - Zod (frontend) + VineJS (backend)
@@ -35,6 +35,7 @@ Un boilerplate moderne et prêt à l'emploi pour créer des applications SaaS mu
 - **Mail**: @adonisjs/mail 9.2.2 + Resend
 - **Validation**: @vinejs/vine 4.1.0
 - **Authorization**: @adonisjs/bouncer 3.1.6
+- **i18n**: @adonisjs/i18n 2.2.3 (français et anglais)
 - **Templating**: Edge.js 6.3.0 + MJML 4.16.1
 
 ## 🏗️ Structure du Projet
@@ -60,7 +61,9 @@ Un boilerplate moderne et prêt à l'emploi pour créer des applications SaaS mu
     │   │   ├── users_controller.ts
     │   │   ├── organizations_controller.ts
     │   │   └── invitations_controller.ts
-    │   ├── middleware/   # Middleware auth
+    │   ├── middleware/   # Middleware auth & i18n
+    │   │   ├── auth_middleware.ts
+    │   │   └── detect_user_locale_middleware.ts
     │   ├── models/
     │   │   ├── user.ts
     │   │   ├── organization.ts
@@ -68,10 +71,17 @@ Un boilerplate moderne et prêt à l'emploi pour créer des applications SaaS mu
     │   ├── policies/     # Policies d'autorisation
     │   └── validators/   # Validateurs VineJS
     ├── config/           # Configuration
+    │   └── i18n.ts       # Config i18n
     ├── database/
     │   └── migrations/   # Migrations DB
+    ├── resources/
+    │   ├── lang/         # Fichiers de traduction
+    │   │   ├── en/       # Anglais
+    │   │   └── fr/       # Français
+    │   └── views/        # Templates Email Edge.js
     └── start/
-        └── routes.ts     # Routes API
+        ├── routes.ts     # Routes API
+        └── validator.ts  # Config validation i18n
 ```
 
 ## 🚦 Démarrage Rapide
@@ -236,6 +246,52 @@ pnpm dev
      "password": "password"
    }
    ```
+
+## 🌐 Internationalisation Backend
+
+### Fonctionnement
+
+Le backend détecte automatiquement la langue de l'utilisateur via l'en-tête HTTP `Accept-Language` et retourne les messages dans la langue appropriée (français ou anglais).
+
+### Fichiers de Traduction
+
+Les traductions sont organisées dans `backend/resources/lang/`:
+
+```
+backend/resources/lang/
+├── en/
+│   ├── messages.json    # Messages applicatifs
+│   ├── emails.json      # Contenu des emails
+│   └── validation.json  # Messages de validation
+└── fr/
+    ├── messages.json
+    ├── emails.json
+    └── validation.json
+```
+
+### Utilisation dans les Controllers
+
+```typescript
+public async login({ i18n, response }: HttpContext) {
+  return response.unauthorized({
+    message: i18n.t('messages.auth.invalid_credentials')
+  })
+}
+```
+
+### Utilisation dans les Templates Email
+
+```edge
+<mj-text>
+  {{ i18n.t('emails.verification.welcome') }}
+</mj-text>
+```
+
+### Ajouter une Nouvelle Traduction
+
+1. Ajouter la clé dans `backend/resources/lang/en/messages.json`
+2. Ajouter la traduction dans `backend/resources/lang/fr/messages.json`
+3. Utiliser `i18n.t('category.key')` dans votre code
 
 ## 📧 Configuration Email (Resend)
 

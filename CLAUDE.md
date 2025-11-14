@@ -26,6 +26,7 @@ This Project is a multi-tenant SaaS boilerplate with Nuxt 4 frontend and AdonisJ
 - **Authorization**: @adonisjs/bouncer v3 with policies
 - **Validation**: VineJS (@vinejs/vine)
 - **Email**: @adonisjs/mail with Resend integration
+- **i18n**: @adonisjs/i18n v2.2.3 with French and English support
 - **Templating**: Edge.js for email templates, MJML for email layouts
 
 ## Development Commands
@@ -82,6 +83,19 @@ node ace generate:key               # Generate APP_KEY
 - **Expiration**: Invitations expire after set period (`expiresAt`)
 - **Flow**: Create → Check validity → Accept (creates new user + links to organization)
 - **Email Notifications**: Automatically sent via Resend when invitation created
+
+### Internationalization (i18n)
+
+- **Auto-detection**: Middleware `detect_user_locale_middleware.ts` reads `Accept-Language` header
+- **Supported Languages**: French (default) and English
+- **Translation Files**: Located in `backend/resources/lang/{locale}/`
+  - `messages.json`: Application messages (auth, errors, success messages)
+  - `emails.json`: Email content and subjects
+  - `validation.json`: VineJS validation error messages
+- **Usage in Controllers**: Access via `i18n` from HttpContext: `i18n.t('messages.auth.invalid_credentials')`
+- **Usage in Templates**: Pass `i18n` to Edge templates and use: `{{ i18n.t('emails.verification.subject') }}`
+- **Validation Integration**: VineJS automatically uses i18n messages via `start/validator.ts`
+- **Critical Rule**: ALWAYS use `i18n.t()` for user-facing messages, never hardcode strings
 
 ### Frontend Architecture (Nuxt 4 Structure)
 
@@ -176,3 +190,12 @@ API_URL=http://localhost:3333
 - Use `defineNuxtConfig` with `compatibilityDate`
 - Layouts must be in `app/layouts/`
 - Components auto-imported from `app/components/`
+
+### Internationalization (i18n)
+
+- **NEVER** hardcode user-facing messages in controllers or templates
+- Always use `i18n.t('category.key')` for all messages
+- When adding new messages, update BOTH `en/` and `fr/` translation files
+- Pass `i18n` to Edge templates when rendering emails: `htmlView('emails/template', { i18n })`
+- Test with different `Accept-Language` headers to verify translations work
+- Translation keys follow pattern: `{file}.{category}.{message}` (e.g., `messages.auth.invalid_credentials`)
