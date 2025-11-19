@@ -2,10 +2,10 @@
   <mjml>
     <mj-head>
       <mj-title>
-        {{ i18n.t('emails.verification.subject') }}
+        {{ i18n.t('emails.login_magic_link.subject') }}
       </mj-title>
       <mj-preview>
-        {{ i18n.t('emails.verification.preview') }}
+        {{ i18n.t('emails.login_magic_link.preview') }}
       </mj-preview>
       <mj-attributes>
         <mj-all
@@ -18,22 +18,28 @@
       <mj-section>
         <mj-column>
           <mj-text font-size="28px" font-weight="bold" padding-top="48px">
-            {{ i18n.t('emails.verification.title') }}
+            {{ i18n.t('emails.login_magic_link.title') }}
           </mj-text>
           <mj-text>
-            {{ i18n.t('emails.verification.greeting') }},<br />
-            {{ i18n.t('emails.verification.intro') }}
+            {{ i18n.t('emails.login_magic_link.greeting') }},<br />
+            {{ i18n.t('emails.login_magic_link.intro') }}
           </mj-text>
           <mj-button
-            href="http://localhost:3000/verify-email/{{ token }}"
+            href="http://localhost:3000/verify-login?token={{ token }}"
             target="_blank"
             background-color="hsl(221.2, 83.2%, 53.3%)"
             color="hsl(210, 40%, 98%)"
             border-radius="0.25rem"
             padding-top="24px"
           >
-            {{ i18n.t('emails.verification.button') }}
+            {{ i18n.t('emails.login_magic_link.button') }}
           </mj-button>
+          <mj-text padding-top="24px" color="hsl(0, 0%, 45%)">
+            {{ i18n.t('emails.login_magic_link.expiry') }}
+          </mj-text>
+          <mj-text padding-top="12px" font-size="14px" color="hsl(0, 0%, 55%)">
+            {{ i18n.t('emails.login_magic_link.outro') }}
+          </mj-text>
         </mj-column>
       </mj-section>
     </mj-body>

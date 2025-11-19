@@ -37,7 +37,7 @@ export default class OrganizationsController {
 
       const userData = JSON.parse(request.input('user'))
       userData.organizationId = organization.id
-      userData.emailVerified = false
+      userData.onboardingCompleted = false
       userData.verificationToken = randomUUID()
 
       let user

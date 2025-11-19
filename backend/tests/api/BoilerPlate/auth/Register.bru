@@ -1,0 +1,42 @@
+meta {
+  name: Register
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/register/request-magic-link
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept-Language: en
+}
+
+body:json {
+  {
+    "email": "betteanthony73@gmail.com"
+  }
+}
+
+tests {
+  test("should send magic link successfully", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('message');
+  });
+}
+
+docs {
+  # Request Magic Link for Registration
+  
+  This endpoint replaces the old /signup endpoint.
+  It sends a magic link to the user's email instead of requiring a password.
+  
+  **Next steps:**
+  1. Check email for magic link
+  2. Use VerifyMagicLink to verify the token
+  3. Use CompleteRegistration to finish signup
+}

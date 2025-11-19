@@ -11,7 +11,7 @@
 
     <UPageCard
       variant="subtle"
-      class="max-w-sm w-full"
+      class="max-w-lg w-full"
     >
       <slot />
     </UPageCard>

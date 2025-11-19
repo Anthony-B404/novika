@@ -9,7 +9,20 @@
     "email_not_verified": "Please verify your email address before continuing",
     "verification_sent": "A verification email has been sent",
     "email_verified": "Email verified successfully",
-    "token_valid": "Token is valid"
+    "token_valid": "Token is valid",
+    "registration": {
+      "magic_link_sent": "A magic link has been sent to your email address. Please check your inbox.",
+      "token_invalid": "This registration link is invalid",
+      "token_expired": "This registration link has expired. Please request a new link."
+    },
+    "login": {
+      "magic_link_sent": "A login link has been sent to your email address",
+      "user_not_found": "No account found with this email address",
+      "onboarding_not_completed": "Please complete your registration first",
+      "token_invalid": "This login link is invalid",
+      "token_expired": "This login link has expired. Please request a new link.",
+      "success": "Login successful"
+    }
   },
   "organization": {
     "created": "Organization created successfully",

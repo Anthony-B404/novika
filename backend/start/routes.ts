@@ -20,17 +20,20 @@ router.get('/', async () => {
   }
 })
 
-// Public routes
-router.post('/register', [UsersController, 'register'])
-router.post('/login', [UsersController, 'login'])
-router.post('/signup', [OrganizationsController, 'signupWithOrganization'])
+// Public routes - Registration flow
+router.post('/register/request-magic-link', [UsersController, 'registerWithMagicLink'])
+router.post('/register/complete', [UsersController, 'completeRegistration'])
+
+// Public routes - Login flow
+router.post('/login/request-magic-link', [UsersController, 'loginWithMagicLink'])
+
+// Public route - Verify magic link (handles both registration and login)
+router.get('/verify-magic-link/:token', [UsersController, 'verifyMagicLink'])
 
 router.get('/organization-logo/:logo', [OrganizationsController, 'getOrganizationLogo'])
 
 router.get('/check-invitation/:identifier', [InvitationsController, 'checkInvitation'])
 router.post('/accept-invitation', [InvitationsController, 'acceptInvitation'])
-
-router.get('/verify-email/:token', [UsersController, 'verifyEmail'])
 
 // Protected routes
 router
@@ -39,8 +42,6 @@ router
     router.post('/logout', [UsersController, 'logout'])
     router.get('/me', [UsersController, 'me'])
     router.get('/check-token', [UsersController, 'checkToken'])
-    router.post('/resend-verification', [UsersController, 'resendVerification'])
-    router.get('/check-email-verification', [UsersController, 'checkEmailVerification'])
     router.delete('/delete-member/:id', [UsersController, 'deleteMember'])
 
     // Organization routes

@@ -1,4 +1,14 @@
 {
+  "registration_magic_link": {
+    "subject": "Finalisez votre inscription",
+    "preview": "Cliquez sur le lien pour finaliser votre inscription",
+    "title": "Bienvenue ! Finalisez votre inscription",
+    "greeting": "Bonjour",
+    "intro": "Merci de votre intérêt. Pour finaliser votre inscription et créer votre organisation, veuillez cliquer sur le bouton ci-dessous.",
+    "button": "Finaliser mon inscription",
+    "expiry": "⏱️ Ce lien expire dans 15 minutes",
+    "outro": "Si vous n'avez pas demandé cette inscription, vous pouvez ignorer cet email."
+  },
   "verification": {
     "subject": "Vérifiez votre adresse email",
     "preview": "Vérifiez votre adresse email pour activer votre compte",
@@ -26,5 +36,15 @@
     "button": "Réinitialiser le mot de passe",
     "outro": "Ce lien de réinitialisation expirera dans {minutes} minutes.",
     "footer": "Si vous n'avez pas demandé de réinitialisation de mot de passe, aucune action supplémentaire n'est requise."
+  },
+  "login_magic_link": {
+    "subject": "Connexion à votre compte",
+    "preview": "Cliquez pour vous connecter en toute sécurité",
+    "title": "Connexion à votre compte",
+    "greeting": "Bonjour",
+    "intro": "Cliquez sur le bouton ci-dessous pour vous connecter en toute sécurité à votre compte.",
+    "button": "Se connecter",
+    "expiry": "⏱️ Ce lien expire dans 15 minutes",
+    "outro": "Si vous n'avez pas demandé cette connexion, vous pouvez ignorer cet email."
   }
 }

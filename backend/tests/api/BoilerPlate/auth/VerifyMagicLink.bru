@@ -1,0 +1,64 @@
+meta {
+  name: VerifyMagicLink
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/verify-magic-link/{{magicLinkToken}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept-Language: en
+}
+
+vars:pre-request {
+  magicLinkToken: PASTE_TOKEN_FROM_EMAIL_HERE
+}
+
+tests {
+  test("should verify magic link token successfully", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+
+    // Check if this is a login flow (onboardingCompleted=true)
+    if (data.user && data.token) {
+      // Login flow - should have user and access token
+      expect(data).to.have.property('user');
+      expect(data).to.have.property('token');
+      expect(data).to.have.property('message');
+      expect(data.user.onboardingCompleted).to.equal(true);
+
+      // Store access token for authenticated requests
+      env.set('accessToken', data.token.token);
+    } else {
+      // Registration flow - should have email and token
+      expect(data).to.have.property('email');
+      expect(data).to.have.property('token');
+
+      // Store token for next request (CompleteRegistration)
+      env.set('magicLinkToken', data.token);
+    }
+  });
+}
+
+docs {
+  # Verify Magic Link Token (Registration or Login)
+
+  This endpoint verifies that the magic link token is valid and not expired.
+  It handles both registration and login flows automatically:
+  - If onboardingCompleted=true → returns access token (login)
+  - If onboardingCompleted=false → returns email+token for completing registration
+
+  **Before running:**
+  1. Copy the token from the magic link email
+  2. Replace PASTE_TOKEN_FROM_EMAIL_HERE in the vars:pre-request section
+
+  **Next steps (for registration):**
+  3. Use the CompleteRegistration request to finish the signup process
+
+  **Next steps (for login):**
+  3. Use the returned access token for authenticated requests
+}

@@ -231,10 +231,8 @@
     },
     "signup": {
       "title": "Créer un compte",
-      "description": "Entrez vos informations et nous vous enverrons un lien magique pour finaliser l'inscription. Vous avez déjà un compte ?",
+      "description": "Entrez votre email et nous vous enverrons un lien magique pour finaliser l'inscription",
       "loginLink": "Se connecter",
-      "name": "Nom",
-      "namePlaceholder": "Entrez votre nom",
       "email": "Email",
       "emailPlaceholder": "Entrez votre email",
       "submitButton": "Envoyer le lien magique",
@@ -242,12 +240,45 @@
       "successDescription": "Vérifiez votre email à {email} pour finaliser l'inscription",
       "error": "Erreur",
       "errorDescription": "Échec de l'envoi du lien magique. Veuillez réessayer.",
-      "footer": "En vous inscrivant, vous acceptez nos",
-      "termsOfService": "Conditions d'utilisation"
+      "footer": "En vous inscrivant, vous acceptez nos conditions d'utilisation"
+    },
+    "completeSignup": {
+      "title": "Finaliser votre inscription",
+      "description": "Créez votre organisation pour commencer",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Entrez votre prénom",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Entrez votre nom",
+      "organizationName": "Nom de l'organisation",
+      "organizationNamePlaceholder": "Ma super entreprise",
+      "logo": "Logo de l'organisation (optionnel)",
+      "submitButton": "Créer mon organisation",
+      "success": "Organisation créée !",
+      "successDescription": "Bienvenue dans votre nouvelle organisation",
+      "error": "Erreur",
+      "errorDescription": "Échec de la création de l'organisation. Veuillez réessayer.",
+      "noToken": "Lien invalide. Veuillez recommencer l'inscription.",
+      "invalidToken": "Ce lien est invalide ou a expiré",
+      "verifying": "Vérification du lien..."
+    },
+    "verifyLogin": {
+      "verifying": "Vérification de votre lien de connexion",
+      "pleaseWait": "Veuillez patienter pendant que nous vous connectons...",
+      "success": "Connexion réussie !",
+      "successDescription": "Bon retour",
+      "error": "Erreur",
+      "noToken": "Lien invalide. Veuillez demander un nouveau lien de connexion.",
+      "invalidToken": "Ce lien est invalide ou a expiré"
     },
     "validation": {
-      "nameRequired": "Le nom est requis",
-      "invalidEmail": "Email invalide"
+      "emailRequired": "L'email est requis",
+      "firstNameRequired": "Le prénom est requis",
+      "firstNameTooShort": "Le prénom doit contenir au moins 2 caractères",
+      "lastNameRequired": "Le nom est requis",
+      "lastNameTooShort": "Le nom doit contenir au moins 2 caractères",
+      "invalidEmail": "Email invalide",
+      "organizationNameRequired": "Le nom de l'organisation est requis",
+      "organizationNameTooShort": "Le nom de l'organisation doit contenir au moins 2 caractères"
     }
   },
   "dashboard": {
@@ -324,6 +355,14 @@
     "signup": {
       "title": "Inscription",
       "description": "Créez un compte pour commencer"
+    },
+    "completeSignup": {
+      "title": "Finaliser votre inscription",
+      "description": "Créez votre organisation et finalisez votre inscription"
+    },
+    "verifyLogin": {
+      "title": "Vérification de la connexion",
+      "description": "Vérification de votre lien de connexion"
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -430,7 +469,7 @@
         "description": "Ajouter un nouveau client à la base de données",
         "button": "Nouveau client",
         "namePlaceholder": "Jean Dupont",
-        "emailPlaceholder": "jean.dupont[at]exemple.com",
+        "emailPlaceholder": "Entrez votre email",
         "successTitle": "Succès",
         "successDescription": "Nouveau client {name} ajouté",
         "validation": {

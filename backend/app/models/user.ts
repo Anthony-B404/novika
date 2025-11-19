@@ -1,23 +1,15 @@
 import { DateTime } from 'luxon'
-import hash from '@adonisjs/core/services/hash'
-import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
-import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Organization from './organization.js'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-
-const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
-  uids: ['email'],
-  passwordColumnName: 'password',
-})
 
 export enum UserRole {
   Owner = 1,
   Member = 2,
 }
 
-export default class User extends compose(BaseModel, AuthFinder) {
+export default class User extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
@@ -25,10 +17,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare fullName: string | null
 
   @column()
-  declare email: string
+  declare firstName: string | null
 
-  @column({ serializeAs: null })
-  declare password: string
+  @column()
+  declare lastName: string | null
+
+  @column()
+  declare email: string
 
   @column()
   declare role: UserRole
@@ -49,10 +44,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare organization: BelongsTo<typeof Organization>
 
   @column()
-  declare emailVerified: boolean
+  declare onboardingCompleted: boolean
 
   @column()
-  declare verificationToken: string | null
+  declare magicLinkToken: string | null
+
+  @column.dateTime()
+  declare magicLinkExpiresAt: DateTime | null
 
   declare isCurrentUser?: boolean
 

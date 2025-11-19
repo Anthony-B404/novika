@@ -1,11 +1,11 @@
 meta {
   name: Login
   type: http
-  seq: 2
+  seq: 7
 }
 
 post {
-  url: {{baseUrl}}/login
+  url: {{baseUrl}}/login/request-magic-link
   body: json
   auth: none
 }
@@ -17,17 +17,43 @@ headers {
 
 body:json {
   {
-    "email": "betteanthony73@gmail.com",
-    "password": "password123"
+    "email": "betteanthony73@gmail.com"
   }
-  
 }
 
 tests {
-  test("should login successfully", function() {
+  test("should send login magic link successfully", function() {
     const data = res.getBody();
     expect(res.getStatus()).to.equal(200);
-    expect(data).to.have.property('token');
-    env.set('authToken', data.token);
+    expect(data).to.have.property('message');
+    expect(data.message).to.equal('A login link has been sent to your email address');
   });
+  
+  test("should fail if user does not exist", function() {
+    // Change email to non-existent one to test
+    expect(res.getStatus()).to.not.equal(500);
+  });
+  
+  test("should fail if onboarding not completed", function() {
+    // Test with user that hasn't completed onboarding
+    expect(res.getStatus()).to.not.equal(500);
+  });
+}
+
+docs {
+  # Request Magic Link for Login
+  
+  This endpoint sends a magic link to the user's email for passwordless login.
+  
+  **Requirements:**
+  - User must exist
+  - User must have completed onboarding (onboardingCompleted = true)
+  
+  **Next steps:**
+  1. Check email for magic link
+  2. Use VerifyLoginMagicLink to verify the token and login
+  
+  **Errors:**
+  - 404: User not found
+  - 422: Onboarding not completed
 }

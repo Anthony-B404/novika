@@ -133,7 +133,7 @@ export default class InvitationsController {
       organizationId: invitation.organizationId,
       isOwner: false,
       verificationToken: null,
-      emailVerified: true,
+      onboardingCompleted: true,
     }
 
     try {

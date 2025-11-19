@@ -1,6 +1,38 @@
 import vine from '@vinejs/vine'
 import { UserRole } from '#models/user'
 
+// Validator for registration request (initial signup - step 1)
+export const registrationRequestValidator = vine.compile(
+  vine.object({
+    email: vine
+      .string()
+      .email()
+      .unique(async (db, value) => {
+        const user = await db.from('users').where('email', value).first()
+        // Allow if no user exists OR if user exists but onboarding not completed
+        return !user || !user.onboarding_completed
+      }),
+  })
+)
+
+// Validator for complete registration (step 2 with organization details)
+export const completeRegistrationValidator = vine.compile(
+  vine.object({
+    magicLinkToken: vine.string().uuid(),
+    firstName: vine.string().minLength(2),
+    lastName: vine.string().minLength(2),
+    organizationName: vine.string().minLength(2),
+  })
+)
+
+// Validator for login request with magic link
+export const loginRequestValidator = vine.compile(
+  vine.object({
+    email: vine.string().email(),
+  })
+)
+
+// Keep registerValidator for backward compatibility (invitations, etc.)
 export const registerValidator = vine.compile(
   vine.object({
     email: vine
@@ -10,21 +42,12 @@ export const registerValidator = vine.compile(
         const user = await db.from('users').where('email', value).first()
         return !user
       }),
-    password: vine.string().minLength(8),
     fullName: vine.string(),
     role: vine.enum(
       Object.values(UserRole).filter((value) => typeof value === 'number') as number[]
     ),
     organizationId: vine.number(),
     isOwner: vine.boolean(),
-    emailVerified: vine.boolean({ strict: true }),
-    verificationToken: vine.string().uuid().optional(),
-  })
-)
-
-export const loginValidator = vine.compile(
-  vine.object({
-    email: vine.string().email(),
-    password: vine.string(),
+    onboardingCompleted: vine.boolean({ strict: true }),
   })
 )

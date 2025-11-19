@@ -1,0 +1,51 @@
+meta {
+  name: CompleteRegistration
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/register/complete
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  Accept-Language: en
+}
+
+body:multipart-form {
+  magicLinkToken: {{magicLinkToken}}
+  firstName: Test
+  lastName: User
+  organizationName: Test Organization
+  logo: @file(logo test.png)
+}
+
+tests {
+  test("should complete registration successfully", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('token');
+    expect(data).to.have.property('user');
+
+    // Store auth token for authenticated requests
+    env.set('authToken', data.token.token);
+  });
+}
+
+docs {
+  # Step 3: Complete Registration
+
+  This endpoint completes the registration by creating the organization and linking the user.
+
+  **Prerequisites:**
+  1. The magicLinkToken must be set from the VerifyMagicLink request
+  2. Optionally, add a logo file
+
+  **After completion:**
+  - The user and organization are created
+  - An authentication token is returned
+  - The token is stored in the environment as 'authToken' for use in protected routes
+}

@@ -5,8 +5,12 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 const { t } = useI18n();
 
 const schema = z.object({
-  name: z.string().min(2, t('components.customers.addModal.validation.nameTooShort')),
-  email: z.string().email(t('components.customers.addModal.validation.invalidEmail')),
+  name: z
+    .string()
+    .min(2, t("components.customers.addModal.validation.nameTooShort")),
+  email: z
+    .string()
+    .email(t("components.customers.addModal.validation.invalidEmail")),
 });
 const open = ref(false);
 
@@ -20,8 +24,10 @@ const state = reactive<Partial<Schema>>({
 const toast = useToast();
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   toast.add({
-    title: t('components.customers.addModal.successTitle'),
-    description: t('components.customers.addModal.successDescription', { name: event.data.name }),
+    title: t("components.customers.addModal.successTitle"),
+    description: t("components.customers.addModal.successDescription", {
+      name: event.data.name,
+    }),
     color: "success",
   });
   open.value = false;
@@ -34,7 +40,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     :title="t('components.customers.addModal.title')"
     :description="t('components.customers.addModal.description')"
   >
-    <UButton :label="t('components.customers.addModal.button')" icon="i-lucide-plus" />
+    <UButton
+      :label="t('components.customers.addModal.button')"
+      icon="i-lucide-plus"
+    />
 
     <template #body>
       <UForm
@@ -43,15 +52,19 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         class="space-y-4"
         @submit="onSubmit"
       >
-        <UFormField :label="t('common.labels.name')" :placeholder="t('components.customers.addModal.namePlaceholder')" name="name">
-          <UInput v-model="state.name" class="w-full" />
+        <UFormField :label="t('common.labels.name')" name="name">
+          <UInput
+            v-model="state.name"
+            :placeholder="t('components.customers.addModal.namePlaceholder')"
+            class="w-full"
+          />
         </UFormField>
-        <UFormField
-          :label="t('common.labels.email')"
-          :placeholder="t('components.customers.addModal.emailPlaceholder')"
-          name="email"
-        >
-          <UInput v-model="state.email" class="w-full" />
+        <UFormField :label="t('common.labels.email')" name="email">
+          <UInput
+            v-model="state.email"
+            :placeholder="t('components.customers.addModal.emailPlaceholder')"
+            class="w-full"
+          />
         </UFormField>
         <div class="flex justify-end gap-2">
           <UButton

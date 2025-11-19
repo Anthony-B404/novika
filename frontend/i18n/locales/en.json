@@ -241,10 +241,8 @@
     },
     "signup": {
       "title": "Create an account",
-      "description": "Enter your details and we'll send you a magic link to complete signup. Already have an account?",
+      "description": "Enter your email and we'll send you a magic link to complete signup",
       "loginLink": "Login",
-      "name": "Name",
-      "namePlaceholder": "Enter your name",
       "email": "Email",
       "emailPlaceholder": "Enter your email",
       "submitButton": "Send magic link",
@@ -252,12 +250,45 @@
       "successDescription": "Check your email at {email} to complete signup",
       "error": "Error",
       "errorDescription": "Failed to send magic link. Please try again.",
-      "footer": "By signing up, you agree to our",
-      "termsOfService": "Terms of Service"
+      "footer": "By signing up, you agree to our terms of service"
+    },
+    "completeSignup": {
+      "title": "Complete your registration",
+      "description": "Create your organization to get started",
+      "firstName": "First name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Enter your last name",
+      "organizationName": "Organization name",
+      "organizationNamePlaceholder": "My awesome company",
+      "logo": "Organization logo (optional)",
+      "submitButton": "Create my organization",
+      "success": "Organization created!",
+      "successDescription": "Welcome to your new organization",
+      "error": "Error",
+      "errorDescription": "Failed to create organization. Please try again.",
+      "noToken": "Invalid link. Please restart the signup process.",
+      "invalidToken": "This link is invalid or has expired",
+      "verifying": "Verifying link..."
+    },
+    "verifyLogin": {
+      "verifying": "Verifying your login link",
+      "pleaseWait": "Please wait while we log you in...",
+      "success": "Login successful!",
+      "successDescription": "Welcome back",
+      "error": "Error",
+      "noToken": "Invalid link. Please request a new login link.",
+      "invalidToken": "This link is invalid or has expired"
     },
     "validation": {
-      "nameRequired": "Name is required",
-      "invalidEmail": "Invalid email"
+      "emailRequired": "Email is required",
+      "firstNameRequired": "First name is required",
+      "firstNameTooShort": "First name must be at least 2 characters",
+      "lastNameRequired": "Last name is required",
+      "lastNameTooShort": "Last name must be at least 2 characters",
+      "invalidEmail": "Invalid email",
+      "organizationNameRequired": "Organization name is required",
+      "organizationNameTooShort": "Organization name must be at least 2 characters"
     }
   },
   "seo": {
@@ -268,6 +299,14 @@
     "signup": {
       "title": "Sign up",
       "description": "Create an account to get started"
+    },
+    "completeSignup": {
+      "title": "Complete your registration",
+      "description": "Create your organization and complete your registration"
+    },
+    "verifyLogin": {
+      "title": "Verify login",
+      "description": "Verifying your login link"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -374,7 +413,7 @@
         "description": "Add a new customer to the database",
         "button": "New customer",
         "namePlaceholder": "John Doe",
-        "emailPlaceholder": "john.doe[at]example.com",
+        "emailPlaceholder": "Enter your email",
         "successTitle": "Success",
         "successDescription": "New customer {name} added",
         "validation": {
