@@ -7,38 +7,62 @@
       <mj-preview>
         {{ i18n.t('emails.registration_magic_link.preview') }}
       </mj-preview>
+      <mj-font name="Public Sans" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" />
       <mj-attributes>
         <mj-all
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif"
+          font-family="'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
         />
-        <mj-text font-size="16px" line-height="26px" color="hsl(222.2, 84%, 4.9%)" />
+        <mj-text font-size="16px" line-height="24px" color="#334155" />
+        <mj-button font-weight="600" font-size="14px" />
       </mj-attributes>
+      <mj-style>
+        .shadow {
+          box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+      </mj-style>
     </mj-head>
-    <mj-body>
-      <mj-section>
+    <mj-body >
+      <mj-section padding-top="48px" padding-bottom="48px">
+        <mj-column width="100%">
+          <!-- Logo or Brand Name could go here -->
+        </mj-column>
+      </mj-section>
+      
+      <mj-section background-color="#ffffff" border-radius="8px" padding="32px 24px" css-class="shadow">
         <mj-column>
-          <mj-text font-size="28px" font-weight="bold" padding-top="48px">
+          <mj-text font-size="24px" font-weight="700" color="#0f172a" padding-bottom="16px">
             {{ i18n.t('emails.registration_magic_link.title') }}
           </mj-text>
-          <mj-text>
-            {{ i18n.t('emails.registration_magic_link.greeting') }},<br />
+          <mj-text color="#334155" padding-bottom="24px">
+            {{ i18n.t('emails.registration_magic_link.greeting') }},<br /><br />
             {{ i18n.t('emails.registration_magic_link.intro') }}
           </mj-text>
           <mj-button
             href="http://localhost:3000/complete-signup?token={{ token }}"
             target="_blank"
-            background-color="hsl(221.2, 83.2%, 53.3%)"
-            color="hsl(210, 40%, 98%)"
-            border-radius="0.25rem"
-            padding-top="24px"
+            background-color="#2563eb"
+            color="#ffffff"
+            border-radius="6px"
+            padding-top="8px"
+            padding-bottom="24px"
+            align="left"
           >
             {{ i18n.t('emails.registration_magic_link.button') }}
           </mj-button>
-          <mj-text padding-top="24px" color="hsl(0, 0%, 45%)">
+          <mj-text font-size="14px" color="#64748b">
             {{ i18n.t('emails.registration_magic_link.expiry') }}
           </mj-text>
-          <mj-text padding-top="12px" font-size="14px" color="hsl(0, 0%, 55%)">
+          <mj-divider border-color="#e2e8f0" border-width="1px" padding-top="32px" padding-bottom="32px" />
+          <mj-text font-size="12px" color="#94a3b8" line-height="1.5">
             {{ i18n.t('emails.registration_magic_link.outro') }}
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <mj-section>
+        <mj-column>
+           <mj-text align="center" font-size="12px" color="#94a3b8" padding-top="24px">
+            &copy; {{ new Date().getFullYear() }} Your Company. All rights reserved.
           </mj-text>
         </mj-column>
       </mj-section>
