@@ -10,6 +10,7 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 const config = useRuntimeConfig();
 const toast = useToast();
+const api = useApi();
 
 const fileRef = ref<HTMLInputElement>();
 
@@ -68,16 +69,13 @@ async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
 
     // Only send request if there are changes
     if (Array.from(formData.keys()).length > 0) {
-      const response = await $fetch<{ message: string; user: any }>(
-        `${config.public.apiUrl}/profile`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
-          body: formData,
+      const response = await api<{ message: string; user: any }>("/profile", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
         },
-      );
+        body: formData,
+      });
 
       // Update user in store
       authStore.setUser(response.user);

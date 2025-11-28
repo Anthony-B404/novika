@@ -60,8 +60,6 @@ Components, composables, and utilities are auto-imported from:
 - `app/composables/` - Composition API functions
 - `app/utils/` - Utility functions
 
-**Note**: No `useApi.ts` or `authStore.ts` in git (removed during migration).
-
 ### Layouts
 
 Three main layouts in `app/layouts/`:
@@ -74,8 +72,28 @@ Use with: `definePageMeta({ layout: 'auth' })`
 ### API Communication
 
 - **Backend URL**: Configured in `.env` as `API_URL=http://localhost:3333`
-- **Authentication**: Use `Authorization: Bearer <token>` header for protected routes
+- **Critical Rule**: ALWAYS use `useApi()` composable for API calls (adds Accept-Language header automatically)
+- **Authentication**: Use `authenticatedFetch` from `useAuth()` for protected routes
 - **Protected Routes**: All `/api/*` backend endpoints require authentication
+
+**Pattern**:
+```typescript
+// Public API calls
+const api = useApi()
+await api('/register/request-magic-link', {
+  method: 'POST',
+  body: { email: 'user@example.com' }
+})
+
+// Authenticated API calls
+const { authenticatedFetch } = useAuth()
+await authenticatedFetch('/profile', {
+  method: 'PUT',
+  body: formData
+})
+```
+
+**⚠️ Do NOT use `$fetch` directly** - it bypasses the Accept-Language header injection which breaks backend i18n.
 
 ### Internationalization (i18n)
 

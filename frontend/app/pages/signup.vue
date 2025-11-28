@@ -5,6 +5,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 const { t } = useI18n();
 const { $localePath } = useNuxtApp();
 const { isAuthenticated } = useAuth();
+const api = useApi();
 
 // Redirect to dashboard if already authenticated
 onMounted(() => {
@@ -68,9 +69,7 @@ type Schema = z.output<typeof schema>;
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
-    const config = useRuntimeConfig();
-
-    await $fetch(`${config.public.apiUrl}/register/request-magic-link`, {
+    await api("/register/request-magic-link", {
       method: "POST",
       body: {
         email: payload.data.email,

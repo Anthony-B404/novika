@@ -5,6 +5,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 const { t } = useI18n();
 const { $localePath } = useNuxtApp();
 const { isAuthenticated } = useAuth();
+const api = useApi();
 
 // Redirect to dashboard if already authenticated
 onMounted(() => {
@@ -23,6 +24,7 @@ useSeoMeta({
 });
 
 const toast = useToast();
+const config = useRuntimeConfig();
 
 const fields = computed(() => [
   {
@@ -33,8 +35,6 @@ const fields = computed(() => [
     required: true,
   },
 ]);
-
-const config = useRuntimeConfig();
 
 const providers = computed(() => [
   {
@@ -69,9 +69,9 @@ type Schema = z.output<typeof schema>;
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
-    await $fetch(`${config.public.apiUrl}/login/request-magic-link`, {
-      method: 'POST',
-      body: { email: payload.data.email }
+    await api("/login/request-magic-link", {
+      method: "POST",
+      body: { email: payload.data.email },
     });
 
     toast.add({

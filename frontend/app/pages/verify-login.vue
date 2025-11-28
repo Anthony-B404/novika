@@ -4,6 +4,7 @@ const route = useRoute();
 const router = useRouter();
 const { $localePath } = useNuxtApp();
 const toast = useToast();
+const api = useApi();
 
 definePageMeta({
   layout: "auth",
@@ -30,11 +31,10 @@ onMounted(async () => {
   }
 
   try {
-    const config = useRuntimeConfig();
     const { login } = useAuth();
 
-    const response = await $fetch<{ token: string }>(
-      `${config.public.apiUrl}/verify-magic-link/${token.value}`,
+    const response = await api<{ token: string }>(
+      `/verify-magic-link/${token.value}`,
     );
 
     // Store token using auth store

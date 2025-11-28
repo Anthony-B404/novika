@@ -8,6 +8,7 @@ const router = useRouter();
 const { $localePath } = useNuxtApp();
 const toast = useToast();
 const { login } = useAuth();
+const api = useApi();
 
 definePageMeta({
   layout: "auth",
@@ -37,9 +38,8 @@ onMounted(async () => {
   }
 
   try {
-    const config = useRuntimeConfig();
-    const response = await $fetch<{ email: string; token: string }>(
-      `${config.public.apiUrl}/verify-magic-link/${token.value}`,
+    const response = await api<{ email: string; token: string }>(
+      `/verify-magic-link/${token.value}`,
     );
 
     userData.value = {
@@ -121,8 +121,6 @@ const state = reactive<Partial<Schema>>({
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
-    const config = useRuntimeConfig();
-
     // Prepare FormData
     const formData = new FormData();
     formData.append("magicLinkToken", token.value);
@@ -134,12 +132,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       formData.append("logo", selectedLogo.value);
     }
 
-    const response = await $fetch<{ token: string; message: string }>(
-      `${config.public.apiUrl}/register/complete`,
+    const response = await api<{ token: string; message: string }>(
+      "/register/complete",
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     // Store token using auth store

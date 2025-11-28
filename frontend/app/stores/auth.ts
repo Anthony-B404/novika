@@ -62,8 +62,8 @@ export const useAuthStore = defineStore("auth", {
       this.loading = true;
 
       try {
-        const config = useRuntimeConfig();
-        const response = await $fetch<User>(`${config.public.apiUrl}/me`, {
+        const api = useApi();
+        const response = await api<User>("/me", {
           headers: {
             Authorization: `Bearer ${this.token}`,
           },
@@ -88,8 +88,8 @@ export const useAuthStore = defineStore("auth", {
       }
 
       try {
-        const config = useRuntimeConfig();
-        await $fetch(`${config.public.apiUrl}/check-token`, {
+        const api = useApi();
+        await api("/check-token", {
           headers: {
             Authorization: `Bearer ${this.token}`,
           },
@@ -116,8 +116,8 @@ export const useAuthStore = defineStore("auth", {
     async logout() {
       if (this.token) {
         try {
-          const config = useRuntimeConfig();
-          await $fetch(`${config.public.apiUrl}/logout`, {
+          const api = useApi();
+          await api("/logout", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${this.token}`,

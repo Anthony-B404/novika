@@ -5,6 +5,7 @@ const router = useRouter();
 const { $localePath } = useNuxtApp();
 const toast = useToast();
 const { fetchUser } = useAuth();
+const api = useApi();
 
 definePageMeta({
   layout: "auth",
@@ -31,9 +32,7 @@ onMounted(async () => {
   }
 
   try {
-    const config = useRuntimeConfig();
-
-    await $fetch(`${config.public.apiUrl}/verify-email-change/${token.value}`);
+    await api(`/verify-email-change/${token.value}`);
 
     // Refresh user data in Pinia store to get updated email
     await fetchUser();

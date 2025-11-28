@@ -27,14 +27,11 @@ export const useAuth = () => {
    */
   const authenticatedFetch = async <T>(
     url: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<T> => {
-    const config = useRuntimeConfig();
-    const fullUrl = url.startsWith("http")
-      ? url
-      : `${config.public.apiUrl}${url}`;
+    const api = useApi();
 
-    return await $fetch<T>(fullUrl, {
+    return await api<T>(url, {
       ...options,
       headers: {
         ...options.headers,

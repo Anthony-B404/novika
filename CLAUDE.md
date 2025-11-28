@@ -104,7 +104,34 @@ node ace generate:key               # Generate APP_KEY
 - **Pages**: `app/pages/` with file-based routing
 - **Components**: `app/components/` for Vue components
 - **Assets**: `app/assets/css/main.css` for global styles
-- **No Composables/Stores in Git**: Removed `useApi.ts` and `authStore.ts` during migration
+- **Composables**: `app/composables/` for reusable composition functions (useAuth, useApi)
+
+### API Communication Pattern
+
+- **Critical Rule**: ALWAYS use `useApi()` composable for API calls, NEVER use `$fetch` directly
+- **Automatic i18n**: `useApi()` automatically adds `Accept-Language` header based on current locale
+- **Reactive**: Header updates when user changes language during session
+- **Location**: `frontend/app/composables/useApi.ts`
+
+**Usage**:
+```typescript
+// In components/pages - Public API calls
+const api = useApi()
+const data = await api('/endpoint', {
+  method: 'POST',
+  body: {...}
+})
+
+// For authenticated requests
+const { authenticatedFetch } = useAuth()
+const data = await authenticatedFetch('/protected-endpoint')
+```
+
+**Why not `$fetch` directly?**
+- Missing automatic `Accept-Language` header
+- Not reactive to locale changes
+- Backend requires locale for i18n responses
+- Inconsistent with project patterns
 
 ### Backend Architecture (AdonisJS)
 
