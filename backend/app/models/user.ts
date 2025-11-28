@@ -6,7 +6,8 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export enum UserRole {
   Owner = 1,
-  Member = 2,
+  Administrator = 2,
+  Member = 3,
 }
 
 export default class User extends BaseModel {
@@ -33,9 +34,6 @@ export default class User extends BaseModel {
 
   @column()
   declare role: UserRole
-
-  @column()
-  declare isOwner: boolean
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

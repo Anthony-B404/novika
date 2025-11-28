@@ -131,7 +131,6 @@ export default class InvitationsController {
       fullName: fullName,
       role: invitation.role,
       organizationId: invitation.organizationId,
-      isOwner: false,
       verificationToken: null,
       onboardingCompleted: true,
     }

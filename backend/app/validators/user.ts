@@ -47,7 +47,6 @@ export const registerValidator = vine.compile(
       Object.values(UserRole).filter((value) => typeof value === 'number') as number[]
     ),
     organizationId: vine.number(),
-    isOwner: vine.boolean(),
     onboardingCompleted: vine.boolean({ strict: true }),
   })
 )

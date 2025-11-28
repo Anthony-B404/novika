@@ -93,7 +93,6 @@ export default class SocialAuthController {
         googleId: googleUser.id,
         avatar: googleUser.avatarUrl,
         role: UserRole.Owner,
-        isOwner: true,
         onboardingCompleted: false,
         organizationId: organization.id,
         magicLinkToken: null,

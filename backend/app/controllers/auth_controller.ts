@@ -73,7 +73,6 @@ export default class AuthController {
         firstName: null,
         lastName: null,
         role: UserRole.Owner,
-        isOwner: true,
         onboardingCompleted: false,
         organizationId: organization.id,
         magicLinkToken,
