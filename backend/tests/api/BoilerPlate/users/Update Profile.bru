@@ -1,0 +1,42 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseUrl}}/profile
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  firstName: John
+  lastName: Doe
+  email: john.doe@example.com
+  ~removeAvatar: true
+}
+
+tests {
+  test("should update user profile without email change", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('user');
+    expect(data.user.firstName).to.equal('John');
+    expect(data.user.lastName).to.equal('Doe');
+    expect(data.user.fullName).to.equal('John Doe');
+  });
+
+  test("should NOT immediately change email - requires verification", function() {
+    const data = res.getBody();
+    // Email should remain unchanged until verification
+    expect(data.user.email).to.not.equal('john.doe@example.com');
+    // If email was provided in request and different from current, expect verification message
+    // Note: This test assumes email change was requested
+  });
+}

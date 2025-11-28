@@ -1,0 +1,48 @@
+meta {
+  name: Verify Email Change
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/verify-email-change/:token
+  body: none
+  auth: none
+}
+
+params:path {
+  token: valid-token-here
+}
+
+tests {
+  test("should verify and change email successfully", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('user');
+    expect(data.user.email).to.equal(data.user.pendingEmail || 'new-email@example.com');
+    expect(data.user.pendingEmail).to.be.null;
+    expect(data.user.emailChangeToken).to.be.null;
+  });
+
+  test("should return error for invalid token", function() {
+    // Test with invalid token
+    expect(res.getStatus()).to.equal(404);
+    const data = res.getBody();
+    expect(data.message).to.include('invalid');
+  });
+
+  test("should return error for expired token", function() {
+    // Test with expired token
+    expect(res.getStatus()).to.equal(401);
+    const data = res.getBody();
+    expect(data.message).to.include('expired');
+  });
+
+  test("should return error if new email already in use", function() {
+    // Test when pending email is already used by another user
+    expect(res.getStatus()).to.equal(422);
+    const data = res.getBody();
+    expect(data.message).to.include('already in use');
+  });
+}

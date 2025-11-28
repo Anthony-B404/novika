@@ -46,5 +46,15 @@
     "button": "Se connecter",
     "expiry": "⏱️ Ce lien expire dans 15 minutes",
     "outro": "Si vous n'avez pas demandé cette connexion, vous pouvez ignorer cet email."
+  },
+  "email_change": {
+    "subject": "Vérifiez votre nouvelle adresse email",
+    "preview": "Cliquez pour vérifier votre nouvelle adresse email",
+    "title": "Vérifiez votre nouvelle adresse email",
+    "greeting": "Bonjour",
+    "intro": "Vous avez récemment demandé à modifier votre adresse email. Pour confirmer ce changement, veuillez cliquer sur le bouton ci-dessous.",
+    "button": "Vérifier le nouvel email",
+    "expiry": "⏱️ Ce lien expire dans 15 minutes",
+    "outro": "Si vous n'avez pas demandé ce changement d'email, vous pouvez ignorer cet email. Votre adresse email actuelle restera inchangée."
   }
 }

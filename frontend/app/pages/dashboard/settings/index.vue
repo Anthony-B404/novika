@@ -7,35 +7,114 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+const authStore = useAuthStore();
+const config = useRuntimeConfig();
+const toast = useToast();
 
 const fileRef = ref<HTMLInputElement>();
 
 const profileSchema = z.object({
-  name: z.string().min(2, t('pages.dashboard.settings.general.validation.nameTooShort')),
-  email: z.string().email(t('pages.dashboard.settings.general.validation.invalidEmail')),
-  username: z.string().min(2, t('pages.dashboard.settings.general.validation.nameTooShort')),
+  firstName: z
+    .string()
+    .min(2, t("pages.dashboard.settings.general.validation.firstNameTooShort")),
+  lastName: z
+    .string()
+    .min(2, t("pages.dashboard.settings.general.validation.lastNameTooShort")),
+  email: z
+    .string()
+    .email(t("pages.dashboard.settings.general.validation.invalidEmail")),
   avatar: z.string().optional(),
-  bio: z.string().optional(),
 });
 
 type ProfileSchema = z.output<typeof profileSchema>;
 
-const profile = reactive<Partial<ProfileSchema>>({
-  name: "Benjamin Canac",
-  email: "ben@nuxtlabs.com",
-  username: "benjamincanac",
-  avatar: undefined,
-  bio: undefined,
+// Initialize state with user data from store
+const profile = reactive<ProfileSchema>({
+  firstName: authStore.user?.firstName || "",
+  lastName: authStore.user?.lastName || "",
+  email: authStore.user?.email || "",
+  avatar: authStore.user?.avatar || undefined,
 });
-const toast = useToast();
+
+const loading = ref(false);
+const avatarRemoved = ref(false);
+
 async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
-  toast.add({
-    title: t('pages.dashboard.settings.general.successTitle'),
-    description: t('pages.dashboard.settings.general.successDescription'),
-    icon: "i-lucide-check",
-    color: "success",
-  });
-  console.log(event.data);
+  loading.value = true;
+  try {
+    const formData = new FormData();
+
+    // Add text fields if they changed
+    if (event.data.firstName !== authStore.user?.firstName) {
+      formData.append("firstName", event.data.firstName);
+    }
+    if (event.data.lastName !== authStore.user?.lastName) {
+      formData.append("lastName", event.data.lastName);
+    }
+    if (event.data.email !== authStore.user?.email) {
+      formData.append("email", event.data.email);
+    }
+
+    // Add avatar removal flag
+    if (avatarRemoved.value) {
+      formData.append("removeAvatar", "true");
+    }
+
+    // Add avatar if file was selected
+    const fileInput = fileRef.value;
+    if (fileInput?.files && fileInput.files.length > 0) {
+      formData.append("avatar", fileInput.files[0]);
+    }
+
+    // Only send request if there are changes
+    if (Array.from(formData.keys()).length > 0) {
+      const response = await $fetch<{ message: string; user: any }>(
+        `${config.public.apiUrl}/profile`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authStore.token}`,
+          },
+          body: formData,
+        },
+      );
+
+      // Update user in store
+      authStore.setUser(response.user);
+
+      // Update local state with new data
+      profile.firstName = response.user.firstName;
+      profile.lastName = response.user.lastName;
+      profile.email = response.user.email;
+      profile.avatar = response.user.avatar;
+      avatarRemoved.value = false;
+
+      toast.add({
+        title: t("pages.dashboard.settings.general.successTitle"),
+        description: response.message,
+        icon: "i-lucide-check",
+        color: "success",
+      });
+    } else {
+      toast.add({
+        title: t("pages.dashboard.settings.general.noChangesTitle"),
+        description: t("pages.dashboard.settings.general.noChangesDescription"),
+        icon: "i-lucide-info",
+        color: "neutral",
+      });
+    }
+  } catch (error: any) {
+    toast.add({
+      title: t("pages.dashboard.settings.general.errorTitle"),
+      description:
+        error.data?.message ||
+        t("pages.dashboard.settings.general.errorDescription"),
+      icon: "i-lucide-x",
+      color: "error",
+    });
+  } finally {
+    loading.value = false;
+  }
 }
 
 function onFileChange(e: Event) {
@@ -46,11 +125,47 @@ function onFileChange(e: Event) {
   }
 
   profile.avatar = URL.createObjectURL(input.files[0]!);
+  avatarRemoved.value = false;
 }
 
 function onFileClick() {
   fileRef.value?.click();
 }
+
+function onRemoveAvatar() {
+  profile.avatar = undefined;
+  avatarRemoved.value = true;
+  // Clear file input
+  if (fileRef.value) {
+    fileRef.value.value = "";
+  }
+}
+
+// Get avatar URL with smart detection
+const avatarUrl = computed(() => {
+  if (!profile.avatar) return undefined;
+
+  // If it's already a full URL (Google OAuth), use it directly
+  if (
+    profile.avatar.startsWith("http://") ||
+    profile.avatar.startsWith("https://")
+  ) {
+    return profile.avatar;
+  }
+
+  // If it's a blob URL (local preview), use it directly
+  if (profile.avatar.startsWith("blob:")) {
+    return profile.avatar;
+  }
+
+  // Otherwise, it's an uploaded file - construct backend URL
+  return `${config.public.apiUrl}/user-avatar/${profile.avatar}`;
+});
+
+// Compute full name for display
+const fullName = computed(() => {
+  return `${profile.firstName} ${profile.lastName}`.trim();
+});
 </script>
 
 <template>
@@ -70,6 +185,8 @@ function onFileClick() {
       <UButton
         form="settings"
         :label="t('common.buttons.saveChanges')"
+        :loading="loading"
+        :disabled="loading"
         color="neutral"
         type="submit"
         class="w-fit lg:ms-auto"
@@ -78,13 +195,25 @@ function onFileClick() {
 
     <UPageCard variant="subtle">
       <UFormField
-        name="name"
-        :label="t('pages.dashboard.settings.general.nameLabel')"
-        :description="t('pages.dashboard.settings.general.nameDescription')"
+        name="firstName"
+        :label="t('pages.dashboard.settings.general.firstNameLabel')"
+        :description="
+          t('pages.dashboard.settings.general.firstNameDescription')
+        "
         required
         class="flex items-start justify-between gap-4 max-sm:flex-col"
       >
-        <UInput v-model="profile.name" autocomplete="off" />
+        <UInput v-model="profile.firstName" autocomplete="given-name" />
+      </UFormField>
+      <USeparator />
+      <UFormField
+        name="lastName"
+        :label="t('pages.dashboard.settings.general.lastNameLabel')"
+        :description="t('pages.dashboard.settings.general.lastNameDescription')"
+        required
+        class="flex items-start justify-between gap-4 max-sm:flex-col"
+      >
+        <UInput v-model="profile.lastName" autocomplete="family-name" />
       </UFormField>
       <USeparator />
       <UFormField
@@ -94,17 +223,12 @@ function onFileClick() {
         required
         class="flex items-start justify-between gap-4 max-sm:flex-col"
       >
-        <UInput v-model="profile.email" type="email" autocomplete="off" />
-      </UFormField>
-      <USeparator />
-      <UFormField
-        name="username"
-        :label="t('pages.dashboard.settings.general.usernameLabel')"
-        :description="t('pages.dashboard.settings.general.usernameDescription')"
-        required
-        class="flex items-start justify-between gap-4 max-sm:flex-col"
-      >
-        <UInput v-model="profile.username" type="username" autocomplete="off" />
+        <UInput
+          v-model="profile.email"
+          type="email"
+          autocomplete="off"
+          class="min-w-[225px]"
+        />
       </UFormField>
       <USeparator />
       <UFormField
@@ -114,8 +238,19 @@ function onFileClick() {
         class="flex justify-between gap-4 max-sm:flex-col sm:items-center"
       >
         <div class="flex flex-wrap items-center gap-3">
-          <UAvatar :src="profile.avatar" :alt="profile.name" size="lg" />
-          <UButton :label="t('common.buttons.choose')" color="neutral" @click="onFileClick" />
+          <UAvatar :src="avatarUrl" :alt="fullName" size="lg" />
+          <UButton
+            :label="t('common.buttons.choose')"
+            color="neutral"
+            @click="onFileClick"
+          />
+          <UButton
+            v-if="profile.avatar"
+            :label="t('pages.dashboard.settings.general.removeAvatar')"
+            color="error"
+            variant="ghost"
+            @click="onRemoveAvatar"
+          />
           <input
             ref="fileRef"
             type="file"
@@ -124,16 +259,6 @@ function onFileClick() {
             @change="onFileChange"
           />
         </div>
-      </UFormField>
-      <USeparator />
-      <UFormField
-        name="bio"
-        :label="t('pages.dashboard.settings.general.bioLabel')"
-        :description="t('pages.dashboard.settings.general.bioDescription')"
-        class="flex items-start justify-between gap-4 max-sm:flex-col"
-        :ui="{ container: 'w-full' }"
-      >
-        <UTextarea v-model="profile.bio" :rows="5" autoresize class="w-full" />
       </UFormField>
     </UPageCard>
   </UForm>

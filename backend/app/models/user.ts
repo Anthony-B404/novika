@@ -58,6 +58,15 @@ export default class User extends BaseModel {
   @column.dateTime()
   declare magicLinkExpiresAt: DateTime | null
 
+  @column()
+  declare pendingEmail: string | null
+
+  @column()
+  declare emailChangeToken: string | null
+
+  @column.dateTime()
+  declare emailChangeExpiresAt: DateTime | null
+
   declare isCurrentUser?: boolean
 
   static accessTokens = DbAccessTokensProvider.forModel(User)

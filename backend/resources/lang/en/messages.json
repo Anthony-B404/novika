@@ -49,7 +49,14 @@
     "created": "User created successfully",
     "updated": "User updated successfully",
     "deleted": "User deleted successfully",
-    "not_found": "User not found"
+    "not_found": "User not found",
+    "profile_updated": "Profile updated successfully",
+    "email_change_verification_sent": "A verification email has been sent to your new email address",
+    "email_changed_successfully": "Email changed successfully",
+    "email_change_token_invalid": "Invalid email verification token",
+    "email_change_token_expired": "Email verification token has expired",
+    "email_already_in_use": "This email address is already in use",
+    "avatar_removed": "Avatar removed successfully"
   },
   "errors": {
     "server_error": "A server error occurred",

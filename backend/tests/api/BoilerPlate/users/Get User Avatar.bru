@@ -1,0 +1,37 @@
+meta {
+  name: Get User Avatar
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/user-avatar/example-avatar.jpg
+  body: none
+  auth: none
+}
+
+docs {
+  # Get User Avatar
+
+  This endpoint serves user avatar files.
+
+  ## Route
+  `GET /user-avatar/:avatar`
+
+  ## Notes
+  - Replace `example-avatar.jpg` with an actual avatar filename
+  - This is a public route (no authentication required)
+  - Returns the image file directly
+  - Returns 404 if avatar not found
+
+  ## Example URLs
+  - `/user-avatar/abc123.jpg`
+  - `/user-avatar/xyz789.png`
+}
+
+tests {
+  test("should return avatar image", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getHeader('content-type')).to.match(/image\/(jpeg|jpg|png|gif)/);
+  });
+}

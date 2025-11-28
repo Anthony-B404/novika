@@ -1,0 +1,28 @@
+meta {
+  name: Get Current User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("should get current user info", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('id');
+    expect(data).to.have.property('email');
+    expect(data).to.have.property('firstName');
+    expect(data).to.have.property('lastName');
+    expect(data).to.have.property('fullName');
+    expect(data).to.have.property('organizationId');
+  });
+}

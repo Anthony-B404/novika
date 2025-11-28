@@ -280,6 +280,15 @@
       "noToken": "Lien invalide. Veuillez demander un nouveau lien de connexion.",
       "invalidToken": "Ce lien est invalide ou a expiré"
     },
+    "verifyEmailChange": {
+      "verifying": "Vérification de votre nouveau email",
+      "pleaseWait": "Veuillez patienter pendant que nous mettons à jour votre email...",
+      "success": "Email modifié avec succès !",
+      "successDescription": "Votre adresse email a été mise à jour",
+      "error": "Erreur",
+      "noToken": "Lien invalide. Veuillez demander un nouveau lien de vérification.",
+      "invalidToken": "Ce lien est invalide ou a expiré"
+    },
     "validation": {
       "emailRequired": "L'email est requis",
       "firstNameRequired": "Le prénom est requis",
@@ -376,6 +385,10 @@
     "verifyLogin": {
       "title": "Vérification de la connexion",
       "description": "Vérification de votre lien de connexion"
+    },
+    "verifyEmailChange": {
+      "title": "Vérification du changement d'email",
+      "description": "Vérification de votre nouveau email"
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -590,20 +603,24 @@
         "general": {
           "title": "Profil",
           "description": "Ces informations seront affichées publiquement.",
-          "nameLabel": "Nom",
-          "nameDescription": "Apparaîtra sur les reçus, factures et autres communications.",
+          "firstNameLabel": "Prénom",
+          "firstNameDescription": "Votre prénom.",
+          "lastNameLabel": "Nom",
+          "lastNameDescription": "Votre nom de famille.",
           "emailLabel": "Email",
           "emailDescription": "Utilisé pour se connecter, pour les reçus par email et les mises à jour produit.",
-          "usernameLabel": "Nom d'utilisateur",
-          "usernameDescription": "Votre nom d'utilisateur unique pour vous connecter et l'URL de votre profil.",
           "avatarLabel": "Avatar",
           "avatarDescription": "JPG, GIF ou PNG. 1Mo Max.",
-          "bioLabel": "Bio",
-          "bioDescription": "Brève description pour votre profil. Les URLs sont des hyperliens.",
+          "removeAvatar": "Supprimer",
           "successTitle": "Succès",
           "successDescription": "Vos paramètres ont été mis à jour.",
+          "noChangesTitle": "Aucune modification",
+          "noChangesDescription": "Aucune modification n'a été effectuée.",
+          "errorTitle": "Erreur",
+          "errorDescription": "Une erreur s'est produite lors de la mise à jour du profil.",
           "validation": {
-            "nameTooShort": "Trop court",
+            "firstNameTooShort": "Le prénom doit contenir au moins 2 caractères",
+            "lastNameTooShort": "Le nom doit contenir au moins 2 caractères",
             "invalidEmail": "Email invalide"
           }
         },

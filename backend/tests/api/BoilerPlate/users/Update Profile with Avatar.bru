@@ -1,0 +1,72 @@
+meta {
+  name: Update Profile with Avatar
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/profile
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  firstName: Jane
+  lastName: Smith
+  email: jane.smith@example.com
+  ~avatar: @file(/path/to/test-avatar.jpg)
+}
+
+docs {
+  # Update Profile with Avatar
+
+  This test updates the user profile including an avatar upload.
+
+  ## Notes
+  - Replace `/path/to/test-avatar.jpg` with an actual image file path for testing
+  - Avatar is uploaded as multipart/form-data
+  - Supported formats: JPG, PNG, GIF
+  - Max size: 1MB (as per backend validation)
+  - If both `avatar` (file) and `removeAvatar: true` are sent, the new upload takes priority
+
+  ## Available Parameters
+  - `firstName` (optional): User's first name
+  - `lastName` (optional): User's last name
+  - `email` (optional): User's email (triggers verification flow if changed)
+  - `avatar` (optional): Image file to upload as new avatar
+  - `removeAvatar` (optional): Set to `true` to remove current avatar
+
+  ## Expected Response
+  ```json
+  {
+    "message": "Profil mis à jour avec succès",
+    "user": {
+      "id": 1,
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "fullName": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "avatar": "generated-filename.jpg",
+      "organizationId": 1
+    }
+  }
+  ```
+}
+
+tests {
+  test("should update user profile with avatar", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('user');
+    expect(data.user.firstName).to.equal('Jane');
+    expect(data.user.lastName).to.equal('Smith');
+    expect(data.user.email).to.equal('jane.smith@example.com');
+    expect(data.user).to.have.property('avatar');
+    expect(data.user.avatar).to.not.be.null;
+  });
+}

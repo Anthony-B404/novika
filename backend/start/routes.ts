@@ -10,6 +10,7 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 
+const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
 const OrganizationsController = () => import('#controllers/organizations_controller')
 const InvitationsController = () => import('#controllers/invitations_controller')
@@ -22,19 +23,23 @@ router.get('/', async () => {
 })
 
 // Public routes - Registration flow
-router.post('/register/request-magic-link', [UsersController, 'registerWithMagicLink'])
-router.post('/register/complete', [UsersController, 'completeRegistration'])
+router.post('/register/request-magic-link', [AuthController, 'registerWithMagicLink'])
+router.post('/register/complete', [AuthController, 'completeRegistration'])
 
 // Public routes - Login flow
-router.post('/login/request-magic-link', [UsersController, 'loginWithMagicLink'])
+router.post('/login/request-magic-link', [AuthController, 'loginWithMagicLink'])
 
 // Public route - Verify magic link (handles both registration and login)
-router.get('/verify-magic-link/:token', [UsersController, 'verifyMagicLink'])
+router.get('/verify-magic-link/:token', [AuthController, 'verifyMagicLink'])
 
 router.get('/organization-logo/:logo', [OrganizationsController, 'getOrganizationLogo'])
+router.get('/user-avatar/:avatar', [UsersController, 'getUserAvatar'])
 
 router.get('/check-invitation/:identifier', [InvitationsController, 'checkInvitation'])
 router.post('/accept-invitation', [InvitationsController, 'acceptInvitation'])
+
+// Email verification route
+router.get('/verify-email-change/:token', [UsersController, 'verifyEmailChange'])
 
 // OAuth routes
 router.get('/auth/google/redirect', [SocialAuthController, 'googleRedirect'])
@@ -43,10 +48,13 @@ router.get('/auth/google/callback', [SocialAuthController, 'googleCallback'])
 // Protected routes
 router
   .group(() => {
+    // Auth routes
+    router.post('/logout', [AuthController, 'logout'])
+    router.get('/check-token', [AuthController, 'checkToken'])
+
     // User routes
-    router.post('/logout', [UsersController, 'logout'])
     router.get('/me', [UsersController, 'me'])
-    router.get('/check-token', [UsersController, 'checkToken'])
+    router.put('/profile', [UsersController, 'updateProfile'])
     router.delete('/delete-member/:id', [UsersController, 'deleteMember'])
 
     // OAuth completion route (requires authentication)

@@ -293,6 +293,15 @@
       "noToken": "Invalid link. Please request a new login link.",
       "invalidToken": "This link is invalid or has expired"
     },
+    "verifyEmailChange": {
+      "verifying": "Verifying your new email",
+      "pleaseWait": "Please wait while we update your email...",
+      "success": "Email changed successfully!",
+      "successDescription": "Your email address has been updated",
+      "error": "Error",
+      "noToken": "Invalid link. Please request a new verification link.",
+      "invalidToken": "This link is invalid or has expired"
+    },
     "validation": {
       "emailRequired": "Email is required",
       "firstNameRequired": "First name is required",
@@ -320,6 +329,10 @@
     "verifyLogin": {
       "title": "Verify login",
       "description": "Verifying your login link"
+    },
+    "verifyEmailChange": {
+      "title": "Verify email change",
+      "description": "Verifying your new email"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -534,20 +547,24 @@
         "general": {
           "title": "Profile",
           "description": "These informations will be displayed publicly.",
-          "nameLabel": "Name",
-          "nameDescription": "Will appear on receipts, invoices, and other communication.",
+          "firstNameLabel": "First Name",
+          "firstNameDescription": "Your first name.",
+          "lastNameLabel": "Last Name",
+          "lastNameDescription": "Your last name.",
           "emailLabel": "Email",
           "emailDescription": "Used to sign in, for email receipts and product updates.",
-          "usernameLabel": "Username",
-          "usernameDescription": "Your unique username for logging in and your profile URL.",
           "avatarLabel": "Avatar",
           "avatarDescription": "JPG, GIF or PNG. 1MB Max.",
-          "bioLabel": "Bio",
-          "bioDescription": "Brief description for your profile. URLs are hyperlinked.",
+          "removeAvatar": "Remove",
           "successTitle": "Success",
           "successDescription": "Your settings have been updated.",
+          "noChangesTitle": "No changes",
+          "noChangesDescription": "No changes were made.",
+          "errorTitle": "Error",
+          "errorDescription": "An error occurred while updating the profile.",
           "validation": {
-            "nameTooShort": "Too short",
+            "firstNameTooShort": "First name must be at least 2 characters",
+            "lastNameTooShort": "Last name must be at least 2 characters",
             "invalidEmail": "Invalid email"
           }
         },

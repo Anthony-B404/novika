@@ -1,0 +1,60 @@
+meta {
+  name: Remove Avatar
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/profile
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  removeAvatar: true
+}
+
+docs {
+  # Remove Avatar
+
+  This test removes the user's avatar.
+
+  ## How it works
+  - Send `removeAvatar: true` in the request body
+  - If the user has an avatar that's not a Google OAuth URL, the file will be deleted from storage
+  - The user's avatar field will be set to `null`
+
+  ## Expected Response
+  ```json
+  {
+    "message": "Avatar removed successfully" / "Avatar supprimé avec succès",
+    "user": {
+      "id": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "fullName": "John Doe",
+      "email": "john.doe@example.com",
+      "avatar": null,
+      "organizationId": 1
+    }
+  }
+  ```
+
+  ## Notes
+  - If user has a Google OAuth avatar (URL starting with http:// or https://), the URL is removed but the file is not deleted (as it's external)
+  - If `removeAvatar` and `avatar` (file upload) are sent together, the new upload takes priority
+}
+
+tests {
+  test("should remove user avatar", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('user');
+    expect(data.user.avatar).to.be.null;
+  });
+}

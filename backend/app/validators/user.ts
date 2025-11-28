@@ -51,3 +51,25 @@ export const registerValidator = vine.compile(
     onboardingCompleted: vine.boolean({ strict: true }),
   })
 )
+
+// Validator for updating user profile
+export const updateProfileValidator = vine.compile(
+  vine.object({
+    firstName: vine.string().minLength(2).optional(),
+    lastName: vine.string().minLength(2).optional(),
+    email: vine
+      .string()
+      .email()
+      .unique(async (db, value, field) => {
+        // Skip uniqueness check if email hasn't changed
+        const user = await db
+          .from('users')
+          .where('email', value)
+          .whereNot('id', field.meta.userId)
+          .first()
+        return !user
+      })
+      .optional(),
+    removeAvatar: vine.boolean().optional(),
+  })
+)

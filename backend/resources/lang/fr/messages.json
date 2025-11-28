@@ -49,7 +49,14 @@
     "created": "Utilisateur créé avec succès",
     "updated": "Utilisateur mis à jour avec succès",
     "deleted": "Utilisateur supprimé avec succès",
-    "not_found": "Utilisateur introuvable"
+    "not_found": "Utilisateur introuvable",
+    "profile_updated": "Profil mis à jour avec succès",
+    "email_change_verification_sent": "Un email de vérification a été envoyé à votre nouvelle adresse",
+    "email_changed_successfully": "Email modifié avec succès",
+    "email_change_token_invalid": "Token de vérification d'email invalide",
+    "email_change_token_expired": "Le token de vérification d'email a expiré",
+    "email_already_in_use": "Cette adresse email est déjà utilisée",
+    "avatar_removed": "Avatar supprimé avec succès"
   },
   "errors": {
     "server_error": "Une erreur serveur s'est produite",

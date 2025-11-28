@@ -5,6 +5,7 @@ import { en, fr } from "@nuxt/ui/locale";
 const { t, locale, setLocale } = useI18n();
 const localePath = useLocalePath();
 const { user: authUser, logout } = useAuth();
+const config = useRuntimeConfig();
 
 defineProps<{
   collapsed?: boolean;
@@ -34,12 +35,28 @@ const colors = [
 ];
 const neutrals = ["slate", "gray", "zinc", "neutral", "stone"];
 
+// Compute avatar URL with smart detection
+const avatarUrl = computed(() => {
+  const avatar = authUser.value?.avatar;
+
+  // If it's already a full URL (Google OAuth), use it directly
+  if (avatar?.startsWith("http://") || avatar?.startsWith("https://")) {
+    return avatar;
+  }
+
+  // If it's a blob URL (local preview), use it directly
+  if (avatar?.startsWith("blob:")) {
+    return avatar;
+  }
+
+  // Otherwise, it's an uploaded file - construct backend URL
+  return `${config.public.apiUrl}/user-avatar/${avatar}`;
+});
+
 const user = computed(() => ({
   name: authUser.value?.fullName || authUser.value?.email || "User",
   avatar: {
-    src:
-      authUser.value?.avatar ||
-      `https://ui-avatars.com/api/?name=${encodeURIComponent(authUser.value?.fullName || authUser.value?.email || "U")}`,
+    src: avatarUrl.value,
     alt: authUser.value?.fullName || authUser.value?.email || "User",
   },
 }));
