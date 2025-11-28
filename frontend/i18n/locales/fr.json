@@ -433,8 +433,9 @@
       "bounced": "Rejeté"
     },
     "roles": {
-      "member": "Membre",
-      "owner": "Propriétaire"
+      "owner": "Propriétaire",
+      "administrator": "Administrateur",
+      "member": "Membre"
     },
     "periods": {
       "daily": "Quotidien",

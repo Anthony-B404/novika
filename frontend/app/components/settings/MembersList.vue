@@ -3,6 +3,7 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 import type { Member } from "~/types";
 
 const { t } = useI18n();
+const { getRoleOptions } = useRoles();
 
 defineProps<{
   members: Member[];
@@ -44,12 +45,9 @@ const items = computed(() => [
       <div class="flex items-center gap-3">
         <USelect
           :model-value="member.role"
-          :items="[
-            { label: t('common.roles.member'), value: 'member' },
-            { label: t('common.roles.owner'), value: 'owner' }
-          ]"
+          :items="getRoleOptions()"
           color="neutral"
-          :ui="{ value: 'capitalize', itemLabel: 'label' }"
+          :ui="{ itemLabel: 'label' }"
         />
 
         <UDropdownMenu :items="items" :content="{ align: 'end' }">

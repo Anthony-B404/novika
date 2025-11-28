@@ -21,10 +21,12 @@ export interface Mail {
   date: string;
 }
 
+import type { UserRole } from './auth'
+
 export interface Member {
   name: string;
   username: string;
-  role: "member" | "owner";
+  role: UserRole;
   avatar: AvatarProps;
 }
 

@@ -377,8 +377,9 @@
       "bounced": "Bounced"
     },
     "roles": {
-      "member": "Member",
-      "owner": "Owner"
+      "owner": "Owner",
+      "administrator": "Administrator",
+      "member": "Member"
     },
     "periods": {
       "daily": "Daily",

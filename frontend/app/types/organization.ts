@@ -1,9 +1,10 @@
+import type { UserRole } from './auth'
+
 export interface User {
   id: number
   fullName: string | null
   email: string
-  role: number
-  isOwner: boolean
+  role: UserRole
   isCurrentUser?: boolean
 }
 
