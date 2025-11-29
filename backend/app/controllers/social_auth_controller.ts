@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import fs from 'node:fs/promises'
+import { completeOAuthRegistrationValidator } from '#validators/user'
 
 export default class SocialAuthController {
   private readonly LOGO_DIRECTORY = app.makePath('storage/organizations/logos')
@@ -75,12 +76,17 @@ export default class SocialAuthController {
       const firstName = nameParts[0] || ''
       const lastName = nameParts.slice(1).join(' ') || ''
 
-      // Create new organization
-      const organization = await Organization.create({
-        name: 'Temporary Organization',
-        email: googleUser.email,
-        logo: null,
-      })
+      // Check if an organization with this email already exists
+      let organization = await Organization.query().where('email', googleUser.email).first()
+
+      if (!organization) {
+        // Create new organization only if it doesn't exist
+        organization = await Organization.create({
+          name: 'Temporary Organization',
+          email: googleUser.email,
+          logo: null,
+        })
+      }
 
       // Create new user
       user = await User.create({
@@ -117,7 +123,7 @@ export default class SocialAuthController {
   /**
    * Complete OAuth registration with organization details
    */
-  public async completeOAuthRegistration({ request, response, auth, i18n }: HttpContext) {
+  public async completeOAuthRegistration({ request, response, auth }: HttpContext) {
     try {
       // Get authenticated user
       const user = auth.user!
@@ -129,44 +135,36 @@ export default class SocialAuthController {
         })
       }
 
-      // Validate request data
-      const firstName = request.input('firstName')
-      const lastName = request.input('lastName')
-      const organizationName = request.input('organizationName')
+      // Validate request data using validator
+      const data = await request.validateUsing(completeOAuthRegistrationValidator)
       const logo = request.file('logo')
-
-      if (!firstName || !lastName || !organizationName) {
-        return response.status(422).json({
-          message: 'Validation failed',
-        })
-      }
 
       // Handle logo upload
       const fileName = await this.handleLogoUpload(logo)
 
       // Calculate full name
-      const fullName = `${firstName} ${lastName}`
+      const fullName = `${data.firstName} ${data.lastName}`
 
       // Update organization
       const organization = await Organization.findOrFail(user.currentOrganizationId)
-      organization.name = organizationName
+      organization.name = data.organizationName
       organization.logo = fileName
       await organization.save()
 
       // Update user
-      user.firstName = firstName
-      user.lastName = lastName
+      user.firstName = data.firstName
+      user.lastName = data.lastName
       user.fullName = fullName
       user.onboardingCompleted = true
       await user.save()
 
       return response.ok({
-        message: i18n.t('messages.organization.created'),
+        message: 'Organization created successfully',
         user,
       })
     } catch (error) {
       return response.status(422).json({
-        message: i18n.t('messages.errors.validation_failed'),
+        message: 'Validation failed',
         errors: error.messages || error.message,
       })
     }

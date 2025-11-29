@@ -25,6 +25,15 @@ export const completeRegistrationValidator = vine.compile(
   })
 )
 
+// Validator for OAuth complete registration (without magicLinkToken)
+export const completeOAuthRegistrationValidator = vine.compile(
+  vine.object({
+    firstName: vine.string().minLength(2),
+    lastName: vine.string().minLength(2),
+    organizationName: vine.string().minLength(2),
+  })
+)
+
 // Validator for login request with magic link
 export const loginRequestValidator = vine.compile(
   vine.object({

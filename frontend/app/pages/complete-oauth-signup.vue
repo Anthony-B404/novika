@@ -157,6 +157,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       body: formData,
     });
 
+    // Refresh user data to update organization info
+    const { fetchUser } = useAuth();
+    await fetchUser();
+
     toast.add({
       title: t("auth.completeSignup.success"),
       description: t("auth.completeSignup.successDescription"),
