@@ -164,7 +164,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     });
 
     // Redirect to dashboard
-    router.push($localePath("index"));
+    router.push($localePath("dashboard"));
   } catch (error: any) {
     toast.add({
       title: t("auth.completeSignup.error"),
