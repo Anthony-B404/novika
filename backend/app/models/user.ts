@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany, belongsTo } from '@adonisjs/lucid/orm'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Organization from './organization.js'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { ManyToMany, BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export enum UserRole {
   Owner = 1,
@@ -32,9 +32,6 @@ export default class User extends BaseModel {
   @column()
   declare avatar: string | null
 
-  @column()
-  declare role: UserRole
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -42,10 +39,18 @@ export default class User extends BaseModel {
   declare updatedAt: DateTime | null
 
   @column()
-  declare organizationId: number
+  declare currentOrganizationId: number | null
 
-  @belongsTo(() => Organization)
-  declare organization: BelongsTo<typeof Organization>
+  @manyToMany(() => Organization, {
+    pivotTable: 'organization_user',
+    pivotColumns: ['role'],
+  })
+  declare organizations: ManyToMany<typeof Organization>
+
+  @belongsTo(() => Organization, {
+    foreignKey: 'currentOrganizationId',
+  })
+  declare currentOrganization: BelongsTo<typeof Organization>
 
   @column()
   declare onboardingCompleted: boolean
@@ -68,4 +73,21 @@ export default class User extends BaseModel {
   declare isCurrentUser?: boolean
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
+
+  /**
+   * Check if user is owner of a specific organization
+   */
+  async isOwnerOf(organizationId: number): Promise<boolean> {
+    await this.load('organizations')
+    const org = this.organizations.find((o) => o.id === organizationId)
+    return org?.$extras.pivot_role === UserRole.Owner
+  }
+
+  /**
+   * Check if user has access to a specific organization
+   */
+  async hasOrganization(organizationId: number): Promise<boolean> {
+    await this.load('organizations')
+    return this.organizations.some((o) => o.id === organizationId)
+  }
 }

@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany, hasMany } from '@adonisjs/lucid/orm'
 import User from './user.js'
 import Invitation from './invitation.js'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import type { ManyToMany, HasMany } from '@adonisjs/lucid/types/relations'
 
 export default class Organization extends BaseModel {
   @column({ isPrimary: true })
@@ -23,8 +23,11 @@ export default class Organization extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @hasMany(() => User)
-  declare users: HasMany<typeof User>
+  @manyToMany(() => User, {
+    pivotTable: 'organization_user',
+    pivotColumns: ['role'],
+  })
+  declare users: ManyToMany<typeof User>
 
   @hasMany(() => Invitation)
   declare invitations: HasMany<typeof Invitation>
