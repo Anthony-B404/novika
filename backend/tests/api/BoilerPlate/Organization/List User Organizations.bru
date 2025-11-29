@@ -1,0 +1,43 @@
+meta {
+  name: List User Organizations
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/organizations
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return array of organizations", function() {
+    const data = res.getBody();
+    expect(Array.isArray(data)).to.be.true;
+  });
+  
+  test("each organization should have required fields", function() {
+    const data = res.getBody();
+    if (data.length > 0) {
+      expect(data[0]).to.have.property('id');
+      expect(data[0]).to.have.property('name');
+      expect(data[0]).to.have.property('email');
+      expect(data[0]).to.have.property('role');
+      expect(data[0]).to.have.property('isOwner');
+      expect(data[0]).to.have.property('isCurrent');
+    }
+  });
+}

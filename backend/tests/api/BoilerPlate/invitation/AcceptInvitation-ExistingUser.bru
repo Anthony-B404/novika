@@ -1,0 +1,38 @@
+meta {
+  name: Accept Invitation - Existing User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/accept-invitation
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "identifier": "{{invitationId}}",
+    "fullName": "Existing User",
+    "password": "not-needed-for-existing-user"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should accept invitation for existing user", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('userExists');
+    expect(data.userExists).to.be.true;
+  });
+}
+
+docs {
+  Test d'acceptation d'invitation pour un utilisateur qui existe déjà dans le système.
+  Le user sera ajouté à l'organisation via la table pivot, sans créer de nouveau compte.
+}

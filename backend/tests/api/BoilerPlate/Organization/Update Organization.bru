@@ -1,24 +1,37 @@
 meta {
   name: Update Organization
   type: http
-  seq: 3
+  seq: 6
 }
 
 put {
   url: {{baseUrl}}/organization/update
-  body: json
+  body: multipartForm
   auth: bearer
+}
+
+headers {
+  Accept-Language: en
 }
 
 auth:bearer {
   token: {{token}}
 }
 
-body:json {
-  {
-          name: organizationName.value,
-        email: organizationEmail.value,
-        logo: organizationLogo.value,
-  
-  }
+body:multipart-form {
+  name: Update Organization Name
+  email: updated@test.com
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update organization successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('name');
+    expect(data.name).to.equal('Updated Organization Name');
+  });
 }
