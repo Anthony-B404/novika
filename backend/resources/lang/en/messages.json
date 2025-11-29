@@ -35,6 +35,7 @@
     "created": "Organization created successfully",
     "updated": "Organization updated successfully",
     "deleted": "Organization deleted successfully",
+    "switched": "Organization switched successfully",
     "not_found": "Organization not found"
   },
   "invitation": {
@@ -43,6 +44,7 @@
     "expired": "This invitation has expired",
     "invalid": "Invalid invitation",
     "already_accepted": "This invitation has already been accepted",
+    "already_member": "You are already a member of this organization",
     "deleted": "Invitation deleted successfully"
   },
   "user": {
@@ -63,6 +65,7 @@
     "not_found": "Resource not found",
     "validation_failed": "Validation failed",
     "unauthorized": "You are not authorized to perform this action",
+    "no_current_organization": "No active organization selected",
     "organization_validation_failed": "Organization validation failed",
     "user_validation_failed": "User validation failed",
     "email_send_failed": "Email sending failed",

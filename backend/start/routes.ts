@@ -58,14 +58,15 @@ router
     router.delete('/delete-member/:id', [UsersController, 'deleteMember'])
 
     // OAuth completion route (requires authentication)
-    router.post('/oauth/complete-registration', [
-      SocialAuthController,
-      'completeOAuthRegistration',
-    ])
+    router.post('/oauth/complete-registration', [SocialAuthController, 'completeOAuthRegistration'])
 
     // Organization routes
+    router.get('/organizations', [OrganizationsController, 'listUserOrganizations'])
+    router.post('/organizations', [OrganizationsController, 'createOrganization'])
     router.get('/organization', [OrganizationsController, 'getOrganizationWithUsers'])
     router.put('/organization/update', [OrganizationsController, 'updateOrganization'])
+    router.post('/organizations/:id/switch', [OrganizationsController, 'switchOrganization'])
+    router.delete('/organizations/:id', [OrganizationsController, 'deleteOrganization'])
 
     // Invitation routes
     router.post('/invite-member', [InvitationsController, 'createInvitation'])
