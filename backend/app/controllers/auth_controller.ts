@@ -1,6 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User, { UserRole } from '#models/user'
-import { registrationRequestValidator, completeRegistrationValidator, loginRequestValidator } from '#validators/user'
+import {
+  registrationRequestValidator,
+  completeRegistrationValidator,
+  loginRequestValidator,
+} from '#validators/user'
 import Organization from '#models/organization'
 import mail from '@adonisjs/mail/services/main'
 import { randomUUID } from 'node:crypto'
@@ -72,11 +76,15 @@ export default class AuthController {
         fullName: null,
         firstName: null,
         lastName: null,
-        role: UserRole.Owner,
         onboardingCompleted: false,
-        organizationId: organization.id,
+        currentOrganizationId: organization.id,
         magicLinkToken,
         magicLinkExpiresAt,
+      })
+
+      // Créer la relation pivot avec role Owner
+      await organization.related('users').attach({
+        [user.id]: { role: UserRole.Owner },
       })
 
       // Send magic link email
@@ -157,7 +165,9 @@ export default class AuthController {
 
       // Check if token has expired
       if (user.magicLinkExpiresAt && user.magicLinkExpiresAt < DateTime.now()) {
-        return response.unauthorized({ message: i18n.t('messages.auth.registration.token_expired') })
+        return response.unauthorized({
+          message: i18n.t('messages.auth.registration.token_expired'),
+        })
       }
 
       // Handle logo upload
@@ -167,7 +177,7 @@ export default class AuthController {
       const fullName = `${data.firstName} ${data.lastName}`
 
       // Update existing organization (created in step 1)
-      const organization = await Organization.findOrFail(user.organizationId)
+      const organization = await Organization.findOrFail(user.currentOrganizationId)
       organization.name = data.organizationName
       organization.email = user.email
       organization.logo = fileName

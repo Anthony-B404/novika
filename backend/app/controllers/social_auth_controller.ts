@@ -22,7 +22,7 @@ export default class SocialAuthController {
   /**
    * Handle Google OAuth callback
    */
-  public async googleCallback({ ally, response, i18n }: HttpContext) {
+  public async googleCallback({ ally, response }: HttpContext) {
     try {
       const google = ally.use('google')
 
@@ -33,9 +33,7 @@ export default class SocialAuthController {
 
       // Check if there is an error
       if (google.hasError()) {
-        return response.redirect(
-          `${env.get('FRONTEND_URL')}/login?error=${google.getError()}`
-        )
+        return response.redirect(`${env.get('FRONTEND_URL')}/login?error=${google.getError()}`)
       }
 
       // Get user details from Google
@@ -92,11 +90,15 @@ export default class SocialAuthController {
         fullName: googleUser.name,
         googleId: googleUser.id,
         avatar: googleUser.avatarUrl,
-        role: UserRole.Owner,
         onboardingCompleted: false,
-        organizationId: organization.id,
+        currentOrganizationId: organization.id,
         magicLinkToken: null,
         magicLinkExpiresAt: null,
+      })
+
+      // Link user to organization with Owner role
+      await organization.related('users').attach({
+        [user.id]: { role: UserRole.Owner },
       })
 
       // Generate access token
@@ -123,7 +125,7 @@ export default class SocialAuthController {
       // Check if onboarding already completed
       if (user.onboardingCompleted) {
         return response.status(400).json({
-          message: i18n.t('messages.auth.registration.already_completed'),
+          message: 'Onboarding already completed',
         })
       }
 
@@ -135,7 +137,7 @@ export default class SocialAuthController {
 
       if (!firstName || !lastName || !organizationName) {
         return response.status(422).json({
-          message: i18n.t('messages.errors.validation_failed'),
+          message: 'Validation failed',
         })
       }
 
@@ -146,7 +148,7 @@ export default class SocialAuthController {
       const fullName = `${firstName} ${lastName}`
 
       // Update organization
-      const organization = await Organization.findOrFail(user.organizationId)
+      const organization = await Organization.findOrFail(user.currentOrganizationId)
       organization.name = organizationName
       organization.logo = fileName
       await organization.save()

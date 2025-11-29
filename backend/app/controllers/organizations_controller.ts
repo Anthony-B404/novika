@@ -3,21 +3,98 @@ import { createOrganizationValidator } from '#validators/organization'
 import { cuid } from '@adonisjs/core/helpers'
 import app from '@adonisjs/core/services/app'
 import { MultipartFile } from '@adonisjs/core/bodyparser'
-import User from '#models/user'
 import Organization from '#models/organization'
-import { registerValidator } from '#validators/user'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import fs from 'node:fs/promises'
 import OrganizationPolicy from '#policies/organization_policy'
-import { randomUUID } from 'node:crypto'
-import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
 export default class OrganizationsController {
   private readonly LOGO_DIRECTORY = app.makePath('storage/organizations/logos')
 
-  public async signupWithOrganization({ request, response, i18n }: HttpContext) {
+  /**
+   * Lister toutes les organisations du user
+   */
+  public async listUserOrganizations({ response, auth }: HttpContext) {
+    const authUser = auth.user!
+
+    await authUser.load('organizations', (query) => {
+      query.pivotColumns(['role'])
+    })
+
+    const organizations = authUser.organizations.map((org) => ({
+      id: org.id,
+      name: org.name,
+      logo: org.logo ? `organization-logo/${org.logo}` : null,
+      email: org.email,
+      role: org.$extras.pivot_role,
+      isOwner: org.$extras.pivot_role === 1,
+      isCurrent: org.id === authUser.currentOrganizationId,
+    }))
+
+    return response.json(organizations)
+  }
+
+  /**
+   * Obtenir l'organisation courante avec ses users
+   */
+  public async getOrganizationWithUsers({ response, auth, bouncer, i18n }: HttpContext) {
+    const authUser = auth.user!
+
+    if (!authUser.currentOrganizationId) {
+      return response.status(400).json({
+        message: i18n.t('messages.errors.no_current_organization'),
+      })
+    }
+
+    const organization = await Organization.findOrFail(authUser.currentOrganizationId)
+
+    if (await bouncer.with(OrganizationPolicy).denies('getOrganizationWithUsers', organization)) {
+      return response.status(403).json({
+        message: i18n.t('messages.errors.unauthorized'),
+      })
+    }
+
+    await organization.load('users', (query) => {
+      query.pivotColumns(['role']).wherePivot('role', '!=', 3)
+    })
+
+    await organization.load('invitations', (query) => {
+      query.where('accepted', false).where('expires_at', '>', DateTime.now().toSQL())
+    })
+
+    const serializedOrganization = {
+      ...organization.serialize(),
+      logo: organization.logo ? `organization-logo/${organization.logo}` : null,
+      users: organization.users.map((user) => ({
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.$extras.pivot_role,
+        isCurrentUser: user.id === authUser.id,
+      })),
+      invitations: organization.invitations.map((inv) => ({
+        id: inv.id,
+        email: inv.email,
+      })),
+    }
+
+    return response.json(serializedOrganization)
+  }
+
+  /**
+   * Créer une nouvelle organisation
+   */
+  public async createOrganization({ request, response, auth, bouncer, i18n }: HttpContext) {
+    const authUser = auth.user!
+
+    if (await bouncer.with(OrganizationPolicy).denies('createOrganization', authUser)) {
+      return response.status(403).json({
+        message: i18n.t('messages.errors.unauthorized'),
+      })
+    }
+
     try {
       const organizationData = JSON.parse(request.input('organization'))
       const logo = request.file('logo')
@@ -25,99 +102,56 @@ export default class OrganizationsController {
       const fileName = await this.handleLogoUpload(logo)
       organizationData.logo = fileName
 
-      let organization: Organization
-      try {
-        const organizationPayload = await createOrganizationValidator.validate(organizationData)
-        organization = await Organization.create(organizationPayload)
-      } catch (orgError) {
-        return response
-          .status(422)
-          .json({ message: i18n.t('messages.errors.organization_validation_failed'), errors: orgError.messages })
-      }
+      const organizationPayload = await createOrganizationValidator.validate(organizationData)
+      const organization = await Organization.create(organizationPayload)
 
-      const userData = JSON.parse(request.input('user'))
-      userData.organizationId = organization.id
-      userData.onboardingCompleted = false
-      userData.verificationToken = randomUUID()
+      // Créer la relation pivot avec role Owner
+      await organization.related('users').attach({
+        [authUser.id]: { role: 1 }, // UserRole.Owner
+      })
 
-      let user
-      try {
-        const userPayload = await registerValidator.validate(userData)
-        user = await User.create(userPayload)
-      } catch (userError) {
-        await organization.delete()
-        return response.status(422).json({
-          message: i18n.t('messages.errors.user_validation_failed'),
-          errors: userError.messages,
-        })
-      }
-
-      try {
-        await mail.send((message) => {
-          message
-            .to(user.email)
-            .from('onboarding@resend.dev')
-            .subject(i18n.t('emails.verification.subject'))
-            .htmlView('emails/verify_email', {
-              token: user.verificationToken,
-              i18n: i18n,
-            })
-        })
-      } catch (errors) {
-        await organization.delete()
-        await user.delete()
-        return response.status(422).json({
-          message: i18n.t('messages.errors.email_send_failed'),
-          errors: errors,
-        })
+      // Définir cette organisation comme organisation courante si c'est la première
+      if (!authUser.currentOrganizationId) {
+        authUser.currentOrganizationId = organization.id
+        await authUser.save()
       }
 
       return response.status(201).json({
         message: i18n.t('messages.organization.created'),
+        organization: {
+          id: organization.id,
+          name: organization.name,
+          logo: organization.logo ? `organization-logo/${organization.logo}` : null,
+          email: organization.email,
+        },
       })
     } catch (error) {
       return this.handleError(response, error, i18n)
     }
   }
 
-  public async getOrganizationWithUsers({ response, auth, bouncer, i18n }: HttpContext) {
-    const authUser = auth.user
+  /**
+   * Changer l'organisation courante
+   */
+  public async switchOrganization({ params, response, auth, i18n }: HttpContext) {
+    const authUser = auth.user!
+    const { id } = params
 
-    if (
-      await bouncer.with(OrganizationPolicy).denies('getOrganizationWithUsers' as never, authUser!)
-    ) {
+    const hasAccess = await authUser.hasOrganization(Number(id))
+
+    if (!hasAccess) {
       return response.status(403).json({
         message: i18n.t('messages.errors.unauthorized'),
       })
     }
 
-    if (authUser?.organizationId) {
-      const organization = await Organization.query()
-        .where('id', authUser.organizationId)
-        .select('id', 'name', 'logo', 'email')
-        .preload('users', (query) => {
-          query.where('role', '!=', 3)
-          query.select('id', 'fullName', 'email', 'role', 'is_owner')
-        })
-        .preload('invitations', (query) => {
-          query.where('accepted', false)
-          query.where('expires_at', '>', DateTime.now().toSQL())
-          query.select('id', 'email')
-        })
-        .firstOrFail()
+    authUser.currentOrganizationId = Number(id)
+    await authUser.save()
 
-      if (organization.logo) {
-        organization.logo = `organization-logo/${organization.logo}`
-      }
-
-      const serializedOrganization = organization.serialize()
-      serializedOrganization.users = organization.users.map((user) => ({
-        ...user.serialize(),
-        isCurrentUser: user.id === authUser.id,
-      }))
-
-      return response.json(serializedOrganization)
-    }
+    return response.json({
+      message: i18n.t('messages.organization.switched'),
+      currentOrganizationId: authUser.currentOrganizationId,
+    })
   }
 
   public async getOrganizationLogo({ response, params }: HttpContext) {
@@ -127,15 +161,23 @@ export default class OrganizationsController {
   }
 
   public async updateOrganization({ request, response, auth, bouncer, i18n }: HttpContext) {
-    const user = auth.user
-    if (await bouncer.with(OrganizationPolicy).denies('updateOrganization' as never, user!)) {
+    const user = auth.user!
+
+    if (!user.currentOrganizationId) {
+      return response.status(400).json({
+        message: i18n.t('messages.errors.no_current_organization'),
+      })
+    }
+
+    const organization = await Organization.findOrFail(user.currentOrganizationId)
+
+    if (await bouncer.with(OrganizationPolicy).denies('updateOrganization', organization)) {
       return response.status(403).json({
         message: i18n.t('messages.errors.unauthorized'),
       })
     }
 
     try {
-      const organization = await Organization.findOrFail(user?.organizationId)
       const oldLogo = organization.logo
 
       const logo = request.file('logo')
@@ -153,7 +195,48 @@ export default class OrganizationsController {
         await this.deleteOldLogo(oldLogo)
       }
 
-      return response.json(updatedData)
+      return response.json({
+        ...updatedData,
+        logo: updatedData.logo ? `organization-logo/${updatedData.logo}` : null,
+      })
+    } catch (error) {
+      return this.handleError(response, error, i18n)
+    }
+  }
+
+  /**
+   * Supprimer une organisation (seulement si owner)
+   */
+  public async deleteOrganization({ params, response, auth, bouncer, i18n }: HttpContext) {
+    const authUser = auth.user!
+    const { id } = params
+
+    const organization = await Organization.findOrFail(id)
+
+    if (await bouncer.with(OrganizationPolicy).denies('deleteOrganization', organization)) {
+      return response.status(403).json({
+        message: i18n.t('messages.errors.unauthorized'),
+      })
+    }
+
+    try {
+      // Si c'est l'organisation courante, la retirer
+      if (authUser.currentOrganizationId === organization.id) {
+        authUser.currentOrganizationId = null
+        await authUser.save()
+      }
+
+      // Supprimer le logo s'il existe
+      if (organization.logo) {
+        await this.deleteOldLogo(organization.logo)
+      }
+
+      // Supprimer l'organisation (cascade supprimera les pivots et invitations)
+      await organization.delete()
+
+      return response.json({
+        message: i18n.t('messages.organization.deleted'),
+      })
     } catch (error) {
       return this.handleError(response, error, i18n)
     }

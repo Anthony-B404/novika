@@ -7,6 +7,7 @@ import { registerValidator } from '#validators/user'
 import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
 import { invitationValidator } from '#validators/invitation'
+import mail from '@adonisjs/mail/services/main'
 
 export default class InvitationsController {
   public async createInvitation({ request, response, auth, bouncer, i18n }: HttpContext) {
@@ -15,6 +16,12 @@ export default class InvitationsController {
     if (!authUser) {
       return response.status(401).json({
         message: i18n.t('messages.auth.unauthorized'),
+      })
+    }
+
+    if (!authUser.currentOrganizationId) {
+      return response.status(400).json({
+        message: i18n.t('messages.errors.no_current_organization'),
       })
     }
 
@@ -29,7 +36,7 @@ export default class InvitationsController {
     let payload: any = {
       identifier: randomUUID(),
       email: email,
-      organizationId: authUser.organizationId,
+      organizationId: authUser.currentOrganizationId,
       role: role,
       expiresAt: DateTime.now().plus({ days: 7 }).toFormat('yyyy-MM-dd'),
       accepted: false,
@@ -44,7 +51,7 @@ export default class InvitationsController {
       })
     }
 
-    const organization = await Organization.find(authUser.organizationId)
+    const organization = await Organization.find(authUser.currentOrganizationId)
 
     if (!organization) {
       return response.status(404).json({
@@ -117,39 +124,69 @@ export default class InvitationsController {
       })
     }
 
-    const user = await User.findBy('email', invitation.email)
-
-    if (user) {
-      return response.status(400).json({
-        message: i18n.t('messages.errors.email_already_used'),
-      })
-    }
-
-    const payload = {
-      email: invitation.email,
-      password: password,
-      fullName: fullName,
-      role: invitation.role,
-      organizationId: invitation.organizationId,
-      verificationToken: null,
-      onboardingCompleted: true,
-    }
+    const existingUser = await User.findBy('email', invitation.email)
 
     try {
-      await registerValidator.validate(payload)
-      await User.create(payload)
-      invitation.accepted = true
-      await invitation.save()
+      if (existingUser) {
+        // User existe déjà → juste créer la relation pivot
+        const organization = await Organization.findOrFail(invitation.organizationId)
+
+        // Vérifier si le user n'est pas déjà dans cette org
+        const hasAccess = await existingUser.hasOrganization(invitation.organizationId)
+
+        if (hasAccess) {
+          return response.status(400).json({
+            message: i18n.t('messages.invitation.already_member'),
+          })
+        }
+
+        // Créer la relation pivot
+        await organization.related('users').attach({
+          [existingUser.id]: { role: invitation.role },
+        })
+
+        // Marquer l'invitation comme acceptée
+        invitation.accepted = true
+        await invitation.save()
+
+        return response.status(200).json({
+          message: i18n.t('messages.invitation.accepted'),
+          userExists: true,
+        })
+      } else {
+        // User n'existe pas → créer user + relation pivot
+        const payload = {
+          email: invitation.email,
+          password: password,
+          fullName: fullName,
+          onboardingCompleted: true,
+          currentOrganizationId: invitation.organizationId,
+        }
+
+        await registerValidator.validate(payload)
+        const newUser = await User.create(payload)
+
+        // Créer la relation pivot
+        const organization = await Organization.findOrFail(invitation.organizationId)
+        await organization.related('users').attach({
+          [newUser.id]: { role: invitation.role },
+        })
+
+        // Marquer l'invitation comme acceptée
+        invitation.accepted = true
+        await invitation.save()
+
+        return response.status(200).json({
+          message: i18n.t('messages.invitation.accepted'),
+          userExists: false,
+        })
+      }
     } catch (error) {
       return response.status(422).json({
         message: i18n.t('messages.errors.user_validation_failed'),
-        errors: error.messages,
+        errors: error.messages || error.message,
       })
     }
-
-    return response.status(200).json({
-      message: i18n.t('messages.invitation.accepted'),
-    })
   }
 
   public async deleteInvitation({ params, response, i18n }: HttpContext) {
