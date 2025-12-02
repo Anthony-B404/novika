@@ -1,0 +1,29 @@
+meta {
+  name: Switch Organization
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/organizations/1/switch
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should switch organization successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('currentOrganizationId');
+    expect(data.currentOrganizationId).to.equal(Number(bru.getVar("newOrgId")));
+  });
+}

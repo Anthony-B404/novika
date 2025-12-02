@@ -1,6 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User, { UserRole } from '#models/user'
-import { registrationRequestValidator, completeRegistrationValidator, loginRequestValidator } from '#validators/user'
+import {
+  registrationRequestValidator,
+  completeRegistrationValidator,
+  loginRequestValidator,
+} from '#validators/user'
 import Organization from '#models/organization'
 import mail from '@adonisjs/mail/services/main'
 import { randomUUID } from 'node:crypto'
@@ -12,6 +16,7 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import fs from 'node:fs/promises'
+import { errors } from '@vinejs/vine'
 
 export default class AuthController {
   private readonly LOGO_DIRECTORY = app.makePath('storage/organizations/logos')
@@ -72,12 +77,15 @@ export default class AuthController {
         fullName: null,
         firstName: null,
         lastName: null,
-        role: UserRole.Owner,
-        isOwner: true,
         onboardingCompleted: false,
-        organizationId: organization.id,
+        currentOrganizationId: organization.id,
         magicLinkToken,
         magicLinkExpiresAt,
+      })
+
+      // Créer la relation pivot avec role Owner
+      await organization.related('users').attach({
+        [user.id]: { role: UserRole.Owner },
       })
 
       // Send magic link email
@@ -95,6 +103,27 @@ export default class AuthController {
 
       return response.ok({ message: i18n.t('messages.auth.registration.magic_link_sent') })
     } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        // Extraire le premier message d'erreur et traduire le nom du champ
+        const firstError = error.messages[0]
+
+        if (firstError) {
+          // Traduire le nom du champ
+          const translatedField = i18n.t(
+            `validation.fields.${firstError.field}`,
+            firstError.field
+          )
+
+          // Injecter le nom traduit dans le message d'erreur
+          const translatedMessage = i18n.t(firstError.message, { field: translatedField })
+
+          return response.status(422).json({
+            message: translatedMessage,
+            error: 'Validation failure',
+          })
+        }
+      }
+
       return response.status(422).json({
         message: i18n.t('messages.errors.validation_failed'),
         errors: error.messages || error.message,
@@ -158,7 +187,9 @@ export default class AuthController {
 
       // Check if token has expired
       if (user.magicLinkExpiresAt && user.magicLinkExpiresAt < DateTime.now()) {
-        return response.unauthorized({ message: i18n.t('messages.auth.registration.token_expired') })
+        return response.unauthorized({
+          message: i18n.t('messages.auth.registration.token_expired'),
+        })
       }
 
       // Handle logo upload
@@ -168,7 +199,7 @@ export default class AuthController {
       const fullName = `${data.firstName} ${data.lastName}`
 
       // Update existing organization (created in step 1)
-      const organization = await Organization.findOrFail(user.organizationId)
+      const organization = await Organization.findOrFail(user.currentOrganizationId)
       organization.name = data.organizationName
       organization.email = user.email
       organization.logo = fileName
@@ -192,6 +223,27 @@ export default class AuthController {
         token: accessToken.value!.release(),
       })
     } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        // Extraire le premier message d'erreur et traduire le nom du champ
+        const firstError = error.messages[0]
+
+        if (firstError) {
+          // Traduire le nom du champ
+          const translatedField = i18n.t(
+            `validation.fields.${firstError.field}`,
+            firstError.field
+          )
+
+          // Injecter le nom traduit dans le message d'erreur
+          const translatedMessage = i18n.t(firstError.message, { field: translatedField })
+
+          return response.status(422).json({
+            message: translatedMessage,
+            error: 'Validation failure',
+          })
+        }
+      }
+
       return response.status(422).json({
         message: i18n.t('messages.errors.validation_failed'),
         errors: error.messages || error.message,
@@ -242,6 +294,27 @@ export default class AuthController {
 
       return response.ok({ message: i18n.t('messages.auth.login.magic_link_sent') })
     } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        // Extraire le premier message d'erreur et traduire le nom du champ
+        const firstError = error.messages[0]
+
+        if (firstError) {
+          // Traduire le nom du champ
+          const translatedField = i18n.t(
+            `validation.fields.${firstError.field}`,
+            firstError.field
+          )
+
+          // Injecter le nom traduit dans le message d'erreur
+          const translatedMessage = i18n.t(firstError.message, { field: translatedField })
+
+          return response.status(422).json({
+            message: translatedMessage,
+            error: 'Validation failure',
+          })
+        }
+      }
+
       return response.status(422).json({
         message: i18n.t('messages.errors.validation_failed'),
         errors: error.messages || error.message,

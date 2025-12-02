@@ -11,18 +11,53 @@ import fs from 'node:fs/promises'
 import mail from '@adonisjs/mail/services/main'
 import { randomUUID } from 'node:crypto'
 import { DateTime } from 'luxon'
+import { errors } from '@vinejs/vine'
 
 export default class UsersController {
   public async me({ auth, response }: HttpContext) {
-    const user = auth.user
-    return response.ok(user)
+    const user = auth.user!
+
+    // Charger les organisations du user avec leur role
+    await user.load('organizations', (query) => {
+      query.pivotColumns(['role'])
+    })
+
+    // Charger l'organisation courante si elle existe
+    if (user.currentOrganizationId) {
+      await user.load('currentOrganization')
+    }
+
+    const userResponse = {
+      ...user.serialize(),
+      organizations: user.organizations.map((org) => ({
+        id: org.id,
+        name: org.name,
+        logo: org.logo ? `organization-logo/${org.logo}` : null,
+        email: org.email,
+        role: org.$extras.pivot_role,
+        isOwner: org.$extras.pivot_role === 1,
+        isCurrent: org.id === user.currentOrganizationId,
+      })),
+      currentOrganization: user.currentOrganization
+        ? {
+            id: user.currentOrganization.id,
+            name: user.currentOrganization.name,
+            logo: user.currentOrganization.logo
+              ? `organization-logo/${user.currentOrganization.logo}`
+              : null,
+            email: user.currentOrganization.email,
+          }
+        : null,
+    }
+
+    return response.ok(userResponse)
   }
 
   public async updateProfile({ auth, request, response, i18n }: HttpContext) {
     try {
       const user = auth.user!
       const data = await request.validateUsing(updateProfileValidator, {
-        meta: { userId: user.id }
+        meta: { userId: user.id },
       })
       const avatar = request.file('avatar')
 
@@ -67,7 +102,11 @@ export default class UsersController {
       // Handle avatar removal (priority: new upload > removal)
       if (data.removeAvatar && !avatar) {
         // Only remove if no new avatar is being uploaded
-        if (user.avatar && !user.avatar.startsWith('http://') && !user.avatar.startsWith('https://')) {
+        if (
+          user.avatar &&
+          !user.avatar.startsWith('http://') &&
+          !user.avatar.startsWith('https://')
+        ) {
           // Delete local file if it exists (not Google OAuth URL)
           const avatarPath = app.makePath('storage/users/avatars', user.avatar)
           try {
@@ -101,12 +140,33 @@ export default class UsersController {
 
       return response.ok({
         message,
-        user
+        user,
       })
     } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        // Extraire le premier message d'erreur et traduire le nom du champ
+        const firstError = error.messages[0]
+
+        if (firstError) {
+          // Traduire le nom du champ
+          const translatedField = i18n.t(
+            `validation.fields.${firstError.field}`,
+            firstError.field
+          )
+
+          // Injecter le nom traduit dans le message d'erreur
+          const translatedMessage = i18n.t(firstError.message, { field: translatedField })
+
+          return response.status(422).json({
+            message: translatedMessage,
+            error: 'Validation failure',
+          })
+        }
+      }
+
       return response.status(422).json({
         message: i18n.t('messages.errors.validation_failed'),
-        errors: error.messages || error.message
+        errors: error.messages || error.message,
       })
     }
   }
@@ -194,7 +254,7 @@ export default class UsersController {
 
     if (existingUser) {
       return response.status(422).json({
-        message: i18n.t('messages.user.email_already_in_use')
+        message: i18n.t('messages.user.email_already_in_use'),
       })
     }
 
@@ -207,7 +267,7 @@ export default class UsersController {
 
     return response.ok({
       message: i18n.t('messages.user.email_changed_successfully'),
-      user
+      user,
     })
   }
 

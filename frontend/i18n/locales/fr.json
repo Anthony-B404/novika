@@ -433,8 +433,9 @@
       "bounced": "Rejeté"
     },
     "roles": {
-      "member": "Membre",
-      "owner": "Propriétaire"
+      "owner": "Propriétaire",
+      "administrator": "Administrateur",
+      "member": "Membre"
     },
     "periods": {
       "daily": "Quotidien",
@@ -471,8 +472,30 @@
       "title": "Notifications"
     },
     "teams": {
+      "loading": "Chargement...",
       "createTeam": "Créer une équipe",
-      "manageTeams": "Gérer les équipes"
+      "manageTeams": "Gérer les équipes",
+      "organizationSwitched": "Organisation changée avec succès",
+      "organizationSwitchError": "Erreur lors du changement d'organisation",
+      "createOrganizationModal": {
+        "title": "Créer une organisation",
+        "description": "Renseignez les informations de votre nouvelle organisation.",
+        "organizationName": "Nom de l'organisation",
+        "organizationNamePlaceholder": "Mon entreprise",
+        "organizationEmail": "Email de l'organisation",
+        "organizationEmailPlaceholder": "email",
+        "logo": "Logo (optionnel)",
+        "successTitle": "Organisation créée !",
+        "successDescription": "Votre nouvelle organisation a été créée avec succès",
+        "errorTitle": "Erreur",
+        "errorDescription": "Une erreur est survenue lors de la création de l'organisation",
+        "validation": {
+          "nameRequired": "Le nom de l'organisation est requis",
+          "nameTooShort": "Le nom doit contenir au moins 2 caractères",
+          "emailRequired": "L'email de l'organisation est requis",
+          "invalidEmail": "Email invalide"
+        }
+      }
     },
     "user": {
       "profile": "Profil",
@@ -596,6 +619,7 @@
         "title": "Paramètres",
         "navigation": {
           "general": "Général",
+          "organization": "Organisation",
           "members": "Membres",
           "notifications": "Notifications",
           "security": "Sécurité"
@@ -621,6 +645,27 @@
           "validation": {
             "firstNameTooShort": "Le prénom doit contenir au moins 2 caractères",
             "lastNameTooShort": "Le nom doit contenir au moins 2 caractères",
+            "invalidEmail": "Email invalide"
+          }
+        },
+        "organization": {
+          "title": "Organisation",
+          "description": "Gérer les paramètres de votre organisation.",
+          "nameLabel": "Nom de l'organisation",
+          "nameDescription": "Le nom de votre organisation.",
+          "emailLabel": "Email de l'organisation",
+          "emailDescription": "Email de contact de l'organisation.",
+          "logoLabel": "Logo",
+          "logoDescription": "JPG, GIF ou PNG. 1Mo Max.",
+          "removeLogo": "Supprimer",
+          "successTitle": "Succès",
+          "successDescription": "Les paramètres de l'organisation ont été mis à jour.",
+          "noChangesTitle": "Aucune modification",
+          "noChangesDescription": "Aucune modification n'a été effectuée.",
+          "errorTitle": "Erreur",
+          "errorDescription": "Une erreur s'est produite lors de la mise à jour de l'organisation.",
+          "validation": {
+            "nameTooShort": "Le nom doit contenir au moins 2 caractères",
             "invalidEmail": "Email invalide"
           }
         },

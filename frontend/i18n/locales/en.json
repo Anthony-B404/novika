@@ -377,8 +377,9 @@
       "bounced": "Bounced"
     },
     "roles": {
-      "member": "Member",
-      "owner": "Owner"
+      "owner": "Owner",
+      "administrator": "Administrator",
+      "member": "Member"
     },
     "periods": {
       "daily": "Daily",
@@ -415,8 +416,30 @@
       "title": "Notifications"
     },
     "teams": {
+      "loading": "Loading...",
       "createTeam": "Create team",
-      "manageTeams": "Manage teams"
+      "manageTeams": "Manage teams",
+      "organizationSwitched": "Organization switched successfully",
+      "organizationSwitchError": "Error switching organization",
+      "createOrganizationModal": {
+        "title": "Create organization",
+        "description": "Enter your new organization information.",
+        "organizationName": "Organization name",
+        "organizationNamePlaceholder": "My company",
+        "organizationEmail": "Organization email",
+        "organizationEmailPlaceholder": "email",
+        "logo": "Logo (optional)",
+        "successTitle": "Organization created!",
+        "successDescription": "Your new organization has been created successfully",
+        "errorTitle": "Error",
+        "errorDescription": "An error occurred while creating the organization",
+        "validation": {
+          "nameRequired": "Organization name is required",
+          "nameTooShort": "Name must be at least 2 characters",
+          "emailRequired": "Organization email is required",
+          "invalidEmail": "Invalid email"
+        }
+      }
     },
     "user": {
       "profile": "Profile",
@@ -540,6 +563,7 @@
         "title": "Settings",
         "navigation": {
           "general": "General",
+          "organization": "Organization",
           "members": "Members",
           "notifications": "Notifications",
           "security": "Security"
@@ -565,6 +589,27 @@
           "validation": {
             "firstNameTooShort": "First name must be at least 2 characters",
             "lastNameTooShort": "Last name must be at least 2 characters",
+            "invalidEmail": "Invalid email"
+          }
+        },
+        "organization": {
+          "title": "Organization",
+          "description": "Manage your organization settings.",
+          "nameLabel": "Organization name",
+          "nameDescription": "Your organization's name.",
+          "emailLabel": "Organization email",
+          "emailDescription": "Contact email for the organization.",
+          "logoLabel": "Logo",
+          "logoDescription": "JPG, GIF or PNG. 1MB Max.",
+          "removeLogo": "Remove",
+          "successTitle": "Success",
+          "successDescription": "Your organization settings have been updated.",
+          "noChangesTitle": "No changes",
+          "noChangesDescription": "No changes were made.",
+          "errorTitle": "Error",
+          "errorDescription": "An error occurred while updating the organization.",
+          "validation": {
+            "nameTooShort": "Name must be at least 2 characters",
             "invalidEmail": "Invalid email"
           }
         },

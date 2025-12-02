@@ -1,35 +1,45 @@
 meta {
-  name: getOrganizationWithUsers
+  name: Get Organization With Users
   type: http
-  seq: 1
+  seq: 5
 }
 
 get {
   url: {{baseUrl}}/organization
-  body: multipartForm
+  body: none
   auth: bearer
 }
 
 headers {
-  Content-Type: application/json
+  Accept-Language: en
 }
 
 auth:bearer {
   token: {{token}}
 }
 
-body:json {
-  {
-    "name": "Test Organization",
-    "logo": "https://example.com/logo.png",
-    "email": "test@example.com"
-  }
+assert {
+  res.status: eq 200
+  res.body: isJson
 }
 
 tests {
-  test("should create an organization", function() {
+  test("should return organization with users", function() {
     const data = res.getBody();
-    expect(res.getStatus()).to.equal(201);
     expect(data).to.have.property('id');
+    expect(data).to.have.property('name');
+    expect(data).to.have.property('email');
+    expect(data).to.have.property('users');
+    expect(data).to.have.property('invitations');
+    expect(Array.isArray(data.users)).to.be.true;
+    expect(Array.isArray(data.invitations)).to.be.true;
+  });
+  
+  test("users should have role information", function() {
+    const data = res.getBody();
+    if (data.users.length > 0) {
+      expect(data.users[0]).to.have.property('role');
+      expect(data.users[0]).to.have.property('isCurrentUser');
+    }
   });
 }

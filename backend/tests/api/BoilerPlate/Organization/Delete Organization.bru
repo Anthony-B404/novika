@@ -1,0 +1,31 @@
+meta {
+  name: Delete Organization
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/organizations/4
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete organization successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+  });
+}

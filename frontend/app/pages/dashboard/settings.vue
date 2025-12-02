@@ -17,6 +17,11 @@ const links = computed(() => [
       exact: true,
     },
     {
+      label: t('pages.dashboard.settings.navigation.organization'),
+      icon: "i-lucide-building",
+      to: localePath('/dashboard/settings/organization'),
+    },
+    {
       label: t('pages.dashboard.settings.navigation.members'),
       icon: "i-lucide-users",
       to: localePath('/dashboard/settings/members'),

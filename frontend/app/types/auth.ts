@@ -1,11 +1,16 @@
+export enum UserRole {
+  Owner = 1,
+  Administrator = 2,
+  Member = 3,
+}
+
 export interface User {
   id: number
   email: string
   firstName: string | null
   lastName: string | null
   fullName: string | null
-  role: number
-  isOwner: boolean
+  role: UserRole
   organizationId: number
   avatar: string | null
   googleId: string | null
