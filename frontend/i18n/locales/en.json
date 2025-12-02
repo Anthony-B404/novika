@@ -562,6 +562,7 @@
         "title": "Settings",
         "navigation": {
           "general": "General",
+          "organization": "Organization",
           "members": "Members",
           "notifications": "Notifications",
           "security": "Security"
@@ -587,6 +588,27 @@
           "validation": {
             "firstNameTooShort": "First name must be at least 2 characters",
             "lastNameTooShort": "Last name must be at least 2 characters",
+            "invalidEmail": "Invalid email"
+          }
+        },
+        "organization": {
+          "title": "Organization",
+          "description": "Manage your organization settings.",
+          "nameLabel": "Organization name",
+          "nameDescription": "Your organization's name.",
+          "emailLabel": "Organization email",
+          "emailDescription": "Contact email for the organization.",
+          "logoLabel": "Logo",
+          "logoDescription": "JPG, GIF or PNG. 1MB Max.",
+          "removeLogo": "Remove",
+          "successTitle": "Success",
+          "successDescription": "Your organization settings have been updated.",
+          "noChangesTitle": "No changes",
+          "noChangesDescription": "No changes were made.",
+          "errorTitle": "Error",
+          "errorDescription": "An error occurred while updating the organization.",
+          "validation": {
+            "nameTooShort": "Name must be at least 2 characters",
             "invalidEmail": "Invalid email"
           }
         },

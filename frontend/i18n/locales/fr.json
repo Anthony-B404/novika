@@ -618,6 +618,7 @@
         "title": "Paramètres",
         "navigation": {
           "general": "Général",
+          "organization": "Organisation",
           "members": "Membres",
           "notifications": "Notifications",
           "security": "Sécurité"
@@ -643,6 +644,27 @@
           "validation": {
             "firstNameTooShort": "Le prénom doit contenir au moins 2 caractères",
             "lastNameTooShort": "Le nom doit contenir au moins 2 caractères",
+            "invalidEmail": "Email invalide"
+          }
+        },
+        "organization": {
+          "title": "Organisation",
+          "description": "Gérer les paramètres de votre organisation.",
+          "nameLabel": "Nom de l'organisation",
+          "nameDescription": "Le nom de votre organisation.",
+          "emailLabel": "Email de l'organisation",
+          "emailDescription": "Email de contact de l'organisation.",
+          "logoLabel": "Logo",
+          "logoDescription": "JPG, GIF ou PNG. 1Mo Max.",
+          "removeLogo": "Supprimer",
+          "successTitle": "Succès",
+          "successDescription": "Les paramètres de l'organisation ont été mis à jour.",
+          "noChangesTitle": "Aucune modification",
+          "noChangesDescription": "Aucune modification n'a été effectuée.",
+          "errorTitle": "Erreur",
+          "errorDescription": "Une erreur s'est produite lors de la mise à jour de l'organisation.",
+          "validation": {
+            "nameTooShort": "Le nom doit contenir au moins 2 caractères",
             "invalidEmail": "Email invalide"
           }
         },
