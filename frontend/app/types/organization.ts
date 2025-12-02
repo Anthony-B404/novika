@@ -22,8 +22,19 @@ export interface Organization {
   invitations?: Invitation[]
 }
 
+export interface UserOrganization {
+  id: number
+  name: string
+  email: string
+  logo: string | null
+  role: UserRole
+  isOwner: boolean
+  isCurrent: boolean
+}
+
 export interface OrganizationState {
   organization: Organization | null
+  organizations: UserOrganization[]
   loading: boolean
   error: string | null
 }

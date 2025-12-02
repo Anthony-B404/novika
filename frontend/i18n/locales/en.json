@@ -418,7 +418,27 @@
     "teams": {
       "loading": "Loading...",
       "createTeam": "Create team",
-      "manageTeams": "Manage teams"
+      "manageTeams": "Manage teams",
+      "organizationSwitched": "Organization switched successfully",
+      "organizationSwitchError": "Error switching organization",
+      "createOrganizationModal": {
+        "title": "Create organization",
+        "description": "Enter your new organization information.",
+        "organizationName": "Organization name",
+        "organizationNamePlaceholder": "My company",
+        "organizationEmail": "Organization email",
+        "organizationEmailPlaceholder": "email",
+        "successTitle": "Organization created!",
+        "successDescription": "Your new organization has been created successfully",
+        "errorTitle": "Error",
+        "errorDescription": "An error occurred while creating the organization",
+        "validation": {
+          "nameRequired": "Organization name is required",
+          "nameTooShort": "Name must be at least 2 characters",
+          "emailRequired": "Organization email is required",
+          "invalidEmail": "Invalid email"
+        }
+      }
     },
     "user": {
       "profile": "Profile",

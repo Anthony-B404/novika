@@ -474,7 +474,27 @@
     "teams": {
       "loading": "Chargement...",
       "createTeam": "Créer une équipe",
-      "manageTeams": "Gérer les équipes"
+      "manageTeams": "Gérer les équipes",
+      "organizationSwitched": "Organisation changée avec succès",
+      "organizationSwitchError": "Erreur lors du changement d'organisation",
+      "createOrganizationModal": {
+        "title": "Créer une organisation",
+        "description": "Renseignez les informations de votre nouvelle organisation.",
+        "organizationName": "Nom de l'organisation",
+        "organizationNamePlaceholder": "Mon entreprise",
+        "organizationEmail": "Email de l'organisation",
+        "organizationEmailPlaceholder": "email",
+        "successTitle": "Organisation créée !",
+        "successDescription": "Votre nouvelle organisation a été créée avec succès",
+        "errorTitle": "Erreur",
+        "errorDescription": "Une erreur est survenue lors de la création de l'organisation",
+        "validation": {
+          "nameRequired": "Le nom de l'organisation est requis",
+          "nameTooShort": "Le nom doit contenir au moins 2 caractères",
+          "emailRequired": "L'email de l'organisation est requis",
+          "invalidEmail": "Email invalide"
+        }
+      }
     },
     "user": {
       "profile": "Profil",
