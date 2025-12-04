@@ -302,6 +302,27 @@
       "noToken": "Invalid link. Please request a new verification link.",
       "invalidToken": "This link is invalid or has expired"
     },
+    "acceptInvitation": {
+      "title": "Accept invitation",
+      "description": "You have been invited to join {organization}",
+      "firstName": "First name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Enter your last name",
+      "avatar": "Profile picture (optional)",
+      "submitButton": "Accept invitation",
+      "success": "Invitation accepted!",
+      "successDescription": "Welcome to your new organization",
+      "error": "Error",
+      "errorDescription": "Failed to accept invitation. Please try again.",
+      "noIdentifier": "Invalid link. Please request a new invitation.",
+      "invalidInvitation": "This invitation is invalid or has expired",
+      "existingUser": {
+        "title": "You already have an account",
+        "description": "Click below to join {organization}",
+        "button": "Join organization"
+      }
+    },
     "validation": {
       "emailRequired": "Email is required",
       "firstNameRequired": "First name is required",
@@ -333,6 +354,10 @@
     "verifyEmailChange": {
       "title": "Verify email change",
       "description": "Verifying your new email"
+    },
+    "acceptInvitation": {
+      "title": "Accept invitation",
+      "description": "Join an organization by accepting your invitation"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -507,7 +532,28 @@
     "settings": {
       "members": {
         "editMember": "Edit member",
-        "removeMember": "Remove member"
+        "removeMember": "Remove member",
+        "inviteModal": {
+          "title": "Invite member",
+          "description": "Invite a new member to join your organization.",
+          "emailLabel": "Email",
+          "emailPlaceholder": "email",
+          "roleLabel": "Role",
+          "rolePlaceholder": "Select a role",
+          "roles": {
+            "administrator": "Administrator",
+            "member": "Member"
+          },
+          "successTitle": "Invitation sent!",
+          "successDescription": "The invitation has been sent to {email}",
+          "errorTitle": "Error",
+          "errorDescription": "An error occurred while sending the invitation",
+          "validation": {
+            "emailRequired": "Email is required",
+            "invalidEmail": "Invalid email",
+            "roleRequired": "Role is required"
+          }
+        }
       }
     }
   },

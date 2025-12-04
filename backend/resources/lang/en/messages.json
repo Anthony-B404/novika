@@ -45,6 +45,7 @@
     "invalid": "Invalid invitation",
     "already_accepted": "This invitation has already been accepted",
     "already_member": "You are already a member of this organization",
+    "pending_invitation_exists": "A pending invitation already exists for this email in this organization",
     "deleted": "Invitation deleted successfully"
   },
   "user": {

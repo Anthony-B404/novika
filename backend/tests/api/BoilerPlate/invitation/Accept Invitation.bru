@@ -1,0 +1,60 @@
+meta {
+  name: Accept Invitation
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/accept-invitation
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  identifier: c366a4b8-c5e3-49bd-b6c4-570c4e3bef83
+  firstName: Bruno
+  lastName: WithAvatar
+  avatar: @file(/Users/anthonybette/Downloads/default.png)
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should accept invitation with avatar upload", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('user');
+    expect(data).to.have.property('token');
+    expect(data).to.have.property('userExists');
+    expect(data.userExists).to.be.false;
+    expect(data.user).to.have.property('avatar');
+    expect(data.user.avatar).to.not.be.null;
+  });
+}
+
+docs {
+  Acceptation d'invitation avec **upload d'avatar** (multipart/form-data).
+  
+  Workflow:
+  1. Envoie les données en multipart/form-data
+  2. Valide identifier, firstName, lastName
+  3. Gère l'upload de l'avatar (optionnel)
+  4. Déduplique l'avatar par hash SHA256
+  5. Crée le user avec avatar
+  6. Retourne token API
+  
+  Avatar:
+  - Format: multipart/form-data
+  - Champ: avatar
+  - Déduplication par hash pour éviter les doublons
+  - Optionnel (l'invitation fonctionne sans avatar)
+  
+  Variables requises:
+  - invitationIdentifier: UUID de l'invitation
+  
+  Fichier requis:
+  - avatar-test.png: Image de test (placer dans le même dossier)
+}

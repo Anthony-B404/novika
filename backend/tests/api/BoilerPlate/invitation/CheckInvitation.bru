@@ -5,17 +5,32 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/check-invitation/b280ff2d-c4b1-457e-b365-e313babff71f
-  body: json
-  auth: bearer
+  url: {{baseUrl}}/check-invitation/{{invitationIdentifier}}
+  body: none
+  auth: none
 }
 
-auth:bearer {
-  token: {{token}}
+assert {
+  res.status: eq 200
+  res.body: isJson
 }
 
-body:json {
-  {
-    "email": "test2@te.co"
-  }
+tests {
+  test("should return invitation and organization details", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('email');
+    expect(data).to.have.property('organizationName');
+    expect(data).to.have.property('organizationLogo');
+  });
+}
+
+docs {
+  Vérifie la validité d'une invitation (route publique, pas d'auth requise).
+  - Vérifie que l'invitation existe
+  - Vérifie qu'elle n'est pas déjà acceptée
+  - Vérifie qu'elle n'est pas expirée
+  - Retourne les infos de l'organisation (nom, logo)
+
+  Variables requises:
+  - invitationIdentifier: UUID de l'invitation (ex: b280ff2d-c4b1-457e-b365-e313babff71f)
 }

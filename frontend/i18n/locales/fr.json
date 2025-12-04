@@ -289,6 +289,27 @@
       "noToken": "Lien invalide. Veuillez demander un nouveau lien de vérification.",
       "invalidToken": "Ce lien est invalide ou a expiré"
     },
+    "acceptInvitation": {
+      "title": "Accepter l'invitation",
+      "description": "Vous avez été invité à rejoindre {organization}",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Entrez votre prénom",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Entrez votre nom",
+      "avatar": "Photo de profil (optionnel)",
+      "submitButton": "Accepter l'invitation",
+      "success": "Invitation acceptée !",
+      "successDescription": "Bienvenue dans votre nouvelle organisation",
+      "error": "Erreur",
+      "errorDescription": "Échec de l'acceptation de l'invitation. Veuillez réessayer.",
+      "noIdentifier": "Lien invalide. Veuillez demander une nouvelle invitation.",
+      "invalidInvitation": "Cette invitation est invalide ou a expiré",
+      "existingUser": {
+        "title": "Vous avez déjà un compte",
+        "description": "Cliquez ci-dessous pour rejoindre {organization}",
+        "button": "Rejoindre l'organisation"
+      }
+    },
     "validation": {
       "emailRequired": "L'email est requis",
       "firstNameRequired": "Le prénom est requis",
@@ -389,6 +410,10 @@
     "verifyEmailChange": {
       "title": "Vérification du changement d'email",
       "description": "Vérification de votre nouveau email"
+    },
+    "acceptInvitation": {
+      "title": "Accepter l'invitation",
+      "description": "Rejoignez une organisation en acceptant votre invitation"
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -563,7 +588,28 @@
     "settings": {
       "members": {
         "editMember": "Modifier le membre",
-        "removeMember": "Retirer le membre"
+        "removeMember": "Retirer le membre",
+        "inviteModal": {
+          "title": "Inviter un membre",
+          "description": "Invitez un nouveau membre à rejoindre votre organisation.",
+          "emailLabel": "Email",
+          "emailPlaceholder": "email",
+          "roleLabel": "Rôle",
+          "rolePlaceholder": "Sélectionner un rôle",
+          "roles": {
+            "administrator": "Administrateur",
+            "member": "Membre"
+          },
+          "successTitle": "Invitation envoyée !",
+          "successDescription": "L'invitation a été envoyée à {email}",
+          "errorTitle": "Erreur",
+          "errorDescription": "Une erreur est survenue lors de l'envoi de l'invitation",
+          "validation": {
+            "emailRequired": "L'email est requis",
+            "invalidEmail": "Email invalide",
+            "roleRequired": "Le rôle est requis"
+          }
+        }
       }
     }
   },

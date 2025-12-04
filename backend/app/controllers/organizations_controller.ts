@@ -62,7 +62,7 @@ export default class OrganizationsController {
     })
 
     await organization.load('invitations', (query) => {
-      query.where('accepted', false).where('expires_at', '>', DateTime.now().toSQL())
+      query.where('expires_at', '>', DateTime.now().toSQL())
     })
 
     const serializedOrganization = {

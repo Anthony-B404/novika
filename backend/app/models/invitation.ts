@@ -20,9 +20,6 @@ export default class Invitation extends BaseModel {
   declare expiresAt: DateTime
 
   @column()
-  declare accepted: boolean
-
-  @column()
   declare role: number
 
   @column.dateTime({ autoCreate: true })

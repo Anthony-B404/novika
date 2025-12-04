@@ -1,21 +1,52 @@
 import vine from '@vinejs/vine'
 import Invitation from '#models/invitation'
 import User from '#models/user'
-import { DateTime } from 'luxon'
-export const invitationValidator = vine.compile(
+import { UserRole } from '#models/user'
+
+/**
+ * Validator pour la création d'une invitation
+ * Vérifie que l'email n'existe pas déjà comme membre ou invitation existante dans CETTE organisation
+ * Vérifie que le role est Administrator (2) ou Member (3) uniquement
+ */
+export const createInvitationValidator = vine.compile(
   vine.object({
-    identifier: vine.string().uuid(),
     email: vine
       .string()
       .email()
-      .unique(async (_, value) => {
+      .unique(async (db, value, field) => {
+        // Récupérer organizationId depuis les meta
+        const organizationId = field.meta.organizationId
+
+        // 1. Vérifier si l'email existe comme user membre de CETTE organisation
         const user = await User.findBy('email', value)
-        const invitation = await Invitation.findBy('email', value)
-        return !user && !invitation
+        if (user) {
+          const isMember = await user.hasOrganization(organizationId)
+          if (isMember) {
+            return false // User déjà membre de cette organisation
+          }
+        }
+
+        // 2. Vérifier qu'il n'y a pas d'invitation existante pour CETTE organisation
+        const invitation = await Invitation.query()
+          .where('email', value)
+          .where('organizationId', organizationId)
+          .first()
+
+        return !invitation // false si invitation existe pour cette organisation
       }),
-    organizationId: vine.number(),
-    role: vine.number(),
-    expiresAt: vine.date().equals(DateTime.now().plus({ days: 7 }).toFormat('yyyy-MM-dd')),
-    accepted: vine.boolean(),
+    role: vine.enum([UserRole.Administrator, UserRole.Member]),
+  })
+)
+
+/**
+ * Validator pour l'acceptation d'une invitation
+ * firstName et lastName sont optionnels pour les utilisateurs existants
+ * Obligatoires uniquement pour les nouveaux utilisateurs (vérification dans le controller)
+ */
+export const acceptInvitationValidator = vine.compile(
+  vine.object({
+    identifier: vine.string().uuid(),
+    firstName: vine.string().minLength(2).optional(),
+    lastName: vine.string().minLength(2).optional(),
   })
 )

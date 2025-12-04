@@ -1,0 +1,46 @@
+meta {
+  name: DeleteInvitation
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/delete-invitation/{{invitationId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete invitation successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data.message).to.include('supprimée');
+  });
+}
+
+docs {
+  Supprime une invitation pendante (route protégée).
+
+  Workflow:
+  1. Authentification requise (Owner ou Admin)
+  2. Trouve l'invitation par ID
+  3. Supprime l'invitation (acceptée ou non)
+
+  Cas d'usage:
+  - Annuler une invitation avant qu'elle soit acceptée
+  - Nettoyer les invitations expirées
+  - Supprimer une invitation acceptée (nettoyage)
+
+  Variables requises:
+  - invitationId: ID numérique de l'invitation (pas l'identifier UUID)
+  - token: Token API de l'utilisateur authentifié
+}

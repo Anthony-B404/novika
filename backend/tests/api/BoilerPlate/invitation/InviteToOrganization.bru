@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/invite-member
+  url: {{baseUrl}}/api/invite-member
   body: json
   auth: bearer
 }
@@ -16,7 +16,31 @@ auth:bearer {
 
 body:json {
   {
-    "email": "test2@te.com",
+    "email": "newmember@test.com",
     "role": 2
   }
+}
+
+assert {
+  res.status: eq 201
+  res.body: isJson
+}
+
+tests {
+  test("should create invitation successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('invitation');
+    expect(data.invitation).to.have.property('identifier');
+    expect(data.invitation).to.have.property('email');
+    expect(data.invitation.role).to.equal(2);
+  });
+}
+
+docs {
+  Crée une invitation pour rejoindre l'organisation courante.
+  - Seuls les Owners (1) et Administrators (2) peuvent inviter
+  - Role autorisés : 2 (Administrator) ou 3 (Member)
+  - Génère un identifier (UUID) automatiquement
+  - Envoie un email à l'invité
 }
