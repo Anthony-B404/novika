@@ -533,6 +533,8 @@
       "members": {
         "editMember": "Edit member",
         "removeMember": "Remove member",
+        "errorLoadingTitle": "Error loading members",
+        "errorLoadingDescription": "An error occurred while loading the members list",
         "inviteModal": {
           "title": "Invite member",
           "description": "Invite a new member to join your organization.",

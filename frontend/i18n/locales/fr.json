@@ -589,6 +589,8 @@
       "members": {
         "editMember": "Modifier le membre",
         "removeMember": "Retirer le membre",
+        "errorLoadingTitle": "Erreur de chargement des membres",
+        "errorLoadingDescription": "Une erreur est survenue lors du chargement de la liste des membres",
         "inviteModal": {
           "title": "Inviter un membre",
           "description": "Invitez un nouveau membre à rejoindre votre organisation.",
