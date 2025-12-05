@@ -71,6 +71,8 @@ router
 
     // Invitation routes
     router.post('/invite-member', [InvitationsController, 'createInvitation'])
+    router.get('/invitations', [InvitationsController, 'listInvitations'])
+    router.post('/resend-invitation/:id', [InvitationsController, 'resendInvitation'])
     router.delete('/delete-invitation/:id', [InvitationsController, 'deleteInvitation'])
   })
   .use(middleware.auth({ guards: ['api'] }))

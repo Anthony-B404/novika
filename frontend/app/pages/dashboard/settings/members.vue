@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Member } from "~/types";
+import type { Member, Invitation } from "~/types";
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import type { SelectItem } from "@nuxt/ui";
@@ -13,6 +13,7 @@ const toast = useToast();
 const { authenticatedFetch } = useAuth();
 
 const members = ref<Member[]>([]);
+const invitations = ref<Invitation[]>([]);
 
 const loadMembers = async () => {
   try {
@@ -27,9 +28,34 @@ const loadMembers = async () => {
   }
 };
 
+const loadInvitations = async () => {
+  try {
+    const data = await authenticatedFetch<Invitation[]>("/invitations");
+    invitations.value = data || [];
+  } catch (error) {
+    toast.add({
+      title: t("components.settings.invitations.errorLoadingTitle"),
+      description: t("components.settings.invitations.errorLoadingDescription"),
+      color: "error",
+    });
+  }
+};
+
 await loadMembers();
+await loadInvitations();
 
 const refreshMembers = loadMembers;
+const refreshInvitations = loadInvitations;
+
+// Collapsible state for invitations - open by default if there are invitations
+const invitationsOpen = ref(invitations.value.length > 0);
+
+// Update collapsible state when invitations change
+watch(invitations, (newInvitations) => {
+  if (newInvitations.length > 0 && !invitationsOpen.value) {
+    invitationsOpen.value = true;
+  }
+});
 
 const q = ref("");
 
@@ -140,8 +166,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     state.email = undefined;
     state.role = UserRole.Member;
 
-    // Refresh members list
+    // Refresh members list and invitations list
     await refreshMembers();
+    await refreshInvitations();
   } catch (error: any) {
     toast.add({
       title: t("components.settings.members.inviteModal.errorTitle"),
@@ -152,6 +179,66 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     });
   } finally {
     submitting.value = false;
+  }
+}
+
+// Resend invitation
+const resendingInvitation = ref<number | null>(null);
+
+async function resendInvitation(id: number) {
+  resendingInvitation.value = id;
+
+  try {
+    await authenticatedFetch(`/resend-invitation/${id}`, {
+      method: "POST",
+    });
+
+    toast.add({
+      title: t("components.settings.invitations.resendSuccess"),
+      color: "success",
+    });
+
+    // Refresh invitations list
+    await refreshInvitations();
+  } catch (error: any) {
+    toast.add({
+      title: t("components.settings.invitations.resendError"),
+      description:
+        error.data?.message || t("components.settings.invitations.resendError"),
+      color: "error",
+    });
+  } finally {
+    resendingInvitation.value = null;
+  }
+}
+
+// Delete invitation
+const deletingInvitation = ref<number | null>(null);
+
+async function deleteInvitation(id: number) {
+  deletingInvitation.value = id;
+
+  try {
+    await authenticatedFetch(`/delete-invitation/${id}`, {
+      method: "DELETE",
+    });
+
+    toast.add({
+      title: t("components.settings.invitations.deleteSuccess"),
+      color: "success",
+    });
+
+    // Refresh invitations list
+    await refreshInvitations();
+  } catch (error: any) {
+    toast.add({
+      title: t("components.settings.invitations.deleteError"),
+      description:
+        error.data?.message || t("components.settings.invitations.deleteError"),
+      color: "error",
+    });
+  } finally {
+    deletingInvitation.value = null;
   }
 }
 </script>
@@ -173,6 +260,60 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       />
     </UPageCard>
 
+    <!-- Invitations Section (Collapsible) -->
+    <UPageCard
+      variant="subtle"
+      :ui="{
+        container: 'p-0 sm:p-0 gap-y-0',
+        wrapper: 'items-stretch',
+      }"
+      class="mb-4"
+    >
+      <!-- Collapsible Header (Always visible) -->
+      <UButton
+        variant="ghost"
+        color="neutral"
+        block
+        class="h-auto justify-start p-4"
+        @click="invitationsOpen = !invitationsOpen"
+      >
+        <div class="flex w-full items-center justify-between">
+          <div class="flex-1 text-left">
+            <div class="flex items-center gap-2">
+              <h3 class="text-highlighted text-lg font-semibold">
+                {{ t("components.settings.invitations.title") }}
+              </h3>
+              <UBadge
+                v-if="invitations.length > 0"
+                :label="invitations.length.toString()"
+                color="primary"
+                size="sm"
+              />
+            </div>
+            <p class="text-muted mt-1 text-sm">
+              {{ t("components.settings.invitations.description") }}
+            </p>
+          </div>
+          <UIcon
+            :name="
+              invitationsOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'
+            "
+            class="text-muted ml-3 h-5 w-5 shrink-0 transition-transform"
+          />
+        </div>
+      </UButton>
+
+      <!-- Collapsible Content -->
+      <div v-show="invitationsOpen" class="border-default border-t">
+        <SettingsInvitationsList
+          :invitations="invitations"
+          @resend="resendInvitation"
+          @delete="deleteInvitation"
+        />
+      </div>
+    </UPageCard>
+
+    <!-- Members Section -->
     <UPageCard
       variant="subtle"
       :ui="{

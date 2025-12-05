@@ -459,7 +459,7 @@
     },
     "roles": {
       "owner": "Propriétaire",
-      "administrator": "Administrateur",
+      "administrator": "Admin",
       "member": "Membre"
     },
     "periods": {
@@ -612,6 +612,21 @@
             "roleRequired": "Le rôle est requis"
           }
         }
+      },
+      "invitations": {
+        "title": "Invitations en cours",
+        "description": "Gérez les invitations envoyées à votre organisation.",
+        "noInvitations": "Aucune invitation en cours",
+        "sentOn": "Envoyée le",
+        "expiresOn": "Expire le",
+        "resend": "Relancer",
+        "delete": "Supprimer",
+        "resendSuccess": "Invitation renvoyée avec succès",
+        "resendError": "Erreur lors du renvoi de l'invitation",
+        "deleteSuccess": "Invitation supprimée avec succès",
+        "deleteError": "Erreur lors de la suppression de l'invitation",
+        "errorLoadingTitle": "Erreur de chargement des invitations",
+        "errorLoadingDescription": "Une erreur est survenue lors du chargement de la liste des invitations"
       }
     }
   },

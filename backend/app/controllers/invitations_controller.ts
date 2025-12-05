@@ -283,6 +283,121 @@ export default class InvitationsController {
   }
 
   /**
+   * Liste les invitations de l'organisation courante
+   * Seuls les Owners et Administrators peuvent voir les invitations
+   */
+  public async listInvitations({ response, auth, bouncer, i18n }: HttpContext) {
+    const authUser = auth.user
+
+    if (!authUser) {
+      return response.status(401).json({
+        message: i18n.t('messages.auth.unauthorized'),
+      })
+    }
+
+    if (!authUser.currentOrganizationId) {
+      return response.status(400).json({
+        message: i18n.t('messages.errors.no_current_organization'),
+      })
+    }
+
+    if (await bouncer.with(InvitationPolicy).denies('createInvitation' as never, authUser!)) {
+      return response.status(403).json({
+        message: i18n.t('messages.errors.unauthorized'),
+      })
+    }
+
+    try {
+      const invitations = await Invitation.query()
+        .where('organizationId', authUser.currentOrganizationId)
+        .orderBy('createdAt', 'desc')
+
+      return response.ok(invitations)
+    } catch (error) {
+      return response.status(500).json({
+        message: i18n.t('messages.errors.server_error'),
+        errors: error.message,
+      })
+    }
+  }
+
+  /**
+   * Relance une invitation en mettant à jour la date d'expiration et en renvoyant l'email
+   * Seuls les Owners et Administrators peuvent relancer des invitations
+   */
+  public async resendInvitation({ params, response, auth, bouncer, i18n }: HttpContext) {
+    const { id } = params
+    const authUser = auth.user
+
+    if (!authUser) {
+      return response.status(401).json({
+        message: i18n.t('messages.auth.unauthorized'),
+      })
+    }
+
+    if (!authUser.currentOrganizationId) {
+      return response.status(400).json({
+        message: i18n.t('messages.errors.no_current_organization'),
+      })
+    }
+
+    if (await bouncer.with(InvitationPolicy).denies('createInvitation' as never, authUser!)) {
+      return response.status(403).json({
+        message: i18n.t('messages.errors.unauthorized'),
+      })
+    }
+
+    try {
+      const invitation = await Invitation.find(id)
+
+      if (!invitation) {
+        return response.notFound({ message: i18n.t('messages.invitation.invalid') })
+      }
+
+      // Vérifier que l'invitation appartient à l'organisation courante
+      if (invitation.organizationId !== authUser.currentOrganizationId) {
+        return response.status(403).json({
+          message: i18n.t('messages.errors.unauthorized'),
+        })
+      }
+
+      // Mettre à jour la date d'expiration
+      invitation.expiresAt = DateTime.now().plus({ days: 7 })
+      await invitation.save()
+
+      // Récupérer l'organisation pour l'email
+      const organization = await Organization.findOrFail(authUser.currentOrganizationId)
+
+      // Renvoyer l'email d'invitation
+      await mail.send((message) => {
+        message
+          .to(invitation.email)
+          .from('onboarding@resend.dev')
+          .subject(i18n.t('emails.invitation.subject', { organization: organization.name }))
+          .htmlView('emails/invitation', {
+            identifier: invitation.identifier,
+            organizationName: organization.name,
+            organizationLogo: organization.logo
+              ? `${process.env.APP_URL || 'http://localhost:3333'}/organization-logo/${organization.logo}`
+              : 'https://placehold.co/100',
+            expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
+            i18n: i18n,
+          })
+      })
+
+      return response.ok({
+        message: i18n.t('messages.invitation.resent'),
+        invitation,
+      })
+    } catch (error) {
+      return response.status(500).json({
+        message: i18n.t('messages.errors.server_error'),
+        errors: error.message,
+      })
+    }
+  }
+
+  /**
    * Supprime une invitation pendante
    */
   public async deleteInvitation({ params, response, i18n }: HttpContext) {

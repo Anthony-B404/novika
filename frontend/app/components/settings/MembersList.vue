@@ -77,7 +77,7 @@ const handleRoleChange = (member: Member, newRole: UserRole) => {
         />
 
         <UDropdownMenu
-          v-if="!member.isCurrentUser"
+          v-if="!member.isCurrentUser || member.role !== UserRole.Owner"
           :items="items"
           :content="{ align: 'end' }"
         >

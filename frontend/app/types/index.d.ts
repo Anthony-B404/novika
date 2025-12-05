@@ -32,6 +32,17 @@ export interface Member {
   isCurrentUser: boolean;
 }
 
+export interface Invitation {
+  id: number;
+  identifier: string;
+  email: string;
+  organizationId: number;
+  role: UserRole;
+  expiresAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Stat {
   title: string;
   icon: string;

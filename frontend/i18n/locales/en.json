@@ -403,7 +403,7 @@
     },
     "roles": {
       "owner": "Owner",
-      "administrator": "Administrator",
+      "administrator": "Admin",
       "member": "Member"
     },
     "periods": {
@@ -556,6 +556,21 @@
             "roleRequired": "Role is required"
           }
         }
+      },
+      "invitations": {
+        "title": "Pending Invitations",
+        "description": "Manage invitations sent to your organization.",
+        "noInvitations": "No pending invitations",
+        "sentOn": "Sent on",
+        "expiresOn": "Expires on",
+        "resend": "Resend",
+        "delete": "Delete",
+        "resendSuccess": "Invitation resent successfully",
+        "resendError": "Error resending invitation",
+        "deleteSuccess": "Invitation deleted successfully",
+        "deleteError": "Error deleting invitation",
+        "errorLoadingTitle": "Error loading invitations",
+        "errorLoadingDescription": "An error occurred while loading the invitations list"
       }
     }
   },
