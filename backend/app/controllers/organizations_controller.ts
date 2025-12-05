@@ -113,7 +113,7 @@ export default class OrganizationsController {
       fullName: user.fullName,
       email: user.email,
       role: user.$extras.pivot_role,
-      avatar: user.avatar ? `user-avatar/${user.avatar}` : null,
+      avatar: user.avatar,
       isCurrentUser: user.id === authUser.id,
     }))
 

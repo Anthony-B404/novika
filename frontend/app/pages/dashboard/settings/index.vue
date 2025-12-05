@@ -8,9 +8,9 @@ definePageMeta({
 
 const { t } = useI18n();
 const authStore = useAuthStore();
-const config = useRuntimeConfig();
 const toast = useToast();
 const api = useApi();
+const { getAvatarUrl } = useAvatarUrl();
 
 const fileRef = ref<HTMLInputElement>();
 
@@ -139,27 +139,6 @@ function onRemoveAvatar() {
   }
 }
 
-// Get avatar URL with smart detection
-const avatarUrl = computed(() => {
-  if (!profile.avatar) return undefined;
-
-  // If it's already a full URL (Google OAuth), use it directly
-  if (
-    profile.avatar.startsWith("http://") ||
-    profile.avatar.startsWith("https://")
-  ) {
-    return profile.avatar;
-  }
-
-  // If it's a blob URL (local preview), use it directly
-  if (profile.avatar.startsWith("blob:")) {
-    return profile.avatar;
-  }
-
-  // Otherwise, it's an uploaded file - construct backend URL
-  return `${config.public.apiUrl}/user-avatar/${profile.avatar}`;
-});
-
 // Compute full name for display
 const fullName = computed(() => {
   return `${profile.firstName} ${profile.lastName}`.trim();
@@ -236,7 +215,7 @@ const fullName = computed(() => {
         class="flex justify-between gap-4 max-sm:flex-col sm:items-center"
       >
         <div class="flex flex-wrap items-center gap-3">
-          <UAvatar :src="avatarUrl" :alt="fullName" size="lg" />
+          <UAvatar :src="getAvatarUrl(profile.avatar)" :alt="fullName" size="lg" />
           <UButton
             :label="t('common.buttons.choose')"
             color="neutral"
