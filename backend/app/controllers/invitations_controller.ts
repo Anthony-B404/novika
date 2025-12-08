@@ -138,9 +138,7 @@ export default class InvitationsController {
     return response.status(200).json({
       email: invitation.email,
       organizationName: organization?.name,
-      organizationLogo: organization?.logo
-        ? `${process.env.APP_URL || 'http://localhost:3333'}/organization-logo/${organization.logo}`
-        : 'https://placehold.co/100',
+      organizationLogo: organization?.logo ? `organization-logo/${organization.logo}` : null,
       userExists,
     })
   }
@@ -189,6 +187,11 @@ export default class InvitationsController {
           })
         }
 
+        // Réactiver le user si désactivé (pas besoin de refaire l'onboarding)
+        if (existingUser.disabled) {
+          existingUser.disabled = false
+        }
+
         // Créer la relation pivot avec le role de l'invitation
         await organization.related('users').attach({
           [existingUser.id]: { role: invitation.role },
@@ -197,8 +200,9 @@ export default class InvitationsController {
         // Si le user n'a pas d'organisation courante, définir celle-ci
         if (!existingUser.currentOrganizationId) {
           existingUser.currentOrganizationId = invitation.organizationId
-          await existingUser.save()
         }
+
+        await existingUser.save()
 
         // Supprimer l'invitation (acceptée)
         await invitation.delete()
