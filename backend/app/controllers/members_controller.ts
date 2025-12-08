@@ -258,8 +258,19 @@ export default class MembersController {
         await targetUser.load('organizations')
         const otherOrg = targetUser.organizations[0]
         targetUser.currentOrganizationId = otherOrg?.id ?? null
-        await targetUser.save()
+      } else {
+        // Load organizations to check if user has any left
+        await targetUser.load('organizations')
       }
+
+      // If user has no more organizations, disable their account
+      if (targetUser.organizations.length === 0) {
+        targetUser.disabled = true
+        // Invalidate all access tokens for this user
+        await db.from('auth_access_tokens').where('tokenable_id', targetUser.id).delete()
+      }
+
+      await targetUser.save()
 
       return response.ok({
         message: i18n.t('messages.member.deleted'),
