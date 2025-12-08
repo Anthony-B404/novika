@@ -233,6 +233,8 @@
       "successDescription": "Check your email at {email} to complete login",
       "error": "Error",
       "errorDescription": "Failed to send magic link. Please try again.",
+      "accountDisabled": "Account deactivated",
+      "accountDisabledDescription": "Your account has been deactivated. Please sign up again to reactivate.",
       "footer": "By signing in, you agree to our",
       "termsOfService": "Terms of Service",
       "processing": "Logging in...",
@@ -282,7 +284,9 @@
       "errorDescription": "Failed to create organization. Please try again.",
       "noToken": "Invalid link. Please restart the signup process.",
       "invalidToken": "This link is invalid or has expired",
-      "verifying": "Verifying link..."
+      "verifying": "Verifying link...",
+      "reactivating": "Welcome back!",
+      "reactivatingDescription": "Your account is being reactivated. Complete your profile to continue."
     },
     "verifyLogin": {
       "verifying": "Verifying your login link",

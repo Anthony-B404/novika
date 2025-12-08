@@ -220,6 +220,8 @@
       "successDescription": "Vérifiez votre email à {email} pour vous connecter",
       "error": "Erreur",
       "errorDescription": "Échec de l'envoi du lien magique. Veuillez réessayer.",
+      "accountDisabled": "Compte désactivé",
+      "accountDisabledDescription": "Votre compte a été désactivé. Veuillez vous réinscrire pour le réactiver.",
       "footer": "En vous connectant, vous acceptez nos",
       "termsOfService": "Conditions d'utilisation",
       "processing": "Connexion en cours...",
@@ -269,7 +271,9 @@
       "errorDescription": "Échec de la création de l'organisation. Veuillez réessayer.",
       "noToken": "Lien invalide. Veuillez recommencer l'inscription.",
       "invalidToken": "Ce lien est invalide ou a expiré",
-      "verifying": "Vérification du lien..."
+      "verifying": "Vérification du lien...",
+      "reactivating": "Bon retour !",
+      "reactivatingDescription": "Votre compte est en cours de réactivation. Complétez votre profil pour continuer."
     },
     "verifyLogin": {
       "verifying": "Vérification de votre lien de connexion",

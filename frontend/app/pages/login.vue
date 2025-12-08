@@ -4,13 +4,17 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 
 const { t } = useI18n();
 const { $localePath } = useNuxtApp();
-const { isAuthenticated } = useAuth();
+const { isAuthenticated, user } = useAuth();
 const api = useApi();
 
-// Redirect to dashboard if already authenticated
+// Redirect based on authentication and onboarding status
 onMounted(() => {
   if (isAuthenticated.value) {
-    navigateTo($localePath('dashboard'));
+    if (user.value && !user.value.onboardingCompleted) {
+      navigateTo($localePath('complete-oauth-signup'));
+    } else {
+      navigateTo($localePath('dashboard'));
+    }
   }
 });
 
@@ -81,7 +85,24 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       }),
       color: "success",
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as { data?: { code?: string; userData?: { email?: string } } };
+
+    // Handle disabled account - redirect to signup with pre-filled email
+    if (err.data?.code === "ACCOUNT_DISABLED") {
+      toast.add({
+        title: t("auth.login.accountDisabled"),
+        description: t("auth.login.accountDisabledDescription"),
+        color: "warning",
+      });
+
+      navigateTo({
+        path: $localePath("signup"),
+        query: { email: err.data.userData?.email },
+      });
+      return;
+    }
+
     toast.add({
       title: t("auth.login.error"),
       description: t("auth.login.errorDescription"),

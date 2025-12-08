@@ -22,7 +22,12 @@ useSeoMeta({
 const token = ref(route.query.token as string);
 const isVerifying = ref(true);
 const isValid = ref(false);
-const userData = ref<{ email: string } | null>(null);
+const userData = ref<{
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  isDisabled?: boolean;
+} | null>(null);
 const selectedLogo = ref<File | null>(null);
 
 // Verify magic link token on mount
@@ -38,13 +43,38 @@ onMounted(async () => {
   }
 
   try {
-    const response = await api<{ email: string; token: string }>(
-      `/verify-magic-link/${token.value}`,
-    );
+    const response = await api<{
+      email: string;
+      firstName?: string | null;
+      lastName?: string | null;
+      token: string;
+      isDisabled?: boolean;
+    }>(`/verify-magic-link/${token.value}`);
 
     userData.value = {
       email: response.email,
+      firstName: response.firstName,
+      lastName: response.lastName,
+      isDisabled: response.isDisabled,
     };
+
+    // Pre-fill form with existing user data (for disabled users reactivating)
+    if (response.firstName) {
+      state.firstName = response.firstName;
+    }
+    if (response.lastName) {
+      state.lastName = response.lastName;
+    }
+
+    // Show reactivation message for disabled users
+    if (response.isDisabled) {
+      toast.add({
+        title: t("auth.completeSignup.reactivating"),
+        description: t("auth.completeSignup.reactivatingDescription"),
+        color: "info",
+      });
+    }
+
     isValid.value = true;
   } catch (error: any) {
     toast.add({

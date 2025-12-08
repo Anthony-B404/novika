@@ -4,13 +4,18 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 
 const { t } = useI18n();
 const { $localePath } = useNuxtApp();
-const { isAuthenticated } = useAuth();
+const { isAuthenticated, user } = useAuth();
 const api = useApi();
+const route = useRoute();
 
-// Redirect to dashboard if already authenticated
+// Redirect based on authentication and onboarding status
 onMounted(() => {
   if (isAuthenticated.value) {
-    navigateTo($localePath('dashboard'));
+    if (user.value && !user.value.onboardingCompleted) {
+      navigateTo($localePath('complete-oauth-signup'));
+    } else {
+      navigateTo($localePath('dashboard'));
+    }
   }
 });
 
@@ -25,6 +30,11 @@ useSeoMeta({
 
 const toast = useToast();
 const config = useRuntimeConfig();
+
+// Pre-fill email from query parameter (e.g., when redirected from login with disabled account)
+const initialState = reactive({
+  email: (route.query.email as string) || "",
+});
 
 const fields = computed(() => [
   {
@@ -97,6 +107,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <UAuthForm
     :fields="fields"
     :schema="schema"
+    :state="initialState"
     :providers="providers"
     :title="$t('auth.signup.title')"
     icon="i-lucide-mail"

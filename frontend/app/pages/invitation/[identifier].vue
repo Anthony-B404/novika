@@ -9,6 +9,7 @@ const { $localePath } = useNuxtApp();
 const toast = useToast();
 const { login } = useAuth();
 const api = useApi();
+const config = useRuntimeConfig();
 
 definePageMeta({
   layout: "auth",
@@ -26,7 +27,7 @@ const userExists = ref(false);
 const invitationData = ref<{
   email: string;
   organizationName: string;
-  organizationLogo: string;
+  organizationLogo: string | null;
 } | null>(null);
 const fileRef = ref<HTMLInputElement>();
 
@@ -46,7 +47,7 @@ onMounted(async () => {
     const response = await api<{
       email: string;
       organizationName: string;
-      organizationLogo: string;
+      organizationLogo: string | null;
       userExists: boolean;
     }>(`/check-invitation/${identifier.value}`);
 
@@ -154,6 +155,12 @@ const fullName = computed(() => {
   return `${state.firstName || ""} ${state.lastName || ""}`.trim();
 });
 
+// Compute organization logo URL
+const organizationLogoUrl = computed(() => {
+  if (!invitationData.value?.organizationLogo) return null;
+  return `${config.public.apiUrl}/${invitationData.value.organizationLogo}`;
+});
+
 async function onSubmit(event?: FormSubmitEvent<Schema>) {
   try {
     // Prepare FormData
@@ -211,10 +218,13 @@ async function onSubmit(event?: FormSubmitEvent<Schema>) {
     <div class="mb-10 text-center">
       <div class="mb-6 flex justify-center">
         <UAvatar
-          :src="invitationData?.organizationLogo"
-          :alt="invitationData?.organizationName"
+          v-if="organizationLogoUrl"
+          :src="organizationLogoUrl"
           size="3xl"
         />
+        <div v-else class="bg-primary/10 rounded-full p-4">
+          <UIcon name="i-lucide-building-2" class="text-primary h-8 w-8" />
+        </div>
       </div>
       <h1 class="text-foreground mb-3 text-3xl font-bold tracking-tight">
         {{ $t("auth.acceptInvitation.title") }}

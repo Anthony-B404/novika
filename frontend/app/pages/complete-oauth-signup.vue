@@ -17,12 +17,23 @@ useSeoMeta({
   description: t("seo.completeSignup.description"),
 });
 
-const userData = ref<{ email: string; fullName?: string } | null>(null);
+const route = useRoute();
+const userData = ref<{
+  email: string;
+  fullName?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  disabled?: boolean;
+} | null>(null);
 const selectedLogo = ref<File | null>(null);
 const isLoading = ref(true);
+const isReactivating = ref(false);
 
 // Verify auth token and get user data on mount
 onMounted(async () => {
+  // Check if this is a reactivation flow (from query param)
+  isReactivating.value = route.query.reactivating === "true";
+
   if (!token.value) {
     toast.add({
       title: t("auth.completeSignup.error"),
@@ -39,7 +50,27 @@ onMounted(async () => {
       userData.value = {
         email: user.value.email,
         fullName: user.value.fullName || user.value.firstName || "",
+        firstName: user.value.firstName,
+        lastName: user.value.lastName,
+        disabled: user.value.disabled,
       };
+
+      // Pre-fill form with existing user data (for disabled users reactivating)
+      if (user.value.firstName) {
+        state.firstName = user.value.firstName;
+      }
+      if (user.value.lastName) {
+        state.lastName = user.value.lastName;
+      }
+
+      // Show reactivation message for disabled users
+      if (isReactivating.value || user.value.disabled) {
+        toast.add({
+          title: t("auth.completeSignup.reactivating"),
+          description: t("auth.completeSignup.reactivatingDescription"),
+          color: "info",
+        });
+      }
 
       // If onboarding already completed, redirect to dashboard
       if (user.value.onboardingCompleted) {
@@ -53,14 +84,36 @@ onMounted(async () => {
       const response = await authenticatedFetch<{
         email: string;
         fullName?: string;
-        firstName?: string;
+        firstName?: string | null;
+        lastName?: string | null;
         onboardingCompleted: boolean;
+        disabled?: boolean;
       }>("/me");
 
       userData.value = {
         email: response.email,
         fullName: response.fullName || response.firstName || "",
+        firstName: response.firstName,
+        lastName: response.lastName,
+        disabled: response.disabled,
       };
+
+      // Pre-fill form with existing user data
+      if (response.firstName) {
+        state.firstName = response.firstName;
+      }
+      if (response.lastName) {
+        state.lastName = response.lastName;
+      }
+
+      // Show reactivation message
+      if (isReactivating.value || response.disabled) {
+        toast.add({
+          title: t("auth.completeSignup.reactivating"),
+          description: t("auth.completeSignup.reactivatingDescription"),
+          color: "info",
+        });
+      }
 
       if (response.onboardingCompleted) {
         router.push($localePath("dashboard"));
