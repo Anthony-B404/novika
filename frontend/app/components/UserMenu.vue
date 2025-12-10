@@ -59,6 +59,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
     {
       label: t("components.user.billing"),
       icon: "i-lucide-credit-card",
+      to: localePath("/dashboard/settings/billing"),
     },
     {
       label: t("components.user.settings"),

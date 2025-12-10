@@ -709,7 +709,8 @@
           "organization": "Organisation",
           "members": "Membres",
           "notifications": "Notifications",
-          "security": "Sécurité"
+          "security": "Sécurité",
+          "billing": "Facturation"
         },
         "general": {
           "title": "Profil",
@@ -793,6 +794,33 @@
         "security": {
           "title": "Compte",
           "description": "Vous ne souhaitez plus utiliser notre service ? Vous pouvez supprimer votre compte ici. Cette action est irréversible. Toutes les informations liées à ce compte seront supprimées définitivement."
+        },
+        "billing": {
+          "title": "Facturation",
+          "description": "Gérez votre abonnement et vos informations de facturation.",
+          "noSubscription": {
+            "title": "Aucun abonnement actif",
+            "description": "Abonnez-vous pour débloquer toutes les fonctionnalités."
+          },
+          "subscribe": "S'abonner",
+          "status": "Statut de l'abonnement",
+          "renewsAt": "Renouvellement le",
+          "statuses": {
+            "active": "Actif",
+            "cancelled": "Annulé",
+            "expired": "Expiré",
+            "paused": "En pause",
+            "past_due": "En retard",
+            "unpaid": "Impayé",
+            "on_trial": "Essai"
+          },
+          "success": {
+            "subscribed": "Abonnement réussi ! Merci pour votre soutien."
+          },
+          "error": {
+            "fetchFailed": "Impossible de charger le statut de l'abonnement",
+            "checkoutFailed": "Impossible de créer la session de paiement"
+          }
         }
       }
     }

@@ -36,6 +36,11 @@ const links = computed(() => [
       icon: "i-lucide-shield",
       to: localePath('/dashboard/settings/security'),
     },
+    {
+      label: t('pages.dashboard.settings.navigation.billing'),
+      icon: "i-lucide-credit-card",
+      to: localePath('/dashboard/settings/billing'),
+    },
   ],
   [
     {

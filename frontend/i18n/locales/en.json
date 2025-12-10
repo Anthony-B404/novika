@@ -653,7 +653,8 @@
           "organization": "Organization",
           "members": "Members",
           "notifications": "Notifications",
-          "security": "Security"
+          "security": "Security",
+          "billing": "Billing"
         },
         "general": {
           "title": "Profile",
@@ -737,6 +738,33 @@
         "security": {
           "title": "Account",
           "description": "No longer want to use our service? You can delete your account here. This action is not reversible. All information related to this account will be deleted permanently."
+        },
+        "billing": {
+          "title": "Billing",
+          "description": "Manage your subscription and billing information.",
+          "noSubscription": {
+            "title": "No active subscription",
+            "description": "Subscribe to unlock all features."
+          },
+          "subscribe": "Subscribe Now",
+          "status": "Subscription Status",
+          "renewsAt": "Renews at",
+          "statuses": {
+            "active": "Active",
+            "cancelled": "Cancelled",
+            "expired": "Expired",
+            "paused": "Paused",
+            "past_due": "Past Due",
+            "unpaid": "Unpaid",
+            "on_trial": "Trial"
+          },
+          "success": {
+            "subscribed": "Successfully subscribed! Thank you for your support."
+          },
+          "error": {
+            "fetchFailed": "Failed to load subscription status",
+            "checkoutFailed": "Failed to create checkout session"
+          }
         }
       }
     }

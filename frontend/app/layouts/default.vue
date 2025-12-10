@@ -80,6 +80,13 @@ const links = computed(
                 open.value = false;
               },
             },
+            {
+              label: t("pages.dashboard.settings.navigation.billing"),
+              to: localePath("/dashboard/settings/billing"),
+              onSelect: () => {
+                open.value = false;
+              },
+            },
           ],
         },
       ],
