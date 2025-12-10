@@ -72,7 +72,14 @@
   "billing": {
     "checkout_failed": "Failed to create checkout session",
     "already_subscribed": "You already have an active subscription",
-    "subscription_created": "Subscription created successfully"
+    "subscription_created": "Subscription created successfully",
+    "subscription_cancelled": "Subscription cancelled successfully",
+    "subscription_reactivated": "Subscription reactivated successfully",
+    "subscription_not_found": "Subscription not found",
+    "cancel_failed": "Failed to cancel subscription",
+    "reactivate_failed": "Failed to reactivate subscription",
+    "no_active_subscription": "No active subscription",
+    "cannot_reactivate": "Cannot reactivate - subscription has already expired"
   },
   "errors": {
     "server_error": "A server error occurred",

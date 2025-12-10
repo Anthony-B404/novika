@@ -805,6 +805,7 @@
           "subscribe": "S'abonner",
           "status": "Statut de l'abonnement",
           "renewsAt": "Renouvellement le",
+          "endsAt": "Accès jusqu'au",
           "statuses": {
             "active": "Actif",
             "cancelled": "Annulé",
@@ -813,6 +814,32 @@
             "past_due": "En retard",
             "unpaid": "Impayé",
             "on_trial": "Essai"
+          },
+          "paymentMethod": {
+            "title": "Moyen de paiement",
+            "update": "Modifier le moyen de paiement"
+          },
+          "cancel": {
+            "button": "Résilier l'abonnement",
+            "modal": {
+              "title": "Résilier l'abonnement",
+              "description": "Êtes-vous sûr de vouloir résilier votre abonnement ?",
+              "warning": "Votre abonnement restera actif jusqu'au {date}. Après cette date, vous perdrez l'accès aux fonctionnalités premium.",
+              "confirm": "Oui, résilier l'abonnement"
+            },
+            "success": "Abonnement résilié avec succès",
+            "error": "Impossible de résilier l'abonnement"
+          },
+          "cancelled": {
+            "alert": {
+              "title": "Abonnement résilié",
+              "description": "Votre abonnement a été résilié. Vous aurez accès jusqu'au {date}."
+            }
+          },
+          "reactivate": {
+            "button": "Réactiver l'abonnement",
+            "success": "Abonnement réactivé avec succès",
+            "error": "Impossible de réactiver l'abonnement"
           },
           "success": {
             "subscribed": "Abonnement réussi ! Merci pour votre soutien."

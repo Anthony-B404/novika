@@ -32,6 +32,12 @@ export default class Subscription extends BaseModel {
   @column()
   declare status: SubscriptionStatus
 
+  @column()
+  declare cardBrand: string | null
+
+  @column()
+  declare cardLastFour: string | null
+
   @column.dateTime()
   declare currentPeriodEnd: DateTime | null
 

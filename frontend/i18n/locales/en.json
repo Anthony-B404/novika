@@ -749,6 +749,7 @@
           "subscribe": "Subscribe Now",
           "status": "Subscription Status",
           "renewsAt": "Renews at",
+          "endsAt": "Access until",
           "statuses": {
             "active": "Active",
             "cancelled": "Cancelled",
@@ -757,6 +758,32 @@
             "past_due": "Past Due",
             "unpaid": "Unpaid",
             "on_trial": "Trial"
+          },
+          "paymentMethod": {
+            "title": "Payment Method",
+            "update": "Update payment method"
+          },
+          "cancel": {
+            "button": "Cancel subscription",
+            "modal": {
+              "title": "Cancel subscription",
+              "description": "Are you sure you want to cancel your subscription?",
+              "warning": "Your subscription will remain active until {date}. After this date, you will lose access to premium features.",
+              "confirm": "Yes, cancel subscription"
+            },
+            "success": "Subscription cancelled successfully",
+            "error": "Failed to cancel subscription"
+          },
+          "cancelled": {
+            "alert": {
+              "title": "Subscription cancelled",
+              "description": "Your subscription has been cancelled. You will have access until {date}."
+            }
+          },
+          "reactivate": {
+            "button": "Reactivate subscription",
+            "success": "Subscription reactivated successfully",
+            "error": "Failed to reactivate subscription"
           },
           "success": {
             "subscribed": "Successfully subscribed! Thank you for your support."

@@ -88,5 +88,7 @@ router
     // Billing routes
     router.get('/billing/status', [BillingController, 'getSubscriptionStatus'])
     router.post('/billing/checkout', [BillingController, 'createCheckoutSession'])
+    router.post('/billing/cancel', [BillingController, 'cancelSubscription'])
+    router.post('/billing/reactivate', [BillingController, 'reactivateSubscription'])
   })
   .use(middleware.auth({ guards: ['api'] }))

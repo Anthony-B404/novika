@@ -30,11 +30,9 @@ export default class WebhooksController {
         case 'subscription_created':
           await this.handleSubscriptionCreated(payload)
           break
-        // Future events can be added here:
-        // case 'subscription_updated':
-        // case 'subscription_cancelled':
-        // case 'subscription_resumed':
-        // case 'subscription_expired':
+        case 'subscription_updated':
+          await this.handleSubscriptionUpdated(payload)
+          break
         default:
           console.log('Unhandled webhook event:', eventName)
       }
@@ -119,5 +117,47 @@ export default class WebhooksController {
     })
 
     console.log('Subscription created for user:', user.id)
+  }
+
+  /**
+   * Handle subscription_updated event
+   */
+  private async handleSubscriptionUpdated(payload: any) {
+    const subscriptionData = payload.data.attributes
+    const lemonSqueezySubscriptionId = String(payload.data.id)
+
+    // Find existing subscription
+    const subscription = await Subscription.findBy('lemonSqueezySubscriptionId', lemonSqueezySubscriptionId)
+
+    if (!subscription) {
+      console.error('Subscription not found for ID:', lemonSqueezySubscriptionId)
+      throw new Error(`Subscription not found: ${lemonSqueezySubscriptionId}`)
+    }
+
+    // Map Lemon Squeezy status to our enum
+    const statusMap: Record<string, SubscriptionStatus> = {
+      active: SubscriptionStatus.Active,
+      cancelled: SubscriptionStatus.Cancelled,
+      expired: SubscriptionStatus.Expired,
+      paused: SubscriptionStatus.Paused,
+      past_due: SubscriptionStatus.PastDue,
+      unpaid: SubscriptionStatus.Unpaid,
+      on_trial: SubscriptionStatus.OnTrial,
+    }
+
+    // Update subscription fields
+    subscription.status = statusMap[subscriptionData.status] || subscription.status
+    subscription.cardBrand = subscriptionData.card_brand || subscription.cardBrand
+    subscription.cardLastFour = subscriptionData.card_last_four || subscription.cardLastFour
+
+    if (subscriptionData.renews_at) {
+      subscription.currentPeriodEnd = DateTime.fromISO(subscriptionData.renews_at)
+    } else if (subscriptionData.ends_at) {
+      subscription.currentPeriodEnd = DateTime.fromISO(subscriptionData.ends_at)
+    }
+
+    await subscription.save()
+
+    console.log('Subscription updated:', subscription.id, '- Status:', subscription.status)
   }
 }
