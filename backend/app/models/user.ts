@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, manyToMany, belongsTo } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany, belongsTo, hasOne } from '@adonisjs/lucid/orm'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Organization from './organization.js'
-import type { ManyToMany, BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { ManyToMany, BelongsTo, HasOne } from '@adonisjs/lucid/types/relations'
+import Subscription from '#models/subscription'
 
 export enum UserRole {
   Owner = 1,
@@ -52,6 +53,9 @@ export default class User extends BaseModel {
   })
   declare currentOrganization: BelongsTo<typeof Organization>
 
+  @hasOne(() => Subscription)
+  declare subscription: HasOne<typeof Subscription>
+
   @column()
   declare onboardingCompleted: boolean
 
@@ -92,5 +96,13 @@ export default class User extends BaseModel {
   async hasOrganization(organizationId: number): Promise<boolean> {
     await this.load('organizations')
     return this.organizations.some((o) => o.id === organizationId)
+  }
+
+  /**
+   * Check if user has an active subscription
+   */
+  async hasActiveSubscription(): Promise<boolean> {
+    await this.load('subscription')
+    return this.subscription?.isActive() ?? false
   }
 }
