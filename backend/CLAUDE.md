@@ -4,12 +4,13 @@ This file provides guidance to Claude Code when working with the AdonisJS v6 bac
 
 ## Technology Stack
 
-- **Framework**: AdonisJS 6.14.1
+- **Framework**: AdonisJS 6.19.1
 - **ORM**: Lucid ORM with PostgreSQL
 - **Authentication**: @adonisjs/auth v9 with API tokens
 - **Authorization**: @adonisjs/bouncer v3 with policies
 - **Validation**: VineJS (@vinejs/vine)
 - **Email**: @adonisjs/mail with Resend integration
+- **Billing**: Lemon Squeezy integration for subscriptions
 - **i18n**: @adonisjs/i18n v2.2.3 (French and English)
 - **Templating**: Edge.js for email templates, MJML for email layouts
 - **TypeScript**: Strict mode enabled
@@ -99,6 +100,22 @@ node ace generate:key               # Generate APP_KEY
 - `pendingEmail` - Email pending change (optional)
 - `emailChangeToken` - Token for email change confirmation (optional)
 - `emailChangeExpiresAt` - Expiration date for email change token
+- `trialStartedAt` - Trial period start date
+- `trialEndsAt` - Trial period end date
+- `trialUsed` - Boolean flag if user has used trial
+- `disabled` - Boolean flag if user is disabled
+
+**subscriptions**
+
+- `id` - Primary key
+- `userId` - Foreign key to users
+- `lemonSqueezySubscriptionId` - Lemon Squeezy subscription ID
+- `lemonSqueezyCustomerId` - Lemon Squeezy customer ID
+- `lemonSqueezyVariantId` - Lemon Squeezy variant ID
+- `status` - Enum: `active`, `cancelled`, `expired`, `paused`, `past_due`, `unpaid`, `on_trial`
+- `cardBrand` - Card brand (optional)
+- `cardLastFour` - Last four digits of card (optional)
+- `currentPeriodEnd` - Current billing period end date
 
 **organizations**
 
@@ -144,9 +161,18 @@ declare organizations: ManyToMany<typeof Organization>
 })
 declare currentOrganization: BelongsTo<typeof Organization>
 
+@hasOne(() => Subscription)
+declare subscription: HasOne<typeof Subscription>
+
 // Helper methods
 async isOwnerOf(organizationId: number): Promise<boolean>
 async hasOrganization(organizationId: number): Promise<boolean>
+async hasActiveSubscription(): Promise<boolean>
+isOnTrial(): boolean
+getTrialDaysRemaining(): number
+isTrialExpired(): boolean
+async hasAccess(): Promise<boolean>  // true if on trial OR has active subscription
+async getOrganizationOwnerAccess(): Promise<{ hasAccess: boolean; owner: User | null }>
 
 // Organization model
 @manyToMany(() => User, {
@@ -169,9 +195,28 @@ export enum UserRole {
 }
 ```
 
-- **Owner**: Full control of organization (create, update, delete)
-- **Administrator**: Can manage users and settings
+- **Owner**: Full control of organization (create, update, delete, billing, settings)
+- **Administrator**: Can manage users (members only) and some settings
 - **Member**: Basic access to organization resources
+
+### Role-Based Permissions (MemberPolicy)
+
+```typescript
+// MemberPolicy - Granular member management permissions
+manageMember(user, targetUser, organizationId)
+  // Owner: can manage anyone (except themselves)
+  // Admin: can only manage Members (not Owner, other Admins, or themselves)
+  // Member: cannot manage anyone
+
+changeRole(user, targetUser, organizationId, newRole)
+  // Owner: can change any role (except to Owner)
+  // Admin: can only change Member's role
+  // Member: cannot change roles
+  // Nobody can change their own role or assign Owner role
+
+deleteMember(user, targetUser, organizationId)
+  // Same rules as manageMember
+```
 
 ### Organization Management
 
@@ -208,6 +253,101 @@ await organization.related('users').attach({
 user.currentOrganizationId = organization.id
 await user.save()
 ```
+
+## Billing & Trial System (Lemon Squeezy)
+
+### Overview
+
+- **Provider**: Lemon Squeezy for payment processing
+- **Trial Period**: Configurable trial days for new users
+- **Access Control**: `TrialGuardMiddleware` checks access on protected routes
+- **Owner-Based Access**: Members inherit access from organization owner
+
+### Subscription Model
+
+```typescript
+export enum SubscriptionStatus {
+  Active = 'active',
+  Cancelled = 'cancelled',
+  Expired = 'expired',
+  Paused = 'paused',
+  PastDue = 'past_due',
+  Unpaid = 'unpaid',
+  OnTrial = 'on_trial',
+}
+
+// Check if subscription is active
+subscription.isActive() // true for 'active' or 'on_trial'
+```
+
+### User Access Methods
+
+```typescript
+// Check if user is on trial
+user.isOnTrial(): boolean
+
+// Get remaining trial days
+user.getTrialDaysRemaining(): number
+
+// Check if trial expired
+user.isTrialExpired(): boolean
+
+// Check if user has access (trial OR active subscription)
+await user.hasAccess(): Promise<boolean>
+
+// Check if user has active subscription
+await user.hasActiveSubscription(): Promise<boolean>
+
+// Get organization owner's access (for members)
+await user.getOrganizationOwnerAccess(): Promise<{ hasAccess: boolean; owner: User | null }>
+```
+
+### TrialGuardMiddleware
+
+Protects routes that require active trial or subscription:
+
+```typescript
+// In routes
+router.group(() => {
+  // Protected routes here
+}).middleware([middleware.trialGuard()])
+
+// Middleware behavior:
+// 1. If Owner: checks own hasAccess()
+// 2. If Member/Admin: checks organization owner's hasAccess()
+// 3. Returns 402 with code: 'SUBSCRIPTION_ENDED' if no access
+```
+
+### BillingController Endpoints
+
+```typescript
+// Get subscription status
+GET /api/billing/status
+
+// Create checkout session
+POST /api/billing/checkout
+// Body: { billingName?: string }
+// Returns: { checkoutUrl: string }
+
+// Cancel subscription
+POST /api/billing/cancel
+
+// Reactivate cancelled subscription
+POST /api/billing/reactivate
+```
+
+### Checkout Localization
+
+Checkout URLs automatically include billing country based on user locale:
+- `fr` → France
+- `en` → US (default)
+
+### Webhook Handling (WebhooksController)
+
+Lemon Squeezy webhooks sync subscription status:
+- `subscription_created` → Creates/updates Subscription record
+- `subscription_updated` → Updates status, card info, period end
+- Validates webhook signature with `LEMON_SQUEEZY_WEBHOOK_SECRET`
 
 ## Authentication & Authorization
 
@@ -693,9 +833,17 @@ DB_DATABASE=boilerplate_db
 # Email
 RESEND_API_KEY=            # From resend.com
 
+# Billing (Lemon Squeezy)
+LEMON_SQUEEZY_API_KEY=     # From lemonsqueezy.com
+LEMON_SQUEEZY_STORE_ID=    # Your store ID
+LEMON_SQUEEZY_VARIANT_ID=  # Product variant ID
+LEMON_SQUEEZY_WEBHOOK_SECRET=  # Webhook signing secret
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:3000
+
 # Optional
 LOG_LEVEL=info
-SESSION_DRIVER=cookie
 ```
 
 ## Code Style & Conventions
@@ -919,3 +1067,4 @@ Deployment considerations:
 - Generate APP_KEY: `node ace generate:key`
 - Configure PostgreSQL connection
 - Set up Resend API key
+- Configure Lemon Squeezy credentials and webhook URL

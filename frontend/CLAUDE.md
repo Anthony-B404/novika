@@ -21,11 +21,29 @@ frontend/
 │   │   └── css/           # Global styles
 │   │       └── main.css
 │   ├── components/        # Auto-imported Vue components
+│   │   └── billing/       # Billing-related components
+│   │       ├── TrialBanner.vue
+│   │       ├── CancelSubscriptionModal.vue
+│   │       └── AccessBlockedModal.vue
+│   ├── composables/       # Composition API functions
+│   │   ├── useApi.ts
+│   │   ├── useAuth.ts
+│   │   ├── useRoles.ts
+│   │   └── useSettingsPermissions.ts
 │   ├── layouts/           # Layout components
 │   │   ├── default.vue
 │   │   ├── auth.vue
 │   │   └── app.vue
 │   ├── pages/             # File-based routing
+│   │   └── dashboard/
+│   │       └── settings/  # Settings pages with RBAC
+│   │           ├── billing.vue    # Owner only
+│   │           ├── organization.vue # Owner only
+│   │           ├── members.vue    # Owner + Admin
+│   │           ├── security.vue   # All users
+│   │           └── notifications.vue # All users
+│   ├── stores/            # Pinia stores
+│   │   └── trial.ts       # Trial state management
 │   └── app.vue            # Root component
 ├── public/                # Static assets
 ├── nuxt.config.ts         # Nuxt configuration
@@ -102,6 +120,97 @@ await authenticatedFetch('/profile', {
 - **Usage**: `$t('key')` in templates, `t('key')` in scripts
 - **Locale Switching**: Available in user settings/preferences
 
+## Role-Based Access Control (RBAC)
+
+### useSettingsPermissions Composable
+
+Controls access to settings pages based on user role in current organization:
+
+```typescript
+const {
+  currentUserRole,
+  isOwner,
+  isAdministrator,
+  isMember,
+  canAccessOrganization,  // Owner only
+  canAccessBilling,       // Owner only
+  canManageMembers,       // Owner + Administrator
+} = useSettingsPermissions()
+```
+
+### useRoles Composable
+
+Utility functions for role management:
+
+```typescript
+const {
+  getRoleLabel,          // Get localized role name
+  getRoleOptions,        // Get role options for select
+  hasAdminPrivileges,    // Check if Owner or Admin
+} = useRoles()
+```
+
+### Settings Page Access Matrix
+
+| Page | Route | Access |
+|------|-------|--------|
+| Billing | `/dashboard/settings/billing` | Owner only |
+| Organization | `/dashboard/settings/organization` | Owner only |
+| Members | `/dashboard/settings/members` | Owner + Administrator |
+| Security | `/dashboard/settings/security` | All authenticated |
+| Notifications | `/dashboard/settings/notifications` | All authenticated |
+
+**Usage in pages**:
+```vue
+<script setup lang="ts">
+const { canAccessBilling, isOwner } = useSettingsPermissions()
+
+// Redirect if no access
+if (!canAccessBilling.value) {
+  navigateTo('/dashboard')
+}
+</script>
+```
+
+## Billing & Trial System
+
+### Trial Store (`app/stores/trial.ts`)
+
+Manages trial state and subscription status:
+
+```typescript
+const trialStore = useTrialStore()
+
+// State
+trialStore.isOnTrial
+trialStore.trialDaysRemaining
+trialStore.hasAccess
+trialStore.subscriptionStatus
+
+// Actions
+await trialStore.fetchTrialStatus()
+```
+
+### Billing Components
+
+**TrialBanner.vue**: Shows remaining trial days, displayed in app layout
+
+**CancelSubscriptionModal.vue**: Confirmation modal for subscription cancellation
+
+**AccessBlockedModal.vue**: Shown when user loses access (trial expired, no subscription)
+
+### Handling 402 Responses
+
+When API returns 402 with `code: 'SUBSCRIPTION_ENDED'`:
+
+```typescript
+// In useAuth or API interceptor
+if (error.status === 402 && error.data?.code === 'SUBSCRIPTION_ENDED') {
+  // Show AccessBlockedModal
+  // Redirect to billing page (if owner)
+}
+```
+
 ## Nuxt UI Components
 
 Primary component library is **Nuxt UI 4.1.0**. Use Nuxt UI components instead of building custom ones:
@@ -149,6 +258,11 @@ export const useExampleStore = defineStore('example', {
   }
 })
 ```
+
+### Key Stores
+
+- **`useOrganizationStore`**: Current organization context, user role in org
+- **`useTrialStore`**: Trial status, subscription state, access control
 
 ## Validation with Zod
 
@@ -286,6 +400,41 @@ async function handleSubmit() {
 - Don't fight with Nuxt UI's color system
 - Use provided color modes and variants
 - Extend theme in `nuxt.config.ts` if needed
+
+### Role-Based UI
+
+When building UI that depends on user role:
+
+```vue
+<script setup lang="ts">
+const { isOwner, canManageMembers } = useSettingsPermissions()
+</script>
+
+<template>
+  <!-- Show billing link only to owner -->
+  <UButton v-if="isOwner" to="/dashboard/settings/billing">
+    Billing
+  </UButton>
+
+  <!-- Show member management only to owner/admin -->
+  <div v-if="canManageMembers">
+    <!-- Member management UI -->
+  </div>
+</template>
+```
+
+### Billing UI Patterns
+
+```vue
+<!-- Show trial banner -->
+<TrialBanner v-if="trialStore.isOnTrial" />
+
+<!-- Handle access blocked -->
+<AccessBlockedModal
+  v-if="showAccessBlocked"
+  @close="showAccessBlocked = false"
+/>
+```
 
 ## Testing
 
