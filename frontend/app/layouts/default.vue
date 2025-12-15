@@ -6,107 +6,124 @@ const localePath = useLocalePath();
 const route = useRoute();
 const toast = useToast();
 const trialStore = useTrialStore();
+const { canAccessOrganization, canAccessBilling } = useSettingsPermissions();
 
 const open = ref(false);
 
-const links = computed(
-  () =>
+const links = computed(() => {
+  // Build settings children based on permissions
+  const settingsChildren: NavigationMenuItem[] = [
+    {
+      label: t("pages.dashboard.settings.navigation.general"),
+      to: localePath("/dashboard/settings"),
+      exact: true,
+      onSelect: () => {
+        open.value = false;
+      },
+    },
+  ];
+
+  // Organization - Owner only
+  if (canAccessOrganization.value) {
+    settingsChildren.push({
+      label: t("pages.dashboard.settings.navigation.organization"),
+      to: localePath("/dashboard/settings/organization"),
+      onSelect: () => {
+        open.value = false;
+      },
+    });
+  }
+
+  // Members - All roles can view
+  settingsChildren.push({
+    label: t("pages.dashboard.settings.navigation.members"),
+    to: localePath("/dashboard/settings/members"),
+    onSelect: () => {
+      open.value = false;
+    },
+  });
+
+  // Notifications - All roles
+  settingsChildren.push({
+    label: t("pages.dashboard.settings.navigation.notifications"),
+    to: localePath("/dashboard/settings/notifications"),
+    onSelect: () => {
+      open.value = false;
+    },
+  });
+
+  // Security - All roles
+  settingsChildren.push({
+    label: t("pages.dashboard.settings.navigation.security"),
+    to: localePath("/dashboard/settings/security"),
+    onSelect: () => {
+      open.value = false;
+    },
+  });
+
+  // Billing - Owner only
+  if (canAccessBilling.value) {
+    settingsChildren.push({
+      label: t("pages.dashboard.settings.navigation.billing"),
+      to: localePath("/dashboard/settings/billing"),
+      onSelect: () => {
+        open.value = false;
+      },
+    });
+  }
+
+  return [
     [
-      [
-        {
-          label: t("layouts.default.navigation.home"),
-          icon: "i-lucide-house",
-          to: localePath("/dashboard"),
-          onSelect: () => {
-            open.value = false;
-          },
+      {
+        label: t("layouts.default.navigation.home"),
+        icon: "i-lucide-house",
+        to: localePath("/dashboard"),
+        onSelect: () => {
+          open.value = false;
         },
-        {
-          label: t("layouts.default.navigation.inbox"),
-          icon: "i-lucide-inbox",
-          to: localePath("/dashboard/inbox"),
-          badge: "4",
-          onSelect: () => {
-            open.value = false;
-          },
+      },
+      {
+        label: t("layouts.default.navigation.inbox"),
+        icon: "i-lucide-inbox",
+        to: localePath("/dashboard/inbox"),
+        badge: "4",
+        onSelect: () => {
+          open.value = false;
         },
-        {
-          label: t("layouts.default.navigation.customers"),
-          icon: "i-lucide-users",
-          to: localePath("/dashboard/customers"),
-          onSelect: () => {
-            open.value = false;
-          },
+      },
+      {
+        label: t("layouts.default.navigation.customers"),
+        icon: "i-lucide-users",
+        to: localePath("/dashboard/customers"),
+        onSelect: () => {
+          open.value = false;
         },
-        {
-          label: t("layouts.default.navigation.settings"),
-          to: localePath("/dashboard/settings"),
-          icon: "i-lucide-settings",
-          defaultOpen: true,
-          type: "trigger",
-          children: [
-            {
-              label: t("pages.dashboard.settings.navigation.general"),
-              to: localePath("/dashboard/settings"),
-              exact: true,
-              onSelect: () => {
-                open.value = false;
-              },
-            },
-            {
-              label: t("pages.dashboard.settings.navigation.organization"),
-              to: localePath("/dashboard/settings/organization"),
-              onSelect: () => {
-                open.value = false;
-              },
-            },
-            {
-              label: t("pages.dashboard.settings.navigation.members"),
-              to: localePath("/dashboard/settings/members"),
-              onSelect: () => {
-                open.value = false;
-              },
-            },
-            {
-              label: t("pages.dashboard.settings.navigation.notifications"),
-              to: localePath("/dashboard/settings/notifications"),
-              onSelect: () => {
-                open.value = false;
-              },
-            },
-            {
-              label: t("pages.dashboard.settings.navigation.security"),
-              to: localePath("/dashboard/settings/security"),
-              onSelect: () => {
-                open.value = false;
-              },
-            },
-            {
-              label: t("pages.dashboard.settings.navigation.billing"),
-              to: localePath("/dashboard/settings/billing"),
-              onSelect: () => {
-                open.value = false;
-              },
-            },
-          ],
-        },
-      ],
-      [
-        {
-          label: t("layouts.default.navigation.feedback"),
-          icon: "i-lucide-message-circle",
-          to: "https://github.com/nuxt-ui-templates/dashboard",
-          target: "_blank",
-        },
-        {
-          label: t("layouts.default.navigation.helpSupport"),
-          icon: "i-lucide-info",
-          to: "https://github.com/nuxt-ui-templates/dashboard",
-          target: "_blank",
-        },
-      ],
-    ] satisfies NavigationMenuItem[][],
-);
+      },
+      {
+        label: t("layouts.default.navigation.settings"),
+        to: localePath("/dashboard/settings"),
+        icon: "i-lucide-settings",
+        defaultOpen: true,
+        type: "trigger",
+        children: settingsChildren,
+      },
+    ],
+    [
+      {
+        label: t("layouts.default.navigation.feedback"),
+        icon: "i-lucide-message-circle",
+        to: "https://github.com/nuxt-ui-templates/dashboard",
+        target: "_blank",
+      },
+      {
+        label: t("layouts.default.navigation.helpSupport"),
+        icon: "i-lucide-info",
+        to: "https://github.com/nuxt-ui-templates/dashboard",
+        target: "_blank",
+      },
+    ],
+  ] satisfies NavigationMenuItem[][];
+});
 
 const groups = computed(() => [
   {

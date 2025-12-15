@@ -7,50 +7,69 @@ definePageMeta({
 
 const { t } = useI18n();
 const localePath = useLocalePath();
+const { canAccessOrganization, canAccessBilling } = useSettingsPermissions();
 
-const links = computed(() => [
-  [
+const links = computed(() => {
+  const mainLinks: NavigationMenuItem[] = [
     {
-      label: t('pages.dashboard.settings.navigation.general'),
+      label: t("pages.dashboard.settings.navigation.general"),
       icon: "i-lucide-user",
-      to: localePath('/dashboard/settings'),
+      to: localePath("/dashboard/settings"),
       exact: true,
     },
-    {
-      label: t('pages.dashboard.settings.navigation.organization'),
+  ];
+
+  // Organization - Owner only
+  if (canAccessOrganization.value) {
+    mainLinks.push({
+      label: t("pages.dashboard.settings.navigation.organization"),
       icon: "i-lucide-building",
-      to: localePath('/dashboard/settings/organization'),
-    },
-    {
-      label: t('pages.dashboard.settings.navigation.members'),
-      icon: "i-lucide-users",
-      to: localePath('/dashboard/settings/members'),
-    },
-    {
-      label: t('pages.dashboard.settings.navigation.notifications'),
-      icon: "i-lucide-bell",
-      to: localePath('/dashboard/settings/notifications'),
-    },
-    {
-      label: t('pages.dashboard.settings.navigation.security'),
-      icon: "i-lucide-shield",
-      to: localePath('/dashboard/settings/security'),
-    },
-    {
-      label: t('pages.dashboard.settings.navigation.billing'),
+      to: localePath("/dashboard/settings/organization"),
+    });
+  }
+
+  // Members - All roles can view
+  mainLinks.push({
+    label: t("pages.dashboard.settings.navigation.members"),
+    icon: "i-lucide-users",
+    to: localePath("/dashboard/settings/members"),
+  });
+
+  // Notifications - All roles
+  mainLinks.push({
+    label: t("pages.dashboard.settings.navigation.notifications"),
+    icon: "i-lucide-bell",
+    to: localePath("/dashboard/settings/notifications"),
+  });
+
+  // Security - All roles
+  mainLinks.push({
+    label: t("pages.dashboard.settings.navigation.security"),
+    icon: "i-lucide-shield",
+    to: localePath("/dashboard/settings/security"),
+  });
+
+  // Billing - Owner only
+  if (canAccessBilling.value) {
+    mainLinks.push({
+      label: t("pages.dashboard.settings.navigation.billing"),
       icon: "i-lucide-credit-card",
-      to: localePath('/dashboard/settings/billing'),
-    },
-  ],
-  [
-    {
-      label: t('components.user.documentation'),
-      icon: "i-lucide-book-open",
-      to: "https://ui.nuxt.com/docs/getting-started/installation/nuxt",
-      target: "_blank",
-    },
-  ],
-] satisfies NavigationMenuItem[][]);
+      to: localePath("/dashboard/settings/billing"),
+    });
+  }
+
+  return [
+    mainLinks,
+    [
+      {
+        label: t("components.user.documentation"),
+        icon: "i-lucide-book-open",
+        to: "https://ui.nuxt.com/docs/getting-started/installation/nuxt",
+        target: "_blank",
+      },
+    ],
+  ] satisfies NavigationMenuItem[][];
+});
 </script>
 
 <template>

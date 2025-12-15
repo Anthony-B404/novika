@@ -439,6 +439,9 @@
       "copiedToClipboard": "Copied to clipboard",
       "rowsSelected": "{count} of {total} row(s) selected."
     },
+    "errors": {
+      "accessDenied": "Access denied"
+    },
     "or": "or"
   },
   "components": {

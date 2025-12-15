@@ -13,6 +13,7 @@ const { t } = useI18n();
 const toast = useToast();
 const { authenticatedFetch } = useAuth();
 const authStore = useAuthStore();
+const { canManageMembers } = useSettingsPermissions();
 
 const members = ref<Member[]>([]);
 const invitations = ref<Invitation[]>([]);
@@ -43,11 +44,26 @@ const loadInvitations = async () => {
   }
 };
 
-await loadMembers();
-await loadInvitations();
+const organizationStore = useOrganizationStore();
+
+// Load data on mount
+onMounted(async () => {
+  await loadMembers();
+
+  // Only load invitations if user can manage members (Owner/Admin)
+  // Wait for organization data to be available
+  if (organizationStore.currentOrganization && canManageMembers.value) {
+    await loadInvitations();
+  }
+});
 
 const refreshMembers = loadMembers;
-const refreshInvitations = loadInvitations;
+const refreshInvitations = async () => {
+  // Only refresh invitations if user can manage members
+  if (canManageMembers.value) {
+    await loadInvitations();
+  }
+};
 
 // Get current user's role in the organization
 const currentUserRole = computed(() => {
@@ -84,13 +100,7 @@ const inviteModalOpen = ref(false);
 const formRef = ref();
 const submitting = ref(false);
 
-// Role enum matching backend (2 = Administrator, 3 = Member)
-enum UserRole {
-  Administrator = 2,
-  Member = 3,
-}
-
-// Role options for select
+// Role options for select (UserRole imported from ~/types/auth)
 const roleOptions = ref<SelectItem[]>([
   {
     label: t("components.settings.members.inviteModal.roles.administrator"),
@@ -262,6 +272,7 @@ async function deleteInvitation(id: number) {
       class="mb-4"
     >
       <UButton
+        v-if="canManageMembers"
         :label="t('common.buttons.invitePeople')"
         color="neutral"
         class="w-fit lg:ms-auto"
@@ -269,8 +280,9 @@ async function deleteInvitation(id: number) {
       />
     </UPageCard>
 
-    <!-- Invitations Section (Collapsible) -->
+    <!-- Invitations Section (Collapsible) - Only visible to Owners/Admins -->
     <UPageCard
+      v-if="canManageMembers"
       variant="subtle"
       :ui="{
         container: 'p-0 sm:p-0 gap-y-0',
@@ -348,8 +360,9 @@ async function deleteInvitation(id: number) {
       />
     </UPageCard>
 
-    <!-- Invitation Modal -->
+    <!-- Invitation Modal - Only for Owners/Admins -->
     <UModal
+      v-if="canManageMembers"
       v-model:open="inviteModalOpen"
       :title="t('components.settings.members.inviteModal.title')"
       :description="t('components.settings.members.inviteModal.description')"

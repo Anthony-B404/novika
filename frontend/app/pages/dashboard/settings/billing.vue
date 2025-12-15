@@ -8,6 +8,30 @@ const { authenticatedFetch } = useAuth();
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const localePath = useLocalePath();
+const { canAccessBilling } = useSettingsPermissions();
+const organizationStore = useOrganizationStore();
+
+// Redirect if not authorized (Owner only) - wait for org data to load
+const hasRedirected = ref(false);
+watch(
+  () => ({
+    canAccess: canAccessBilling.value,
+    orgLoaded: organizationStore.currentOrganization !== null,
+  }),
+  ({ canAccess, orgLoaded }) => {
+    if (orgLoaded && canAccess === false && !hasRedirected.value) {
+      hasRedirected.value = true;
+      toast.add({
+        title: t("common.errors.accessDenied"),
+        icon: "i-lucide-shield-x",
+        color: "error",
+      });
+      navigateTo(localePath("/dashboard/settings"), { replace: true });
+    }
+  },
+  { immediate: true }
+);
 
 // State
 const loading = ref(true);

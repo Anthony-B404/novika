@@ -11,6 +11,29 @@ const authStore = useAuthStore();
 const organizationStore = useOrganizationStore();
 const config = useRuntimeConfig();
 const toast = useToast();
+const localePath = useLocalePath();
+const { canAccessOrganization } = useSettingsPermissions();
+
+// Redirect if not authorized (Owner only) - wait for org data to load
+const hasRedirected = ref(false);
+watch(
+  () => ({
+    canAccess: canAccessOrganization.value,
+    orgLoaded: organizationStore.currentOrganization !== null,
+  }),
+  ({ canAccess, orgLoaded }) => {
+    if (orgLoaded && canAccess === false && !hasRedirected.value) {
+      hasRedirected.value = true;
+      toast.add({
+        title: t("common.errors.accessDenied"),
+        icon: "i-lucide-shield-x",
+        color: "error",
+      });
+      navigateTo(localePath("/dashboard/settings"), { replace: true });
+    }
+  },
+  { immediate: true }
+);
 
 const fileRef = ref<HTMLInputElement>();
 
