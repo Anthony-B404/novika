@@ -281,6 +281,25 @@
       "logout": "Log out",
       "error": "Failed to create checkout session"
     },
+    "contactSupport": {
+      "title": "Contact Support",
+      "description": "Send us a message and we'll get back to you as soon as possible.",
+      "subject": "Subject",
+      "subjectPlaceholder": "Briefly describe your request",
+      "message": "Message",
+      "messagePlaceholder": "Describe your question or issue in detail...",
+      "send": "Send",
+      "successTitle": "Message sent!",
+      "successDescription": "We've received your message and will respond shortly.",
+      "errorTitle": "Error",
+      "errorDescription": "Failed to send message. Please try again.",
+      "validation": {
+        "subjectTooShort": "Subject must be at least 5 characters",
+        "subjectTooLong": "Subject must not exceed 200 characters",
+        "messageTooShort": "Message must be at least 20 characters",
+        "messageTooLong": "Message must not exceed 5000 characters"
+      }
+    },
     "user": {
       "profile": "Profile",
       "billing": "Billing",

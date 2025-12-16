@@ -83,6 +83,9 @@
     "subscription_ended": "Your subscription has ended. Please subscribe to continue using the application.",
     "subscription_ended_member": "The organization owner's subscription has ended. Create your own organization to continue."
   },
+  "contact": {
+    "sent": "Message sent successfully"
+  },
   "errors": {
     "server_error": "A server error occurred",
     "not_found": "Resource not found",

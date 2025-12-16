@@ -83,6 +83,9 @@
     "subscription_ended": "Votre abonnement est terminé. Veuillez vous abonner pour continuer à utiliser l'application.",
     "subscription_ended_member": "L'abonnement du propriétaire de l'organisation est terminé. Créez votre propre organisation pour continuer."
   },
+  "contact": {
+    "sent": "Message envoyé avec succès"
+  },
   "errors": {
     "server_error": "Une erreur serveur s'est produite",
     "not_found": "Ressource introuvable",

@@ -1,0 +1,82 @@
+@mjml()
+  <mjml>
+    <mj-head>
+      <mj-title>
+        {{ i18n.t('emails.contact_support.subject', { subject }) }}
+      </mj-title>
+      <mj-preview>
+        {{ i18n.t('emails.contact_support.preview', { userName }) }}
+      </mj-preview>
+      <mj-font
+        name="Public Sans"
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap"
+      />
+      <mj-attributes>
+        <mj-all font-family="'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" />
+        <mj-text font-size="16px" line-height="24px" color="#334155" />
+      </mj-attributes>
+      <mj-style>
+        .shadow {
+          box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        .message-box {
+          background-color: #f1f5f9;
+          border-radius: 6px;
+          padding: 16px;
+        }
+      </mj-style>
+    </mj-head>
+    <mj-body background-color="#f8fafc">
+      <mj-section padding-top="48px" padding-bottom="24px">
+        <mj-column width="100%">
+          <!-- Logo or Brand Name could go here -->
+        </mj-column>
+      </mj-section>
+
+      <mj-section background-color="#ffffff" border-radius="8px" padding="32px 24px" css-class="shadow">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" color="#0f172a" padding-bottom="16px">
+            {{ i18n.t('emails.contact_support.title') }}
+          </mj-text>
+
+          <mj-text color="#64748b" padding-bottom="8px">
+            <strong>{{ i18n.t('emails.contact_support.from') }}</strong> {{ userName }}
+          </mj-text>
+
+          <mj-text color="#64748b" padding-bottom="24px">
+            <strong>{{ i18n.t('emails.contact_support.email') }}</strong>
+            <a href="mailto:{{ userEmail }}" style="color: #2563eb; text-decoration: none;">{{ userEmail }}</a>
+          </mj-text>
+
+          <mj-text font-weight="600" color="#0f172a" padding-bottom="8px">
+            {{ i18n.t('emails.contact_support.subject_label') }} {{ subject }}
+          </mj-text>
+
+          <mj-divider border-color="#e2e8f0" border-width="1px" padding-top="16px" padding-bottom="16px" />
+
+          <mj-text font-weight="600" color="#0f172a" padding-bottom="8px">
+            {{ i18n.t('emails.contact_support.message_label') }}
+          </mj-text>
+
+          <mj-text color="#334155" padding-bottom="24px" css-class="message-box">
+            {{{ message.replace(/\n/g, '<br>') }}}
+          </mj-text>
+
+          <mj-divider border-color="#e2e8f0" border-width="1px" padding-top="16px" padding-bottom="16px" />
+
+          <mj-text font-size="12px" color="#94a3b8" line-height="1.5">
+            {{ i18n.t('emails.contact_support.footer') }}
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <mj-section>
+        <mj-column>
+          <mj-text align="center" font-size="12px" color="#94a3b8" padding-top="24px">
+            &copy; {{ new Date().getFullYear() }} Your Company. All rights reserved.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-body>
+  </mjml>
+@end

@@ -56,5 +56,15 @@
     "button": "Vérifier le nouvel email",
     "expiry": "⏱️ Ce lien expire dans 15 minutes",
     "outro": "Si vous n'avez pas demandé ce changement d'email, vous pouvez ignorer cet email. Votre adresse email actuelle restera inchangée."
+  },
+  "contact_support": {
+    "subject": "Support: {subject}",
+    "preview": "Nouvelle demande de support de {userName}",
+    "title": "Nouvelle demande de support",
+    "from": "De :",
+    "email": "Email :",
+    "subject_label": "Sujet :",
+    "message_label": "Message :",
+    "footer": "Cet email a été envoyé via le formulaire de contact de l'application."
   }
 }

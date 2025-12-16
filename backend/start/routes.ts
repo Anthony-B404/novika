@@ -18,6 +18,7 @@ const SocialAuthController = () => import('#controllers/social_auth_controller')
 const MembersController = () => import('#controllers/members_controller')
 const BillingController = () => import('#controllers/billing_controller')
 const WebhooksController = () => import('#controllers/webhooks_controller')
+const ContactController = () => import('#controllers/contact_controller')
 
 router.get('/', async () => {
   return {
@@ -82,6 +83,9 @@ router
     router.post('/billing/checkout', [BillingController, 'createCheckoutSession'])
     router.post('/billing/cancel', [BillingController, 'cancelSubscription'])
     router.post('/billing/reactivate', [BillingController, 'reactivateSubscription'])
+
+    // Contact support route
+    router.post('/contact', [ContactController, 'send'])
   })
   .use(middleware.auth({ guards: ['api'] }))
 

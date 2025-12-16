@@ -9,6 +9,7 @@ const trialStore = useTrialStore();
 const { canAccessOrganization, canAccessBilling } = useSettingsPermissions();
 
 const open = ref(false);
+const contactModalOpen = ref(false);
 
 const links = computed(() => {
   // Build settings children based on permissions
@@ -118,8 +119,9 @@ const links = computed(() => {
       {
         label: t("layouts.default.navigation.helpSupport"),
         icon: "i-lucide-info",
-        to: "https://github.com/nuxt-ui-templates/dashboard",
-        target: "_blank",
+        onSelect: () => {
+          contactModalOpen.value = true;
+        },
       },
     ],
   ] satisfies NavigationMenuItem[][];
@@ -239,5 +241,8 @@ onMounted(async () => {
 
     <!-- Access blocked modal (shows when trial expired or subscription ended) -->
     <BillingAccessBlockedModal v-if="trialStore.loaded && !trialStore.hasAccess" />
+
+    <!-- Contact support modal -->
+    <ContactSupportModal v-model:open="contactModalOpen" />
   </UDashboardGroup>
 </template>
