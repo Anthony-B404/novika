@@ -213,18 +213,6 @@ const items = computed<DropdownMenuItem[][]>(() => [
   ],
   [
     {
-      label: t("components.user.documentation"),
-      icon: "i-lucide-book-open",
-      to: "https://ui.nuxt.com/docs/getting-started/installation/nuxt",
-      target: "_blank",
-    },
-    {
-      label: t("components.user.githubRepository"),
-      icon: "i-simple-icons-github",
-      to: "https://github.com/nuxt-ui-templates/dashboard",
-      target: "_blank",
-    },
-    {
       label: t("components.user.logOut"),
       icon: "i-lucide-log-out",
       onSelect: async () => {
@@ -264,7 +252,10 @@ const items = computed<DropdownMenuItem[][]>(() => [
         <span
           class="size-2 rounded-full ring ring-white/20 dark:ring-black/20"
           :style="{
-            backgroundColor: getChipColor((item as any).chip, colorMode.value === 'dark' ? 'dark' : 'light'),
+            backgroundColor: getChipColor(
+              (item as any).chip,
+              colorMode.value === 'dark' ? 'dark' : 'light',
+            ),
           }"
         />
       </div>

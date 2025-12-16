@@ -58,17 +58,7 @@ const links = computed(() => {
     });
   }
 
-  return [
-    mainLinks,
-    [
-      {
-        label: t("components.user.documentation"),
-        icon: "i-lucide-book-open",
-        to: "https://ui.nuxt.com/docs/getting-started/installation/nuxt",
-        target: "_blank",
-      },
-    ],
-  ] satisfies NavigationMenuItem[][];
+  return [mainLinks] satisfies NavigationMenuItem[][];
 });
 </script>
 
