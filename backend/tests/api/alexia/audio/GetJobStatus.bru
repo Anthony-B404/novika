@@ -1,0 +1,117 @@
+meta {
+  name: Get Job Status
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/audio/status/{{jobId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Accept-Language: fr
+}
+
+tests {
+  test("should return job status", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+    expect(data).to.have.property('jobId');
+    expect(data).to.have.property('status');
+    expect(data).to.have.property('progress');
+  });
+
+  test("status should be valid value", function() {
+    const data = res.getBody();
+    const validStatuses = ['pending', 'processing', 'completed', 'failed'];
+    expect(validStatuses).to.include(data.status);
+  });
+
+  test("progress should be between 0 and 100", function() {
+    const data = res.getBody();
+    expect(data.progress).to.be.at.least(0);
+    expect(data.progress).to.be.at.most(100);
+  });
+
+  test("completed job should have result", function() {
+    const data = res.getBody();
+    if (data.status === 'completed') {
+      expect(data).to.have.property('result');
+      expect(data.result).to.have.property('transcription');
+      expect(data.result).to.have.property('analysis');
+    }
+  });
+
+  test("failed job should have error", function() {
+    const data = res.getBody();
+    if (data.status === 'failed') {
+      expect(data).to.have.property('error');
+    }
+  });
+}
+
+docs {
+  # Get Job Status
+
+  This endpoint returns the status and progress of an audio processing job.
+
+  **Prerequisites:**
+  - Must have submitted an audio file via POST /audio/process
+  - Use the jobId from the process response
+
+  **Response (200):**
+
+  **Pending/Processing:**
+  ```json
+  {
+    "jobId": "uuid",
+    "status": "processing",
+    "progress": 45,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "processedAt": "2024-01-01T00:00:01.000Z"
+  }
+  ```
+
+  **Completed:**
+  ```json
+  {
+    "jobId": "uuid",
+    "status": "completed",
+    "progress": 100,
+    "result": {
+      "transcription": "...",
+      "analysis": "..."
+    },
+    "createdAt": "...",
+    "processedAt": "...",
+    "completedAt": "..."
+  }
+  ```
+
+  **Failed:**
+  ```json
+  {
+    "jobId": "uuid",
+    "status": "failed",
+    "progress": 50,
+    "error": "Error message"
+  }
+  ```
+
+  **Progress stages:**
+  - 0-10%: Downloading file from storage
+  - 10-50%: Transcribing audio
+  - 50-90%: Analyzing with AI
+  - 90-100%: Cleanup and completion
+
+  **Errors:**
+  - 401: Unauthorized
+  - 402: Subscription ended
+  - 404: Job not found
+}

@@ -1,0 +1,38 @@
+meta {
+  name: Get Job Status - Not Found
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/audio/status/00000000-0000-0000-0000-000000000000
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Accept-Language: fr
+}
+
+tests {
+  test("should return 404 for non-existent job", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("should return error message", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+  });
+}
+
+docs {
+  # Get Job Status - Not Found
+
+  Test case for requesting status of a non-existent job.
+
+  **Expected:** 404 Not Found with error message
+}

@@ -1,82 +1,112 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { audioProcessValidator, ALLOWED_AUDIO_EXTENSIONS, MAX_AUDIO_SIZE } from '#validators/audio'
-import MistralService from '#services/mistral_service'
+import QueueService from '#services/queue_service'
+import storageService from '#services/storage_service'
 import { errors } from '@vinejs/vine'
+import { randomUUID } from 'node:crypto'
 
 export default class AudioController {
-    /**
-     * Process audio file: transcribe and analyze according to user prompt
-     */
-    async process({ request, response, i18n }: HttpContext) {
-        try {
-            // Validate prompt
-            const { prompt } = await request.validateUsing(audioProcessValidator)
+  /**
+   * Submit audio file for async processing.
+   * Returns a job ID for status tracking.
+   *
+   * POST /audio/process
+   */
+  async process({ request, response, auth, i18n }: HttpContext) {
+    try {
+      // Validate prompt
+      const { prompt } = await request.validateUsing(audioProcessValidator)
 
-            // Get uploaded file
-            const audioFile = request.file('audio', {
-                size: `${MAX_AUDIO_SIZE / (1024 * 1024)}mb`,
-                extnames: ALLOWED_AUDIO_EXTENSIONS,
-            })
+      // Get uploaded file
+      const audioFile = request.file('audio', {
+        size: `${MAX_AUDIO_SIZE / (1024 * 1024)}mb`,
+        extnames: ALLOWED_AUDIO_EXTENSIONS,
+      })
 
-            if (!audioFile) {
-                return response.badRequest({
-                    message: i18n.t('messages.audio.no_file_uploaded'),
-                })
-            }
+      if (!audioFile) {
+        return response.badRequest({
+          message: i18n.t('messages.audio.no_file_uploaded'),
+        })
+      }
 
-            if (!audioFile.isValid) {
-                return response.badRequest({
-                    message: audioFile.errors[0]?.message || i18n.t('messages.audio.invalid_file'),
-                })
-            }
+      if (!audioFile.isValid) {
+        return response.badRequest({
+          message: audioFile.errors[0]?.message || i18n.t('messages.audio.invalid_file'),
+        })
+      }
 
-            if (!audioFile.tmpPath) {
-                return response.badRequest({
-                    message: i18n.t('messages.audio.file_upload_error'),
-                })
-            }
+      const user = auth.user!
+      const organizationId = user.currentOrganizationId
 
-            // Process with Mistral
-            const mistralService = new MistralService()
+      if (!organizationId) {
+        return response.badRequest({
+          message: i18n.t('messages.errors.no_current_organization'),
+        })
+      }
 
-            // Step 1: Transcribe audio
-            const transcription = await mistralService.transcribe(
-                audioFile.tmpPath,
-                audioFile.clientName
-            )
+      // Store file in persistent storage
+      const storedFile = await storageService.storeAudioFile(audioFile, organizationId)
 
-            if (!transcription || transcription.trim() === '') {
-                return response.unprocessableEntity({
-                    message: i18n.t('messages.audio.transcription_empty'),
-                })
-            }
+      // Generate job ID and queue the job
+      const jobId = randomUUID()
+      const queueService = QueueService.getInstance()
 
-            // Step 2: Analyze transcription with user prompt
-            const analysis = await mistralService.analyze(transcription, prompt)
+      await queueService.addTranscriptionJob({
+        jobId,
+        userId: user.id,
+        organizationId,
+        audioFilePath: storedFile.path,
+        audioFileName: storedFile.originalName,
+        prompt,
+        locale: i18n.locale,
+      })
 
-            return response.ok({
-                transcription,
-                analysis,
-            })
-        } catch (error) {
-            if (error instanceof errors.E_VALIDATION_ERROR) {
-                const firstError = error.messages[0]
-                if (firstError) {
-                    const translatedField = i18n.t(`validation.fields.${firstError.field}`, firstError.field)
-                    const translatedMessage = i18n.t(firstError.message, { field: translatedField })
-                    return response.status(422).json({
-                        message: translatedMessage,
-                        error: 'Validation failure',
-                    })
-                }
-            }
-
-            // Log the error for debugging
-            console.error('Audio processing error:', error)
-
-            return response.internalServerError({
-                message: i18n.t('messages.audio.processing_error'),
-            })
+      return response.accepted({
+        jobId,
+        message: i18n.t('messages.audio.processing_started'),
+        statusUrl: `/audio/status/${jobId}`,
+      })
+    } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        const firstError = error.messages[0]
+        if (firstError) {
+          const translatedField = i18n.t(`validation.fields.${firstError.field}`, firstError.field)
+          const translatedMessage = i18n.t(firstError.message, { field: translatedField })
+          return response.status(422).json({
+            message: translatedMessage,
+            error: 'Validation failure',
+          })
         }
+      }
+
+      console.error('Audio processing error:', error)
+
+      return response.internalServerError({
+        message: i18n.t('messages.audio.processing_error'),
+      })
     }
+  }
+
+  /**
+   * Get job status and results.
+   *
+   * GET /audio/status/:jobId
+   */
+  async status({ params, response, i18n }: HttpContext) {
+    const { jobId } = params
+
+    const queueService = QueueService.getInstance()
+    const jobStatus = await queueService.getJobStatus(jobId)
+
+    if (!jobStatus) {
+      return response.notFound({
+        message: i18n.t('messages.audio.job_not_found'),
+      })
+    }
+
+    // TODO: Add authorization check in Phase 1.2
+    // Verify job belongs to user's organization by storing job metadata in database
+
+    return response.ok(jobStatus)
+  }
 }

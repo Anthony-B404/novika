@@ -107,6 +107,8 @@
     "invalid_file": "The audio file is invalid",
     "file_upload_error": "Error uploading file",
     "transcription_empty": "Unable to transcribe the audio file. Please try again with a better quality file.",
-    "processing_error": "An error occurred while processing the audio"
+    "processing_error": "An error occurred while processing the audio",
+    "processing_started": "Audio processing has started. Check the status to track progress.",
+    "job_not_found": "Processing job not found"
   }
 }

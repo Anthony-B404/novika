@@ -114,6 +114,7 @@ router
 
     // Audio analysis routes
     router.post('/audio/process', [AudioController, 'process'])
+    router.get('/audio/status/:jobId', [AudioController, 'status'])
   })
   .use(middleware.auth({ guards: ['api'] }))
   .use(middleware.trialGuard())

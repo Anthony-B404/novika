@@ -69,4 +69,21 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   MISTRAL_API_KEY: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring Redis (BullMQ)
+  |----------------------------------------------------------
+  */
+  REDIS_HOST: Env.schema.string({ format: 'host' }),
+  REDIS_PORT: Env.schema.number(),
+  REDIS_PASSWORD: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring file storage
+  | Note: Add 's3' to the enum when S3 is configured
+  |----------------------------------------------------------
+  */
+  DRIVE_DISK: Env.schema.enum(['local'] as const),
 })

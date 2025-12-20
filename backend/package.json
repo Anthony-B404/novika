@@ -19,6 +19,7 @@
     "#models/*": "./app/models/*.js",
     "#mails/*": "./app/mails/*.js",
     "#services/*": "./app/services/*.js",
+    "#jobs/*": "./app/jobs/*.js",
     "#listeners/*": "./app/listeners/*.js",
     "#events/*": "./app/events/*.js",
     "#middleware/*": "./app/middleware/*.js",
@@ -66,7 +67,10 @@
     "luxon": "^3.7.2",
     "mjml": "^4.16.1",
     "pg": "^8.16.3",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "@adonisjs/drive": "^3.4.1",
+    "bullmq": "^5.66.2",
+    "ioredis": "^5.8.2"
   },
   "hotHook": {
     "boundaries": [

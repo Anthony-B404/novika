@@ -1,0 +1,86 @@
+meta {
+  name: Process Audio
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/audio/process
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Accept-Language: fr
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  audio: @file(/Users/anthonybette/Downloads/20251220235350.wav)
+  prompt: Resume cette conversation en points cles
+}
+
+tests {
+  test("should accept audio for async processing", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(202);
+    expect(data).to.have.property('jobId');
+    expect(data).to.have.property('statusUrl');
+    expect(data).to.have.property('message');
+  
+    // Save jobId for next test
+    bru.setEnvVar("jobId", data.jobId);
+  });
+  
+  test("should return valid UUID as jobId", function() {
+    const data = res.getBody();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    expect(data.jobId).to.match(uuidRegex);
+  });
+  
+  test("should return correct statusUrl format", function() {
+    const data = res.getBody();
+    expect(data.statusUrl).to.include('/audio/status/');
+    expect(data.statusUrl).to.include(data.jobId);
+  });
+}
+
+docs {
+  # Process Audio - Async Transcription
+  
+  This endpoint submits an audio file for asynchronous transcription and analysis.
+  
+  **Flow:**
+  1. Upload audio file with prompt
+  2. File is stored in persistent storage
+  3. Job is queued for background processing
+  4. Returns 202 Accepted with jobId
+  
+  **Request:**
+  - Method: POST
+  - Content-Type: multipart/form-data
+  - Body:
+    - audio: Audio file (MP3, WAV, M4A, OGG, FLAC)
+    - prompt: Instructions for analysis
+  
+  **Response (202):**
+  ```json
+  {
+    "jobId": "uuid",
+    "message": "Le traitement audio a demarre...",
+    "statusUrl": "/api/audio/status/{jobId}"
+  }
+  ```
+  
+  **Next steps:**
+  - Poll GET /audio/status/:jobId to track progress
+  
+  **Errors:**
+  - 400: No file uploaded or invalid file
+  - 401: Unauthorized
+  - 402: Subscription ended
+  - 422: Validation error
+}
