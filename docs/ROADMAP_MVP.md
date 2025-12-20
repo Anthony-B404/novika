@@ -1,6 +1,6 @@
 # Roadmap MVP Alexia - Audio vers Documents Structurés
 
-> **Dernière mise à jour**: Décembre 2024
+> **Dernière mise à jour**: 20 Décembre 2024
 > **Durée estimée**: 6-8 semaines
 
 ## Vue d'ensemble
@@ -12,10 +12,11 @@
 - **Billing**: Lemon Squeezy, trial 14 jours, gestion abonnements
 - **i18n**: Français + Anglais avec détection auto
 - **Dashboard**: Layout, navigation, settings, membres
+- ✅ **Infrastructure Audio**: Storage local, queue Redis/BullMQ, service Mistral
 
 ### Ce qu'il faut construire (coeur MVP)
 1. **Atelier Audio** - Upload/enregistrement
-2. **Transcription IA** - Voxtral (Mistral AI)
+2. **Transcription IA** - Voxtral Small (Mistral AI)
 3. **Templates** - Modèles de documents métier
 4. **Transformation** - Audio → Document structuré
 5. **Export** - PDF/Word
@@ -26,175 +27,211 @@
 
 | Composant | Technologie | Notes |
 |-----------|-------------|-------|
-| **Transcription** | Voxtral (Mistral AI) | Européen, excellent FR, GDPR-friendly |
-| **Stockage** | Local (MVP) → R2 (prod) | Fichiers dans `storage/uploads` |
-| **Queue** | Redis + Bull | Traitement asynchrone |
+| **Transcription** | Voxtral Small (Mistral AI) | Européen, excellent FR, GDPR-friendly, via `chat.complete` |
+| **Analyse** | Mistral Large | Transformation transcription → document structuré |
+| **Stockage** | @adonisjs/drive (Local) | MVP: local, Prod: R2/S3 via driver swap |
+| **Queue** | Redis + BullMQ | Traitement asynchrone avec retry/backoff |
 | **PDF** | Puppeteer ou pdfmake | HTML → PDF |
 | **Word** | docx npm | Génération .docx |
 
 ## Décisions MVP
 
-- **Transcription**: Voxtral (Mistral AI) - modèle européen, excellent support français
-- **Stockage**: Local pour dev, migration R2/S3 en production
+- **Transcription**: Voxtral Small via `chat.complete` avec audio base64 (l'endpoint `/transcriptions` ne supporte que Voxtral Mini Transcribe)
+- **Diarization**: ❌ Non disponible actuellement - Mistral annonce "Coming soon" pour speaker identification
+- **Stockage**: @adonisjs/drive avec driver local (dev), migration R2/S3 en production via config
 - **Templates**: Uniquement prédéfinis (Médical, Juridique, Commercial, Général)
 - **Trial**: Limité à 3 audios, 30 min max par audio
-- **Processing**: Asynchrone avec queue Redis
+- **Processing**: Asynchrone avec queue BullMQ + Redis
 
 ---
 
 ## Phase 1: Infrastructure Audio (Semaine 1-2)
 
-### 1.1 Configuration Services
+### 1.1 Configuration Services ✅ COMPLÉTÉ
 **Backend**
-- [ ] Créer dossier `storage/uploads/audios` + `storage/uploads/documents`
-- [ ] Créer compte Mistral AI + API key (console.mistral.ai)
-- [ ] Configurer variables d'env: `MISTRAL_API_KEY`, `REDIS_HOST`, `REDIS_PORT`
-- [ ] Setup Redis local (dev) + config Bull queue
+- [x] Créer dossier `storage/uploads/audios` + `storage/uploads/documents`
+- [x] Créer compte Mistral AI + API key (console.mistral.ai)
+- [x] Configurer variables d'env: `MISTRAL_API_KEY`, `REDIS_HOST`, `REDIS_PORT`, `DRIVE_DISK`
+- [x] Setup Redis local (dev) + config BullMQ queue
 
-**Fichiers à créer/modifier**:
+**Fichiers créés**:
 ```
-backend/.env                          # Nouvelles vars
-backend/config/drive.ts               # Config stockage local
-backend/config/queue.ts               # Config Bull/Redis
-```
-
-### 1.2 Modèles de Données
-**Migrations à créer**:
-```sql
--- audios
-id, organization_id, user_id, title, file_name, file_size,
-duration, status (pending|processing|completed|failed),
-r2_path, error_message, created_at, updated_at
-
--- transcriptions
-id, audio_id, raw_text, language (fr|en),
-timestamps (JSON), confidence, created_at
-
--- templates
-id, organization_id, name, description, category (medical|legal|commercial|custom),
-schema (JSON - définition des champs), is_default, created_by, created_at, updated_at
-
--- documents
-id, audio_id, transcription_id, template_id,
-title, content (JSON), status, r2_path, format (pdf|docx),
-created_at
+backend/.env.example                  # Variables d'environnement template
+backend/config/drive.ts               # Config @adonisjs/drive (local storage)
+backend/config/queue.ts               # Config BullMQ/Redis
+backend/app/services/storage_service.ts   # Service stockage fichiers
+backend/app/services/queue_service.ts     # Service queue jobs
+backend/app/services/mistral_service.ts   # Service Voxtral Small + Mistral Large
+backend/app/jobs/transcription_job.ts     # Worker job transcription
+backend/start/worker.ts               # Preload worker BullMQ
+backend/app/controllers/audio_controller.ts  # Controller API audio
 ```
 
-**Fichiers à créer**:
+**Routes API créées**:
 ```
-backend/database/migrations/XXXX_create_audios_table.ts
-backend/database/migrations/XXXX_create_transcriptions_table.ts
-backend/database/migrations/XXXX_create_templates_table.ts
-backend/database/migrations/XXXX_create_documents_table.ts
-backend/app/models/audio.ts
-backend/app/models/transcription.ts
-backend/app/models/template.ts
-backend/app/models/document.ts
+POST /audio/process          # Upload + lance transcription async
+GET  /audio/status/:jobId    # Polling statut job
 ```
 
-### 1.3 Service de Stockage Local
-**Fichiers à créer**:
+**Dépendances ajoutées**:
+- `@adonisjs/drive` - Abstraction stockage fichiers
+- `bullmq` - Queue management
+- `ioredis` - Client Redis
+
+### 1.2 Modèles de Données ✅ COMPLÉTÉ
+**Migrations créées**:
 ```
-backend/app/services/storage_service.ts
-  - upload(file, path): Promise<string>  # Retourne chemin local
-  - download(path): Promise<Buffer>
-  - delete(path): Promise<void>
-  - getPublicUrl(path): Promise<string>
+backend/database/migrations/1765500000001_create_audios_table.ts
+backend/database/migrations/1765500000002_create_transcriptions_table.ts
+backend/database/migrations/1765500000003_create_templates_table.ts
+backend/database/migrations/1765500000004_create_documents_table.ts
 ```
+
+**Modèles créés**:
+```
+backend/app/models/audio.ts         # AudioStatus enum, relations, helpers
+backend/app/models/transcription.ts # TranscriptionTimestamp interface
+backend/app/models/template.ts      # TemplateCategory enum, TemplateSchema interface
+backend/app/models/document.ts      # DocumentStatus, DocumentFormat enums
+```
+
+**Schéma des tables**:
+- `audios`: organization_id, user_id, title, file_name, file_path, file_size, mime_type, duration, status, error_message
+- `transcriptions`: audio_id (unique), raw_text, language, timestamps (JSONB), confidence
+- `templates`: organization_id (nullable=système), name, description, category, schema (JSONB), is_default, created_by
+- `documents`: audio_id, transcription_id, template_id (nullable), title, content (JSONB), status, file_path, format
+
+**Enums TypeScript**:
+- `AudioStatus`: pending, processing, completed, failed
+- `TemplateCategory`: medical, legal, commercial, general
+- `DocumentStatus`: draft, completed, exported
+- `DocumentFormat`: pdf, docx
+
+### 1.3 Service de Stockage Local ✅ COMPLÉTÉ (Phase 1.1)
+**Fichier créé**: `backend/app/services/storage_service.ts`
+
+**Méthodes implémentées**:
+- `storeAudioFile(file, organizationId)` - Upload audio avec scoping multi-tenant
+- `storeDocumentFile(content, fileName, organizationId)` - Upload documents
+- `getFileBuffer(path)` - Download fichier en Buffer
+- `getFileStream(path)` - Download fichier en Stream
+- `deleteFile(path)` - Suppression fichier
+- `getSignedUrl(path, expiresIn)` - URL signée temporaire
+- `fileExists(path)` - Vérification existence
 
 ---
 
-## Phase 2: Upload Audio (Semaine 2-3)
+## Phase 2: Upload Audio (Semaine 2-3) ⏳ EN COURS
 
-### 2.1 API Upload
-**Endpoints à créer**:
-```
-POST   /api/audios/upload         # Upload fichier audio
-GET    /api/audios                # Liste des audios (orga)
-GET    /api/audios/:id            # Détails audio
-DELETE /api/audios/:id            # Supprimer audio
-```
+### 2.1 API Upload ⚠️ PARTIELLEMENT COMPLÉTÉ
 
-**Fichiers à créer**:
+**Existant (Phase 1.1)**:
 ```
-backend/app/controllers/audios_controller.ts
-backend/app/validators/audio_validator.ts
-backend/app/policies/audio_policy.ts
-backend/start/routes.ts           # Ajouter routes
+✅ POST /audio/process           # Upload + lance transcription async
+✅ GET  /audio/status/:jobId     # Polling statut job
+✅ backend/app/controllers/audio_controller.ts  # process() + status()
+✅ backend/app/validators/audio.ts              # Constantes validation
 ```
 
-**Validation**:
-- Formats acceptés: MP3, WAV, M4A, WEBM
-- Taille max: 100MB
-- Durée max: 2 heures
+**À compléter**:
+```
+⬜ POST   /api/audios/upload         # Upload avec sauvegarde BDD
+⬜ GET    /api/audios                # Liste des audios (orga)
+⬜ GET    /api/audios/:id            # Détails audio
+⬜ DELETE /api/audios/:id            # Supprimer audio
+```
 
-### 2.2 Frontend Upload
+**Fichiers à créer/modifier**:
+```
+⬜ backend/app/controllers/audios_controller.ts  # CRUD complet avec modèle Audio
+⬜ backend/app/policies/audio_policy.ts          # Autorisation multi-tenant
+⬜ Modifier audio_controller.ts                  # Sauvegarder dans table audios
+⬜ Modifier transcription_job.ts                 # Sauvegarder transcription en BDD
+```
+
+**Validation** (déjà configurée):
+- Formats acceptés: MP3, WAV, M4A, OGG, FLAC
+- Taille max: 25MB (configurable)
+
+### 2.2 Frontend Upload ⬜ NON COMMENCÉ
 **Pages à créer**:
 ```
-frontend/app/pages/dashboard/workshop/index.vue    # Page principale
-frontend/app/pages/dashboard/workshop/[id].vue     # Détail audio
+⬜ frontend/app/pages/dashboard/workshop/index.vue    # Page principale
+⬜ frontend/app/pages/dashboard/workshop/[id].vue     # Détail audio
 ```
 
 **Composants à créer**:
 ```
 frontend/app/components/workshop/
-  - AudioUploadZone.vue           # Drag & drop
-  - AudioRecorder.vue             # Enregistrement micro
-  - AudioList.vue                 # Liste des audios
-  - AudioCard.vue                 # Carte audio individuelle
-  - AudioPlayer.vue               # Lecteur audio
-  - ProcessingStatus.vue          # Statut traitement
+  ⬜ AudioUploadZone.vue           # Drag & drop
+  ⬜ AudioRecorder.vue             # Enregistrement micro
+  ⬜ AudioList.vue                 # Liste des audios
+  ⬜ AudioCard.vue                 # Carte audio individuelle
+  ⬜ AudioPlayer.vue               # Lecteur audio
+  ⬜ ProcessingStatus.vue          # Statut traitement
 ```
 
 **Composables à créer**:
 ```
-frontend/app/composables/useAudioUpload.ts
-frontend/app/composables/useAudioRecorder.ts
-frontend/app/stores/audio.ts
-frontend/app/types/audio.ts
+⬜ frontend/app/composables/useAudioUpload.ts
+⬜ frontend/app/composables/useAudioRecorder.ts
+⬜ frontend/app/stores/audio.ts
+⬜ frontend/app/types/audio.ts
 ```
 
 ---
 
 ## Phase 3: Transcription IA (Semaine 3-4)
 
-### 3.1 Service Voxtral (Mistral AI)
-**Fichiers à créer**:
-```
-backend/app/services/voxtral_service.ts
-  - transcribe(audioPath): Promise<TranscriptionResult>
-  - getLanguage(audioPath): Promise<string>
+### 3.1 Service Mistral AI ✅ PARTIELLEMENT COMPLÉTÉ
+**Fichier créé**: `backend/app/services/mistral_service.ts`
+
+**Méthodes implémentées**:
+```typescript
+transcribe(filePath, fileName): Promise<string>   // ✅ Voxtral Small via chat.complete
+analyze(transcription, prompt): Promise<string>   // ✅ Mistral Large
 ```
 
-**Intégration**:
-- Appel API Mistral AI (Voxtral)
-- Gestion des fichiers volumineux
-- Détection automatique langue (excellent FR)
-- Extraction timestamps (optionnel)
+**Détails techniques**:
+- **Modèle transcription**: `voxtral-small-latest` via endpoint `chat.complete` (pas `/transcriptions`)
+- **Format audio**: Base64 encodé avec `type: "input_audio"`
+- **Temperature**: 0.0 pour transcription (recommandé par Mistral)
+- **Modèle analyse**: `mistral-large-latest` pour transformation
 
-**Avantages Voxtral**:
+**Limitations actuelles**:
+- ❌ **Diarization non disponible** - Speaker identification "Coming soon" selon Mistral
+- ⚠️ Durée max audio: ~20 min pour chat avec audio
+- Alternative future: Intégrer Pyannote pour diarization si besoin
+
+**Avantages Voxtral Small**:
 - Modèle européen (conformité GDPR)
 - Excellent support français natif
-- API simple et moderne
-- Pricing compétitif
+- Contexte 32k tokens
+- $0.004/min audio
 
-### 3.2 Queue de Transcription
+### 3.2 Queue de Transcription ✅ PARTIELLEMENT COMPLÉTÉ
+**Fichiers créés**:
+```
+backend/app/jobs/transcription_job.ts    ✅ Worker processor avec progress
+backend/app/services/queue_service.ts    ✅ Service gestion queue
+backend/start/worker.ts                  ✅ Preload worker BullMQ
+```
+
 **Fichiers à créer**:
 ```
-backend/app/jobs/transcription_job.ts
-backend/app/listeners/audio_uploaded.ts
-backend/commands/transcribe_worker.ts    # Worker background
+backend/app/listeners/audio_uploaded.ts  # Event listener (optionnel)
 ```
 
-**Flow**:
-1. Upload audio → Créer record `pending`
-2. Emit event `audio:uploaded`
-3. Listener enqueue job Bull
-4. Worker process job
-5. Appel Voxtral API
-6. Sauvegarde transcription
-7. Update status `completed`
-8. (Optionnel) Email notification
+**Flow implémenté**:
+1. ✅ Upload audio via POST /audio/process
+2. ✅ Stockage fichier via StorageService
+3. ✅ Ajout job queue via QueueService
+4. ✅ Worker traite job (transcription_job.ts)
+5. ✅ Appel Voxtral Small API (transcribe)
+6. ✅ Appel Mistral Large API (analyze)
+7. ⬜ Sauvegarde en BDD (nécessite modèles Phase 1.2)
+8. ✅ Progress tracking (0-100%)
+9. ⬜ (Optionnel) Email notification
 
 ### 3.3 Frontend Status
 **Composants à modifier**:
@@ -464,52 +501,94 @@ frontend/locales/en.json
 
 | Risque | Impact | Mitigation |
 |--------|--------|------------|
-| Coût API Voxtral | Moyen | Limites trial, monitoring usage |
-| Fichiers volumineux | Moyen | Limite 100MB, chunking si nécessaire |
+| Coût API Voxtral Small | Moyen | Limites trial, monitoring usage ($0.004/min) |
+| Fichiers volumineux | Moyen | Limite 100MB, durée max 20min pour chat audio |
 | Qualité transcription | Haut | Édition manuelle post-transcription |
-| Temps transformation | Moyen | Queue async + polling status |
-| Multi-langue | Faible | Voxtral excellent en FR/EN natif |
+| Temps transformation | Moyen | Queue async BullMQ + polling status |
+| Multi-langue | Faible | Voxtral Small excellent en FR/EN natif |
+| **Diarization** | **Moyen** | **Non dispo Mistral - Alternative: Pyannote** |
 
 ---
 
 ## Prochaines Étapes
 
-1. **Créer compte Mistral AI** - Obtenir API key sur console.mistral.ai
-2. **Setup Redis local** - `docker run -d -p 6379:6379 redis`
-3. **Créer migrations** - Tables audios, transcriptions, templates, documents
-4. **Créer service storage local** - Upload/download depuis `storage/uploads`
-5. **Créer endpoint upload** - POST /api/audios/upload
+### ✅ Terminé
+~~1. **Créer compte Mistral AI** - Obtenir API key sur console.mistral.ai~~ ✅
+~~2. **Setup Redis local** - `docker run -d -p 6379:6379 redis`~~ ✅
+~~3. **Créer service storage local** - Upload/download depuis `storage/uploads`~~ ✅
+~~4. **Créer migrations** - Tables `audios`, `transcriptions`, `templates`, `documents`~~ ✅
+~~5. **Créer modèles Lucid** - Audio, Transcription, Template, Document~~ ✅
+
+### ⏳ En cours (Phase 2.1 - Backend API)
+1. **Créer `audios_controller.ts`** - CRUD complet avec intégration modèle Audio
+2. **Créer `audio_policy.ts`** - Autorisation multi-tenant
+3. **Modifier `audio_controller.ts`** - Sauvegarder audio dans BDD lors du process
+4. **Modifier `transcription_job.ts`** - Sauvegarder transcription dans BDD
+5. **Ajouter routes** - GET /audios, GET /audios/:id, DELETE /audios/:id
+
+### ⬜ À venir (Phase 2.2 - Frontend)
+6. **Frontend Workshop** - Page upload avec drag & drop
+7. **Composants audio** - Upload, liste, player, status
 
 ---
 
-## Fichiers Critiques à Créer
+## Fichiers Critiques
 
-### Backend
+### Backend - ✅ Créés
 ```
-backend/app/models/audio.ts
-backend/app/models/transcription.ts
-backend/app/models/template.ts
-backend/app/models/document.ts
-backend/app/controllers/audios_controller.ts
+# Phase 1.1 - Infrastructure
+backend/app/services/storage_service.ts      ✅
+backend/app/services/mistral_service.ts      ✅
+backend/app/services/queue_service.ts        ✅
+backend/app/jobs/transcription_job.ts        ✅
+backend/app/controllers/audio_controller.ts  ✅ (process + status)
+backend/app/validators/audio.ts              ✅
+backend/config/drive.ts                      ✅
+backend/config/queue.ts                      ✅
+backend/start/worker.ts                      ✅
+
+# Phase 1.2 - Modèles
+backend/app/models/audio.ts                  ✅
+backend/app/models/transcription.ts          ✅
+backend/app/models/template.ts               ✅
+backend/app/models/document.ts               ✅
+```
+
+### Backend - ⬜ À créer
+```
+# Phase 2 - API CRUD
+backend/app/controllers/audios_controller.ts     # CRUD complet
+backend/app/policies/audio_policy.ts             # Autorisation
+
+# Phase 4+ - Templates & Documents
 backend/app/controllers/templates_controller.ts
 backend/app/controllers/documents_controller.ts
-backend/app/services/storage_service.ts
-backend/app/services/voxtral_service.ts
+backend/database/seeders/default_templates_seeder.ts
+
+# Phase 5-6 - Transformation & Export
 backend/app/services/transformation_service.ts
 backend/app/services/pdf_service.ts
-backend/app/jobs/transcription_job.ts
-backend/commands/transcribe_worker.ts
+backend/app/services/docx_service.ts
 ```
 
-### Frontend
+### Frontend - ⬜ À créer
 ```
+# Phase 2 - Workshop
 frontend/app/pages/dashboard/workshop/index.vue
 frontend/app/pages/dashboard/workshop/[id].vue
-frontend/app/pages/dashboard/documents/index.vue
 frontend/app/components/workshop/AudioUploadZone.vue
 frontend/app/components/workshop/AudioRecorder.vue
+frontend/app/components/workshop/AudioList.vue
+frontend/app/components/workshop/AudioCard.vue
+frontend/app/components/workshop/AudioPlayer.vue
+frontend/app/components/workshop/ProcessingStatus.vue
+frontend/app/composables/useAudioUpload.ts
+frontend/app/composables/useAudioRecorder.ts
+frontend/app/stores/audio.ts
+frontend/app/types/audio.ts
+
+# Phase 5+ - Templates & Documents
+frontend/app/pages/dashboard/documents/index.vue
 frontend/app/components/workshop/TemplateSelector.vue
 frontend/app/components/workshop/DocumentPreview.vue
-frontend/app/composables/useAudioUpload.ts
-frontend/app/stores/audio.ts
 ```
