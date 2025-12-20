@@ -4,29 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Audio Analysis SaaS** - Une application SaaS permettant aux utilisateurs d'analyser et transcrire des fichiers audio à l'aide de l'IA Mistral.
+Alexia is a B2B SaaS application that transforms audio recordings (meetings, dictations, calls) into structured written documents using AI. Built with Nuxt 4 frontend and AdonisJS v6 backend with multi-tenant architecture.
 
-### Fonctionnalités Principales
+### Core Features (MVP)
+- **Audio Workshop**: Upload (MP3, WAV) or record via microphone
+- **Transformation Engine**: AI-powered transcription + intelligent restructuring via templates
+- **Template Manager**: Customizable document templates (Medical reports, Legal summaries, Commercial action lists)
+- **Dashboard & Export**: Audio library with PDF/Word export
 
-1. **Upload Audio** : Les utilisateurs peuvent uploader des fichiers audio (MP3, WAV, M4A, etc.)
-2. **Prompt Personnalisé** : L'utilisateur entre un prompt décrivant ce qu'il souhaite obtenir (résumé, extraction de points clés, analyse de sentiment, etc.)
-3. **Transcription** : Utilisation de l'API Mistral pour transcrire l'audio en texte
-4. **Analyse IA** : L'API Mistral analyse la transcription selon le prompt de l'utilisateur
-5. **Résumé** : Génération d'un résumé/analyse conforme aux instructions du prompt
-
-### Workflow Utilisateur
-
-```mermaid
-graph LR
-    A[Upload Audio] --> B[Saisie Prompt]
-    B --> C[Transcription Mistral]
-    C --> D[Analyse selon Prompt]
-    D --> E[Affichage Résultat]
-```
-
-### Stack Technique
-
-Ce projet est basé sur un boilerplate multi-tenant SaaS avec Nuxt 4 frontend et AdonisJS v6 backend. Le projet utilise Nuxt UI pour l'interface et une architecture `app/` directory.
+### Business Context
+- **Target users**: Professionals (Lawyers, Doctors, Salespeople)
+- **Value proposition**: "1-hour messy audio → 2-minute structured document"
+- **UX principles**: Minimalist, reassuring, "Drag, Drop, Done"
 
 ## Technology Stack
 
@@ -266,7 +255,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=
-DB_DATABASE=boilerplate_db
+DB_DATABASE=alexia_db
 
 # Email (Resend)
 RESEND_API_KEY=            # From resend.com for emails
