@@ -68,6 +68,46 @@ export default class AudiosController {
   }
 
   /**
+   * Stream the audio file.
+   *
+   * GET /api/audios/:id/file
+   */
+  async file({ params, response, bouncer, i18n }: HttpContext) {
+    const audio = await Audio.find(params.id)
+
+    if (!audio) {
+      return response.notFound({
+        message: i18n.t('messages.audio.not_found'),
+      })
+    }
+
+    // Check authorization
+    if (await bouncer.with(AudioPolicy).denies('viewAudio', audio)) {
+      return response.forbidden({
+        message: i18n.t('messages.audio.access_denied'),
+      })
+    }
+
+    // Check if file exists
+    const exists = await storageService.fileExists(audio.filePath)
+    if (!exists) {
+      return response.notFound({
+        message: i18n.t('messages.audio.file_not_found'),
+      })
+    }
+
+    // Stream the file
+    const stream = await storageService.getFileStream(audio.filePath)
+
+    // Set appropriate headers
+    response.header('Content-Type', audio.mimeType || 'audio/mpeg')
+    response.header('Content-Disposition', `inline; filename="${audio.fileName}"`)
+    response.header('Accept-Ranges', 'bytes')
+
+    return response.stream(stream)
+  }
+
+  /**
    * Delete an audio and its associated file.
    *
    * DELETE /api/audios/:id

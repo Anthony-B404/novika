@@ -120,6 +120,7 @@ router
     // Audio CRUD routes
     router.get('/audios', [AudiosController, 'index'])
     router.get('/audios/:id', [AudiosController, 'show'])
+    router.get('/audios/:id/file', [AudiosController, 'file'])
     router.delete('/audios/:id', [AudiosController, 'destroy'])
   })
   .use(middleware.auth({ guards: ['api'] }))

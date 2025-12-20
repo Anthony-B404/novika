@@ -61,16 +61,6 @@ async function processTranscriptionJob(
       throw new Error('Transcription returned empty result')
     }
 
-    // Save transcription to database
-    if (audio) {
-      await Transcription.create({
-        audioId: audio.id,
-        rawText: transcription,
-        language: 'fr', // Default to French, could be detected later
-      })
-      console.log(`[Job ${job.id}] Transcription saved to database`)
-    }
-
     // Stage 3: Analyze with AI (50-90%)
     await job.updateProgress(60)
     console.log(`[Job ${job.id}] Starting analysis...`)
@@ -79,6 +69,17 @@ async function processTranscriptionJob(
 
     await job.updateProgress(90)
     console.log(`[Job ${job.id}] Analysis complete (${analysis.length} chars)`)
+
+    // Save transcription AND analysis to database
+    if (audio) {
+      await Transcription.create({
+        audioId: audio.id,
+        rawText: transcription,
+        language: 'fr', // Default to French, could be detected later
+        analysis: analysis,
+      })
+      console.log(`[Job ${job.id}] Transcription and analysis saved to database`)
+    }
 
     // Stage 4: Cleanup and finalize (90-100%)
     await unlink(tempPath)

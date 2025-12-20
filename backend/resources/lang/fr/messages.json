@@ -113,6 +113,7 @@
     "not_found": "Audio introuvable",
     "deleted": "Audio supprimé avec succès",
     "access_denied": "Vous n'avez pas accès à cet audio",
-    "created": "Audio créé avec succès"
+    "created": "Audio créé avec succès",
+    "file_not_found": "Fichier audio introuvable dans le stockage"
   }
 }

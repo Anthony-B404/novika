@@ -113,6 +113,7 @@
     "not_found": "Audio not found",
     "deleted": "Audio deleted successfully",
     "access_denied": "You do not have access to this audio",
-    "created": "Audio created successfully"
+    "created": "Audio created successfully",
+    "file_not_found": "Audio file not found in storage"
   }
 }

@@ -1,6 +1,6 @@
 # Roadmap MVP Alexia - Audio vers Documents Structurés
 
-> **Dernière mise à jour**: 21 Décembre 2024
+> **Dernière mise à jour**: 21 Décembre 2025
 > **Durée estimée**: 6-8 semaines
 
 ## Vue d'ensemble
@@ -121,7 +121,7 @@ backend/app/models/document.ts      # DocumentStatus, DocumentFormat enums
 
 ---
 
-## Phase 2: Upload Audio (Semaine 2-3) ⏳ EN COURS
+## Phase 2: Upload Audio (Semaine 2-3) ✅ COMPLÉTÉ
 
 ### 2.1 API Upload ✅ COMPLÉTÉ
 
@@ -174,30 +174,51 @@ backend/app/models/document.ts      # DocumentStatus, DocumentFormat enums
 - Formats acceptés: MP3, WAV, M4A, OGG, FLAC
 - Taille max: 25MB (configurable)
 
-### 2.2 Frontend Upload ⬜ NON COMMENCÉ
-**Pages à créer**:
+### 2.2 Frontend Upload ✅ COMPLÉTÉ
+
+**Pages créées**:
 ```
-⬜ frontend/app/pages/dashboard/workshop/index.vue    # Page principale
-⬜ frontend/app/pages/dashboard/workshop/[id].vue     # Détail audio
+✅ frontend/app/pages/dashboard/workshop/index.vue    # Page principale
+✅ frontend/app/pages/dashboard/workshop/[id].vue     # Détail audio
 ```
 
-**Composants à créer**:
+**Composants créés**:
 ```
 frontend/app/components/workshop/
-  ⬜ AudioUploadZone.vue           # Drag & drop
-  ⬜ AudioRecorder.vue             # Enregistrement micro
-  ⬜ AudioList.vue                 # Liste des audios
-  ⬜ AudioCard.vue                 # Carte audio individuelle
-  ⬜ AudioPlayer.vue               # Lecteur audio
-  ⬜ ProcessingStatus.vue          # Statut traitement
+  ✅ AudioUploadZone.vue           # Drag & drop
+  ✅ AudioRecorder.vue             # Enregistrement micro
+  ✅ AudioList.vue                 # Liste des audios
+  ✅ AudioCard.vue                 # Carte audio individuelle
+  ✅ AudioPlayer.vue               # Lecteur audio
+  ✅ ProcessingStatus.vue          # Statut traitement
+  ✅ AudioDeleteModal.vue          # Modal de confirmation suppression
+  ✅ EmptyState.vue                # État vide de la liste
 ```
 
-**Composables à créer**:
+**Composables créés**:
 ```
-⬜ frontend/app/composables/useAudioUpload.ts
-⬜ frontend/app/composables/useAudioRecorder.ts
-⬜ frontend/app/stores/audio.ts
-⬜ frontend/app/types/audio.ts
+✅ frontend/app/composables/useAudioUpload.ts
+✅ frontend/app/composables/useAudioRecorder.ts
+✅ frontend/app/composables/useAudioPolling.ts    # Polling statut transcription
+✅ frontend/app/composables/useMarkdown.ts        # Rendu markdown des analyses
+✅ frontend/app/stores/audio.ts
+✅ frontend/app/types/audio.ts
+```
+
+**Autres modifications**:
+```
+✅ frontend/app/layouts/default.vue     # Navigation Atelier ajoutée
+✅ frontend/i18n/locales/fr.json        # Traductions FR
+✅ frontend/i18n/locales/en.json        # Traductions EN
+✅ frontend/app/assets/css/main.css     # Styles additionnels
+```
+
+**Backend - Amélioration analyse**:
+```
+✅ backend/database/migrations/1766270576042_add_analysis_to_transcriptions_table.ts
+✅ backend/app/models/transcription.ts  # Champ analysis ajouté
+✅ backend/app/jobs/transcription_job.ts # Sauvegarde analyse en BDD
+✅ backend/app/controllers/audios_controller.ts # Retourne analyse
 ```
 
 ---
@@ -550,13 +571,14 @@ frontend/locales/en.json
    - ~~Ajouter routes GET/DELETE /audios~~ ✅
    - ~~Créer tests Bruno~~ ✅
 
-### ⏳ En cours (Phase 2.2 - Frontend)
-1. **Frontend Workshop** - Page upload avec drag & drop
-2. **Composants audio** - Upload, liste, player, status
-3. **Store Pinia** - Gestion état audios
-4. **Composables** - useAudioUpload, useAudioRecorder
+### ✅ Phase 2.2 Complétée - Frontend Workshop
+~~1. **Frontend Workshop** - Page upload avec drag & drop~~ ✅
+~~2. **Composants audio** - Upload, liste, player, status, delete modal, empty state~~ ✅
+~~3. **Store Pinia** - Gestion état audios~~ ✅
+~~4. **Composables** - useAudioUpload, useAudioRecorder, useAudioPolling, useMarkdown~~ ✅
+~~5. **Backend** - Sauvegarde analyse dans transcription~~ ✅
 
-### ⬜ À venir (Phase 3+)
+### ⏳ Prochaine étape (Phase 3+)
 5. **Templates prédéfinis** - Seeder avec 8 templates métier
 6. **Transformation IA** - Service de transformation transcription → document
 7. **Export PDF/Word** - Services de génération documents
@@ -598,6 +620,12 @@ backend/tests/api/alexia/audio/GetAudio.bru             ✅
 backend/tests/api/alexia/audio/GetAudio-NotFound.bru    ✅
 backend/tests/api/alexia/audio/DeleteAudio.bru          ✅
 backend/tests/api/alexia/audio/DeleteAudio-NotFound.bru ✅
+
+# Phase 2.2 - Amélioration analyse
+backend/database/migrations/1766270576042_add_analysis_to_transcriptions_table.ts ✅
+backend/app/models/transcription.ts                     ✅ (modifié: champ analysis)
+backend/app/jobs/transcription_job.ts                   ✅ (modifié: sauvegarde analyse)
+backend/app/controllers/audios_controller.ts            ✅ (modifié: retourne analyse)
 ```
 
 ### Backend - ⬜ À créer
@@ -613,22 +641,30 @@ backend/app/services/pdf_service.ts
 backend/app/services/docx_service.ts
 ```
 
+### Frontend - ✅ Phase 2 Créés
+```
+# Phase 2 - Workshop ✅
+frontend/app/pages/dashboard/workshop/index.vue        ✅
+frontend/app/pages/dashboard/workshop/[id].vue         ✅
+frontend/app/components/workshop/AudioUploadZone.vue   ✅
+frontend/app/components/workshop/AudioRecorder.vue     ✅
+frontend/app/components/workshop/AudioList.vue         ✅
+frontend/app/components/workshop/AudioCard.vue         ✅
+frontend/app/components/workshop/AudioPlayer.vue       ✅
+frontend/app/components/workshop/ProcessingStatus.vue  ✅
+frontend/app/components/workshop/AudioDeleteModal.vue  ✅
+frontend/app/components/workshop/EmptyState.vue        ✅
+frontend/app/composables/useAudioUpload.ts             ✅
+frontend/app/composables/useAudioRecorder.ts           ✅
+frontend/app/composables/useAudioPolling.ts            ✅
+frontend/app/composables/useMarkdown.ts                ✅
+frontend/app/stores/audio.ts                           ✅
+frontend/app/types/audio.ts                            ✅
+frontend/app/layouts/default.vue                       ✅ (modifié)
+```
+
 ### Frontend - ⬜ À créer
 ```
-# Phase 2 - Workshop
-frontend/app/pages/dashboard/workshop/index.vue
-frontend/app/pages/dashboard/workshop/[id].vue
-frontend/app/components/workshop/AudioUploadZone.vue
-frontend/app/components/workshop/AudioRecorder.vue
-frontend/app/components/workshop/AudioList.vue
-frontend/app/components/workshop/AudioCard.vue
-frontend/app/components/workshop/AudioPlayer.vue
-frontend/app/components/workshop/ProcessingStatus.vue
-frontend/app/composables/useAudioUpload.ts
-frontend/app/composables/useAudioRecorder.ts
-frontend/app/stores/audio.ts
-frontend/app/types/audio.ts
-
 # Phase 5+ - Templates & Documents
 frontend/app/pages/dashboard/documents/index.vue
 frontend/app/components/workshop/TemplateSelector.vue
