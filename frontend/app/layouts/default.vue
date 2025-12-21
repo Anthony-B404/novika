@@ -76,42 +76,9 @@ const links = computed(() => {
   return [
     [
       {
-        label: t("layouts.default.navigation.home"),
+        label: t("layouts.default.navigation.workshop"),
         icon: "i-lucide-house",
         to: localePath("/dashboard"),
-        onSelect: () => {
-          open.value = false;
-        },
-      },
-      {
-        label: t("layouts.default.navigation.inbox"),
-        icon: "i-lucide-inbox",
-        to: localePath("/dashboard/inbox"),
-        badge: "4",
-        onSelect: () => {
-          open.value = false;
-        },
-      },
-      {
-        label: t("layouts.default.navigation.customers"),
-        icon: "i-lucide-users",
-        to: localePath("/dashboard/customers"),
-        onSelect: () => {
-          open.value = false;
-        },
-      },
-      {
-        label: t("layouts.default.navigation.analyze"),
-        icon: "i-lucide-audio-lines",
-        to: localePath("/dashboard/analyze"),
-        onSelect: () => {
-          open.value = false;
-        },
-      },
-      {
-        label: t("layouts.default.navigation.workshop"),
-        icon: "i-lucide-audio-waveform",
-        to: localePath("/dashboard/workshop"),
         onSelect: () => {
           open.value = false;
         },

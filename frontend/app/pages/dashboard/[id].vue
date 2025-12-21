@@ -110,7 +110,7 @@ async function handleDeleteConfirm() {
       title: t('pages.dashboard.workshop.deleteSuccess'),
       color: 'success',
     })
-    navigateTo(localePath('/dashboard/workshop'))
+    navigateTo(localePath('/dashboard'))
   } else {
     toast.add({
       title: t('pages.dashboard.workshop.deleteError'),
@@ -204,7 +204,7 @@ const tabItems = computed(() => [
           icon="i-lucide-arrow-left"
           color="neutral"
           variant="ghost"
-          :to="localePath('/dashboard/workshop')"
+          :to="localePath('/dashboard')"
         />
         <span class="text-lg font-semibold text-highlighted truncate">
           {{ audio?.title || audio?.fileName || t('pages.dashboard.workshop.detail.title') }}
@@ -239,7 +239,7 @@ const tabItems = computed(() => [
             :label="t('pages.dashboard.workshop.detail.backToWorkshop')"
             color="primary"
             class="mt-4"
-            :to="localePath('/dashboard/workshop')"
+            :to="localePath('/dashboard')"
           />
         </WorkshopEmptyState>
 

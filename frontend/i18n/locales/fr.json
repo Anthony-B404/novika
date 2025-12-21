@@ -319,54 +319,6 @@
       "githubRepository": "Dépôt GitHub",
       "logOut": "Se déconnecter"
     },
-    "customers": {
-      "addModal": {
-        "title": "Nouveau client",
-        "description": "Ajouter un nouveau client à la base de données",
-        "button": "Nouveau client",
-        "namePlaceholder": "Jean Dupont",
-        "emailPlaceholder": "Entrez votre email",
-        "successTitle": "Succès",
-        "successDescription": "Nouveau client {name} ajouté",
-        "validation": {
-          "nameTooShort": "Trop court",
-          "invalidEmail": "Email invalide"
-        }
-      },
-      "deleteModal": {
-        "title": "Supprimer {count} client",
-        "titlePlural": "Supprimer {count} clients",
-        "description": "Êtes-vous sûr ? Cette action ne peut pas être annulée."
-      }
-    },
-    "home": {
-      "revenue": "Revenu",
-      "stats": {
-        "customers": "Clients",
-        "conversions": "Conversions",
-        "orders": "Commandes"
-      },
-      "dateRanges": {
-        "last7Days": "7 derniers jours",
-        "last14Days": "14 derniers jours",
-        "last30Days": "30 derniers jours",
-        "last3Months": "3 derniers mois",
-        "last6Months": "6 derniers mois",
-        "lastYear": "Dernière année"
-      },
-      "tableHeaders": {
-        "status": "Statut"
-      }
-    },
-    "inbox": {
-      "markAsUnread": "Marquer comme non lu",
-      "markAsImportant": "Marquer comme important",
-      "starThread": "Mettre en favoris",
-      "muteThread": "Masquer la conversation",
-      "emailSent": "Email envoyé",
-      "emailSentDescription": "Votre email a été envoyé avec succès",
-      "replyTo": "Répondre à {name} ({email})"
-    },
     "settings": {
       "members": {
         "editMember": "Modifier le membre",
@@ -479,11 +431,7 @@
   "layouts": {
     "default": {
       "navigation": {
-        "home": "Accueil",
-        "inbox": "Boîte de réception",
-        "customers": "Clients",
-        "analyze": "Analyse Audio",
-        "workshop": "Atelier Audio",
+        "workshop": "Accueil",
         "settings": "Paramètres",
         "feedback": "Commentaires",
         "helpSupport": "Aide & Support"
@@ -502,30 +450,6 @@
   },
   "pages": {
     "dashboard": {
-      "home": {
-        "title": "Accueil",
-        "notifications": "Notifications",
-        "newMail": "Nouveau message",
-        "newCustomer": "Nouveau client"
-      },
-      "customers": {
-        "title": "Clients",
-        "copyCustomerId": "Copier l'ID client",
-        "customerIdCopied": "ID client copié dans le presse-papier",
-        "viewCustomerDetails": "Voir les détails du client",
-        "viewCustomerPayments": "Voir les paiements du client",
-        "deleteCustomer": "Supprimer le client",
-        "customerDeleted": "Client supprimé",
-        "customerDeletedDescription": "Le client a été supprimé.",
-        "filterStatus": "Filtrer par statut",
-        "all": "Tous",
-        "deleteSelected": "Supprimer"
-      },
-      "inbox": {
-        "title": "Boîte de réception",
-        "all": "Tous",
-        "unread": "Non lus"
-      },
       "workshop": {
         "title": "Atelier Audio",
         "newAudio": "Nouveau fichier audio",
@@ -564,33 +488,6 @@
           "noAnalysis": "Pas d'analyse disponible",
           "noAnalysisDescription": "L'analyse de ce fichier n'a pas encore été générée.",
           "processingFailed": "Le traitement a échoué"
-        }
-      },
-      "analyze": {
-        "title": "Analyse Audio",
-        "uploadTitle": "Fichier Audio",
-        "promptTitle": "Instructions",
-        "processButton": "Analyser",
-        "resetButton": "Recommencer",
-        "resultTitle": "Résultats",
-        "success": "Analyse terminée !",
-        "error": "Une erreur est survenue lors de l'analyse",
-        "dropzone": {
-          "title": "Glissez-déposez votre fichier audio ici",
-          "description": "ou cliquez pour sélectionner",
-          "formats": "MP3, WAV, M4A, OGG, FLAC - Max 25MB"
-        },
-        "promptPlaceholder": "Décrivez ce que vous souhaitez obtenir de cette analyse...",
-        "examplesTitle": "Exemples de prompts :",
-        "examples": {
-          "summary": "Fais un résumé de cette conversation",
-          "keyPoints": "Extrais les points clés et actions à faire",
-          "participants": "Identifie les participants et leurs positions",
-          "sentiment": "Analyse le sentiment général"
-        },
-        "tabs": {
-          "analysis": "Analyse",
-          "transcription": "Transcription"
         }
       },
       "settings": {
