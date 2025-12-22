@@ -10,14 +10,25 @@ const localePath = useLocalePath()
 const runtimeConfig = useRuntimeConfig()
 
 const audioStore = useAudioStore()
-const { stopPolling } = useAudioPolling({
+
+// Track current job for real-time progress display
+const currentJobId = ref<string | null>(null)
+const currentJobStatus = computed(() =>
+  currentJobId.value ? audioStore.getJobStatus(currentJobId.value) : null
+)
+
+const { startPolling, stopPolling, polling } = useAudioPolling({
   onComplete: () => {
+    currentJobId.value = null
     toast.add({
       title: t('pages.dashboard.workshop.detail.processingComplete'),
       color: 'success',
     })
+    // Refresh audio to get transcription
+    audioStore.fetchAudio(audioId.value)
   },
   onError: (error) => {
+    currentJobId.value = null
     toast.add({
       title: t('pages.dashboard.workshop.detail.processingError'),
       description: error.message,
@@ -66,6 +77,18 @@ watch(
   async (status) => {
     if (status === 'completed' && audio.value && !audioFileUrl.value) {
       await loadAudioFile()
+    }
+  },
+  { immediate: true }
+)
+
+// Watch for processing audio with currentJobId (resume polling after page refresh)
+watch(
+  () => audio.value,
+  (newAudio) => {
+    if (newAudio?.currentJobId && isProcessing.value && !polling.value) {
+      currentJobId.value = newAudio.currentJobId
+      startPolling(newAudio.currentJobId, newAudio.id)
     }
   },
   { immediate: true }
@@ -288,18 +311,17 @@ const tabItems = computed(() => [
               @timeupdate="onTimeUpdate"
             />
 
-            <!-- Status badge for processing -->
-            <UAlert
+            <!-- Processing status with real-time progress -->
+            <WorkshopProcessingStatus
               v-if="isProcessing"
-              color="primary"
-              variant="subtle"
-              :title="t('pages.dashboard.workshop.detail.processingInProgress')"
               class="mt-4"
-            >
-              <template #icon>
-                <UIcon name="i-lucide-loader-2" class="animate-spin" />
-              </template>
-            </UAlert>
+              :status="{
+                jobId: currentJobId || '',
+                status: currentJobStatus?.status || 'processing',
+                progress: currentJobStatus?.progress || 0,
+                error: currentJobStatus?.error,
+              }"
+            />
           </UPageCard>
 
           <!-- Transcription/Analysis tabs -->

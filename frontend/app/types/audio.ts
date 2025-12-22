@@ -51,6 +51,7 @@ export interface Audio {
   duration: number | null
   status: AudioStatus
   errorMessage: string | null
+  currentJobId: string | null
   createdAt: string
   updatedAt: string
   transcription?: Transcription | null

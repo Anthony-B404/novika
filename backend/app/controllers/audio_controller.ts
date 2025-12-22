@@ -48,7 +48,10 @@ export default class AudioController {
       // Store file in persistent storage
       const storedFile = await storageService.storeAudioFile(audioFile, organizationId)
 
-      // Create Audio record in database
+      // Generate job ID first so we can store it with the audio
+      const jobId = randomUUID()
+
+      // Create Audio record in database with job ID for progress tracking
       const audio = await Audio.create({
         organizationId,
         userId: user.id,
@@ -58,10 +61,10 @@ export default class AudioController {
         fileSize: storedFile.size,
         mimeType: storedFile.mimeType,
         status: AudioStatus.Pending,
+        currentJobId: jobId, // Store job ID for progress tracking
       })
 
-      // Generate job ID and queue the job
-      const jobId = randomUUID()
+      // Queue the job
       const queueService = QueueService.getInstance()
 
       await queueService.addTranscriptionJob({

@@ -6,6 +6,7 @@ import type { Audio, AudioStatus } from '~/types/audio'
 const props = defineProps<{
   audio: Audio
   selected?: boolean
+  progress?: number
 }>()
 
 const emit = defineEmits<{
@@ -133,6 +134,19 @@ function formatDuration(seconds: number | null): string {
         >
           {{ audio.errorMessage }}
         </p>
+
+        <!-- Progress bar for processing items -->
+        <div v-if="isProcessing && props.progress !== undefined" class="mt-2">
+          <div class="flex items-center gap-2">
+            <UProgress
+              :model-value="props.progress"
+              color="primary"
+              size="xs"
+              class="flex-1"
+            />
+            <span class="text-xs text-muted w-8 text-right">{{ props.progress }}%</span>
+          </div>
+        </div>
       </div>
 
       <!-- Actions -->

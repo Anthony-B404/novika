@@ -49,6 +49,9 @@ export default class Audio extends BaseModel {
   @column()
   declare errorMessage: string | null
 
+  @column()
+  declare currentJobId: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

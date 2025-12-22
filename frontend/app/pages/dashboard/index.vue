@@ -10,15 +10,24 @@ const toast = useToast();
 const localePath = useLocalePath();
 
 const audioStore = useAudioStore();
+
+// Track current job for real-time progress display
+const currentJobId = ref<string | null>(null);
+const currentJobStatus = computed(() =>
+  currentJobId.value ? audioStore.getJobStatus(currentJobId.value) : null
+);
+
 const {
   uploading,
   progress,
-  error: uploadError,
   upload,
   reset: resetUpload,
   formatFileSize,
 } = useAudioUpload({
   onSuccess: async (response) => {
+    // Track the job ID for real-time progress display
+    currentJobId.value = response.jobId;
+
     // Fetch the newly created audio and add it to the list immediately
     await audioStore.fetchAudio(response.audioId);
     if (audioStore.currentAudio) {
@@ -41,8 +50,9 @@ const {
   },
 });
 
-const { startPolling, stopPolling, polling } = useAudioPolling({
+const { startPolling, stopPolling, polling, currentAudioId } = useAudioPolling({
   onComplete: () => {
+    currentJobId.value = null;
     toast.add({
       title: t("pages.dashboard.workshop.processingComplete"),
       color: "success",
@@ -51,6 +61,7 @@ const { startPolling, stopPolling, polling } = useAudioPolling({
     audioStore.fetchAudios(1);
   },
   onError: (error) => {
+    currentJobId.value = null;
     toast.add({
       title: t("pages.dashboard.workshop.processingError"),
       description: error.message,
@@ -69,6 +80,15 @@ const audioToDelete = ref<Audio | null>(null);
 // Load audios on mount
 onMounted(async () => {
   await audioStore.fetchAudios();
+
+  // Resume polling for any processing audio with currentJobId (after page refresh)
+  const processingAudio = audioStore.audios.find(
+    (a) => (a.status === "pending" || a.status === "processing") && a.currentJobId
+  );
+  if (processingAudio && processingAudio.currentJobId) {
+    currentJobId.value = processingAudio.currentJobId;
+    startPolling(processingAudio.currentJobId, processingAudio.id);
+  }
 });
 
 // Handle file selection
@@ -249,13 +269,14 @@ const tabItems = computed(() => [
               class="bg-white dark:bg-slate-900" 
             />
 
-            <!-- Processing status -->
+            <!-- Processing status with real-time progress -->
             <WorkshopProcessingStatus
               v-if="uploading || polling"
               :status="{
-                jobId: '',
-                status: uploading ? 'processing' : 'pending',
-                progress: progress.percentage,
+                jobId: currentJobId || '',
+                status: uploading ? 'pending' : (currentJobStatus?.status || 'processing'),
+                progress: uploading ? progress.percentage : (currentJobStatus?.progress || 0),
+                error: currentJobStatus?.error,
               }"
             />
 
@@ -280,6 +301,8 @@ const tabItems = computed(() => [
         <WorkshopAudioList
           :audios="audioStore.audios"
           :loading="audioStore.loading"
+          :processing-audio-id="currentAudioId"
+          :processing-progress="currentJobStatus?.progress"
           @select="handleSelectAudio"
           @delete="handleDeleteRequest"
           @load-more="handleLoadMore"

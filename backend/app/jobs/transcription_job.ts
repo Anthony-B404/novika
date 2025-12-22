@@ -259,9 +259,10 @@ async function processTranscriptionJob(
       await chunkingService.cleanupChunks(chunkingResult.chunks)
     }
 
-    // Update audio status to completed
+    // Update audio status to completed and clear job ID
     if (audio) {
       audio.status = AudioStatus.Completed
+      audio.currentJobId = null
       await audio.save()
     }
 
@@ -273,10 +274,11 @@ async function processTranscriptionJob(
       analysis,
     }
   } catch (error) {
-    // Update audio status to failed
+    // Update audio status to failed and clear job ID
     if (audio) {
       audio.status = AudioStatus.Failed
       audio.errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      audio.currentJobId = null
       await audio.save()
     }
 

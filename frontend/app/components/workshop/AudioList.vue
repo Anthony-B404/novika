@@ -5,6 +5,8 @@ const props = defineProps<{
   audios: Audio[]
   loading?: boolean
   selectedId?: number | null
+  processingAudioId?: number | null
+  processingProgress?: number
 }>()
 
 const emit = defineEmits<{
@@ -67,6 +69,7 @@ const statusOptions = computed(() => [
         :key="audio.id"
         :audio="audio"
         :selected="selectedId === audio.id"
+        :progress="audio.id === processingAudioId ? processingProgress : undefined"
         @click="emit('select', audio)"
         @delete="emit('delete', audio)"
       />
