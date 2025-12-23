@@ -430,6 +430,7 @@
     "default": {
       "navigation": {
         "workshop": "Home",
+        "library": "Library",
         "settings": "Settings",
         "feedback": "Feedback",
         "helpSupport": "Help & Support"
@@ -465,6 +466,7 @@
         "deleteError": "Delete error",
         "validationError": "Validation error",
         "fileAndPromptRequired": "Please select a file and enter instructions",
+        "viewAllAudios": "View all audios",
         "detail": {
           "title": "Audio detail",
           "notFound": "Audio not found",
@@ -485,8 +487,44 @@
           "analysisComingSoonDescription": "The analysis feature will be available soon",
           "noAnalysis": "No analysis available",
           "noAnalysisDescription": "The analysis for this file has not been generated yet.",
-          "processingFailed": "Processing failed"
+          "processingFailed": "Processing failed",
+          "titleUpdated": "Title updated",
+          "titleUpdateError": "Error updating title",
+          "titlePlaceholder": "Enter audio title",
+          "clickToEdit": "Click to edit title"
         }
+      },
+      "library": {
+        "title": "Audio Library",
+        "description": "Manage all your audio files in one place.",
+        "search": "Search by name...",
+        "backToWorkshop": "Back to workshop",
+        "empty": "No audio found",
+        "emptyDescription": "Upload or record an audio file to get started.",
+        "selected": "{count} selected",
+        "deleteSelected": "Delete selected",
+        "showing": "{count} of {total} audios",
+        "batchDeleteSuccess": "{count} audio(s) deleted successfully",
+        "batchDeleteError": "Error deleting audios",
+        "sort": {
+          "date": "Date",
+          "title": "Title",
+          "duration": "Duration"
+        },
+        "columns": {
+          "title": "Title",
+          "duration": "Duration",
+          "status": "Status",
+          "date": "Date"
+        },
+        "deleteConfirm": {
+          "title": "Delete audios",
+          "message": "Are you sure you want to delete {count} audio(s)?",
+          "warning": "This action cannot be undone."
+        },
+        "clickToRename": "Click to rename",
+        "titleUpdated": "Title updated",
+        "titleUpdateError": "Error updating title"
       },
       "settings": {
         "title": "Settings",

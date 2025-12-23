@@ -77,6 +77,10 @@ const activeTab = ref<"upload" | "record">("upload");
 const deleteModalOpen = ref(false);
 const audioToDelete = ref<Audio | null>(null);
 
+// Computed: Only show 5 most recent audios on dashboard
+const recentAudios = computed(() => audioStore.audios.slice(0, 5));
+const hasMoreAudios = computed(() => audioStore.pagination.total > 5);
+
 // Load audios on mount
 onMounted(async () => {
   await audioStore.fetchAudios();
@@ -157,11 +161,6 @@ async function handleDeleteConfirm() {
 
   deleteModalOpen.value = false;
   audioToDelete.value = null;
-}
-
-// Load more
-async function handleLoadMore() {
-  await audioStore.fetchAudios(audioStore.pagination.currentPage + 1);
 }
 
 // Cleanup
@@ -297,16 +296,30 @@ const tabItems = computed(() => [
       </div>
 
       <!-- Right: Audio list -->
-      <div>
+      <div class="space-y-4">
         <WorkshopAudioList
-          :audios="audioStore.audios"
+          :audios="recentAudios"
           :loading="audioStore.loading"
           :processing-audio-id="currentAudioId"
           :processing-progress="currentJobStatus?.progress"
           @select="handleSelectAudio"
           @delete="handleDeleteRequest"
-          @load-more="handleLoadMore"
         />
+
+        <!-- View all audios link -->
+        <div v-if="hasMoreAudios" class="text-center pt-2">
+          <UButton
+            :to="localePath('/dashboard/library')"
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-library"
+          >
+            {{ t('pages.dashboard.workshop.viewAllAudios') }}
+            <UBadge color="primary" variant="subtle" size="xs" class="ml-2">
+              {{ audioStore.pagination.total }}
+            </UBadge>
+          </UButton>
+        </div>
       </div>
     </div>
   </div>

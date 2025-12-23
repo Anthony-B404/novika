@@ -432,6 +432,7 @@
     "default": {
       "navigation": {
         "workshop": "Accueil",
+        "library": "Bibliothèque",
         "settings": "Paramètres",
         "feedback": "Commentaires",
         "helpSupport": "Aide & Support"
@@ -467,6 +468,7 @@
         "deleteError": "Erreur de suppression",
         "validationError": "Erreur de validation",
         "fileAndPromptRequired": "Veuillez sélectionner un fichier et entrer des instructions",
+        "viewAllAudios": "Voir tous les audios",
         "detail": {
           "title": "Détail audio",
           "notFound": "Audio introuvable",
@@ -487,7 +489,11 @@
           "analysisComingSoonDescription": "La fonctionnalité d'analyse sera disponible prochainement",
           "noAnalysis": "Pas d'analyse disponible",
           "noAnalysisDescription": "L'analyse de ce fichier n'a pas encore été générée.",
-          "processingFailed": "Le traitement a échoué"
+          "processingFailed": "Le traitement a échoué",
+          "titleUpdated": "Titre mis à jour",
+          "titleUpdateError": "Erreur lors de la mise à jour du titre",
+          "titlePlaceholder": "Entrez le titre de l'audio",
+          "clickToEdit": "Cliquez pour modifier le titre"
         }
       },
       "analyze": {
@@ -499,6 +505,38 @@
           "participants": "Intervenants",
           "sentiment": "Analyse sentiment"
         }
+      },
+      "library": {
+        "title": "Bibliothèque Audio",
+        "description": "Gérez tous vos fichiers audio en un seul endroit.",
+        "search": "Rechercher par nom...",
+        "backToWorkshop": "Retour à l'atelier",
+        "empty": "Aucun audio trouvé",
+        "emptyDescription": "Importez ou enregistrez un fichier audio pour commencer.",
+        "selected": "{count} sélectionné(s)",
+        "deleteSelected": "Supprimer la sélection",
+        "showing": "{count} sur {total} audios",
+        "batchDeleteSuccess": "{count} audio(s) supprimé(s) avec succès",
+        "batchDeleteError": "Erreur lors de la suppression des audios",
+        "sort": {
+          "date": "Date",
+          "title": "Titre",
+          "duration": "Durée"
+        },
+        "columns": {
+          "title": "Titre",
+          "duration": "Durée",
+          "status": "Statut",
+          "date": "Date"
+        },
+        "deleteConfirm": {
+          "title": "Supprimer les audios",
+          "message": "Êtes-vous sûr de vouloir supprimer {count} audio(s) ?",
+          "warning": "Cette action est irréversible."
+        },
+        "clickToRename": "Cliquez pour renommer",
+        "titleUpdated": "Titre mis à jour",
+        "titleUpdateError": "Erreur lors de la mise à jour du titre"
       },
       "settings": {
         "title": "Paramètres",

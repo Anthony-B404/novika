@@ -59,24 +59,40 @@ export const useAudioStore = defineStore('audio', {
 
   actions: {
     /**
-     * Fetch paginated list of audios
+     * Fetch paginated list of audios with optional filters and sorting
      */
-    async fetchAudios(page: number = 1, status?: AudioStatus) {
+    async fetchAudios(
+      page: number = 1,
+      options?: {
+        status?: AudioStatus
+        search?: string
+        sort?: 'createdAt' | 'title' | 'duration' | 'status'
+        order?: 'asc' | 'desc'
+        append?: boolean
+      }
+    ) {
       this.loading = true
       this.error = null
 
       try {
         const { authenticatedFetch } = useAuth()
         const params = new URLSearchParams({ page: String(page), limit: '20' })
-        if (status) params.append('status', status)
+
+        if (options?.status) params.append('status', options.status)
+        if (options?.search) params.append('search', options.search)
+        if (options?.sort) params.append('sort', options.sort)
+        if (options?.order) params.append('order', options.order)
 
         const response = await authenticatedFetch<AudioPagination>(`/audios?${params}`)
 
-        if (page === 1) {
-          this.audios = response.data
-        } else {
+        // Determine if we should append or replace
+        const shouldAppend = options?.append ?? page > 1
+
+        if (shouldAppend) {
           // Append for pagination
           this.audios = [...this.audios, ...response.data]
+        } else {
+          this.audios = response.data
         }
 
         this.pagination = {
@@ -146,6 +162,60 @@ export const useAudioStore = defineStore('audio', {
       } catch (error: any) {
         this.error = error?.data?.message || error?.message || 'Failed to delete audio'
         console.error('Failed to delete audio:', error)
+        return false
+      }
+    },
+
+    /**
+     * Delete multiple audios and remove from state
+     */
+    async deleteMultiple(ids: number[]): Promise<{ success: boolean; deletedCount: number }> {
+      try {
+        const { authenticatedFetch } = useAuth()
+        const response = await authenticatedFetch<{ deletedCount: number }>('/audios/batch', {
+          method: 'DELETE',
+          body: { ids },
+        })
+
+        // Remove from local state
+        this.audios = this.audios.filter((a) => !ids.includes(a.id))
+        if (this.currentAudio && ids.includes(this.currentAudio.id)) {
+          this.currentAudio = null
+        }
+        this.pagination.total = Math.max(0, this.pagination.total - response.deletedCount)
+
+        return { success: true, deletedCount: response.deletedCount }
+      } catch (error: any) {
+        this.error = error?.data?.message || error?.message || 'Failed to delete audios'
+        console.error('Failed to delete multiple audios:', error)
+        return { success: false, deletedCount: 0 }
+      }
+    },
+
+    /**
+     * Update audio title
+     */
+    async updateAudio(id: number, title: string): Promise<boolean> {
+      try {
+        const { authenticatedFetch } = useAuth()
+        const response = await authenticatedFetch<{ audio: Audio }>(`/audios/${id}`, {
+          method: 'PUT',
+          body: { title },
+        })
+
+        // Update in local state
+        const index = this.audios.findIndex((a) => a.id === id)
+        if (index !== -1) {
+          this.audios[index] = { ...this.audios[index], title: response.audio.title }
+        }
+        if (this.currentAudio?.id === id) {
+          this.currentAudio = { ...this.currentAudio, title: response.audio.title }
+        }
+
+        return true
+      } catch (error: any) {
+        this.error = error?.data?.message || error?.message || 'Failed to update audio'
+        console.error('Failed to update audio:', error)
         return false
       }
     },

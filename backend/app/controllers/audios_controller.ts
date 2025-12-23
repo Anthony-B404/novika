@@ -2,12 +2,12 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Audio from '#models/audio'
 import AudioPolicy from '#policies/audio_policy'
 import storageService from '#services/storage_service'
-import { audioIndexValidator } from '#validators/audio'
+import { audioIndexValidator, audioBatchDeleteValidator, audioUpdateValidator } from '#validators/audio'
 
 export default class AudiosController {
   /**
    * List all audios for the current organization.
-   * Supports pagination and status filtering.
+   * Supports pagination, status filtering, search, and sorting.
    *
    * GET /api/audios
    */
@@ -22,17 +22,34 @@ export default class AudiosController {
     }
 
     // Validate query parameters
-    const { page = 1, limit = 20, status } = await request.validateUsing(audioIndexValidator)
+    const {
+      page = 1,
+      limit = 20,
+      status,
+      search,
+      sort = 'createdAt',
+      order = 'desc',
+    } = await request.validateUsing(audioIndexValidator)
 
     // Build query with tenant isolation
-    const query = Audio.query()
-      .where('organizationId', user.currentOrganizationId!)
-      .orderBy('createdAt', 'desc')
+    const query = Audio.query().where('organizationId', user.currentOrganizationId!)
 
     // Apply status filter if provided
     if (status) {
       query.where('status', status)
     }
+
+    // Apply search filter if provided (search in title and fileName)
+    if (search) {
+      query.where((subQuery) => {
+        subQuery
+          .whereILike('title', `%${search}%`)
+          .orWhereILike('fileName', `%${search}%`)
+      })
+    }
+
+    // Apply sorting
+    query.orderBy(sort, order)
 
     // Execute with pagination
     const audios = await query.paginate(page, limit)
@@ -73,6 +90,48 @@ export default class AudiosController {
     await audio.load('transcription')
 
     return response.ok(audio)
+  }
+
+  /**
+   * Update an audio's metadata.
+   *
+   * PUT /api/audios/:id
+   */
+  async update({ params, request, response, bouncer, i18n }: HttpContext) {
+    // Validate ID parameter
+    const id = Number(params.id)
+    if (!Number.isInteger(id) || id <= 0) {
+      return response.badRequest({
+        message: i18n.t('messages.errors.invalid_id'),
+      })
+    }
+
+    const audio = await Audio.find(id)
+
+    if (!audio) {
+      return response.notFound({
+        message: i18n.t('messages.audio.not_found'),
+      })
+    }
+
+    // Check authorization
+    if (await bouncer.with(AudioPolicy).denies('updateAudio', audio)) {
+      return response.forbidden({
+        message: i18n.t('messages.audio.access_denied'),
+      })
+    }
+
+    // Validate request body
+    const { title } = await request.validateUsing(audioUpdateValidator)
+
+    // Update audio
+    audio.title = title
+    await audio.save()
+
+    return response.ok({
+      message: i18n.t('messages.audio.updated'),
+      audio,
+    })
   }
 
   /**
@@ -168,6 +227,55 @@ export default class AudiosController {
 
     return response.ok({
       message: i18n.t('messages.audio.deleted'),
+    })
+  }
+
+  /**
+   * Delete multiple audios and their associated files.
+   *
+   * DELETE /api/audios/batch
+   */
+  async destroyMultiple({ request, response, auth, bouncer, i18n }: HttpContext) {
+    const user = auth.user!
+
+    // Validate request body
+    const { ids } = await request.validateUsing(audioBatchDeleteValidator)
+
+    // Check authorization for listing (user must have current organization)
+    if (await bouncer.with(AudioPolicy).denies('listAudios')) {
+      return response.badRequest({
+        message: i18n.t('messages.errors.no_current_organization'),
+      })
+    }
+
+    // Fetch all audios to delete (only from user's current organization)
+    const audios = await Audio.query()
+      .whereIn('id', ids)
+      .where('organizationId', user.currentOrganizationId!)
+
+    if (audios.length === 0) {
+      return response.notFound({
+        message: i18n.t('messages.audio.not_found'),
+      })
+    }
+
+    // Delete files from storage and records
+    let deletedCount = 0
+    for (const audio of audios) {
+      try {
+        await storageService.deleteFile(audio.filePath)
+      } catch (error) {
+        console.error(`Failed to delete audio file: ${audio.filePath}`, error)
+        // Continue with deletion even if file removal fails
+      }
+
+      await audio.delete()
+      deletedCount++
+    }
+
+    return response.ok({
+      message: i18n.t('messages.audio.batch_deleted', { count: deletedCount }),
+      deletedCount,
     })
   }
 }

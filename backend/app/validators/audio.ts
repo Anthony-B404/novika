@@ -44,5 +44,26 @@ export const audioIndexValidator = vine.compile(
     page: vine.number().positive().optional(),
     limit: vine.number().positive().max(100).optional(),
     status: vine.enum(['pending', 'processing', 'completed', 'failed']).optional(),
+    search: vine.string().maxLength(255).optional(),
+    sort: vine.enum(['createdAt', 'title', 'duration', 'status']).optional(),
+    order: vine.enum(['asc', 'desc']).optional(),
+  })
+)
+
+/**
+ * Validator for batch delete request
+ */
+export const audioBatchDeleteValidator = vine.compile(
+  vine.object({
+    ids: vine.array(vine.number().positive()).minLength(1).maxLength(50),
+  })
+)
+
+/**
+ * Validator for audio update request
+ */
+export const audioUpdateValidator = vine.compile(
+  vine.object({
+    title: vine.string().trim().minLength(1).maxLength(255),
   })
 )

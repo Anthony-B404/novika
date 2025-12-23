@@ -121,6 +121,8 @@ router
     router.get('/audios', [AudiosController, 'index'])
     router.get('/audios/:id', [AudiosController, 'show'])
     router.get('/audios/:id/file', [AudiosController, 'file'])
+    router.put('/audios/:id', [AudiosController, 'update'])
+    router.delete('/audios/batch', [AudiosController, 'destroyMultiple'])
     router.delete('/audios/:id', [AudiosController, 'destroy'])
   })
   .use(middleware.auth({ guards: ['api'] }))

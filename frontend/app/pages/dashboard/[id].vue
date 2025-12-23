@@ -48,6 +48,12 @@ const deleteModalOpen = ref(false)
 const audioFileUrl = ref<string | null>(null)
 const audioFileLoading = ref(false)
 
+// Title editing state
+const isEditingTitle = ref(false)
+const editedTitle = ref('')
+const savingTitle = ref(false)
+const titleInputRef = ref<HTMLInputElement | null>(null)
+
 // Audio player ref and current time for segment sync
 const audioPlayerRef = ref<InstanceType<typeof WorkshopAudioPlayer> | null>(null)
 const currentTime = ref(0)
@@ -155,6 +161,62 @@ async function copyTranscription() {
   })
 }
 
+// Title editing functions
+function startEditingTitle() {
+  if (!audio.value) return
+  editedTitle.value = audio.value.title || audio.value.fileName
+  isEditingTitle.value = true
+  nextTick(() => {
+    titleInputRef.value?.focus()
+    titleInputRef.value?.select()
+  })
+}
+
+function cancelEditingTitle() {
+  isEditingTitle.value = false
+  editedTitle.value = ''
+}
+
+async function saveTitle() {
+  if (!audio.value || !editedTitle.value.trim()) {
+    cancelEditingTitle()
+    return
+  }
+
+  const newTitle = editedTitle.value.trim()
+  if (newTitle === audio.value.title || (newTitle === audio.value.fileName && !audio.value.title)) {
+    cancelEditingTitle()
+    return
+  }
+
+  savingTitle.value = true
+  const success = await audioStore.updateAudio(audio.value.id, newTitle)
+  savingTitle.value = false
+
+  if (success) {
+    toast.add({
+      title: t('pages.dashboard.workshop.detail.titleUpdated'),
+      color: 'success',
+    })
+  } else {
+    toast.add({
+      title: t('pages.dashboard.workshop.detail.titleUpdateError'),
+      color: 'error',
+    })
+  }
+
+  isEditingTitle.value = false
+}
+
+function handleTitleKeydown(event: KeyboardEvent) {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    saveTitle()
+  } else if (event.key === 'Escape') {
+    cancelEditingTitle()
+  }
+}
+
 // Download transcription as text file
 function downloadTranscription() {
   if (!audio.value?.transcription?.rawText) return
@@ -222,16 +284,51 @@ const tabItems = computed(() => [
   <div class="flex flex-col h-full">
     <!-- Header -->
     <div class="flex items-center justify-between px-6 py-4 border-b border-default">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
         <UButton
           icon="i-lucide-arrow-left"
           color="neutral"
           variant="ghost"
           :to="localePath('/dashboard')"
         />
-        <span class="text-lg font-semibold text-highlighted truncate">
-          {{ audio?.title || audio?.fileName || t('pages.dashboard.workshop.detail.title') }}
-        </span>
+
+        <!-- Editable title -->
+        <div v-if="isEditingTitle" class="flex items-center gap-2 flex-1 min-w-0">
+          <UInput
+            ref="titleInputRef"
+            v-model="editedTitle"
+            :placeholder="t('pages.dashboard.workshop.detail.titlePlaceholder')"
+            size="lg"
+            class="flex-1"
+            :disabled="savingTitle"
+            @keydown="handleTitleKeydown"
+            @blur="saveTitle"
+          />
+          <UButton
+            v-if="savingTitle"
+            icon="i-lucide-loader-2"
+            color="neutral"
+            variant="ghost"
+            disabled
+            class="animate-spin"
+          />
+        </div>
+
+        <!-- Display title (clickable to edit) -->
+        <button
+          v-else
+          class="text-lg font-semibold text-highlighted truncate hover:text-primary transition-colors cursor-pointer text-left flex items-center gap-2 group"
+          :title="t('pages.dashboard.workshop.detail.clickToEdit')"
+          @click="startEditingTitle"
+        >
+          <span class="truncate">
+            {{ audio?.title || audio?.fileName || t('pages.dashboard.workshop.detail.title') }}
+          </span>
+          <UIcon
+            name="i-lucide-pencil"
+            class="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted"
+          />
+        </button>
       </div>
 
       <UButton

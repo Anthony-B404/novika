@@ -23,6 +23,14 @@ const mainLinks = computed<NavigationMenuItem[][]>(() => {
           open.value = false;
         },
       },
+      {
+        label: t("layouts.default.navigation.library"),
+        icon: "i-lucide-library",
+        to: localePath("/dashboard/library"),
+        onSelect: () => {
+          open.value = false;
+        },
+      },
     ],
   ];
 });

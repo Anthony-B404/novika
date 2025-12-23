@@ -113,6 +113,8 @@
     "job_not_found": "Processing job not found",
     "not_found": "Audio not found",
     "deleted": "Audio deleted successfully",
+    "updated": "Audio updated successfully",
+    "batch_deleted": "{count} audio(s) deleted successfully",
     "access_denied": "You do not have access to this audio",
     "created": "Audio created successfully",
     "file_not_found": "Audio file not found in storage"
