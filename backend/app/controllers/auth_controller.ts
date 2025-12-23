@@ -17,6 +17,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import fs from 'node:fs/promises'
 import { errors } from '@vinejs/vine'
+import defaultPromptsService from '#services/default_prompts_service'
 
 export default class AuthController {
   private readonly LOGO_DIRECTORY = app.makePath('storage/organizations/logos')
@@ -269,6 +270,9 @@ export default class AuthController {
       }
 
       await user.save()
+
+      // Seed default prompts for the organization (if not already seeded)
+      await defaultPromptsService.seedIfNeeded(organization.id)
 
       // Create access token
       const accessToken = await User.accessTokens.create(user)

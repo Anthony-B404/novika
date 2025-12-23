@@ -101,7 +101,8 @@
     "invitation_delete_failed": "Error deleting invitation",
     "user_delete_failed": "Error deleting user",
     "member_delete_failed": "Error removing member",
-    "invalid_id": "Invalid ID provided"
+    "invalid_id": "Invalid ID provided",
+    "forbidden": "You do not have permission to perform this action"
   },
   "audio": {
     "no_file_uploaded": "No audio file was uploaded",
@@ -118,5 +119,23 @@
     "access_denied": "You do not have access to this audio",
     "created": "Audio created successfully",
     "file_not_found": "Audio file not found in storage"
+  },
+  "prompt": {
+    "created": "Prompt created successfully",
+    "updated": "Prompt updated successfully",
+    "deleted": "Prompt deleted successfully",
+    "not_found": "Prompt not found",
+    "batch_deleted": "{count} prompt(s) deleted successfully",
+    "added_to_favorites": "Prompt added to favorites",
+    "removed_from_favorites": "Prompt removed from favorites",
+    "reordered": "Prompts reordered successfully"
+  },
+  "prompt_category": {
+    "created": "Category created successfully",
+    "updated": "Category updated successfully",
+    "deleted": "Category deleted successfully",
+    "not_found": "Category not found",
+    "has_prompts": "Cannot delete a category that contains prompts",
+    "reordered": "Categories reordered successfully"
   }
 }

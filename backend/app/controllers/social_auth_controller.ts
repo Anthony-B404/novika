@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import fs from 'node:fs/promises'
 import { completeOAuthRegistrationValidator } from '#validators/user'
 import { DateTime } from 'luxon'
+import defaultPromptsService from '#services/default_prompts_service'
 
 export default class SocialAuthController {
   private readonly LOGO_DIRECTORY = app.makePath('storage/organizations/logos')
@@ -199,6 +200,9 @@ export default class SocialAuthController {
       }
 
       await user.save()
+
+      // Seed default prompts for the organization (if not already seeded)
+      await defaultPromptsService.seedIfNeeded(user.currentOrganizationId!)
 
       return response.ok({
         message: 'Organization created successfully',

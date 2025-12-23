@@ -12,6 +12,7 @@ import fs from 'node:fs/promises'
 import OrganizationPolicy from '#policies/organization_policy'
 import { DateTime } from 'luxon'
 import { errors } from '@vinejs/vine'
+import defaultPromptsService from '#services/default_prompts_service'
 export default class OrganizationsController {
   private readonly LOGO_DIRECTORY = app.makePath('storage/organizations/logos')
 
@@ -214,6 +215,9 @@ export default class OrganizationsController {
       await organization.related('users').attach({
         [authUser.id]: { role: 1 }, // UserRole.Owner
       })
+
+      // Seed default prompts for the new organization
+      await defaultPromptsService.seedForOrganization(organization.id)
 
       // If user has never used their trial, initialize it now
       if (!authUser.trialUsed) {

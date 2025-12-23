@@ -21,6 +21,8 @@ const WebhooksController = () => import('#controllers/webhooks_controller')
 const ContactController = () => import('#controllers/contact_controller')
 const AudioController = () => import('#controllers/audio_controller')
 const AudiosController = () => import('#controllers/audios_controller')
+const PromptsController = () => import('#controllers/prompts_controller')
+const PromptCategoriesController = () => import('#controllers/prompt_categories_controller')
 
 router.get('/', async () => {
   return {
@@ -124,6 +126,25 @@ router
     router.put('/audios/:id', [AudiosController, 'update'])
     router.delete('/audios/batch', [AudiosController, 'destroyMultiple'])
     router.delete('/audios/:id', [AudiosController, 'destroy'])
+
+    // Prompt categories routes
+    router.get('/prompt-categories', [PromptCategoriesController, 'index'])
+    router.get('/prompt-categories/:id', [PromptCategoriesController, 'show'])
+    router.post('/prompt-categories', [PromptCategoriesController, 'store'])
+    router.put('/prompt-categories/:id', [PromptCategoriesController, 'update'])
+    router.delete('/prompt-categories/:id', [PromptCategoriesController, 'destroy'])
+    router.post('/prompt-categories/reorder', [PromptCategoriesController, 'reorder'])
+
+    // Prompts routes
+    router.get('/prompts', [PromptsController, 'index'])
+    router.get('/prompts/:id', [PromptsController, 'show'])
+    router.post('/prompts', [PromptsController, 'store'])
+    router.put('/prompts/:id', [PromptsController, 'update'])
+    router.delete('/prompts/batch', [PromptsController, 'destroyMultiple'])
+    router.delete('/prompts/:id', [PromptsController, 'destroy'])
+    router.post('/prompts/:id/favorite', [PromptsController, 'toggleFavorite'])
+    router.post('/prompts/:id/use', [PromptsController, 'incrementUsage'])
+    router.post('/prompts/reorder', [PromptsController, 'reorder'])
   })
   .use(middleware.auth({ guards: ['api'] }))
   .use(middleware.trialGuard())
