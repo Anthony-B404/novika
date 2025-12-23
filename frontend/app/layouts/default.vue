@@ -31,6 +31,14 @@ const mainLinks = computed<NavigationMenuItem[][]>(() => {
           open.value = false;
         },
       },
+      {
+        label: t("layouts.default.navigation.prompts"),
+        icon: "i-lucide-bookmark",
+        to: localePath("/dashboard/prompts"),
+        onSelect: () => {
+          open.value = false;
+        },
+      },
     ],
   ];
 });
@@ -152,24 +160,22 @@ onMounted(async () => {
     <!-- Top Navigation Bar -->
     <header class="relative z-50 border-b border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <!-- Left Side: Logo + Navigation -->
-          <div class="flex items-center gap-6">
-            <div class="flex-shrink-0 flex items-center">
-              <TeamsMenu />
-            </div>
-
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex">
-              <UNavigationMenu
-                :items="mainLinks[0]"
-                orientation="horizontal"
-                class="border-none"
-              />
-            </nav>
+        <div class="grid grid-cols-[auto_1fr_auto] items-center h-16">
+          <!-- Left: Logo -->
+          <div class="flex items-center">
+            <TeamsMenu />
           </div>
 
-          <!-- Right Side Actions -->
+          <!-- Center: Navigation -->
+          <nav class="hidden md:flex justify-center">
+            <UNavigationMenu
+              :items="mainLinks[0]"
+              orientation="horizontal"
+              class="border-none"
+            />
+          </nav>
+
+          <!-- Right: Actions -->
           <div class="hidden md:flex items-center gap-2">
             <!-- Settings Dropdown (Icon Only) -->
             <UDropdownMenu
@@ -188,7 +194,7 @@ onMounted(async () => {
           </div>
 
           <!-- Mobile menu button (Hamburger) -->
-          <div class="flex md:hidden">
+          <div class="flex md:hidden justify-end">
              <UButton icon="i-lucide-menu" color="neutral" variant="ghost" @click="open = true" />
           </div>
         </div>

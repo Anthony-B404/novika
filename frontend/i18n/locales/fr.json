@@ -179,8 +179,10 @@
       "saveDraft": "Enregistrer le brouillon",
       "buyNow": "Acheter maintenant",
       "deleteAccount": "Supprimer le compte",
-      "loadMore": "Charger plus"
+      "loadMore": "Charger plus",
+      "close": "Fermer"
     },
+    "loading": "Chargement...",
     "actions": {
       "copy": "Copier",
       "edit": "Modifier",
@@ -433,6 +435,7 @@
       "navigation": {
         "workshop": "Accueil",
         "library": "Bibliothèque",
+        "prompts": "Prompts",
         "settings": "Paramètres",
         "feedback": "Commentaires",
         "helpSupport": "Aide & Support"
@@ -498,12 +501,60 @@
       },
       "analyze": {
         "promptPlaceholder": "Décrivez ce que vous souhaitez analyser (ex: résumé, points clés...)",
-        "examplesTitle": "Exemples de prompts :",
-        "examples": {
-          "summary": "Résumé audio",
-          "keyPoints": "Points clés",
-          "participants": "Intervenants",
-          "sentiment": "Analyse sentiment"
+        "suggestionsTitle": "Suggestions :"
+      },
+      "prompts": {
+        "title": "Bibliothèque de prompts",
+        "subtitle": "Gérez vos prompts d'analyse audio",
+        "search": "Rechercher un prompt...",
+        "addPrompt": "Nouveau prompt",
+        "addCategory": "Nouvelle catégorie",
+        "favorites": "Favoris",
+        "all": "Tous",
+        "noPrompts": "Aucun prompt trouvé",
+        "noPromptsDescription": "Créez votre premier prompt pour commencer",
+        "noCategories": "Aucune catégorie",
+        "confirmDelete": "Supprimer le prompt",
+        "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer \"{title}\" ?",
+        "system": "Système",
+        "custom": "Personnalisé",
+        "library": "Bibliothèque",
+        "selectPrompt": "Sélectionner un prompt",
+        "manageLibrary": "Gérer la bibliothèque",
+        "manageCategories": "Gérer les catégories",
+        "editCategory": "Modifier la catégorie",
+        "editPrompt": "Modifier le prompt",
+        "promptsCount": "prompts",
+        "promptCreated": "Prompt créé avec succès",
+        "promptUpdated": "Prompt mis à jour",
+        "promptDeleted": "Prompt supprimé",
+        "categoryCreated": "Catégorie créée avec succès",
+        "categoryUpdated": "Catégorie mise à jour",
+        "categoryDeleted": "Catégorie supprimée",
+        "addedToFavorites": "Ajouté aux favoris",
+        "removedFromFavorites": "Retiré des favoris",
+        "form": {
+          "title": "Titre",
+          "titlePlaceholder": "Entrez le titre du prompt",
+          "category": "Catégorie",
+          "content": "Contenu",
+          "contentPlaceholder": "Entrez le contenu du prompt...",
+          "categoryName": "Nom de la catégorie",
+          "categoryNamePlaceholder": "Ex: Analyse, Résumé, etc.",
+          "description": "Description",
+          "descriptionPlaceholder": "Description optionnelle",
+          "color": "Couleur",
+          "addToFavorites": "Ajouter aux favoris",
+          "noCategory": "Sans catégorie"
+        },
+        "errors": {
+          "titleRequired": "Le titre est requis",
+          "titleTooLong": "Le titre ne doit pas dépasser 255 caractères",
+          "contentRequired": "Le contenu est requis",
+          "contentTooShort": "Le contenu doit contenir au moins 5 caractères",
+          "contentTooLong": "Le contenu ne doit pas dépasser 5000 caractères",
+          "categoryNameRequired": "Le nom de la catégorie est requis",
+          "categoryNameTooLong": "Le nom ne doit pas dépasser 100 caractères"
         }
       },
       "library": {

@@ -177,8 +177,10 @@
       "saveDraft": "Save draft",
       "buyNow": "Buy now",
       "deleteAccount": "Delete account",
-      "loadMore": "Load more"
+      "loadMore": "Load more",
+      "close": "Close"
     },
+    "loading": "Loading...",
     "actions": {
       "copy": "Copy",
       "edit": "Edit",
@@ -431,6 +433,7 @@
       "navigation": {
         "workshop": "Home",
         "library": "Library",
+        "prompts": "Prompts",
         "settings": "Settings",
         "feedback": "Feedback",
         "helpSupport": "Help & Support"
@@ -492,6 +495,64 @@
           "titleUpdateError": "Error updating title",
           "titlePlaceholder": "Enter audio title",
           "clickToEdit": "Click to edit title"
+        }
+      },
+      "analyze": {
+        "promptPlaceholder": "Describe what you want to analyze (e.g., summary, key points...)",
+        "suggestionsTitle": "Suggestions:"
+      },
+      "prompts": {
+        "title": "Prompt Library",
+        "subtitle": "Manage your audio analysis prompts",
+        "search": "Search prompts...",
+        "addPrompt": "New prompt",
+        "addCategory": "New category",
+        "favorites": "Favorites",
+        "all": "All",
+        "noPrompts": "No prompts found",
+        "noPromptsDescription": "Create your first prompt to get started",
+        "noCategories": "No categories",
+        "confirmDelete": "Delete prompt",
+        "confirmDeleteMessage": "Are you sure you want to delete \"{title}\"?",
+        "system": "System",
+        "custom": "Custom",
+        "library": "Library",
+        "selectPrompt": "Select a prompt",
+        "manageLibrary": "Manage library",
+        "manageCategories": "Manage categories",
+        "editCategory": "Edit category",
+        "editPrompt": "Edit prompt",
+        "promptsCount": "prompts",
+        "promptCreated": "Prompt created successfully",
+        "promptUpdated": "Prompt updated",
+        "promptDeleted": "Prompt deleted",
+        "categoryCreated": "Category created successfully",
+        "categoryUpdated": "Category updated",
+        "categoryDeleted": "Category deleted",
+        "addedToFavorites": "Added to favorites",
+        "removedFromFavorites": "Removed from favorites",
+        "form": {
+          "title": "Title",
+          "titlePlaceholder": "Enter prompt title",
+          "category": "Category",
+          "content": "Content",
+          "contentPlaceholder": "Enter prompt content...",
+          "categoryName": "Category name",
+          "categoryNamePlaceholder": "e.g., Analysis, Summary, etc.",
+          "description": "Description",
+          "descriptionPlaceholder": "Optional description",
+          "color": "Color",
+          "addToFavorites": "Add to favorites",
+          "noCategory": "No category"
+        },
+        "errors": {
+          "titleRequired": "Title is required",
+          "titleTooLong": "Title must not exceed 255 characters",
+          "contentRequired": "Content is required",
+          "contentTooShort": "Content must be at least 5 characters",
+          "contentTooLong": "Content must not exceed 5000 characters",
+          "categoryNameRequired": "Category name is required",
+          "categoryNameTooLong": "Name must not exceed 100 characters"
         }
       },
       "library": {
