@@ -210,7 +210,7 @@ function handleTitleKeydown(event: KeyboardEvent, audio: Audio) {
           base: 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
         },
       }"
-      @select="(row) => emit('select', row)"
+      @select="(_e, row) => emit('select', row.original)"
     >
       <!-- Header checkbox -->
       <template #select-header>
@@ -224,11 +224,15 @@ function handleTitleKeydown(event: KeyboardEvent, audio: Audio) {
 
       <!-- Row checkbox -->
       <template #select-cell="{ row }">
-        <UCheckbox
-          :model-value="selectedIds.includes(row.original.id)"
-          @update:model-value="toggleItem(row.original.id)"
-          @click.stop
-        />
+        <div
+          class="flex items-center justify-center -m-4 p-4 cursor-pointer"
+          @click.stop="toggleItem(row.original.id)"
+        >
+          <UCheckbox
+            :model-value="selectedIds.includes(row.original.id)"
+            @update:model-value="toggleItem(row.original.id)"
+          />
+        </div>
       </template>
 
       <!-- Title column -->

@@ -4,6 +4,7 @@ import MistralService, { type TranscriptionResult } from '#services/mistral_serv
 import AudioChunkingService, { type ChunkingResult } from '#services/audio_chunking_service'
 import storageService from '#services/storage_service'
 import Audio, { AudioStatus } from '#models/audio'
+import User from '#models/user'
 import Transcription, { type TranscriptionTimestamp } from '#models/transcription'
 import type { TranscriptionJobData, TranscriptionJobResult } from '#services/queue_service'
 import { tmpdir } from 'node:os'
@@ -164,6 +165,38 @@ async function processTranscriptionJob(
         `[Job ${job.id}] Audio under threshold: ${chunkingResult.metadata.duration.toFixed(1)}s, no chunking needed`
       )
     }
+
+    // Credit check: Calculate credits needed (1 credit = 1 minute, rounded up)
+    const durationMinutes = Math.ceil(chunkingResult.metadata.duration / 60)
+    const creditsNeeded = Math.max(1, durationMinutes) // Minimum 1 credit
+
+    console.log(`[Job ${job.id}] Credits needed: ${creditsNeeded} (${chunkingResult.metadata.duration.toFixed(1)}s)`)
+
+    // Load user and check credits
+    const user = await User.find(job.data.userId)
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    if (!user.hasEnoughCredits(creditsNeeded)) {
+      // Set audio status to failed with specific error
+      if (audio) {
+        audio.status = AudioStatus.Failed
+        audio.errorMessage = `Insufficient credits. Required: ${creditsNeeded}, Available: ${user.credits}`
+        audio.currentJobId = null
+        await audio.save()
+      }
+      throw new Error(`Insufficient credits. Required: ${creditsNeeded}, Available: ${user.credits}`)
+    }
+
+    // Deduct credits
+    const fileNameWithoutExt = audioFileName.replace(/\.[^/.]+$/, '')
+    await user.deductCredits(
+      creditsNeeded,
+      `Analyse audio: ${fileNameWithoutExt} (${Math.round(chunkingResult.metadata.duration)}s)`,
+      audioId
+    )
+    console.log(`[Job ${job.id}] Deducted ${creditsNeeded} credits. New balance: ${user.credits}`)
 
     // Stage 3: Transcribe audio chunks (10-70%)
     const mistralService = new MistralService()

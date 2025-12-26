@@ -10,6 +10,7 @@ const toast = useToast();
 const localePath = useLocalePath();
 
 const audioStore = useAudioStore();
+const creditsStore = useCreditsStore();
 
 // Track current job for real-time progress display
 const currentJobId = ref<string | null>(null);
@@ -57,8 +58,9 @@ const { startPolling, stopPolling, polling, currentAudioId } = useAudioPolling({
       title: t("pages.dashboard.workshop.processingComplete"),
       color: "success",
     });
-    // Refresh the list
+    // Refresh the list and credits
     audioStore.fetchAudios(1);
+    creditsStore.refresh();
   },
   onError: (error) => {
     currentJobId.value = null;

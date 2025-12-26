@@ -587,6 +587,25 @@
         "titleUpdated": "Title updated",
         "titleUpdateError": "Error updating title"
       },
+      "credits": {
+        "title": "My Credits",
+        "subtitle": "Manage your audio analysis credits",
+        "balance": "Current Balance",
+        "creditsUnit": "credits",
+        "history": "Transaction History",
+        "noTransactions": "No transactions",
+        "noTransactionsDescription": "Your credit history will appear here",
+        "buyCredits": "Buy Credits",
+        "transactionTypes": {
+          "usage": "Usage",
+          "purchase": "Purchase",
+          "bonus": "Bonus",
+          "refund": "Refund"
+        },
+        "insufficientCredits": "Insufficient Credits",
+        "insufficientCreditsMessage": "You don't have enough credits for this analysis. Required: {required}, available: {available}.",
+        "creditInfo": "1 credit = 1 minute of audio"
+      },
       "settings": {
         "title": "Settings",
         "navigation": {

@@ -23,6 +23,7 @@ const AudioController = () => import('#controllers/audio_controller')
 const AudiosController = () => import('#controllers/audios_controller')
 const PromptsController = () => import('#controllers/prompts_controller')
 const PromptCategoriesController = () => import('#controllers/prompt_categories_controller')
+const CreditsController = () => import('#controllers/credits_controller')
 
 router.get('/', async () => {
   return {
@@ -145,6 +146,10 @@ router
     router.post('/prompts/:id/favorite', [PromptsController, 'toggleFavorite'])
     router.post('/prompts/:id/use', [PromptsController, 'incrementUsage'])
     router.post('/prompts/reorder', [PromptsController, 'reorder'])
+
+    // Credits routes
+    router.get('/credits', [CreditsController, 'balance'])
+    router.get('/credits/history', [CreditsController, 'history'])
   })
   .use(middleware.auth({ guards: ['api'] }))
   .use(middleware.trialGuard())

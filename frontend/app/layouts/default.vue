@@ -7,9 +7,17 @@ const route = useRoute();
 const toast = useToast();
 const trialStore = useTrialStore();
 const { canAccessOrganization, canAccessBilling } = useSettingsPermissions();
+const creditsStore = useCreditsStore();
+const { credits } = storeToRefs(creditsStore);
+const { fetchBalance } = creditsStore;
 
 const open = ref(false);
 const contactModalOpen = ref(false);
+
+// Fetch credits on mount
+onMounted(() => {
+  fetchBalance();
+});
 
 // 1. Navigation principale (Gauche Desktop / Haut Mobile)
 const mainLinks = computed<NavigationMenuItem[][]>(() => {
@@ -176,7 +184,13 @@ onMounted(async () => {
           </nav>
 
           <!-- Right: Actions -->
-          <div class="hidden md:flex items-center gap-2">
+          <div class="hidden md:flex items-center gap-3">
+            <!-- Credits Badge -->
+            <NuxtLink :to="localePath('/dashboard/credits')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+              <UIcon name="i-lucide-coins" class="w-4 h-4 text-indigo-500" />
+              <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">{{ credits }}</span>
+            </NuxtLink>
+
             <!-- Settings Dropdown (Icon Only) -->
             <UDropdownMenu
               :items="settingsItems"

@@ -178,7 +178,7 @@ function cancelEditingTitle() {
 }
 
 async function saveTitle() {
-  if (!audio.value || !editedTitle.value.trim()) {
+  if (!audio.value || !editedTitle.value.trim() || savingTitle.value) {
     cancelEditingTitle()
     return
   }
@@ -191,7 +191,6 @@ async function saveTitle() {
 
   savingTitle.value = true
   const success = await audioStore.updateAudio(audio.value.id, newTitle)
-  savingTitle.value = false
 
   if (success) {
     toast.add({
@@ -205,6 +204,7 @@ async function saveTitle() {
     })
   }
 
+  savingTitle.value = false
   isEditingTitle.value = false
 }
 

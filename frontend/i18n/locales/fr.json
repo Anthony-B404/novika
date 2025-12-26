@@ -589,6 +589,25 @@
         "titleUpdated": "Titre mis à jour",
         "titleUpdateError": "Erreur lors de la mise à jour du titre"
       },
+      "credits": {
+        "title": "Mes crédits",
+        "subtitle": "Gérez vos crédits d'analyse audio",
+        "balance": "Solde actuel",
+        "creditsUnit": "crédits",
+        "history": "Historique des transactions",
+        "noTransactions": "Aucune transaction",
+        "noTransactionsDescription": "Votre historique de crédits apparaîtra ici",
+        "buyCredits": "Acheter des crédits",
+        "transactionTypes": {
+          "usage": "Utilisation",
+          "purchase": "Achat",
+          "bonus": "Bonus",
+          "refund": "Remboursement"
+        },
+        "insufficientCredits": "Crédits insuffisants",
+        "insufficientCreditsMessage": "Vous n'avez pas assez de crédits pour cette analyse. Crédits requis : {required}, disponibles : {available}.",
+        "creditInfo": "1 crédit = 1 minute d'audio"
+      },
       "settings": {
         "title": "Paramètres",
         "navigation": {
