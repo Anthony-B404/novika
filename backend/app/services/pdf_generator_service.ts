@@ -49,8 +49,9 @@ class PdfGeneratorService {
         this.generateAnalysisSection(doc, audio, i18n)
       }
 
-      // Add page numbers
+      // Add page numbers and flush all buffered pages
       this.addPageNumbers(doc)
+      doc.flushPages()
 
       doc.end()
     })
@@ -136,11 +137,7 @@ class PdfGeneratorService {
   /**
    * Generate transcription section
    */
-  private generateTranscriptionSection(
-    doc: PDFKit.PDFDocument,
-    audio: Audio,
-    i18n: I18n
-  ): void {
+  private generateTranscriptionSection(doc: PDFKit.PDFDocument, audio: Audio, i18n: I18n): void {
     if (!audio.transcription?.rawText) return
 
     // Section header
@@ -190,40 +187,56 @@ class PdfGeneratorService {
    */
   private addPageNumbers(doc: PDFKit.PDFDocument): void {
     const pages = doc.bufferedPageRange()
+    const lastPage = pages.start + pages.count - 1
+
     for (let i = 0; i < pages.count; i++) {
-      doc.switchToPage(i)
-      doc
-        .fontSize(9)
-        .font('Helvetica')
-        .fillColor('#999999')
-        .text(`${i + 1} / ${pages.count}`, 0, doc.page.height - 30, {
-          align: 'center',
-        })
+      doc.switchToPage(pages.start + i)
+
+      // Use low-level text positioning to avoid triggering page breaks
+      const pageNumText = `${i + 1} / ${pages.count}`
+
+      doc.save()
+      doc.fontSize(9).font('Helvetica').fillColor('#999999')
+
+      const textWidth = doc.widthOfString(pageNumText)
+      const xPos = (doc.page.width - textWidth) / 2
+      const yPos = doc.page.height - 35
+
+      doc.text(pageNumText, xPos, yPos, {
+        lineBreak: false,
+        continued: false,
+      })
+      doc.restore()
     }
+
+    // Switch back to last page to prevent phantom pages
+    doc.switchToPage(lastPage)
   }
 
   /**
    * Strip markdown formatting from text for plain text rendering
    */
   private stripMarkdown(text: string): string {
-    return text
-      // Remove headers
-      .replace(/^#{1,6}\s+/gm, '')
-      // Remove bold/italic
-      .replace(/\*\*(.+?)\*\*/g, '$1')
-      .replace(/\*(.+?)\*/g, '$1')
-      .replace(/__(.+?)__/g, '$1')
-      .replace(/_(.+?)_/g, '$1')
-      // Remove links
-      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-      // Remove code blocks
-      .replace(/```[\s\S]*?```/g, '')
-      .replace(/`(.+?)`/g, '$1')
-      // Remove bullet points
-      .replace(/^[\*\-]\s+/gm, '- ')
-      // Clean up extra whitespace
-      .replace(/\n{3,}/g, '\n\n')
-      .trim()
+    return (
+      text
+        // Remove headers
+        .replace(/^#{1,6}\s+/gm, '')
+        // Remove bold/italic
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/__(.+?)__/g, '$1')
+        .replace(/_(.+?)_/g, '$1')
+        // Remove links
+        .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+        // Remove code blocks
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/`(.+?)`/g, '$1')
+        // Remove bullet points
+        .replace(/^[\*\-]\s+/gm, '- ')
+        // Clean up extra whitespace
+        .replace(/\n{3,}/g, '\n\n')
+        .trim()
+    )
   }
 }
 
