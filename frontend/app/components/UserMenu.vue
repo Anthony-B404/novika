@@ -1,70 +1,17 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
-import { en, fr } from "@nuxt/ui/locale";
 
 const { t, locale, setLocale } = useI18n();
 const localePath = useLocalePath();
 const { user: authUser, logout } = useAuth();
 const { getAvatarUrl } = useAvatarUrl();
+const { canAccessOrganization, canManageMembers } = useSettingsPermissions();
 
 defineProps<{
   collapsed?: boolean;
 }>();
 
 const colorMode = useColorMode();
-const appConfig = useAppConfig();
-const themeStore = useThemeStore();
-
-const colors = [
-  "red",
-  "orange",
-  "amber",
-  "yellow",
-  "lime",
-  "green",
-  "emerald",
-  "teal",
-  "cyan",
-  "sky",
-  "blue",
-  "indigo",
-  "violet",
-  "purple",
-  "fuchsia",
-  "pink",
-  "rose",
-];
-const neutrals = ["slate", "gray", "zinc", "neutral", "stone"];
-
-// Tailwind color palette values for chip display
-const colorPalette: Record<string, { light: string; dark: string }> = {
-  red: { light: "#ef4444", dark: "#f87171" },
-  orange: { light: "#f97316", dark: "#fb923c" },
-  amber: { light: "#f59e0b", dark: "#fbbf24" },
-  yellow: { light: "#eab308", dark: "#facc15" },
-  lime: { light: "#84cc16", dark: "#a3e635" },
-  green: { light: "#22c55e", dark: "#4ade80" },
-  emerald: { light: "#10b981", dark: "#34d399" },
-  teal: { light: "#14b8a6", dark: "#2dd4bf" },
-  cyan: { light: "#06b6d4", dark: "#22d3ee" },
-  sky: { light: "#0ea5e9", dark: "#38bdf8" },
-  blue: { light: "#3b82f6", dark: "#60a5fa" },
-  indigo: { light: "#6366f1", dark: "#818cf8" },
-  violet: { light: "#8b5cf6", dark: "#a78bfa" },
-  purple: { light: "#a855f7", dark: "#c084fc" },
-  fuchsia: { light: "#d946ef", dark: "#e879f9" },
-  pink: { light: "#ec4899", dark: "#f472b6" },
-  rose: { light: "#f43f5e", dark: "#fb7185" },
-  slate: { light: "#64748b", dark: "#94a3b8" },
-  gray: { light: "#6b7280", dark: "#9ca3af" },
-  zinc: { light: "#71717a", dark: "#a1a1aa" },
-  "old-neutral": { light: "#737373", dark: "#a3a3a3" },
-  stone: { light: "#78716c", dark: "#a8a29e" },
-};
-
-const getChipColor = (colorName: string, mode: "light" | "dark") => {
-  return colorPalette[colorName]?.[mode] || "#888888";
-};
 
 const user = computed(() => ({
   name: authUser.value?.fullName || authUser.value?.email || "User",
@@ -84,70 +31,42 @@ const items = computed<DropdownMenuItem[][]>(() => [
   ],
   [
     {
-      label: t("components.user.profile"),
-      icon: "i-lucide-user",
-    },
-    {
-      label: t("components.user.billing"),
-      icon: "i-lucide-credit-card",
-      to: localePath("/dashboard/settings/billing"),
-    },
-    {
       label: t("components.user.settings"),
       icon: "i-lucide-settings",
-      to: localePath("/dashboard/settings"),
-    },
-  ],
-  [
-    {
-      label: t("components.user.theme"),
-      icon: "i-lucide-palette",
       children: [
         {
-          label: t("components.user.primary"),
-          slot: "chip",
-          chip: appConfig.ui.colors.primary,
-          content: {
-            align: "center",
-            collisionPadding: 16,
-          },
-          children: colors.map((color) => ({
-            label: color,
-            chip: color,
-            slot: "chip",
-            checked: appConfig.ui.colors.primary === color,
-            type: "checkbox",
-            onSelect: (e) => {
-              e.preventDefault();
-              themeStore.setPrimaryColor(color);
-            },
-          })),
+          label: t("pages.dashboard.settings.navigation.general"),
+          icon: "i-lucide-sliders",
+          to: localePath("/dashboard/settings"),
+          exact: true,
         },
+        ...(canAccessOrganization.value
+          ? [
+              {
+                label: t("pages.dashboard.settings.navigation.organization"),
+                icon: "i-lucide-building",
+                to: localePath("/dashboard/settings/organization"),
+              },
+            ]
+          : []),
+        ...(canManageMembers.value
+          ? [
+              {
+                label: t("pages.dashboard.settings.navigation.members"),
+                icon: "i-lucide-users",
+                to: localePath("/dashboard/settings/members"),
+              },
+            ]
+          : []),
         {
-          label: t("components.user.neutral"),
-          slot: "chip",
-          chip:
-            appConfig.ui.colors.neutral === "neutral"
-              ? "old-neutral"
-              : appConfig.ui.colors.neutral,
-          content: {
-            align: "end",
-            collisionPadding: 16,
-          },
-          children: neutrals.map((color) => ({
-            label: color,
-            chip: color === "neutral" ? "old-neutral" : color,
-            slot: "chip",
-            type: "checkbox",
-            checked: appConfig.ui.colors.neutral === color,
-            onSelect: (e) => {
-              e.preventDefault();
-              themeStore.setNeutralColor(color);
-            },
-          })),
+          label: t("pages.dashboard.settings.navigation.security"),
+          icon: "i-lucide-shield",
+          to: localePath("/dashboard/settings/security"),
         },
       ],
     },
+  ],
+  [
     {
       label: t("components.user.appearance"),
       icon: "i-lucide-sun-moon",
@@ -247,18 +166,5 @@ const items = computed<DropdownMenuItem[][]>(() => [
       }"
     />
 
-    <template #chip-leading="{ item }">
-      <div class="inline-flex size-5 shrink-0 items-center justify-center">
-        <span
-          class="size-2 rounded-full ring ring-white/20 dark:ring-black/20"
-          :style="{
-            backgroundColor: getChipColor(
-              (item as any).chip,
-              colorMode.value === 'dark' ? 'dark' : 'light',
-            ),
-          }"
-        />
-      </div>
-    </template>
   </UDropdownMenu>
 </template>

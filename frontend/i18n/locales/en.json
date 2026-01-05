@@ -629,7 +629,6 @@
           "general": "General",
           "organization": "Organization",
           "members": "Members",
-          "notifications": "Notifications",
           "security": "Security"
         },
         "general": {
@@ -680,36 +679,6 @@
         "members": {
           "title": "Members",
           "description": "Invite new members by email address."
-        },
-        "notifications": {
-          "channels": {
-            "title": "Notification channels",
-            "description": "Where can we notify you?",
-            "email": {
-              "label": "Email",
-              "description": "Receive a daily email digest."
-            },
-            "desktop": {
-              "label": "Desktop",
-              "description": "Receive desktop notifications."
-            }
-          },
-          "accountUpdates": {
-            "title": "Account updates",
-            "description": "Receive updates about Nuxt UI.",
-            "weeklyDigest": {
-              "label": "Weekly digest",
-              "description": "Receive a weekly digest of news."
-            },
-            "productUpdates": {
-              "label": "Product updates",
-              "description": "Receive a monthly email with all new features and updates."
-            },
-            "importantUpdates": {
-              "label": "Important updates",
-              "description": "Receive emails about important updates like security fixes, maintenance, etc."
-            }
-          }
         },
         "security": {
           "title": "Account",

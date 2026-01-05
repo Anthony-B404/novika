@@ -35,13 +35,6 @@ const links = computed(() => {
     to: localePath("/dashboard/settings/members"),
   });
 
-  // Notifications - All roles
-  mainLinks.push({
-    label: t("pages.dashboard.settings.navigation.notifications"),
-    icon: "i-lucide-bell",
-    to: localePath("/dashboard/settings/notifications"),
-  });
-
   // Security - All roles
   mainLinks.push({
     label: t("pages.dashboard.settings.navigation.security"),

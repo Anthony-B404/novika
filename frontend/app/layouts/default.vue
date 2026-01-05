@@ -50,7 +50,7 @@ const mainLinks = computed<NavigationMenuItem[][]>(() => {
   ];
 });
 
-// 2. Items des paramètres (Contenu du Dropdown Droite / Bas Mobile)
+// 2. Items des paramètres pour le menu mobile
 const settingsItems = computed(() => {
   const items: DropdownMenuItem[] = [
     {
@@ -78,15 +78,6 @@ const settingsItems = computed(() => {
     label: t("pages.dashboard.settings.navigation.members"),
     to: localePath("/dashboard/settings/members"),
     icon: "i-lucide-users",
-    onSelect: () => {
-      open.value = false;
-    },
-  });
-
-  items.push({
-    label: t("pages.dashboard.settings.navigation.notifications"),
-    to: localePath("/dashboard/settings/notifications"),
-    icon: "i-lucide-bell",
     onSelect: () => {
       open.value = false;
     },
@@ -174,19 +165,6 @@ onMounted(async () => {
               <UIcon name="i-lucide-coins" class="w-4 h-4 text-indigo-500" />
               <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">{{ credits }}</span>
             </NuxtLink>
-
-            <!-- Settings Dropdown (Icon Only) -->
-            <UDropdownMenu
-              :items="settingsItems"
-              :content="{ align: 'end' }"
-            >
-              <UButton
-                icon="i-lucide-settings"
-                color="neutral"
-                variant="ghost"
-                class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              />
-            </UDropdownMenu>
 
             <UserMenu :collapsed="true" />
           </div>
