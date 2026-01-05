@@ -6,7 +6,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import type { SelectItem } from "@nuxt/ui";
 
 definePageMeta({
-  middleware: "auth",
+  middleware: ["auth", "pending-deletion"],
 });
 
 const { t } = useI18n();

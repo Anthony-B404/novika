@@ -1,0 +1,107 @@
+@mjml()
+  <mjml>
+    <mj-head>
+      <mj-title>
+        {{ i18n.t('emails.gdpr_deletion_completed.subject') }}
+      </mj-title>
+      <mj-preview>
+        {{ i18n.t('emails.gdpr_deletion_completed.preview') }}
+      </mj-preview>
+      <mj-font
+        name="Public Sans"
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap"
+      />
+      <mj-attributes>
+        <mj-all font-family="'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" />
+        <mj-text font-size="16px" line-height="24px" color="#334155" />
+        <mj-button font-weight="600" font-size="14px" />
+      </mj-attributes>
+      <mj-style>
+        .shadow {
+          box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        .success-box {
+          background-color: #f0fdf4;
+          border-left: 4px solid #22c55e;
+        }
+        .summary-table {
+          background-color: #f8fafc;
+        }
+      </mj-style>
+    </mj-head>
+    <mj-body background-color="#f8fafc">
+      <mj-section padding-top="48px" padding-bottom="24px">
+        <mj-column width="100%">
+          <mj-text align="center" font-size="28px" font-weight="700" color="#0f172a">
+            Alexia
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <mj-section background-color="#ffffff" border-radius="8px" padding="32px 24px" css-class="shadow">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" color="#0f172a" padding-bottom="16px">
+            {{ i18n.t('emails.gdpr_deletion_completed.title') }}
+          </mj-text>
+          <mj-text color="#334155" padding-bottom="16px">
+            {{ i18n.t('emails.gdpr_deletion_completed.greeting') }},
+          </mj-text>
+
+          <mj-text color="#334155" padding-bottom="16px">
+            {{ i18n.t('emails.gdpr_deletion_completed.intro') }}
+          </mj-text>
+
+          <mj-section css-class="success-box" padding="0">
+            <mj-column>
+              <mj-text color="#166534" font-weight="600" padding="16px">
+                ✅ {{ i18n.t('emails.gdpr_deletion_completed.title') }}
+              </mj-text>
+            </mj-column>
+          </mj-section>
+
+          <mj-text font-weight="600" color="#0f172a" padding-top="24px" padding-bottom="8px">
+            {{ i18n.t('emails.gdpr_deletion_completed.summary_title') }}
+          </mj-text>
+
+          <mj-section css-class="summary-table" padding="0">
+            <mj-column>
+              <mj-text font-size="14px" color="#64748b" padding="16px">
+                • {{ i18n.t('emails.gdpr_deletion_completed.summary_profile') }}<br />
+                • {{ i18n.t('emails.gdpr_deletion_completed.summary_audios', { audioCount: summary.audioCount.toString() }) }}<br />
+                • {{ i18n.t('emails.gdpr_deletion_completed.summary_transcriptions', { transcriptionCount: summary.transcriptionCount.toString() }) }}<br />
+                • {{ i18n.t('emails.gdpr_deletion_completed.summary_documents', { documentCount: summary.documentCount.toString() }) }}<br />
+                • {{ i18n.t('emails.gdpr_deletion_completed.summary_credits') }}
+              </mj-text>
+            </mj-column>
+          </mj-section>
+
+          <mj-text color="#334155" padding-top="24px" padding-bottom="8px">
+            {{ i18n.t('emails.gdpr_deletion_completed.thanks') }}
+          </mj-text>
+
+          <mj-text color="#64748b" font-size="14px" padding-bottom="16px">
+            {{ i18n.t('emails.gdpr_deletion_completed.reregister') }}
+          </mj-text>
+
+          <mj-text color="#334155" padding-bottom="16px">
+            {{ i18n.t('emails.gdpr_deletion_completed.closing') }}
+          </mj-text>
+
+          <mj-divider border-color="#e2e8f0" border-width="1px" padding-top="16px" padding-bottom="24px" />
+
+          <mj-text font-size="12px" color="#94a3b8" line-height="1.5">
+            {{ i18n.t('emails.gdpr_deletion_completed.footer') }}
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <mj-section>
+        <mj-column>
+          <mj-text align="center" font-size="12px" color="#94a3b8" padding-top="24px">
+            &copy; {{ new Date().getFullYear() }} Alexia.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-body>
+  </mjml>
+@end

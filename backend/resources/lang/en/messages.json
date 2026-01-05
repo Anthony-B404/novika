@@ -148,5 +148,35 @@
     "invalid_link": "Invalid share link",
     "no_content": "No content to share",
     "revoked": "Share revoked successfully"
+  },
+  "gdpr": {
+    "account_pending_deletion": "Your account is pending deletion. Access to the application is restricted. You can cancel the deletion or export your data.",
+    "export": {
+      "started": "Data export is being prepared",
+      "ready": "Your data export is ready",
+      "error": "Error generating export",
+      "download_expired": "Download link has expired"
+    },
+    "deletion": {
+      "requested": "Your deletion request has been registered. Your account will be deleted on {scheduledDate}.",
+      "cancelled": "Your deletion request has been cancelled",
+      "already_pending": "A deletion request is already pending",
+      "no_pending_request": "No pending deletion request",
+      "invalid_token": "Invalid cancellation token",
+      "cannot_cancel": "This request can no longer be cancelled",
+      "orphan_orgs_required": "Please specify how to handle organizations where you are the sole owner",
+      "invalid_new_owner": "The specified new owner is invalid",
+      "transfer_success": "Organization ownership transferred successfully",
+      "completed": "Your account has been deleted successfully"
+    },
+    "data_summary": {
+      "title": "Your Data Summary",
+      "profile": "User profile",
+      "organizations": "Organizations",
+      "audios": "Audio files",
+      "transcriptions": "Transcriptions",
+      "documents": "Documents",
+      "credits": "Credits"
+    }
   }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'auth',
+  middleware: ['auth', 'pending-deletion'],
 })
 
 const { t, locale } = useI18n()

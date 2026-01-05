@@ -136,6 +136,18 @@
       "title": "Conditions d'utilisation",
       "description": "Consultez nos conditions d'utilisation"
     },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "description": "Découvrez comment nous protégeons vos données personnelles"
+    },
+    "legal": {
+      "title": "Mentions légales",
+      "description": "Informations légales sur notre service"
+    },
+    "cookies": {
+      "title": "Politique des cookies",
+      "description": "Informations sur l'utilisation des cookies"
+    },
     "login": {
       "title": "Connexion",
       "description": "Connectez-vous à votre compte pour continuer"
@@ -467,7 +479,16 @@
       "cookies": {
         "title": "Nous utilisons des cookies propriétaires pour améliorer votre expérience sur notre site web.",
         "accept": "Accepter",
-        "optOut": "Refuser"
+        "optOut": "Refuser",
+        "learnMore": "En savoir plus"
+      },
+      "footer": {
+        "legal": "Légal",
+        "terms": "CGU",
+        "privacy": "Confidentialité",
+        "cookies": "Cookies",
+        "legalNotice": "Mentions légales",
+        "copyright": "© {year} Alexia. Tous droits réservés."
       }
     }
   },
@@ -635,7 +656,7 @@
           "general": "Général",
           "organization": "Organisation",
           "members": "Membres",
-          "security": "Sécurité"
+          "privacy": "Données personnelles"
         },
         "general": {
           "title": "Profil",
@@ -686,9 +707,77 @@
           "title": "Membres",
           "description": "Invitez de nouveaux membres par adresse email."
         },
-        "security": {
-          "title": "Compte",
-          "description": "Vous ne souhaitez plus utiliser notre service ? Vous pouvez supprimer votre compte ici. Cette action est irréversible. Toutes les informations liées à ce compte seront supprimées définitivement."
+        "privacy": {
+          "title": "Données personnelles",
+          "description": "Conformément au RGPD, vous avez le droit d'accéder, de modifier et de supprimer vos données personnelles.",
+          "summary": {
+            "title": "Résumé de vos données",
+            "profile": "Profil",
+            "email": "Email",
+            "name": "Nom",
+            "createdAt": "Inscrit depuis",
+            "organizations": "Organisations",
+            "organizationsCount": "{count} organisation | {count} organisations",
+            "audios": "Fichiers audio",
+            "audiosCount": "{count} fichier | {count} fichiers",
+            "totalDuration": "{duration} min au total",
+            "totalSize": "{size} Mo au total",
+            "transcriptions": "Transcriptions",
+            "transcriptionsCount": "{count} transcription | {count} transcriptions",
+            "documents": "Documents",
+            "documentsCount": "{count} document | {count} documents",
+            "credits": "Crédits",
+            "creditsBalance": "{count} crédit disponible | {count} crédits disponibles",
+            "transactionsCount": "{count} transaction | {count} transactions"
+          },
+          "export": {
+            "title": "Exporter vos données",
+            "description": "Téléchargez une archive contenant toutes vos données personnelles (profil, organisations, audios, transcriptions, documents, historique des crédits).",
+            "button": "Télécharger mes données",
+            "loading": "Préparation de l'export...",
+            "success": "Export téléchargé avec succès",
+            "error": "Erreur lors de l'export"
+          },
+          "deletion": {
+            "title": "Supprimer mon compte",
+            "description": "Demandez la suppression définitive de votre compte et de toutes vos données. Cette action est irréversible.",
+            "warning": "Attention : La suppression de votre compte entraînera la perte définitive de toutes vos données après un délai de 30 jours.",
+            "button": "Demander la suppression",
+            "loading": "Traitement en cours...",
+            "pendingTitle": "Suppression programmée",
+            "pendingDescription": "Votre compte sera supprimé le {date}. Il vous reste {days} jours pour annuler cette demande.",
+            "cancelButton": "Annuler la suppression",
+            "cancelSuccess": "Demande de suppression annulée",
+            "cancelError": "Erreur lors de l'annulation"
+          },
+          "orphanOrgs": {
+            "title": "Organisations à gérer",
+            "description": "Vous êtes le seul propriétaire de ces organisations. Avant de supprimer votre compte, veuillez gérer chacune d'elles.",
+            "soloOrgsTitle": "Organisations qui seront supprimées",
+            "soloOrgsDescription": "Vous êtes le seul membre de ces organisations. Elles seront automatiquement supprimées avec votre compte.",
+            "withMembersTitle": "Organisations avec d'autres membres",
+            "withMembersDescription": "Ces organisations ont d'autres membres. Choisissez de transférer la propriété ou de les supprimer.",
+            "transferOption": "Transférer la propriété",
+            "deleteOption": "Supprimer l'organisation",
+            "deleteAllMembersWarning": "Tous les membres perdront l'accès à cette organisation",
+            "selectNewOwner": "Sélectionner le nouveau propriétaire",
+            "noOtherMembers": "Aucun autre membre disponible",
+            "membersCount": "{count} membre | {count} membres",
+            "confirmButton": "Confirmer et demander la suppression",
+            "cancelButton": "Annuler"
+          },
+          "errors": {
+            "fetchSummary": "Impossible de charger le résumé des données",
+            "fetchOrphans": "Impossible de charger les organisations",
+            "fetchStatus": "Impossible de charger le statut de suppression",
+            "requestDeletion": "Impossible de demander la suppression",
+            "missingDecisions": "Veuillez choisir une action pour chaque organisation"
+          },
+          "restriction": {
+            "title": "Accès restreint - Compte en cours de suppression",
+            "description": "Votre compte est programmé pour être supprimé. L'accès à l'application est temporairement restreint. Vous pouvez annuler la suppression, exporter vos données ou vous déconnecter.",
+            "logout": "Se déconnecter"
+          }
         }
       }
     },
@@ -733,6 +822,14 @@
         "nameTooShort": "Le nom doit contenir au moins 2 caractères",
         "invalidEmail": "Email invalide"
       }
+    },
+    "pendingDeletion": {
+      "title": "Compte en cours de suppression",
+      "description": "Votre compte est programmé pour être supprimé. Pendant cette période, l'accès à l'application est restreint.",
+      "cancelDeletion": "Annuler la suppression",
+      "exportData": "Exporter mes données",
+      "logout": "Se déconnecter",
+      "info": "Vous pouvez annuler la suppression ou exporter vos données avant la date limite."
     }
   },
   "terms": {
@@ -751,6 +848,112 @@
       "limitations": {
         "title": "Limitations de responsabilité",
         "content": "Notre service est fourni \"tel quel\". Nous ne garantissons pas une exactitude parfaite des transcriptions et analyses. L'utilisateur est responsable de la vérification des contenus générés."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour : Janvier 2025",
+    "backToHome": "Retour à l'accueil",
+    "termsLink": "Voir les CGU",
+    "sections": {
+      "dataCollection": {
+        "title": "Données collectées",
+        "content": "Nous collectons les données nécessaires au fonctionnement de notre service de transcription et d'analyse audio :",
+        "items": {
+          "account": "Informations de compte (email, nom, organisation)",
+          "audio": "Fichiers audio téléversés et transcriptions générées",
+          "usage": "Données d'utilisation (historique des crédits, logs de connexion)"
+        }
+      },
+      "dataUsage": {
+        "title": "Utilisation des données",
+        "content": "Vos données sont utilisées exclusivement pour fournir nos services de transcription et d'analyse. Nous ne vendons jamais vos données à des tiers et ne les utilisons pas à des fins publicitaires."
+      },
+      "thirdParties": {
+        "title": "Services tiers",
+        "content": "Nous utilisons des services tiers conformes au RGPD pour le traitement de vos données :",
+        "items": {
+          "mistral": "Mistral AI : Traitement IA pour la transcription et l'analyse. Rétention zéro des données activée - vos audios ne sont pas conservés.",
+          "resend": "Resend : Service d'envoi d'emails transactionnels (serveurs aux États-Unis, couvert par les Clauses Contractuelles Types)."
+        }
+      },
+      "dataRetention": {
+        "title": "Conservation des données",
+        "content": "Vos données sont conservées tant que votre compte est actif. En cas de suppression de compte, toutes vos données personnelles sont définitivement effacées dans un délai de 30 jours."
+      },
+      "rights": {
+        "title": "Vos droits RGPD",
+        "content": "Conformément au Règlement Général sur la Protection des Données, vous disposez des droits suivants :",
+        "items": {
+          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
+          "rectification": "Droit de rectification : corriger vos données inexactes",
+          "deletion": "Droit à l'effacement : demander la suppression de vos données",
+          "portability": "Droit à la portabilité : recevoir vos données dans un format structuré",
+          "opposition": "Droit d'opposition : vous opposer au traitement de vos données"
+        }
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "Pour toute question concernant la protection de vos données ou pour exercer vos droits, vous pouvez nous contacter à : support{'@'}alexia.app"
+      }
+    }
+  },
+  "legal": {
+    "title": "Mentions légales",
+    "lastUpdated": "Dernière mise à jour : Janvier 2025",
+    "backToHome": "Retour à l'accueil",
+    "termsLink": "Voir les CGU",
+    "sections": {
+      "publisher": {
+        "title": "Éditeur du site",
+        "content": "Alexia est un service de transcription et d'analyse audio par intelligence artificielle. Le service est édité par [Nom de l'entreprise], [Forme juridique], au capital de [Montant] euros. Siège social : [Adresse]. RCS : [Numéro RCS]. TVA intracommunautaire : [Numéro TVA]."
+      },
+      "hosting": {
+        "title": "Hébergement",
+        "content": "Le site est hébergé par [Nom de l'hébergeur], [Adresse de l'hébergeur]. Le responsable de la publication est [Nom du responsable]."
+      },
+      "intellectualProperty": {
+        "title": "Propriété intellectuelle",
+        "content": "L'ensemble des contenus présents sur ce site (textes, images, logos, interface) sont protégés par le droit d'auteur et le droit des marques. Toute reproduction, représentation ou diffusion, totale ou partielle, sans autorisation expresse est interdite."
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "Pour toute question ou réclamation, vous pouvez nous contacter à : support{'@'}alexia.app"
+      }
+    }
+  },
+  "cookies": {
+    "title": "Politique des cookies",
+    "lastUpdated": "Dernière mise à jour : Janvier 2025",
+    "backToHome": "Retour à l'accueil",
+    "privacyLink": "Voir la politique de confidentialité",
+    "sections": {
+      "what": {
+        "title": "Qu'est-ce qu'un cookie ?",
+        "content": "Un cookie est un petit fichier texte déposé sur votre appareil lors de la consultation de notre site. Il permet de mémoriser certaines informations pour améliorer votre expérience utilisateur."
+      },
+      "types": {
+        "title": "Types de cookies utilisés",
+        "content": "Nous utilisons uniquement des cookies strictement nécessaires au fonctionnement du service :",
+        "items": {
+          "essential": {
+            "name": "Cookies essentiels",
+            "description": "Nécessaires à l'authentification et à la sécurité de votre session."
+          },
+          "preferences": {
+            "name": "Cookies de préférences",
+            "description": "Permettent de mémoriser vos préférences (langue, thème sombre/clair)."
+          }
+        }
+      },
+      "management": {
+        "title": "Gestion des cookies",
+        "content": "Vous pouvez configurer votre navigateur pour refuser les cookies. Cependant, cela pourrait affecter le fonctionnement de certaines fonctionnalités du service."
+      },
+      "thirdParty": {
+        "title": "Cookies tiers",
+        "content": "Nous n'utilisons pas de cookies de tracking publicitaire ni de cookies de réseaux sociaux. Aucun cookie tiers n'est déposé à des fins de ciblage publicitaire."
       }
     }
   }

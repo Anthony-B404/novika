@@ -1,150 +1,50 @@
 <script setup lang="ts">
-import { en, fr } from '@nuxt/ui/locale';
+const { t } = useI18n();
+const localePath = useLocalePath();
 
-const { t, locale, setLocale } = useI18n();
+const currentYear = new Date().getFullYear();
 
-const locales = [en, fr];
-
-const columns = computed(() => [
+const legalLinks = computed(() => [
   {
-    label: t('footer.resources.title'),
-    children: [
-      {
-        label: t('footer.resources.helpCenter'),
-      },
-      {
-        label: t('footer.resources.docs'),
-      },
-      {
-        label: t('footer.resources.roadmap'),
-      },
-      {
-        label: t('footer.resources.changelog'),
-      },
-    ],
+    label: t("layouts.default.footer.terms"),
+    to: localePath("/terms"),
   },
   {
-    label: t('footer.features.title'),
-    children: [
-      {
-        label: t('footer.features.affiliates'),
-      },
-      {
-        label: t('footer.features.portal'),
-      },
-      {
-        label: t('footer.features.jobs'),
-      },
-      {
-        label: t('footer.features.sponsors'),
-      },
-    ],
+    label: t("layouts.default.footer.privacy"),
+    to: localePath("/privacy-policy"),
   },
   {
-    label: t('footer.company.title'),
-    children: [
-      {
-        label: t('footer.company.about'),
-      },
-      {
-        label: t('footer.company.pricing'),
-      },
-      {
-        label: t('footer.company.careers'),
-      },
-      {
-        label: t('footer.company.blog'),
-      },
-    ],
+    label: t("layouts.default.footer.cookies"),
+    to: localePath("/cookies-policy"),
+  },
+  {
+    label: t("layouts.default.footer.legalNotice"),
+    to: localePath("/legal-notice"),
   },
 ]);
-
-const toast = useToast();
-
-const email = ref("");
-const loading = ref(false);
-
-function onSubmit() {
-  loading.value = true;
-
-  toast.add({
-    title: t('footer.newsletter.subscribed'),
-    description: t('footer.newsletter.subscribedMessage'),
-  });
-}
 </script>
 
 <template>
-  <USeparator icon="i-simple-icons-nuxtdotjs" class="h-px" />
+  <footer class="relative z-10 mt-auto border-t border-gray-200 bg-white/50 py-6 backdrop-blur-sm dark:border-gray-800 dark:bg-slate-900/50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <!-- Copyright -->
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ t("layouts.default.footer.copyright", { year: currentYear }) }}
+        </p>
 
-  <UFooter :ui="{ top: 'border-b border-default' }">
-    <template #top>
-      <UContainer>
-        <UFooterColumns :columns="columns">
-          <template #right>
-            <form @submit.prevent="onSubmit">
-              <UFormField
-                name="email"
-                :label="$t('footer.newsletter.label')"
-                size="lg"
-              >
-                <UInput
-                  v-model="email"
-                  type="email"
-                  class="w-full"
-                  :placeholder="$t('footer.newsletter.placeholder')"
-                >
-                  <template #trailing>
-                    <UButton type="submit" size="xs" :label="$t('footer.newsletter.subscribe')" />
-                  </template>
-                </UInput>
-              </UFormField>
-            </form>
-          </template>
-        </UFooterColumns>
-      </UContainer>
-    </template>
-
-    <template #left>
-      <p class="text-muted text-sm">
-        {{ $t('footer.builtWith') }} • © {{ new Date().getFullYear() }}
-      </p>
-    </template>
-
-    <template #right>
-      <ULocaleSelect
-        :model-value="locale"
-        :locales="locales"
-        @update:model-value="setLocale($event)"
-        size="sm"
-        color="neutral"
-        variant="ghost"
-        class="w-40"
-      />
-      <UButton
-        to="https://go.nuxt.com/discord"
-        target="_blank"
-        icon="i-simple-icons-discord"
-        aria-label="Nuxt on Discord"
-        color="neutral"
-        variant="ghost"
-      />
-      <UButton
-        to="https://go.nuxt.com/x"
-        target="_blank"
-        icon="i-simple-icons-x"
-        aria-label="Nuxt on X"
-        color="neutral"
-        variant="ghost"
-      />
-      <UButton
-        to="https://github.com/nuxt-ui-templates/landing"
-        target="_blank"
-        icon="i-simple-icons-github"
-        aria-label="Nuxt UI on GitHub"
-        color="neutral"
-        variant="ghost"
-      />
-    </template>
-  </UFooter>
+        <!-- Legal Links -->
+        <nav class="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+          <NuxtLink
+            v-for="link in legalLinks"
+            :key="link.to"
+            :to="link.to"
+            class="text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+          >
+            {{ link.label }}
+          </NuxtLink>
+        </nav>
+      </div>
+    </div>
+  </footer>
 </template>

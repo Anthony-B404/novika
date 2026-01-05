@@ -24,6 +24,7 @@ const PromptCategoriesController = () => import('#controllers/prompt_categories_
 const CreditsController = () => import('#controllers/credits_controller')
 const AudioSharesController = () => import('#controllers/audio_shares_controller')
 const SharedAudioController = () => import('#controllers/shared_audio_controller')
+const GdprController = () => import('#controllers/gdpr_controller')
 
 router.get('/', async () => {
   return {
@@ -59,23 +60,40 @@ router.get('/shared/:identifier', [SharedAudioController, 'show'])
 router.get('/shared/:identifier/export', [SharedAudioController, 'export'])
 router.get('/shared/:identifier/audio', [SharedAudioController, 'audio'])
 
-// Protected routes (all authenticated users)
+// Protected routes - Always accessible (even with pending deletion)
 router
   .group(() => {
     // Auth routes
     router.post('/logout', [AuthController, 'logout'])
     router.get('/check-token', [AuthController, 'checkToken'])
 
-    // User routes
+    // User info (needed for UI)
     router.get('/me', [UsersController, 'me'])
+
+    // Organization info (needed for UI initialization)
+    router.get('/organization', [OrganizationsController, 'getOrganizationWithUsers'])
+    router.get('/organizations', [OrganizationsController, 'listUserOrganizations'])
+
+    // GDPR routes - Always accessible for account management
+    router.get('/gdpr/data-summary', [GdprController, 'dataSummary'])
+    router.get('/gdpr/export', [GdprController, 'export'])
+    router.get('/gdpr/orphan-organizations', [GdprController, 'orphanOrganizations'])
+    router.post('/gdpr/request-deletion', [GdprController, 'requestDeletion'])
+    router.post('/gdpr/cancel-deletion', [GdprController, 'cancelDeletion'])
+    router.get('/gdpr/deletion-status', [GdprController, 'deletionStatus'])
+  })
+  .use(middleware.auth({ guards: ['api'] }))
+
+// Protected routes - Restricted when pending deletion
+router
+  .group(() => {
+    // User routes
     router.put('/profile', [UsersController, 'updateProfile'])
 
     // OAuth completion route (onboarding)
     router.post('/oauth/complete-registration', [SocialAuthController, 'completeOAuthRegistration'])
 
-    // Organization routes
-    router.get('/organization', [OrganizationsController, 'getOrganizationWithUsers'])
-    router.get('/organizations', [OrganizationsController, 'listUserOrganizations'])
+    // Organization routes (write operations only - read operations are always accessible)
     router.post('/organizations', [OrganizationsController, 'createOrganization'])
     router.post('/organizations/:id/switch', [OrganizationsController, 'switchOrganization'])
     router.put('/organization/update', [OrganizationsController, 'updateOrganization'])
@@ -137,4 +155,4 @@ router
     // Contact support route
     router.post('/contact', [ContactController, 'send'])
   })
-  .use(middleware.auth({ guards: ['api'] }))
+  .use([middleware.auth({ guards: ['api'] }), middleware.pendingDeletion()])

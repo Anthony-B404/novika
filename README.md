@@ -81,11 +81,15 @@ Alexia est une application web B2B qui transforme des enregistrements audio (ré
 └── backend/              # API AdonisJS v6
     ├── app/
     │   ├── controllers/
+    │   ├── jobs/         # Workers BullMQ (transcription, GDPR)
     │   ├── middleware/
     │   ├── models/
     │   ├── policies/
+    │   ├── services/     # Services métier (GDPR, queue, storage)
     │   └── validators/
+    ├── commands/         # Commandes Ace (gdpr_scheduler)
     ├── config/
+    │   └── queue.ts      # Configuration Redis/BullMQ
     ├── database/
     │   └── migrations/
     ├── resources/
@@ -93,7 +97,8 @@ Alexia est une application web B2B qui transforme des enregistrements audio (ré
     │   └── views/        # Templates Email Edge.js
     └── start/
         ├── routes.ts
-        └── validator.ts
+        ├── validator.ts
+        └── worker.ts     # Initialisation des workers BullMQ
 ```
 
 ---
@@ -104,6 +109,7 @@ Alexia est une application web B2B qui transforme des enregistrements audio (ré
 
 - Node.js >= 18.x
 - PostgreSQL >= 14.x
+- Redis >= 6.x (pour les jobs en arrière-plan)
 - pnpm (recommandé) ou npm
 
 ### Installation
@@ -157,6 +163,11 @@ DB_DATABASE=alexia_db
 
 # Mail (Resend)
 RESEND_API_KEY=re_your_resend_api_key
+
+# Redis (BullMQ)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
 ```
 
 #### Frontend (.env)
@@ -165,6 +176,32 @@ RESEND_API_KEY=re_your_resend_api_key
 # API URL
 API_URL=http://localhost:3333
 ```
+
+### Installer Redis
+
+**macOS (Homebrew):**
+
+```bash
+brew install redis
+brew services start redis
+```
+
+**Ubuntu/Debian:**
+
+```bash
+sudo apt update
+sudo apt install redis-server
+sudo systemctl start redis
+sudo systemctl enable redis
+```
+
+**Docker:**
+
+```bash
+docker run -d --name redis -p 6379:6379 redis:alpine
+```
+
+Vérifier l'installation : `redis-cli ping` → doit répondre `PONG`
 
 ### Initialiser la Base de Données
 
@@ -210,8 +247,9 @@ pnpm test            # Exécuter les tests
 pnpm lint            # ESLint
 pnpm format          # Prettier
 pnpm typecheck       # TypeScript type checking
-node ace migration:run    # Exécuter les migrations
+node ace migration:run       # Exécuter les migrations
 node ace migration:rollback  # Rollback dernière migration
+node ace gdpr:scheduler      # Traiter les suppressions GDPR dues
 ```
 
 ### Frontend
@@ -232,6 +270,69 @@ Alexia utilise une architecture multi-tenant où :
 - Chaque utilisateur peut appartenir à **plusieurs organisations**
 - Les données sont isolées par organisation (`currentOrganizationId`)
 - **Rôles** : Owner (propriétaire), Administrator, Member
+
+---
+
+## Jobs en Arrière-Plan (Redis & BullMQ)
+
+Alexia utilise **BullMQ** avec **Redis** pour gérer les tâches asynchrones :
+
+### Queues disponibles
+
+| Queue | Description | Concurrence |
+|-------|-------------|-------------|
+| `audio-transcription` | Transcription audio via Mistral AI | 2 |
+| `gdpr-deletion` | Suppression de compte GDPR | 1 |
+| `gdpr-reminder` | Rappels avant suppression | 1 |
+
+### Workers
+
+Les workers démarrent **automatiquement** avec le serveur backend (`pnpm dev` ou `pnpm start`).
+
+Pour vérifier que Redis fonctionne :
+
+```bash
+redis-cli ping
+# Doit répondre: PONG
+```
+
+### Scheduler GDPR (CRON)
+
+Le système GDPR nécessite un **cron job** pour :
+- Exécuter les suppressions de compte programmées (après 30 jours)
+- Envoyer les emails de rappel (J-7 et J-1)
+
+#### Configuration du CRON
+
+**Développement** (exécution manuelle) :
+
+```bash
+cd backend
+node ace gdpr:scheduler
+```
+
+**Production** (cron automatique) :
+
+```bash
+# Ajouter à crontab (crontab -e)
+# Exécution quotidienne à 2h du matin
+0 2 * * * cd /path/to/alexia/backend && node ace gdpr:scheduler >> /var/log/alexia-gdpr.log 2>&1
+```
+
+#### Ce que fait le scheduler
+
+1. **Traite les suppressions dues** : demandes avec `scheduled_for <= now`
+2. **Envoie les rappels** : emails à J-7 et J-1 avant suppression
+3. **Ajoute les jobs à BullMQ** : les workers traitent ensuite automatiquement
+
+#### Flow de suppression GDPR
+
+```
+Jour 0  → Demande de suppression + Email de confirmation
+Jour 23 → Email de rappel (J-7)
+Jour 29 → Email de rappel (J-1)
+Jour 30 → Suppression automatique + Email de confirmation finale
+```
 
 ---
 

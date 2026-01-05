@@ -6,7 +6,7 @@ import CategoryTabs from '~/components/prompt/CategoryTabs.vue'
 import CategoryManager from '~/components/prompt/CategoryManager.vue'
 
 definePageMeta({
-  middleware: 'auth',
+  middleware: ['auth', 'pending-deletion'],
 })
 
 const { t } = useI18n()

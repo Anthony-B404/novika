@@ -148,5 +148,35 @@
     "invalid_link": "Lien de partage invalide",
     "no_content": "Aucun contenu à partager",
     "revoked": "Partage révoqué avec succès"
+  },
+  "gdpr": {
+    "account_pending_deletion": "Votre compte est en cours de suppression. L'accès à l'application est restreint. Vous pouvez annuler la suppression ou exporter vos données.",
+    "export": {
+      "started": "Export de données en cours de préparation",
+      "ready": "Votre export de données est prêt",
+      "error": "Erreur lors de la génération de l'export",
+      "download_expired": "Le lien de téléchargement a expiré"
+    },
+    "deletion": {
+      "requested": "Votre demande de suppression a été enregistrée. Votre compte sera supprimé le {scheduledDate}.",
+      "cancelled": "Votre demande de suppression a été annulée",
+      "already_pending": "Une demande de suppression est déjà en cours",
+      "no_pending_request": "Aucune demande de suppression en cours",
+      "invalid_token": "Token d'annulation invalide",
+      "cannot_cancel": "Cette demande ne peut plus être annulée",
+      "orphan_orgs_required": "Veuillez spécifier le traitement des organisations dont vous êtes le seul propriétaire",
+      "invalid_new_owner": "Le nouveau propriétaire spécifié est invalide",
+      "transfer_success": "Propriété de l'organisation transférée avec succès",
+      "completed": "Votre compte a été supprimé avec succès"
+    },
+    "data_summary": {
+      "title": "Résumé de vos données",
+      "profile": "Profil utilisateur",
+      "organizations": "Organisations",
+      "audios": "Fichiers audio",
+      "transcriptions": "Transcriptions",
+      "documents": "Documents",
+      "credits": "Crédits"
+    }
   }
 }

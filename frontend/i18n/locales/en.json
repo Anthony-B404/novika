@@ -134,6 +134,18 @@
       "title": "Terms of Service",
       "description": "View our terms of service"
     },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "Learn how we protect your personal data"
+    },
+    "legal": {
+      "title": "Legal Notice",
+      "description": "Legal information about our service"
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "description": "Information about cookie usage"
+    },
     "login": {
       "title": "Login",
       "description": "Login to your account to continue"
@@ -465,7 +477,16 @@
       "cookies": {
         "title": "We use first-party cookies to enhance your experience on our website.",
         "accept": "Accept",
-        "optOut": "Opt out"
+        "optOut": "Opt out",
+        "learnMore": "Learn more"
+      },
+      "footer": {
+        "legal": "Legal",
+        "terms": "Terms",
+        "privacy": "Privacy",
+        "cookies": "Cookies",
+        "legalNotice": "Legal Notice",
+        "copyright": "© {year} Alexia. All rights reserved."
       }
     }
   },
@@ -633,7 +654,7 @@
           "general": "General",
           "organization": "Organization",
           "members": "Members",
-          "security": "Security"
+          "privacy": "Personal Data"
         },
         "general": {
           "title": "Profile",
@@ -684,9 +705,77 @@
           "title": "Members",
           "description": "Invite new members by email address."
         },
-        "security": {
-          "title": "Account",
-          "description": "No longer want to use our service? You can delete your account here. This action is not reversible. All information related to this account will be deleted permanently."
+        "privacy": {
+          "title": "Personal Data",
+          "description": "In accordance with GDPR, you have the right to access, modify and delete your personal data.",
+          "summary": {
+            "title": "Your Data Summary",
+            "profile": "Profile",
+            "email": "Email",
+            "name": "Name",
+            "createdAt": "Member since",
+            "organizations": "Organizations",
+            "organizationsCount": "{count} organization | {count} organizations",
+            "audios": "Audio Files",
+            "audiosCount": "{count} file | {count} files",
+            "totalDuration": "{duration} min total",
+            "totalSize": "{size} MB total",
+            "transcriptions": "Transcriptions",
+            "transcriptionsCount": "{count} transcription | {count} transcriptions",
+            "documents": "Documents",
+            "documentsCount": "{count} document | {count} documents",
+            "credits": "Credits",
+            "creditsBalance": "{count} credit available | {count} credits available",
+            "transactionsCount": "{count} transaction | {count} transactions"
+          },
+          "export": {
+            "title": "Export Your Data",
+            "description": "Download an archive containing all your personal data (profile, organizations, audio files, transcriptions, documents, credit history).",
+            "button": "Download My Data",
+            "loading": "Preparing export...",
+            "success": "Export downloaded successfully",
+            "error": "Export failed"
+          },
+          "deletion": {
+            "title": "Delete My Account",
+            "description": "Request the permanent deletion of your account and all your data. This action is irreversible.",
+            "warning": "Warning: Deleting your account will result in the permanent loss of all your data after a 30-day period.",
+            "button": "Request Deletion",
+            "loading": "Processing...",
+            "pendingTitle": "Deletion Scheduled",
+            "pendingDescription": "Your account will be deleted on {date}. You have {days} days left to cancel this request.",
+            "cancelButton": "Cancel Deletion",
+            "cancelSuccess": "Deletion request cancelled",
+            "cancelError": "Failed to cancel deletion"
+          },
+          "orphanOrgs": {
+            "title": "Organizations to Manage",
+            "description": "You are the sole owner of these organizations. Before deleting your account, please manage each one.",
+            "soloOrgsTitle": "Organizations that will be deleted",
+            "soloOrgsDescription": "You are the only member of these organizations. They will be automatically deleted with your account.",
+            "withMembersTitle": "Organizations with other members",
+            "withMembersDescription": "These organizations have other members. Choose to transfer ownership or delete them.",
+            "transferOption": "Transfer ownership",
+            "deleteOption": "Delete organization",
+            "deleteAllMembersWarning": "All members will lose access to this organization",
+            "selectNewOwner": "Select new owner",
+            "noOtherMembers": "No other members available",
+            "membersCount": "{count} member | {count} members",
+            "confirmButton": "Confirm and Request Deletion",
+            "cancelButton": "Cancel"
+          },
+          "errors": {
+            "fetchSummary": "Unable to load data summary",
+            "fetchOrphans": "Unable to load organizations",
+            "fetchStatus": "Unable to load deletion status",
+            "requestDeletion": "Unable to request deletion",
+            "missingDecisions": "Please choose an action for each organization"
+          },
+          "restriction": {
+            "title": "Restricted Access - Account Pending Deletion",
+            "description": "Your account is scheduled for deletion. Access to the application is temporarily restricted. You can cancel the deletion, export your data, or log out.",
+            "logout": "Log out"
+          }
         }
       }
     },
@@ -731,6 +820,14 @@
         "nameTooShort": "Name must be at least 2 characters",
         "invalidEmail": "Invalid email"
       }
+    },
+    "pendingDeletion": {
+      "title": "Account Pending Deletion",
+      "description": "Your account is scheduled for deletion. During this period, access to the application is restricted.",
+      "cancelDeletion": "Cancel Deletion",
+      "exportData": "Export My Data",
+      "logout": "Log Out",
+      "info": "You can cancel the deletion or export your data before the deadline."
     }
   },
   "terms": {
@@ -749,6 +846,112 @@
       "limitations": {
         "title": "Limitation of Liability",
         "content": "Our service is provided \"as is\". We do not guarantee perfect accuracy of transcriptions and analyses. The user is responsible for verifying the generated content."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: January 2025",
+    "backToHome": "Back to home",
+    "termsLink": "View Terms of Service",
+    "sections": {
+      "dataCollection": {
+        "title": "Data Collected",
+        "content": "We collect data necessary for our audio transcription and analysis service to function:",
+        "items": {
+          "account": "Account information (email, name, organization)",
+          "audio": "Uploaded audio files and generated transcriptions",
+          "usage": "Usage data (credit history, login logs)"
+        }
+      },
+      "dataUsage": {
+        "title": "Data Usage",
+        "content": "Your data is used exclusively to provide our transcription and analysis services. We never sell your data to third parties and do not use it for advertising purposes."
+      },
+      "thirdParties": {
+        "title": "Third-Party Services",
+        "content": "We use GDPR-compliant third-party services to process your data:",
+        "items": {
+          "mistral": "Mistral AI: AI processing for transcription and analysis. Zero data retention enabled - your audio files are not stored.",
+          "resend": "Resend: Transactional email service (servers in the United States, covered by Standard Contractual Clauses)."
+        }
+      },
+      "dataRetention": {
+        "title": "Data Retention",
+        "content": "Your data is retained as long as your account is active. Upon account deletion, all your personal data is permanently erased within 30 days."
+      },
+      "rights": {
+        "title": "Your GDPR Rights",
+        "content": "Under the General Data Protection Regulation, you have the following rights:",
+        "items": {
+          "access": "Right of access: obtain a copy of your personal data",
+          "rectification": "Right to rectification: correct inaccurate data",
+          "deletion": "Right to erasure: request deletion of your data",
+          "portability": "Right to data portability: receive your data in a structured format",
+          "opposition": "Right to object: object to the processing of your data"
+        }
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "For any questions regarding the protection of your data or to exercise your rights, you can contact us at: support{'@'}alexia.app"
+      }
+    }
+  },
+  "legal": {
+    "title": "Legal Notice",
+    "lastUpdated": "Last updated: January 2025",
+    "backToHome": "Back to home",
+    "termsLink": "View Terms of Service",
+    "sections": {
+      "publisher": {
+        "title": "Website Publisher",
+        "content": "Alexia is an audio transcription and analysis service powered by artificial intelligence. The service is published by [Company Name], [Legal Form], with a capital of [Amount] euros. Registered office: [Address]. Company registration: [Registration Number]. VAT number: [VAT Number]."
+      },
+      "hosting": {
+        "title": "Hosting",
+        "content": "The website is hosted by [Hosting Provider Name], [Hosting Provider Address]. The publication director is [Director Name]."
+      },
+      "intellectualProperty": {
+        "title": "Intellectual Property",
+        "content": "All content on this website (texts, images, logos, interface) is protected by copyright and trademark law. Any reproduction, representation, or distribution, in whole or in part, without express authorization is prohibited."
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "For any questions or complaints, you can contact us at: support{'@'}alexia.app"
+      }
+    }
+  },
+  "cookies": {
+    "title": "Cookie Policy",
+    "lastUpdated": "Last updated: January 2025",
+    "backToHome": "Back to home",
+    "privacyLink": "View Privacy Policy",
+    "sections": {
+      "what": {
+        "title": "What is a Cookie?",
+        "content": "A cookie is a small text file stored on your device when you visit our website. It allows us to remember certain information to improve your user experience."
+      },
+      "types": {
+        "title": "Types of Cookies Used",
+        "content": "We only use cookies strictly necessary for the service to function:",
+        "items": {
+          "essential": {
+            "name": "Essential Cookies",
+            "description": "Required for authentication and session security."
+          },
+          "preferences": {
+            "name": "Preference Cookies",
+            "description": "Allow us to remember your preferences (language, dark/light theme)."
+          }
+        }
+      },
+      "management": {
+        "title": "Cookie Management",
+        "content": "You can configure your browser to refuse cookies. However, this may affect the functionality of some service features."
+      },
+      "thirdParty": {
+        "title": "Third-Party Cookies",
+        "content": "We do not use advertising tracking cookies or social network cookies. No third-party cookies are placed for advertising targeting purposes."
       }
     }
   }

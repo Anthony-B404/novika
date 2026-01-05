@@ -9,23 +9,45 @@
 */
 
 import { createTranscriptionWorker } from '#jobs/transcription_job'
+import { createDeletionWorker } from '#jobs/deletion_job'
+import { createReminderWorker } from '#jobs/deletion_reminder_job'
 
-let worker: ReturnType<typeof createTranscriptionWorker> | null = null
+let transcriptionWorker: ReturnType<typeof createTranscriptionWorker> | null = null
+let deletionWorker: ReturnType<typeof createDeletionWorker> | null = null
+let reminderWorker: ReturnType<typeof createReminderWorker> | null = null
 
 /**
- * Start the transcription worker.
+ * Start all workers.
  */
-function startWorker() {
-  if (worker) {
-    console.log('[Worker] Already running, skipping initialization')
-    return
+function startWorkers() {
+  // Transcription worker
+  if (!transcriptionWorker) {
+    try {
+      transcriptionWorker = createTranscriptionWorker()
+      console.log('[Worker] Transcription worker started successfully')
+    } catch (error) {
+      console.error('[Worker] Failed to start transcription worker:', error)
+    }
   }
 
-  try {
-    worker = createTranscriptionWorker()
-    console.log('[Worker] Transcription worker started successfully')
-  } catch (error) {
-    console.error('[Worker] Failed to start transcription worker:', error)
+  // GDPR Deletion worker
+  if (!deletionWorker) {
+    try {
+      deletionWorker = createDeletionWorker()
+      console.log('[Worker] GDPR deletion worker started successfully')
+    } catch (error) {
+      console.error('[Worker] Failed to start deletion worker:', error)
+    }
+  }
+
+  // GDPR Reminder worker
+  if (!reminderWorker) {
+    try {
+      reminderWorker = createReminderWorker()
+      console.log('[Worker] GDPR reminder worker started successfully')
+    } catch (error) {
+      console.error('[Worker] Failed to start reminder worker:', error)
+    }
   }
 }
 
@@ -33,12 +55,27 @@ function startWorker() {
  * Handle graceful shutdown.
  */
 async function shutdown() {
-  if (worker) {
-    console.log('[Worker] Shutting down...')
-    await worker.close()
-    worker = null
-    console.log('[Worker] Shutdown complete')
+  console.log('[Worker] Shutting down all workers...')
+
+  const shutdownPromises = []
+
+  if (transcriptionWorker) {
+    shutdownPromises.push(transcriptionWorker.close())
+    transcriptionWorker = null
   }
+
+  if (deletionWorker) {
+    shutdownPromises.push(deletionWorker.close())
+    deletionWorker = null
+  }
+
+  if (reminderWorker) {
+    shutdownPromises.push(reminderWorker.close())
+    reminderWorker = null
+  }
+
+  await Promise.all(shutdownPromises)
+  console.log('[Worker] All workers shutdown complete')
 }
 
 // Register shutdown handlers
@@ -52,5 +89,5 @@ process.on('SIGINT', async () => {
   process.exit(0)
 })
 
-// Start the worker
-startWorker()
+// Start all workers
+startWorkers()

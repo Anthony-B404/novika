@@ -97,7 +97,7 @@ const settingsItems = computed(() => {
 
 onMounted(async () => {
   const cookie = useCookie("cookie-consent");
-  if (cookie.value === "accepted") {
+  if (cookie.value === "accepted" || cookie.value === "declined") {
     return;
   }
 
@@ -118,6 +118,15 @@ onMounted(async () => {
         label: t("layouts.default.cookies.optOut"),
         color: "neutral",
         variant: "ghost",
+        onClick: () => {
+          cookie.value = "declined";
+        },
+      },
+      {
+        label: t("layouts.default.cookies.learnMore"),
+        color: "neutral",
+        variant: "link",
+        to: localePath("/cookies-policy"),
       },
     ],
   });
@@ -125,7 +134,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="relative min-h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
+  <div class="relative flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 overflow-hidden">
     <!-- Background Blobs -->
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
       <!-- Top Left Blob -->
@@ -178,9 +187,12 @@ onMounted(async () => {
     </header>
 
     <!-- Main Content -->
-    <main class="relative z-10 max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <main class="relative z-10 max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 flex-1">
       <slot />
     </main>
+
+    <!-- Footer -->
+    <AppFooter />
 
     <!-- Global Components -->
     <ContactSupportModal v-model:open="contactModalOpen" />

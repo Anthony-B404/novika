@@ -2,7 +2,7 @@
 import type { Audio, AudioStatus } from '~/types/audio'
 
 definePageMeta({
-  middleware: 'auth',
+  middleware: ['auth', 'pending-deletion'],
 })
 
 const { t } = useI18n()

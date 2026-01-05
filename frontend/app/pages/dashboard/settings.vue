@@ -2,7 +2,7 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 definePageMeta({
-  middleware: "auth",
+  middleware: ["auth", "pending-deletion"],
 });
 
 const { t } = useI18n();
@@ -35,11 +35,11 @@ const links = computed(() => {
     to: localePath("/dashboard/settings/members"),
   });
 
-  // Security - All roles
+  // Privacy - All roles (GDPR)
   mainLinks.push({
-    label: t("pages.dashboard.settings.navigation.security"),
-    icon: "i-lucide-shield",
-    to: localePath("/dashboard/settings/security"),
+    label: t("pages.dashboard.settings.navigation.privacy"),
+    icon: "i-lucide-shield-check",
+    to: localePath("/dashboard/settings/privacy"),
   });
 
   return [mainLinks] satisfies NavigationMenuItem[][];

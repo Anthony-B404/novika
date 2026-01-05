@@ -59,9 +59,9 @@ const items = computed<DropdownMenuItem[][]>(() => [
             ]
           : []),
         {
-          label: t("pages.dashboard.settings.navigation.security"),
-          icon: "i-lucide-shield",
-          to: localePath("/dashboard/settings/security"),
+          label: t("pages.dashboard.settings.navigation.privacy"),
+          icon: "i-lucide-shield-check",
+          to: localePath("/dashboard/settings/privacy"),
         },
       ],
     },

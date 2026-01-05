@@ -3,7 +3,7 @@ import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
 definePageMeta({
-  middleware: "auth",
+  middleware: ["auth", "pending-deletion"],
 });
 
 const { t } = useI18n();
