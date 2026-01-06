@@ -24,6 +24,7 @@ const categoryManagerOpen = ref(false)
 const deleteModalOpen = ref(false)
 const editingPrompt = ref<Prompt | null>(null)
 const promptToDelete = ref<Prompt | null>(null)
+const initialLoadDone = ref(false)
 
 // Debounced search
 const debouncedSearch = refDebounced(searchQuery, 300)
@@ -34,6 +35,7 @@ onMounted(async () => {
     promptsStore.fetchCategories(),
     promptsStore.fetchPrompts(),
   ])
+  initialLoadDone.value = true
 })
 
 // Refetch when search changes
@@ -164,9 +166,9 @@ async function handleDeleteCategory(id: number) {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
+  <div class="w-full min-w-0 space-y-6">
+    <!-- Header - toujours visible -->
+    <div class="w-full flex items-center justify-between">
       <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
           {{ t('pages.dashboard.prompts.title') }}
@@ -194,8 +196,8 @@ async function handleDeleteCategory(id: number) {
       </div>
     </div>
 
-    <!-- Filters bar -->
-    <UCard class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+    <!-- Filters bar - toujours visible -->
+    <UCard class="w-full bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
       <div class="flex flex-wrap items-center gap-4">
         <!-- Search input -->
         <div class="flex-1 min-w-[200px]">
@@ -222,7 +224,19 @@ async function handleDeleteCategory(id: number) {
 
       <!-- Category tabs -->
       <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <!-- Skeleton pendant le chargement -->
+        <div v-if="!initialLoadDone" class="flex flex-wrap items-center gap-2">
+          <USkeleton class="h-8 w-14 rounded-md" />
+          <USkeleton class="h-8 w-20 rounded-md" />
+          <div class="h-6 w-px bg-gray-200 dark:bg-gray-700" />
+          <USkeleton class="h-8 w-20 rounded-md" />
+          <USkeleton class="h-8 w-24 rounded-md" />
+          <USkeleton class="h-8 w-22 rounded-md" />
+          <USkeleton class="h-8 w-20 rounded-md" />
+        </div>
+        <!-- Vrais tabs après chargement -->
         <CategoryTabs
+          v-else
           :categories="promptsStore.categories"
           :selected-category-id="selectedCategoryId"
           :show-favorites="showFavorites"
@@ -232,51 +246,56 @@ async function handleDeleteCategory(id: number) {
       </div>
     </UCard>
 
-    <!-- Loading state -->
-    <div v-if="promptsStore.loading" class="py-12 text-center">
-      <UIcon name="i-lucide-loader-2" class="mx-auto h-8 w-8 animate-spin text-primary-500" />
-      <p class="mt-2 text-gray-500 dark:text-gray-400">{{ t('common.loading') }}</p>
-    </div>
+    <!-- Grid area - skeleton ou contenu avec transition -->
+    <div class="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <!-- Skeleton cards pendant le chargement initial -->
+      <template v-if="!initialLoadDone">
+        <PromptCardSkeleton v-for="i in 12" :key="`skeleton-${i}`" />
+      </template>
 
-    <!-- Prompts grid -->
-    <div
-      v-else-if="filteredPrompts.length > 0"
-      class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    >
-      <PromptCard
-        v-for="prompt in filteredPrompts"
-        :key="prompt.id"
-        :prompt="prompt"
-        show-category
-        @edit="handleEditPrompt"
-        @delete="handleDeletePrompt"
-        @toggle-favorite="handleToggleFavorite"
-      />
-    </div>
-
-    <!-- Empty state -->
-    <div
-      v-else
-      class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm"
-    >
-      <div class="py-12 text-center">
-        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-          <UIcon name="i-lucide-file-text" class="h-8 w-8 text-gray-400 dark:text-gray-500" />
-        </div>
-        <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-          {{ t('pages.dashboard.prompts.noPrompts') }}
-        </h3>
-        <p class="mb-4 text-gray-500 dark:text-gray-400">
-          {{ t('pages.dashboard.prompts.noPromptsDescription') }}
-        </p>
-        <UButton
-          icon="i-lucide-plus"
-          color="primary"
-          @click="handleAddPrompt"
+      <!-- Contenu réel avec fade-in -->
+      <template v-else>
+        <TransitionGroup
+          enter-active-class="transition-opacity duration-300 ease-out"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
         >
-          {{ t('pages.dashboard.prompts.addPrompt') }}
-        </UButton>
-      </div>
+          <PromptCard
+            v-for="prompt in filteredPrompts"
+            :key="prompt.id"
+            :prompt="prompt"
+            show-category
+            @edit="handleEditPrompt"
+            @delete="handleDeletePrompt"
+            @toggle-favorite="handleToggleFavorite"
+          />
+        </TransitionGroup>
+
+        <!-- Empty state inline -->
+        <div
+          v-if="filteredPrompts.length === 0"
+          class="col-span-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm"
+        >
+          <div class="py-12 text-center">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+              <UIcon name="i-lucide-file-text" class="h-8 w-8 text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
+              {{ t('pages.dashboard.prompts.noPrompts') }}
+            </h3>
+            <p class="mb-4 text-gray-500 dark:text-gray-400">
+              {{ t('pages.dashboard.prompts.noPromptsDescription') }}
+            </p>
+            <UButton
+              icon="i-lucide-plus"
+              color="primary"
+              @click="handleAddPrompt"
+            >
+              {{ t('pages.dashboard.prompts.addPrompt') }}
+            </UButton>
+          </div>
+        </div>
+      </template>
     </div>
 
     <!-- Prompt form modal -->

@@ -187,7 +187,7 @@ onMounted(async () => {
     </header>
 
     <!-- Main Content -->
-    <main class="relative z-10 max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 flex-1">
+    <main class="relative z-10 w-full max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 flex-1">
       <slot />
     </main>
 

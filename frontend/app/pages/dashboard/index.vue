@@ -69,6 +69,7 @@ const prompt = ref("");
 const activeTab = ref<"upload" | "record">("upload");
 const deleteModalOpen = ref(false);
 const audioToDelete = ref<Audio | null>(null);
+const initialLoadDone = ref(false);
 
 // Computed: Only show 5 most recent audios on dashboard
 const recentAudios = computed(() => audioStore.audios.slice(0, 5));
@@ -77,6 +78,7 @@ const hasMoreAudios = computed(() => audioStore.pagination.total > 5);
 // Load audios on mount
 onMounted(async () => {
   await audioStore.fetchAudios();
+  initialLoadDone.value = true;
 
   // Resume polling for ALL processing audios with currentJobId (after page refresh)
   const processingAudios = audioStore.audios.filter(
@@ -178,18 +180,17 @@ const tabItems = computed(() => [
 </script>
 
 <template>
-  <div>
-  <div class="space-y-6">
-    <!-- Header Section -->
-    <div class="flex items-center justify-between mb-8">
+  <div class="w-full space-y-6">
+    <!-- Header Section - toujours visible -->
+    <div class="w-full flex items-center justify-between mb-8">
       <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ t('pages.dashboard.workshop.title') }}</h1>
         <p class="mt-2 text-gray-500 dark:text-gray-400">{{ t('pages.dashboard.workshop.subtitle') }}</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      <!-- Left: Upload/Record section -->
+    <div class="w-full grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <!-- Left: Upload/Record section - toujours visible -->
       <div class="space-y-6">
         <UCard
           class="transition-all duration-300 hover:-translate-y-1 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-2 hover:ring-primary-500/50 dark:hover:ring-primary-400/50 shadow-lg hover:shadow-xl dark:shadow-none"
@@ -278,38 +279,43 @@ const tabItems = computed(() => [
         </UCard>
       </div>
 
-      <!-- Right: Audio list (progress shown per card) -->
+      <!-- Right: Audio list - skeleton interne géré par AudioList -->
       <div class="space-y-4">
         <WorkshopAudioList
           :audios="recentAudios"
-          :loading="audioStore.loading"
+          :loading="!initialLoadDone || audioStore.loading"
           @select="handleSelectAudio"
           @delete="handleDeleteRequest"
         />
 
-        <!-- View all audios link -->
-        <div v-if="hasMoreAudios" class="text-center pt-2">
-          <UButton
-            :to="localePath('/dashboard/library')"
-            color="neutral"
-            variant="ghost"
-            icon="i-lucide-library"
-          >
-            {{ t('pages.dashboard.workshop.viewAllAudios') }}
-            <UBadge color="primary" variant="subtle" size="xs" class="ml-2">
-              {{ audioStore.pagination.total }}
-            </UBadge>
-          </UButton>
-        </div>
+        <!-- View all audios link - visible seulement après chargement -->
+        <Transition
+          enter-active-class="transition-opacity duration-300"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+        >
+          <div v-if="initialLoadDone && hasMoreAudios" class="text-center pt-2">
+            <UButton
+              :to="localePath('/dashboard/library')"
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-library"
+            >
+              {{ t('pages.dashboard.workshop.viewAllAudios') }}
+              <UBadge color="primary" variant="subtle" size="xs" class="ml-2">
+                {{ audioStore.pagination.total }}
+              </UBadge>
+            </UButton>
+          </div>
+        </Transition>
       </div>
     </div>
-  </div>
 
-  <!-- Delete modal -->
-  <WorkshopAudioDeleteModal
-    v-model:open="deleteModalOpen"
-    :audio="audioToDelete"
-    @confirm="handleDeleteConfirm"
-  />
+    <!-- Delete modal -->
+    <WorkshopAudioDeleteModal
+      v-model:open="deleteModalOpen"
+      :audio="audioToDelete"
+      @confirm="handleDeleteConfirm"
+    />
   </div>
 </template>

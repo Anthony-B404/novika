@@ -67,8 +67,8 @@ function getProgressForAudio(audio: Audio): number | undefined {
     </template>
 
     <!-- Loading state -->
-    <div v-if="loading && audios.length === 0" class="space-y-3">
-      <USkeleton v-for="i in 3" :key="i" class="h-20 rounded-lg" />
+    <div v-if="loading && audios.length === 0" class="space-y-2">
+      <WorkshopAudioCardSkeleton v-for="i in 5" :key="i" />
     </div>
 
     <!-- Empty state -->
