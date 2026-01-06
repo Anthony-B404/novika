@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Alexia is a B2B SaaS application that transforms audio recordings (meetings, dictations, calls) into structured written documents using AI. Built with Nuxt 4 frontend and AdonisJS v6 backend with multi-tenant architecture.
+DH-Echo is a B2B SaaS application that transforms audio recordings (meetings, dictations, calls) into structured written documents using AI. Built with Nuxt 4 frontend and AdonisJS v6 backend with multi-tenant architecture.
 
 ### Core Features (MVP)
 - **Audio Workshop**: Upload (MP3, WAV) or record via microphone
@@ -235,7 +235,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=
-DB_DATABASE=alexia_db
+DB_DATABASE=dh_echo_db
 
 # Email (Resend)
 RESEND_API_KEY=            # From resend.com for emails

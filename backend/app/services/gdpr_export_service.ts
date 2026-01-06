@@ -273,7 +273,7 @@ NOTES:
 - All dates are in ISO 8601 format.
 - This export was generated in compliance with GDPR Article 20.
 
-For questions about your data, please contact: support@alexia.app
+For questions about your data, please contact: support@dh-echo.app
 `
   }
 

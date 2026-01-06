@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "Alexia",
+  "name": "DH-Echo",
   "type": "collection",
   "ignore": ["node_modules", ".git"]
 }

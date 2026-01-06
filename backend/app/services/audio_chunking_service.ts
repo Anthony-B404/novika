@@ -53,7 +53,7 @@ export const CHUNKING_CONFIG = {
   /** Minimum duration that triggers chunking (2 minutes) */
   MIN_DURATION_FOR_CHUNKING: 2 * 60,
   /** Prefix for temporary chunk files */
-  TEMP_CHUNK_PREFIX: 'alexia_chunk_',
+  TEMP_CHUNK_PREFIX: 'dh-echo_chunk_',
   /** Supported audio formats */
   SUPPORTED_FORMATS: ['mp3', 'wav', 'm4a', 'ogg', 'flac'],
 }

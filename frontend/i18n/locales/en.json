@@ -486,7 +486,7 @@
         "privacy": "Privacy",
         "cookies": "Cookies",
         "legalNotice": "Legal Notice",
-        "copyright": "© {year} Alexia. All rights reserved."
+        "copyright": "© {year} DH-Echo. All rights reserved."
       }
     }
   },
@@ -786,7 +786,7 @@
       "notFound": "Share link not found",
       "notFoundDescription": "This share link does not exist or has been revoked.",
       "sharedBy": "Shared by {name}",
-      "sharedVia": "Shared via Alexia",
+      "sharedVia": "Shared via DH-Echo",
       "downloadPdf": "Download PDF",
       "transcriptionCopied": "Transcription copied to clipboard",
       "analysisCopied": "Analysis copied to clipboard",
@@ -893,7 +893,7 @@
       },
       "contact": {
         "title": "Contact",
-        "content": "For any questions regarding the protection of your data or to exercise your rights, you can contact us at: support{'@'}alexia.app"
+        "content": "For any questions regarding the protection of your data or to exercise your rights, you can contact us at: support{'@'}dh-echo.app"
       }
     }
   },
@@ -905,7 +905,7 @@
     "sections": {
       "publisher": {
         "title": "Website Publisher",
-        "content": "Alexia is an audio transcription and analysis service powered by artificial intelligence. The service is published by [Company Name], [Legal Form], with a capital of [Amount] euros. Registered office: [Address]. Company registration: [Registration Number]. VAT number: [VAT Number]."
+        "content": "DH-Echo is an audio transcription and analysis service powered by artificial intelligence. The service is published by [Company Name], [Legal Form], with a capital of [Amount] euros. Registered office: [Address]. Company registration: [Registration Number]. VAT number: [VAT Number]."
       },
       "hosting": {
         "title": "Hosting",
@@ -917,7 +917,7 @@
       },
       "contact": {
         "title": "Contact",
-        "content": "For any questions or complaints, you can contact us at: support{'@'}alexia.app"
+        "content": "For any questions or complaints, you can contact us at: support{'@'}dh-echo.app"
       }
     }
   },

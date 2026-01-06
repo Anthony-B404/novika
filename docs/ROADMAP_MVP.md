@@ -1,4 +1,4 @@
-# Roadmap MVP Alexia - Audio vers Documents Structurés
+# Roadmap MVP DH-Echo - Audio vers Documents Structurés
 
 > **Dernière mise à jour**: 21 Décembre 2025
 > **Durée estimée**: 6-8 semaines
@@ -150,13 +150,13 @@ backend/app/models/document.ts      # DocumentStatus, DocumentFormat enums
 
 **Tests Bruno créés**:
 ```
-✅ backend/tests/api/alexia/audio/ListAudios.bru
-✅ backend/tests/api/alexia/audio/ListAudiosWithFilter.bru
-✅ backend/tests/api/alexia/audio/GetAudio.bru
-✅ backend/tests/api/alexia/audio/GetAudio-NotFound.bru
-✅ backend/tests/api/alexia/audio/DeleteAudio.bru
-✅ backend/tests/api/alexia/audio/DeleteAudio-NotFound.bru
-✅ backend/tests/api/alexia/audio/ProcessAudio.bru  # Mis à jour: capture audioId
+✅ backend/tests/api/dh-echo/audio/ListAudios.bru
+✅ backend/tests/api/dh-echo/audio/ListAudiosWithFilter.bru
+✅ backend/tests/api/dh-echo/audio/GetAudio.bru
+✅ backend/tests/api/dh-echo/audio/GetAudio-NotFound.bru
+✅ backend/tests/api/dh-echo/audio/DeleteAudio.bru
+✅ backend/tests/api/dh-echo/audio/DeleteAudio-NotFound.bru
+✅ backend/tests/api/dh-echo/audio/ProcessAudio.bru  # Mis à jour: capture audioId
 ```
 
 **Flow complet implémenté**:
@@ -614,12 +614,12 @@ backend/resources/lang/fr/messages.json      ✅ (messages audio)
 backend/resources/lang/en/messages.json      ✅ (messages audio EN)
 
 # Phase 2.1 - Tests Bruno
-backend/tests/api/alexia/audio/ListAudios.bru           ✅
-backend/tests/api/alexia/audio/ListAudiosWithFilter.bru ✅
-backend/tests/api/alexia/audio/GetAudio.bru             ✅
-backend/tests/api/alexia/audio/GetAudio-NotFound.bru    ✅
-backend/tests/api/alexia/audio/DeleteAudio.bru          ✅
-backend/tests/api/alexia/audio/DeleteAudio-NotFound.bru ✅
+backend/tests/api/dh-echo/audio/ListAudios.bru           ✅
+backend/tests/api/dh-echo/audio/ListAudiosWithFilter.bru ✅
+backend/tests/api/dh-echo/audio/GetAudio.bru             ✅
+backend/tests/api/dh-echo/audio/GetAudio-NotFound.bru    ✅
+backend/tests/api/dh-echo/audio/DeleteAudio.bru          ✅
+backend/tests/api/dh-echo/audio/DeleteAudio-NotFound.bru ✅
 
 # Phase 2.2 - Amélioration analyse
 backend/database/migrations/1766270576042_add_analysis_to_transcriptions_table.ts ✅

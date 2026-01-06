@@ -488,7 +488,7 @@
         "privacy": "Confidentialité",
         "cookies": "Cookies",
         "legalNotice": "Mentions légales",
-        "copyright": "© {year} Alexia. Tous droits réservés."
+        "copyright": "© {year} DH-Echo. Tous droits réservés."
       }
     }
   },
@@ -788,7 +788,7 @@
       "notFound": "Lien de partage introuvable",
       "notFoundDescription": "Ce lien de partage n'existe pas ou a été révoqué.",
       "sharedBy": "Partagé par {name}",
-      "sharedVia": "Partagé via Alexia",
+      "sharedVia": "Partagé via DH-Echo",
       "downloadPdf": "Télécharger le PDF",
       "transcriptionCopied": "Transcription copiée dans le presse-papiers",
       "analysisCopied": "Analyse copiée dans le presse-papiers",
@@ -895,7 +895,7 @@
       },
       "contact": {
         "title": "Contact",
-        "content": "Pour toute question concernant la protection de vos données ou pour exercer vos droits, vous pouvez nous contacter à : support{'@'}alexia.app"
+        "content": "Pour toute question concernant la protection de vos données ou pour exercer vos droits, vous pouvez nous contacter à : support{'@'}dh-echo.app"
       }
     }
   },
@@ -907,7 +907,7 @@
     "sections": {
       "publisher": {
         "title": "Éditeur du site",
-        "content": "Alexia est un service de transcription et d'analyse audio par intelligence artificielle. Le service est édité par [Nom de l'entreprise], [Forme juridique], au capital de [Montant] euros. Siège social : [Adresse]. RCS : [Numéro RCS]. TVA intracommunautaire : [Numéro TVA]."
+        "content": "DH-Echo est un service de transcription et d'analyse audio par intelligence artificielle. Le service est édité par [Nom de l'entreprise], [Forme juridique], au capital de [Montant] euros. Siège social : [Adresse]. RCS : [Numéro RCS]. TVA intracommunautaire : [Numéro TVA]."
       },
       "hosting": {
         "title": "Hébergement",
@@ -919,7 +919,7 @@
       },
       "contact": {
         "title": "Contact",
-        "content": "Pour toute question ou réclamation, vous pouvez nous contacter à : support{'@'}alexia.app"
+        "content": "Pour toute question ou réclamation, vous pouvez nous contacter à : support{'@'}dh-echo.app"
       }
     }
   },

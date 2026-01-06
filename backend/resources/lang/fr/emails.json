@@ -110,7 +110,7 @@
     "data_credits": "Votre historique de crédits",
     "cancel_intro": "Vous avez changé d'avis ? Vous pouvez annuler cette demande à tout moment avant le {scheduledDate}.",
     "button": "Annuler la suppression",
-    "closing": "Cordialement,\nL'équipe Alexia",
+    "closing": "Cordialement,\nL'équipe DH-Echo",
     "footer": "Si vous n'êtes pas à l'origine de cette demande, veuillez annuler immédiatement et contacter notre support."
   },
   "gdpr_deletion_reminder": {
@@ -122,7 +122,7 @@
     "reminder_text": "Après cette date, toutes vos données seront définitivement effacées et ne pourront pas être récupérées.",
     "cancel_intro": "Si vous souhaitez conserver votre compte, vous pouvez annuler cette demande en cliquant sur le bouton ci-dessous.",
     "button": "Annuler la suppression",
-    "closing": "Cordialement,\nL'équipe Alexia",
+    "closing": "Cordialement,\nL'équipe DH-Echo",
     "footer": "Cet email est envoyé automatiquement dans le cadre de notre processus de suppression de compte."
   },
   "gdpr_deletion_completed": {
@@ -139,7 +139,7 @@
     "summary_credits": "Historique des crédits",
     "thanks": "Nous vous remercions d'avoir utilisé nos services.",
     "reregister": "Si vous souhaitez utiliser à nouveau nos services à l'avenir, vous êtes libre de créer un nouveau compte.",
-    "closing": "Cordialement,\nL'équipe Alexia",
+    "closing": "Cordialement,\nL'équipe DH-Echo",
     "footer": "Cet email est la confirmation finale de la suppression de votre compte."
   }
 }
