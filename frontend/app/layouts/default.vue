@@ -10,6 +10,11 @@ const creditsStore = useCreditsStore();
 const { credits } = storeToRefs(creditsStore);
 const { fetchBalance } = creditsStore;
 
+const organizationStore = useOrganizationStore();
+const { organizations } = storeToRefs(organizationStore);
+
+const hasSingleOrganization = computed(() => organizations.value.length <= 1);
+
 const open = ref(false);
 const contactModalOpen = ref(false);
 
@@ -155,7 +160,15 @@ onMounted(async () => {
         <div class="grid grid-cols-[auto_1fr_auto] items-center h-16">
           <!-- Left: Logo -->
           <div class="flex items-center">
-            <TeamsMenu />
+            <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2">
+              <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500 shadow-sm">
+                <UIcon name="i-lucide-audio-waveform" class="w-5 h-5 text-white" />
+              </div>
+              <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                DH-Echo
+              </span>
+            </NuxtLink>
+            <TeamsMenu v-else />
           </div>
 
           <!-- Center: Navigation -->
@@ -201,7 +214,15 @@ onMounted(async () => {
     <USlideover v-model:open="open" title="Menu">
       <template #body>
         <div class="flex flex-col gap-4 h-full">
-           <TeamsMenu />
+           <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2 px-2">
+             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500 shadow-sm">
+               <UIcon name="i-lucide-audio-waveform" class="w-5 h-5 text-white" />
+             </div>
+             <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+               DH-Echo
+             </span>
+           </NuxtLink>
+           <TeamsMenu v-else />
 
            <div class="space-y-4">
              <div class="font-semibold text-sm text-gray-500 px-2">{{ t("layouts.default.navigation.workshop") }}</div>
