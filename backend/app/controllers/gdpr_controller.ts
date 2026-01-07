@@ -4,7 +4,7 @@ import { errors } from '@vinejs/vine'
 import env from '#start/env'
 import gdprService from '#services/gdpr_service'
 import gdprExportService from '#services/gdpr_export_service'
-import DeletionRequest, { DeletionRequestStatus } from '#models/deletion_request'
+import DeletionRequest from '#models/deletion_request'
 import { requestDeletionValidator, cancelDeletionValidator } from '#validators/gdpr'
 
 export default class GdprController {
@@ -15,7 +15,7 @@ export default class GdprController {
   public async dataSummary({ auth, response, bouncer }: HttpContext) {
     const user = auth.user!
 
-    await bouncer.with('GdprPolicy').authorize('viewDataSummary', user)
+    await bouncer.with('GdprPolicy').authorize('viewDataSummary')
 
     const summary = await gdprService.getDataSummary(user)
 
@@ -29,7 +29,7 @@ export default class GdprController {
   public async export({ auth, response, bouncer, i18n }: HttpContext) {
     const user = auth.user!
 
-    await bouncer.with('GdprPolicy').authorize('exportData', user)
+    await bouncer.with('GdprPolicy').authorize('exportData')
 
     try {
       const zipBuffer = await gdprExportService.generateExport(user)
@@ -56,7 +56,7 @@ export default class GdprController {
   public async orphanOrganizations({ auth, response, bouncer }: HttpContext) {
     const user = auth.user!
 
-    await bouncer.with('GdprPolicy').authorize('viewDataSummary', user)
+    await bouncer.with('GdprPolicy').authorize('viewDataSummary')
 
     const orphanOrgs = await gdprService.detectOrphanOrganizations(user)
 
@@ -70,7 +70,7 @@ export default class GdprController {
   public async requestDeletion({ auth, request, response, bouncer, i18n }: HttpContext) {
     const user = auth.user!
 
-    await bouncer.with('GdprPolicy').authorize('requestDeletion', user)
+    await bouncer.with('GdprPolicy').authorize('requestDeletion')
 
     try {
       const data = await request.validateUsing(requestDeletionValidator)
@@ -198,7 +198,7 @@ export default class GdprController {
   public async deletionStatus({ auth, response, bouncer, i18n }: HttpContext) {
     const user = auth.user!
 
-    await bouncer.with('GdprPolicy').authorize('viewDeletionStatus', user)
+    await bouncer.with('GdprPolicy').authorize('viewDeletionStatus')
 
     const deletionRequest = await gdprService.getDeletionStatus(user.id)
 

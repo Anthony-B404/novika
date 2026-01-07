@@ -23,7 +23,9 @@ const i18nConfig = defineConfig({
   | in order.
   |
   */
-  fallbackLocales: ['fr'],
+  fallbackLocales: {
+    en: 'fr',
+  },
 
   /*
   |--------------------------------------------------------------------------

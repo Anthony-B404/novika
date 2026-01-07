@@ -128,7 +128,7 @@ export default class OrganizationsController {
   public async createOrganization({ request, response, auth, bouncer, i18n }: HttpContext) {
     const authUser = auth.user!
 
-    if (await bouncer.with(OrganizationPolicy).denies('createOrganization', authUser)) {
+    if (await bouncer.with(OrganizationPolicy).denies('createOrganization')) {
       return response.status(403).json({
         message: i18n.t('messages.errors.unauthorized'),
       })

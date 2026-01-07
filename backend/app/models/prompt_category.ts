@@ -53,7 +53,10 @@ export default class PromptCategory extends BaseModel {
    * Check if category has any prompts
    */
   async hasPrompts(): Promise<boolean> {
-    await this.load('prompts')
+    if (!this.$preloaded.prompts) {
+      // @ts-expect-error - Lucid relation loading type issue
+      await this.load('prompts')
+    }
     return this.prompts.length > 0
   }
 
@@ -61,7 +64,10 @@ export default class PromptCategory extends BaseModel {
    * Get prompts count
    */
   async getPromptsCount(): Promise<number> {
-    await this.load('prompts')
+    if (!this.$preloaded.prompts) {
+      // @ts-expect-error - Lucid relation loading type issue
+      await this.load('prompts')
+    }
     return this.prompts.length
   }
 }

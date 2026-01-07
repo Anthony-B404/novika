@@ -7,7 +7,6 @@ import Organization from '#models/organization'
 import Audio from '#models/audio'
 import Transcription from '#models/transcription'
 import Document from '#models/document'
-import CreditTransaction from '#models/credit_transaction'
 import DeletionRequest, {
   DeletionRequestStatus,
   OrphanOrgsDecision,
@@ -441,7 +440,7 @@ class GdprService {
   /**
    * Delete all data for an organization
    */
-  private async deleteOrganizationData(org: Organization, trx: any): Promise<void> {
+  private async deleteOrganizationData(org: Organization, _trx: any): Promise<void> {
     // Get all audios for the organization
     const audios = await Audio.query().where('organizationId', org.id)
 

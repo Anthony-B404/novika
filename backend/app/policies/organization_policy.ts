@@ -1,4 +1,4 @@
-import User, { UserRole } from '#models/user'
+import User from '#models/user'
 import Organization from '#models/organization'
 import { BasePolicy } from '@adonisjs/bouncer'
 import { AuthorizerResponse } from '@adonisjs/bouncer/types'

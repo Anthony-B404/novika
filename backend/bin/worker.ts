@@ -28,21 +28,29 @@ const IMPORTER = (filePath: string) => {
   return import(filePath)
 }
 
-new Ignitor(APP_ROOT, { importer: IMPORTER })
-  .tap((app) => {
-    app.booting(async () => {
-      await import('#start/env')
+async function startWorker() {
+  const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER })
+    .tap((app) => {
+      app.booting(async () => {
+        await import('#start/env')
+      })
+      app.listen('SIGTERM', () => app.terminate())
+      app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
     })
-    app.listen('SIGTERM', () => app.terminate())
-    app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
-  })
-  .startApp(['providers/app_provider'])
-  .then(async () => {
-    // Import and start workers after app is booted
-    await import('#start/worker')
-    console.log('[Worker] All workers started successfully')
-  })
-  .catch((error) => {
-    process.exitCode = 1
-    prettyPrintError(error)
-  })
+
+  // Create and boot the application without starting HTTP server
+  const app = await ignitor.createApp('console')
+  await app.boot()
+
+  // Import and start workers after app is booted
+  await import('#start/worker')
+  console.log('[Worker] All workers started successfully')
+
+  // Keep the process running
+  await new Promise(() => {})
+}
+
+startWorker().catch((error: Error) => {
+  process.exitCode = 1
+  prettyPrintError(error)
+})

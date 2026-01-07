@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { unlink, stat } from 'node:fs/promises'
-import { join, basename } from 'node:path'
+import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
 import app from '@adonisjs/core/services/app'
@@ -128,7 +128,6 @@ export default class AudioConverterService {
     }
 
     const settings = OPUS_PRESETS[preset]
-    const originalName = basename(inputPath)
     const outputPath = join(app.tmpPath(), `${randomUUID()}.opus`)
 
     // Get original file info

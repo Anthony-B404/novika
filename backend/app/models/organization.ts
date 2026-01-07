@@ -36,7 +36,10 @@ export default class Organization extends BaseModel {
    * Get the owner of this organization
    */
   async getOwner(): Promise<User | null> {
-    await this.load('users')
+    if (!this.$preloaded.users) {
+      // @ts-expect-error - Lucid relation loading type issue
+      await this.load('users')
+    }
     return this.users.find((u) => u.$extras.pivot_role === UserRole.Owner) ?? null
   }
 }

@@ -80,15 +80,16 @@ export default class UsersController {
 
       // Handle email change with verification
       if (data.email !== undefined && data.email !== user.email) {
+        const newEmail = data.email
         // Generate email change token
         user.emailChangeToken = randomUUID()
         user.emailChangeExpiresAt = DateTime.now().plus({ minutes: 15 })
-        user.pendingEmail = data.email
+        user.pendingEmail = newEmail
 
         // Send verification email to new email address
         await mail.send((message) => {
           message
-            .to(data.email)
+            .to(newEmail)
             .from('onboarding@resend.dev')
             .subject(i18n.t('emails.email_change.subject'))
             .htmlView('emails/verify_email_change', {

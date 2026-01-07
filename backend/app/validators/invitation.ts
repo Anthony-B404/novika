@@ -13,7 +13,7 @@ export const createInvitationValidator = vine.compile(
     email: vine
       .string()
       .email()
-      .unique(async (db, value, field) => {
+      .unique(async (_db, value, field) => {
         // Récupérer organizationId depuis les meta
         const organizationId = field.meta.organizationId
 

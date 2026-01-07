@@ -88,7 +88,10 @@ export default class User extends BaseModel {
    * Check if user is owner of a specific organization
    */
   async isOwnerOf(organizationId: number): Promise<boolean> {
-    await this.load('organizations')
+    if (!this.$preloaded.organizations) {
+      // @ts-expect-error - Lucid relation loading type issue
+      await this.load('organizations')
+    }
     const org = this.organizations.find((o) => o.id === organizationId)
     return org?.$extras.pivot_role === UserRole.Owner
   }
@@ -97,7 +100,10 @@ export default class User extends BaseModel {
    * Check if user has access to a specific organization
    */
   async hasOrganization(organizationId: number): Promise<boolean> {
-    await this.load('organizations')
+    if (!this.$preloaded.organizations) {
+      // @ts-expect-error - Lucid relation loading type issue
+      await this.load('organizations')
+    }
     return this.organizations.some((o) => o.id === organizationId)
   }
 

@@ -4,7 +4,6 @@ import { PassThrough } from 'node:stream'
 import User, { UserRole } from '#models/user'
 import Audio from '#models/audio'
 import CreditTransaction from '#models/credit_transaction'
-import storageService from './storage_service.js'
 
 export interface ExportProfile {
   id: number
