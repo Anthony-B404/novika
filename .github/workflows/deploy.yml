@@ -236,9 +236,11 @@ jobs:
           source: "docker-compose.prod.yml,docker/nginx/,docker/scheduler/"
           target: "/opt/dh-echo"
 
-      - name: Set lowercase repository name
+      - name: Set lowercase repository name and short SHA
         id: repo
-        run: echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+        run: |
+          echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "short_sha=$(echo '${{ github.sha }}' | cut -c1-7)" >> $GITHUB_OUTPUT
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -275,7 +277,7 @@ jobs:
             GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
 
             # Image tag
-            TAG=${{ github.sha }}
+            TAG=${{ steps.repo.outputs.short_sha }}
             GITHUB_REPOSITORY=${{ steps.repo.outputs.name }}
             ENVEOF
             chmod 600 .env
