@@ -291,8 +291,8 @@ jobs:
             # Run database migrations
             docker compose -f docker-compose.prod.yml run --rm backend node ace migration:run --force
 
-            # Restart services with zero-downtime
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans --build scheduler
+            # Start all services
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
             # Clean up old images
             docker image prune -af --filter "until=24h"
