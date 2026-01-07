@@ -38,6 +38,7 @@ jobs:
       packages: write
     outputs:
       image-name: ${{ steps.image-name.outputs.backend }}
+      image-tag: ${{ steps.image-name.outputs.tag }}
 
     steps:
       - name: Checkout repository
@@ -47,8 +48,10 @@ jobs:
         id: image-name
         run: |
           REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "backend=${REPO_LC}/backend" >> $GITHUB_OUTPUT
           echo "frontend=${REPO_LC}/frontend" >> $GITHUB_OUTPUT
+          echo "tag=${SHORT_SHA}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -147,6 +150,7 @@ jobs:
       contents: read
       packages: read
       security-events: write
+      actions: read
 
     steps:
       - name: Log in to Container Registry
@@ -159,7 +163,7 @@ jobs:
       - name: Run Trivy vulnerability scanner on Backend
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ needs.build-backend.outputs.image-name }}:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ needs.build-backend.outputs.image-name }}:${{ needs.build-backend.outputs.image-tag }}
           format: 'sarif'
           output: 'backend-trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
@@ -168,17 +172,27 @@ jobs:
       - name: Run Trivy vulnerability scanner on Frontend
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ needs.build-frontend.outputs.image-name }}:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ needs.build-frontend.outputs.image-name }}:${{ needs.build-backend.outputs.image-tag }}
           format: 'sarif'
           output: 'frontend-trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
           exit-code: '0'
 
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload Backend scan results
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: '.'
+          sarif_file: 'backend-trivy-results.sarif'
+          category: 'trivy-backend'
+        continue-on-error: true
+
+      - name: Upload Frontend scan results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'frontend-trivy-results.sarif'
+          category: 'trivy-frontend'
+        continue-on-error: true
 
   # ===========================================
   # Deploy to VPS
