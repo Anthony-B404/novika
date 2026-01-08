@@ -39,7 +39,7 @@
             {{ i18n.t('emails.invitation.intro', { organization: organizationName }) }}
           </mj-text>
           <mj-button
-            href="http://localhost:3000/invitation/{{ identifier }}"
+            href="{{ frontendUrl }}/invitation/{{ identifier }}"
             target="_blank"
             background-color="#2563eb"
             color="#ffffff"

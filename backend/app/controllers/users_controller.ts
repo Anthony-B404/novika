@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import env from '@adonisjs/core/services/env'
 import User from '#models/user'
 import { updateProfileValidator } from '#validators/user'
 import { cuid } from '@adonisjs/core/helpers'
@@ -96,6 +97,7 @@ export default class UsersController {
               token: user.emailChangeToken,
               locale: i18n.locale,
               i18n: i18n,
+              frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
             })
         })
       }

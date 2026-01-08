@@ -39,7 +39,7 @@
             {{ i18n.t('emails.email_change.intro') }}
           </mj-text>
           <mj-button
-            href="http://localhost:3000/{{ locale }}/verify-email-change?token={{ token }}"
+            href="{{ frontendUrl }}/{{ locale }}/verify-email-change?token={{ token }}"
             target="_blank"
             background-color="#2563eb"
             color="#ffffff"

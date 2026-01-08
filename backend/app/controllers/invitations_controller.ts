@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import env from '@adonisjs/core/services/env'
 import InvitationPolicy from '#policies/invitation_policy'
 import Invitation from '#models/invitation'
 import Organization from '#models/organization'
@@ -75,6 +76,7 @@ export default class InvitationsController {
               : 'https://placehold.co/100',
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
+            frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
           })
       })
 
@@ -379,6 +381,7 @@ export default class InvitationsController {
               : 'https://placehold.co/100',
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
+            frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
           })
       })
 
