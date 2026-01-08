@@ -253,7 +253,7 @@ volumes:
 networks:
   dh-echo-internal:
     driver: bridge
-    internal: true
+    # Removed 'internal: true' - was blocking outbound connections for OAuth
   dh-echo-public:
     driver: bridge
   traefik-public:
