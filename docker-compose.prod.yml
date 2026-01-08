@@ -120,8 +120,7 @@ services:
     image: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/dh-echo}/backend:${TAG:-latest}
     container_name: dh-echo-worker
     restart: always
-    command:
-      ["node", "--import=./bin/server.js", "-e", "import('./start/worker.js')"]
+    command: ["node", "bin/worker.js"]
     environment:
       NODE_ENV: production
       PORT: 3333
