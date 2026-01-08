@@ -67,8 +67,8 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy built application from builder stage
 COPY --from=builder /app/build ./
 
-# Create storage directory for file uploads
-RUN mkdir -p /app/storage && chown -R adonisjs:nodejs /app/storage
+# Create storage and tmp directories for file uploads and audio processing
+RUN mkdir -p /app/storage /app/tmp && chown -R adonisjs:nodejs /app/storage /app/tmp
 
 # Set ownership
 RUN chown -R adonisjs:nodejs /app
