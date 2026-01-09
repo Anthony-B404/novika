@@ -69,7 +69,8 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
-      # Frontend URL
+      # URLs
+      API_URL: https://api.dh-echo.cloud
       FRONTEND_URL: https://dh-echo.cloud
       # CORS
       ALLOWED_ORIGINS: https://dh-echo.cloud
@@ -143,6 +144,9 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      # URLs
+      API_URL: https://api.dh-echo.cloud
+      FRONTEND_URL: https://dh-echo.cloud
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -187,6 +191,9 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       # External APIs
       RESEND_API_KEY: ${RESEND_API_KEY}
+      # URLs
+      API_URL: https://api.dh-echo.cloud
+      FRONTEND_URL: https://dh-echo.cloud
       # Drive
       DRIVE_DISK: local
     volumes:
