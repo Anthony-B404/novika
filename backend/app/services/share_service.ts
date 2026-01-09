@@ -83,7 +83,7 @@ class ShareService {
           audioTitle,
           shareUrl,
           i18n,
-          apiUrl: env.get('API_URL', 'http://localhost:3333'),
+          apiUrl: 'https://api.dh-echo.cloud',
         })
         .attachData(exportResult.buffer, {
           filename: exportResult.filename,

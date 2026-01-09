@@ -77,7 +77,7 @@ export default class InvitationsController {
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-            apiUrl: env.get('API_URL', 'http://localhost:3333'),
+            apiUrl: 'https://api.dh-echo.cloud',
           })
       })
 
@@ -383,7 +383,7 @@ export default class InvitationsController {
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-            apiUrl: env.get('API_URL', 'http://localhost:3333'),
+            apiUrl: 'https://api.dh-echo.cloud',
           })
       })
 

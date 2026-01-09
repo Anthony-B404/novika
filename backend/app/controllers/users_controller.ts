@@ -98,7 +98,7 @@ export default class UsersController {
               locale: i18n.locale,
               i18n: i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-              apiUrl: env.get('API_URL', 'http://localhost:3333'),
+              apiUrl: 'https://api.dh-echo.cloud',
             })
         })
       }

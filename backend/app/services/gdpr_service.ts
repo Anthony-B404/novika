@@ -494,7 +494,7 @@ class GdprService {
           scheduledDate,
           cancelUrl,
           i18n,
-          apiUrl: env.get('API_URL', 'http://localhost:3333'),
+          apiUrl: 'https://api.dh-echo.cloud',
         })
     })
   }
@@ -515,7 +515,7 @@ class GdprService {
         .htmlView('emails/gdpr_deletion_completed', {
           summary,
           i18n,
-          apiUrl: env.get('API_URL', 'http://localhost:3333'),
+          apiUrl: 'https://api.dh-echo.cloud',
           frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
         })
     })
@@ -551,7 +551,7 @@ class GdprService {
           daysRemaining,
           cancelUrl,
           i18n,
-          apiUrl: env.get('API_URL', 'http://localhost:3333'),
+          apiUrl: 'https://api.dh-echo.cloud',
         })
     })
   }
