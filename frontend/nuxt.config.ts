@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
     "@pinia/nuxt",
     "@vueuse/nuxt",
+    "@formkit/auto-animate/nuxt",
   ],
   routeRules: {
     "/": { prerender: true },

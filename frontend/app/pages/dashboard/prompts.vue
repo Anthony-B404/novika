@@ -25,6 +25,7 @@ const deleteModalOpen = ref(false)
 const editingPrompt = ref<Prompt | null>(null)
 const promptToDelete = ref<Prompt | null>(null)
 const initialLoadDone = ref(false)
+const isFiltering = ref(false)
 
 // Debounced search
 const debouncedSearch = refDebounced(searchQuery, 300)
@@ -43,25 +44,18 @@ watch(debouncedSearch, () => {
   fetchPrompts()
 })
 
-// Computed filtered prompts
-const filteredPrompts = computed(() => {
-  let prompts = promptsStore.prompts
-
-  if (showFavorites.value) {
-    prompts = prompts.filter((p) => p.isFavorite)
-  } else if (selectedCategoryId.value !== null) {
-    prompts = prompts.filter((p) => p.categoryId === selectedCategoryId.value)
-  }
-
-  return prompts
-})
+// Le serveur filtre déjà par categoryId et favorites via fetchPrompts()
+// Pas de filtrage client nécessaire - évite les états intermédiaires qui cassent l'animation
+const filteredPrompts = computed(() => promptsStore.prompts)
 
 async function fetchPrompts() {
+  isFiltering.value = true
   await promptsStore.fetchPrompts(1, {
     categoryId: showFavorites.value ? undefined : selectedCategoryId.value ?? undefined,
     favorites: showFavorites.value ? true : undefined,
     search: debouncedSearch.value || undefined,
   })
+  isFiltering.value = false
 }
 
 function handleCategorySelect(categoryId: number | null) {
@@ -247,33 +241,27 @@ async function handleDeleteCategory(id: number) {
     </UCard>
 
     <!-- Grid area - skeleton ou contenu avec transition -->
-    <div class="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div v-auto-animate class="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <!-- Skeleton cards pendant le chargement initial -->
       <template v-if="!initialLoadDone">
         <PromptCardSkeleton v-for="i in 12" :key="`skeleton-${i}`" />
       </template>
 
-      <!-- Contenu réel avec fade-in -->
+      <!-- Contenu réel -->
       <template v-else>
-        <TransitionGroup
-          enter-active-class="transition-opacity duration-300 ease-out"
-          enter-from-class="opacity-0"
-          enter-to-class="opacity-100"
-        >
-          <PromptCard
-            v-for="prompt in filteredPrompts"
-            :key="prompt.id"
-            :prompt="prompt"
-            show-category
-            @edit="handleEditPrompt"
-            @delete="handleDeletePrompt"
-            @toggle-favorite="handleToggleFavorite"
-          />
-        </TransitionGroup>
+        <PromptCard
+          v-for="prompt in filteredPrompts"
+          :key="prompt.id"
+          :prompt="prompt"
+          show-category
+          @edit="handleEditPrompt"
+          @delete="handleDeletePrompt"
+          @toggle-favorite="handleToggleFavorite"
+        />
 
         <!-- Empty state inline -->
         <div
-          v-if="filteredPrompts.length === 0"
+          v-if="filteredPrompts.length === 0 && !isFiltering"
           class="col-span-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm"
         >
           <div class="py-12 text-center">
