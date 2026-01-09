@@ -9,6 +9,7 @@
 
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+import app from '@adonisjs/core/services/app'
 
 const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
@@ -55,15 +56,13 @@ router.get('/user-avatar/:avatar', [UsersController, 'getUserAvatar'])
 
 // Static logo for emails
 router.get('/logo.png', async ({ response }) => {
-  const logoPath = new URL('../public/logo.png', import.meta.url)
-  return response.download(logoPath.pathname)
+  return response.download(app.publicPath('logo.png'))
 })
 
 // BIMI logo for email client avatars
 router.get('/bimi-logo.svg', async ({ response }) => {
-  const logoPath = new URL('../public/bimi-logo.svg', import.meta.url)
   response.header('Content-Type', 'image/svg+xml')
-  return response.download(logoPath.pathname)
+  return response.download(app.publicPath('bimi-logo.svg'))
 })
 
 router.get('/check-invitation/:identifier', [InvitationsController, 'checkInvitation'])
