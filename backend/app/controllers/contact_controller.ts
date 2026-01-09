@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import env from '#start/env'
 import mail from '@adonisjs/mail/services/main'
 import vine from '@vinejs/vine'
 
@@ -28,7 +29,7 @@ export default class ContactController {
     await mail.send((msg) => {
       msg
         .to('betteanthony73@gmail.com')
-        .from('contact@dh-echo.cloud')
+        .from('DH-Echo <contact@dh-echo.cloud>')
         .replyTo(user.email)
         .subject(i18n.t('emails.contact_support.subject', { subject }))
         .htmlView('emails/contact_support', {
@@ -37,6 +38,7 @@ export default class ContactController {
           subject,
           message,
           i18n,
+          apiUrl: env.get('API_URL', 'http://localhost:3333'),
         })
     })
 

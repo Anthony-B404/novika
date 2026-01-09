@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
 import db from '@adonisjs/lucid/services/db'
 import mail from '@adonisjs/mail/services/main'
+import env from '#start/env'
 import User, { UserRole } from '#models/user'
 import Organization from '#models/organization'
 import Audio from '#models/audio'
@@ -486,13 +487,14 @@ class GdprService {
     await mail.send((message) => {
       message
         .to(user.email)
-        .from('contact@dh-echo.cloud')
+        .from('DH-Echo <contact@dh-echo.cloud>')
         .subject(i18n.t('emails.gdpr_deletion_requested.subject'))
         .htmlView('emails/gdpr_deletion_requested', {
           user,
           scheduledDate,
           cancelUrl,
           i18n,
+          apiUrl: env.get('API_URL', 'http://localhost:3333'),
         })
     })
   }
@@ -508,11 +510,13 @@ class GdprService {
     await mail.send((message) => {
       message
         .to(email)
-        .from('contact@dh-echo.cloud')
+        .from('DH-Echo <contact@dh-echo.cloud>')
         .subject(i18n.t('emails.gdpr_deletion_completed.subject'))
         .htmlView('emails/gdpr_deletion_completed', {
           summary,
           i18n,
+          apiUrl: env.get('API_URL', 'http://localhost:3333'),
+          frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
         })
     })
   }
@@ -535,7 +539,7 @@ class GdprService {
     await mail.send((message) => {
       message
         .to(user.email)
-        .from('contact@dh-echo.cloud')
+        .from('DH-Echo <contact@dh-echo.cloud>')
         .subject(
           i18n.t('emails.gdpr_deletion_reminder.subject', {
             daysRemaining: daysRemaining.toString(),
@@ -547,6 +551,7 @@ class GdprService {
           daysRemaining,
           cancelUrl,
           i18n,
+          apiUrl: env.get('API_URL', 'http://localhost:3333'),
         })
     })
   }

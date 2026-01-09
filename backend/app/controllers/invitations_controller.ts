@@ -66,7 +66,7 @@ export default class InvitationsController {
       await mail.send((message) => {
         message
           .to(payload.email)
-          .from('contact@dh-echo.cloud')
+          .from('DH-Echo <contact@dh-echo.cloud>')
           .subject(i18n.t('emails.invitation.subject', { organization: organization.name }))
           .htmlView('emails/invitation', {
             identifier: invitation.identifier,
@@ -77,6 +77,7 @@ export default class InvitationsController {
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
+            apiUrl: env.get('API_URL', 'http://localhost:3333'),
           })
       })
 
@@ -371,7 +372,7 @@ export default class InvitationsController {
       await mail.send((message) => {
         message
           .to(invitation.email)
-          .from('contact@dh-echo.cloud')
+          .from('DH-Echo <contact@dh-echo.cloud>')
           .subject(i18n.t('emails.invitation.subject', { organization: organization.name }))
           .htmlView('emails/invitation', {
             identifier: invitation.identifier,
@@ -382,6 +383,7 @@ export default class InvitationsController {
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
+            apiUrl: env.get('API_URL', 'http://localhost:3333'),
           })
       })
 

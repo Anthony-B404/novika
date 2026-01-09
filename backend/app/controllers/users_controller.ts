@@ -91,13 +91,14 @@ export default class UsersController {
         await mail.send((message) => {
           message
             .to(newEmail)
-            .from('contact@dh-echo.cloud')
+            .from('DH-Echo <contact@dh-echo.cloud>')
             .subject(i18n.t('emails.email_change.subject'))
             .htmlView('emails/verify_email_change', {
               token: user.emailChangeToken,
               locale: i18n.locale,
               i18n: i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
+              apiUrl: env.get('API_URL', 'http://localhost:3333'),
             })
         })
       }

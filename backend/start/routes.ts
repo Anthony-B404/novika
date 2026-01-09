@@ -53,6 +53,19 @@ router.get('/verify-magic-link/:token', [AuthController, 'verifyMagicLink'])
 router.get('/organization-logo/:logo', [OrganizationsController, 'getOrganizationLogo'])
 router.get('/user-avatar/:avatar', [UsersController, 'getUserAvatar'])
 
+// Static logo for emails
+router.get('/logo.png', async ({ response }) => {
+  const logoPath = new URL('../public/logo.png', import.meta.url)
+  return response.download(logoPath.pathname)
+})
+
+// BIMI logo for email client avatars
+router.get('/bimi-logo.svg', async ({ response }) => {
+  const logoPath = new URL('../public/bimi-logo.svg', import.meta.url)
+  response.header('Content-Type', 'image/svg+xml')
+  return response.download(logoPath.pathname)
+})
+
 router.get('/check-invitation/:identifier', [InvitationsController, 'checkInvitation'])
 router.post('/accept-invitation', [InvitationsController, 'acceptInvitation'])
 

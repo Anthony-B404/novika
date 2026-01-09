@@ -45,13 +45,14 @@ export default class AuthController {
           await mail.send((message) => {
             message
               .to(existingUser.email)
-              .from('contact@dh-echo.cloud')
+              .from('DH-Echo <contact@dh-echo.cloud>')
               .subject(i18n.t('emails.registration_magic_link.subject'))
               .htmlView('emails/registration_magic_link', {
                 token: existingUser.magicLinkToken,
                 locale: i18n.locale,
                 i18n: i18n,
                 frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
+                apiUrl: env.get('API_URL', 'http://localhost:3333'),
               })
           })
 
@@ -74,13 +75,14 @@ export default class AuthController {
         await mail.send((message) => {
           message
             .to(existingUser.email)
-            .from('contact@dh-echo.cloud')
+            .from('DH-Echo <contact@dh-echo.cloud>')
             .subject(i18n.t('emails.registration_magic_link.subject'))
             .htmlView('emails/registration_magic_link', {
               token: existingUser.magicLinkToken,
               locale: i18n.locale,
               i18n: i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
+                apiUrl: env.get('API_URL', 'http://localhost:3333'),
             })
         })
 
@@ -119,13 +121,14 @@ export default class AuthController {
       await mail.send((message) => {
         message
           .to(user.email)
-          .from('contact@dh-echo.cloud')
+          .from('DH-Echo <contact@dh-echo.cloud>')
           .subject(i18n.t('emails.registration_magic_link.subject'))
           .htmlView('emails/registration_magic_link', {
             token: magicLinkToken,
             locale: i18n.locale,
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
+                apiUrl: env.get('API_URL', 'http://localhost:3333'),
           })
       })
 
@@ -347,13 +350,14 @@ export default class AuthController {
       await mail.send((message) => {
         message
           .to(user.email)
-          .from('contact@dh-echo.cloud')
+          .from('DH-Echo <contact@dh-echo.cloud>')
           .subject(i18n.t('emails.login_magic_link.subject'))
           .htmlView('emails/login_magic_link', {
             token: user.magicLinkToken,
             locale: i18n.locale,
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
+                apiUrl: env.get('API_URL', 'http://localhost:3333'),
           })
       })
 
