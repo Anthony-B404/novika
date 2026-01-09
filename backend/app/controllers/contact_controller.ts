@@ -1,5 +1,4 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import env from '#start/env'
 import mail from '@adonisjs/mail/services/main'
 import vine from '@vinejs/vine'
 
