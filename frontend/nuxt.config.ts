@@ -4,6 +4,11 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: "2024-04-03",
+  app: {
+    head: {
+      link: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
+    },
+  },
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
   vite: {

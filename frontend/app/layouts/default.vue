@@ -161,9 +161,7 @@ onMounted(async () => {
           <!-- Left: Logo -->
           <div class="flex items-center">
             <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2">
-              <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500 shadow-sm">
-                <UIcon name="i-lucide-audio-waveform" class="w-5 h-5 text-white" />
-              </div>
+              <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8" />
               <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 DH-Echo
               </span>
@@ -215,9 +213,7 @@ onMounted(async () => {
       <template #body>
         <div class="flex flex-col gap-4 h-full">
            <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2 px-2">
-             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500 shadow-sm">
-               <UIcon name="i-lucide-audio-waveform" class="w-5 h-5 text-white" />
-             </div>
+             <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8" />
              <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                DH-Echo
              </span>
