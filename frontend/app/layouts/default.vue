@@ -5,7 +5,7 @@ const { t } = useI18n();
 const localePath = useLocalePath();
 const route = useRoute();
 const toast = useToast();
-const { canAccessOrganization } = useSettingsPermissions();
+const { canAccessOrganization, canManageMembers } = useSettingsPermissions();
 const creditsStore = useCreditsStore();
 const { credits } = storeToRefs(creditsStore);
 const { fetchBalance } = creditsStore;
@@ -18,9 +18,13 @@ const hasSingleOrganization = computed(() => organizations.value.length <= 1);
 const open = ref(false);
 const contactModalOpen = ref(false);
 
-// Fetch credits on mount
+// Fetch credits and organizations on mount
 onMounted(() => {
   fetchBalance();
+  // Always fetch organizations to ensure role is available for permissions
+  if (organizations.value.length === 0) {
+    organizationStore.fetchUserOrganizations();
+  }
 });
 
 // 1. Navigation principale (Gauche Desktop / Haut Mobile)
@@ -79,14 +83,16 @@ const settingsItems = computed(() => {
     });
   }
 
-  items.push({
-    label: t("pages.dashboard.settings.navigation.members"),
-    to: localePath("/dashboard/settings/members"),
-    icon: "i-lucide-users",
-    onSelect: () => {
-      open.value = false;
-    },
-  });
+  if (canManageMembers.value) {
+    items.push({
+      label: t("pages.dashboard.settings.navigation.members"),
+      to: localePath("/dashboard/settings/members"),
+      icon: "i-lucide-users",
+      onSelect: () => {
+        open.value = false;
+      },
+    });
+  }
 
   items.push({
     label: t("pages.dashboard.settings.navigation.security"),

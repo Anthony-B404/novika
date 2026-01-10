@@ -7,7 +7,7 @@ definePageMeta({
 
 const { t } = useI18n();
 const localePath = useLocalePath();
-const { canAccessOrganization } = useSettingsPermissions();
+const { canAccessOrganization, canManageMembers } = useSettingsPermissions();
 
 const links = computed(() => {
   const mainLinks: NavigationMenuItem[] = [
@@ -28,12 +28,14 @@ const links = computed(() => {
     });
   }
 
-  // Members - All roles can view
-  mainLinks.push({
-    label: t("pages.dashboard.settings.navigation.members"),
-    icon: "i-lucide-users",
-    to: localePath("/dashboard/settings/members"),
-  });
+  // Members - Owner + Administrator only
+  if (canManageMembers.value) {
+    mainLinks.push({
+      label: t("pages.dashboard.settings.navigation.members"),
+      icon: "i-lucide-users",
+      to: localePath("/dashboard/settings/members"),
+    });
+  }
 
   // Privacy - All roles (GDPR)
   mainLinks.push({
