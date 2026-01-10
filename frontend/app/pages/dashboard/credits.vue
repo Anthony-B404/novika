@@ -4,6 +4,11 @@ definePageMeta({
 })
 
 const { t, locale } = useI18n()
+
+useSeoMeta({
+  title: t("seo.credits.title"),
+  description: t("seo.credits.description"),
+})
 const localePath = useLocalePath()
 const creditsStore = useCreditsStore()
 const { credits, transactions, loading } = storeToRefs(creditsStore)

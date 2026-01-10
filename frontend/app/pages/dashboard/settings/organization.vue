@@ -7,6 +7,12 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: t("seo.settingsOrganization.title"),
+  description: t("seo.settingsOrganization.description"),
+});
+
 const authStore = useAuthStore();
 const organizationStore = useOrganizationStore();
 const config = useRuntimeConfig();

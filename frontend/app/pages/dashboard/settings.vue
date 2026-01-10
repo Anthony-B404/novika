@@ -6,6 +6,12 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: t("seo.settings.title"),
+  description: t("seo.settings.description"),
+});
+
 const localePath = useLocalePath();
 const { canAccessOrganization, canManageMembers } = useSettingsPermissions();
 

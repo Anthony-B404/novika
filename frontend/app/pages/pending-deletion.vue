@@ -5,6 +5,12 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: t("seo.pendingDeletion.title"),
+  description: t("seo.pendingDeletion.description"),
+});
+
 const { $localePath } = useNuxtApp();
 const toast = useToast();
 const gdprStore = useGdprStore();

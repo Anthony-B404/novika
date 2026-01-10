@@ -10,6 +10,12 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: t("seo.settingsMembers.title"),
+  description: t("seo.settingsMembers.description"),
+});
+
 const toast = useToast();
 const { authenticatedFetch } = useAuth();
 const authStore = useAuthStore();

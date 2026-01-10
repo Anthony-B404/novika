@@ -10,6 +10,11 @@ definePageMeta({
   layout: "auth",
 });
 
+useSeoMeta({
+  title: t("seo.oauthCallback.title"),
+  description: t("seo.oauthCallback.description"),
+});
+
 onMounted(async () => {
   // Debug logs
   console.log("Callback - Query params:", route.query);

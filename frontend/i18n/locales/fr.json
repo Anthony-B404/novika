@@ -173,12 +173,56 @@
       "description": "Rejoignez une organisation en acceptant votre invitation"
     },
     "dashboard": {
-      "title": "Tableau de bord",
+      "title": "DH-Echo",
       "description": "Votre tableau de bord d'application"
     },
     "error": {
       "title": "Page introuvable",
       "description": "Nous sommes désolés mais cette page est introuvable."
+    },
+    "credits": {
+      "title": "Crédits",
+      "description": "Gérez vos crédits et consultez votre historique de transactions"
+    },
+    "library": {
+      "title": "Bibliothèque",
+      "description": "Accédez à tous vos enregistrements audio et analyses"
+    },
+    "prompts": {
+      "title": "Modèles de prompts",
+      "description": "Gérez vos modèles de prompts pour l'analyse audio"
+    },
+    "audioDetail": {
+      "title": "Détail de l'audio",
+      "description": "Consultez la transcription et l'analyse de votre audio"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Configurez votre compte et votre organisation"
+    },
+    "settingsGeneral": {
+      "title": "Paramètres généraux",
+      "description": "Configurez vos préférences générales"
+    },
+    "settingsMembers": {
+      "title": "Membres",
+      "description": "Gérez les membres de votre organisation"
+    },
+    "settingsOrganization": {
+      "title": "Organisation",
+      "description": "Configurez les paramètres de votre organisation"
+    },
+    "settingsPrivacy": {
+      "title": "Confidentialité",
+      "description": "Gérez vos données et votre vie privée"
+    },
+    "pendingDeletion": {
+      "title": "Suppression en cours",
+      "description": "Votre compte est en attente de suppression"
+    },
+    "oauthCallback": {
+      "title": "Connexion en cours",
+      "description": "Finalisation de votre connexion"
     }
   },
   "common": {

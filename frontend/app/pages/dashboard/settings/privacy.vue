@@ -6,6 +6,12 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: t("seo.settingsPrivacy.title"),
+  description: t("seo.settingsPrivacy.description"),
+});
+
 const toast = useToast();
 const gdprStore = useGdprStore();
 

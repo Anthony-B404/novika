@@ -171,12 +171,56 @@
       "description": "Join an organization by accepting your invitation"
     },
     "dashboard": {
-      "title": "Dashboard",
+      "title": "DH-Echo",
       "description": "Your application dashboard"
     },
     "error": {
       "title": "Page not found",
       "description": "We are sorry but this page could not be found."
+    },
+    "credits": {
+      "title": "Credits",
+      "description": "Manage your credits and view your transaction history"
+    },
+    "library": {
+      "title": "Library",
+      "description": "Access all your audio recordings and analyses"
+    },
+    "prompts": {
+      "title": "Prompt Templates",
+      "description": "Manage your prompt templates for audio analysis"
+    },
+    "audioDetail": {
+      "title": "Audio Detail",
+      "description": "View the transcription and analysis of your audio"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Configure your account and organization"
+    },
+    "settingsGeneral": {
+      "title": "General Settings",
+      "description": "Configure your general preferences"
+    },
+    "settingsMembers": {
+      "title": "Members",
+      "description": "Manage your organization members"
+    },
+    "settingsOrganization": {
+      "title": "Organization",
+      "description": "Configure your organization settings"
+    },
+    "settingsPrivacy": {
+      "title": "Privacy",
+      "description": "Manage your data and privacy"
+    },
+    "pendingDeletion": {
+      "title": "Pending Deletion",
+      "description": "Your account is pending deletion"
+    },
+    "oauthCallback": {
+      "title": "Logging in",
+      "description": "Completing your login"
     }
   },
   "common": {

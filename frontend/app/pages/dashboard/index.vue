@@ -7,6 +7,11 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: t("seo.dashboard.title"),
+  description: t("seo.dashboard.description"),
+});
 const toast = useToast();
 const localePath = useLocalePath();
 

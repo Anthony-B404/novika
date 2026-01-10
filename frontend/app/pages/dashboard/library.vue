@@ -7,6 +7,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+useSeoMeta({
+  title: t("seo.library.title"),
+  description: t("seo.library.description"),
+})
 const toast = useToast()
 const localePath = useLocalePath()
 const audioStore = useAudioStore()

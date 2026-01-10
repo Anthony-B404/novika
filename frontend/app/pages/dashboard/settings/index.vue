@@ -7,6 +7,12 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: t("seo.settingsGeneral.title"),
+  description: t("seo.settingsGeneral.description"),
+});
+
 const authStore = useAuthStore();
 const toast = useToast();
 const api = useApi();

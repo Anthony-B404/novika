@@ -10,6 +10,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+useSeoMeta({
+  title: t("seo.prompts.title"),
+  description: t("seo.prompts.description"),
+})
 const localePath = useLocalePath()
 
 const promptsStore = usePromptsStore()

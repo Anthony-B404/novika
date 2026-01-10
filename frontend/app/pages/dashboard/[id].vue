@@ -7,6 +7,11 @@ definePageMeta({
 
 const route = useRoute()
 const { t } = useI18n()
+
+useSeoMeta({
+  title: t("seo.audioDetail.title"),
+  description: t("seo.audioDetail.description"),
+})
 const toast = useToast()
 const localePath = useLocalePath()
 const runtimeConfig = useRuntimeConfig()
