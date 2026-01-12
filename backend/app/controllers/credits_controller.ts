@@ -4,20 +4,21 @@ import vine from '@vinejs/vine'
 
 export default class CreditsController {
   /**
-   * Get current user's credit balance.
+   * Get current organization's credit balance.
    *
    * GET /api/credits
    */
   async balance({ response, auth }: HttpContext) {
     const user = auth.user!
+    await user.load('currentOrganization')
 
     return response.ok({
-      credits: user.credits,
+      credits: user.currentOrganization?.credits ?? 0,
     })
   }
 
   /**
-   * Get credit transaction history for the current user.
+   * Get credit transaction history for the current organization.
    *
    * GET /api/credits/history
    */
@@ -36,7 +37,7 @@ export default class CreditsController {
     const { page = 1, limit = 20, type } = await request.validateUsing(validator)
 
     const query = CreditTransaction.query()
-      .where('userId', user.id)
+      .where('organizationId', user.currentOrganizationId!)
       .orderBy('createdAt', 'desc')
       .preload('audio')
 

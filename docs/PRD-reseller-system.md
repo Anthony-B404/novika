@@ -373,15 +373,15 @@ if (user.isSuperAdmin) {
 - [x] **1.8** Mettre à jour modèle `User` (flags, relations)
 - [x] **1.9** Créer seeder `super_admin` pour initialisation Super Admin
 
-### Phase 2 : Migration Crédits
+### Phase 2 : Migration Crédits ✅
 **Priorité**: Critique
 **Estimation**: 1 jour
 
-- [ ] **2.1** Script migration crédits User → Organization
-- [ ] **2.2** Modifier `credit_transactions` (add `organization_id`)
-- [ ] **2.3** Mettre à jour les méthodes de crédits (`hasEnoughCredits`, `deductCredits`)
-- [ ] **2.4** Mettre à jour `transcription_job.ts` pour utiliser org.credits
-- [ ] **2.5** Tests de non-régression
+- [x] **2.1** Script migration crédits User → Organization
+- [x] **2.2** Modifier `credit_transactions` (add `organization_id`)
+- [x] **2.3** Mettre à jour les méthodes de crédits (`hasEnoughCredits`, `deductCredits`)
+- [x] **2.4** Mettre à jour `transcription_job.ts` pour utiliser org.credits
+- [x] **2.5** Tests de non-régression
 
 ### Phase 3 : API Super Admin
 **Priorité**: Haute

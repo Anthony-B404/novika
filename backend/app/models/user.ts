@@ -1,9 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, manyToMany, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany, belongsTo } from '@adonisjs/lucid/orm'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import Organization from './organization.js'
-import type { ManyToMany, BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import CreditTransaction, { CreditTransactionType } from './credit_transaction.js'
+import type { ManyToMany, BelongsTo } from '@adonisjs/lucid/types/relations'
 import Reseller from './reseller.js'
 
 export enum UserRole {
@@ -78,18 +77,12 @@ export default class User extends BaseModel {
   declare emailChangeExpiresAt: DateTime | null
 
   @column()
-  declare credits: number
-
-  @column()
   declare isSuperAdmin: boolean
 
   @column()
   declare resellerId: number | null
 
   declare isCurrentUser?: boolean
-
-  @hasMany(() => CreditTransaction)
-  declare creditTransactions: HasMany<typeof CreditTransaction>
 
   @belongsTo(() => Reseller)
   declare reseller: BelongsTo<typeof Reseller>
@@ -117,62 +110,6 @@ export default class User extends BaseModel {
       await this.load('organizations')
     }
     return this.organizations.some((o) => o.id === organizationId)
-  }
-
-  /**
-   * Check if user has enough credits for an operation
-   */
-  hasEnoughCredits(amount: number): boolean {
-    return this.credits >= amount
-  }
-
-  /**
-   * Deduct credits from user and create a transaction record
-   */
-  async deductCredits(
-    amount: number,
-    description: string,
-    audioId?: number
-  ): Promise<CreditTransaction> {
-    if (!this.hasEnoughCredits(amount)) {
-      throw new Error('Insufficient credits')
-    }
-
-    this.credits -= amount
-    await this.save()
-
-    const transaction = await CreditTransaction.create({
-      userId: this.id,
-      amount: -amount,
-      balanceAfter: this.credits,
-      type: CreditTransactionType.Usage,
-      description,
-      audioId: audioId || null,
-    })
-
-    return transaction
-  }
-
-  /**
-   * Add credits to user (for purchases, bonuses, refunds)
-   */
-  async addCredits(
-    amount: number,
-    type: CreditTransactionType,
-    description: string
-  ): Promise<CreditTransaction> {
-    this.credits += amount
-    await this.save()
-
-    const transaction = await CreditTransaction.create({
-      userId: this.id,
-      amount: amount,
-      balanceAfter: this.credits,
-      type,
-      description,
-    })
-
-    return transaction
   }
 
   /**

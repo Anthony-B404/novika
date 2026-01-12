@@ -13,7 +13,6 @@ export interface ExportProfile {
   lastName: string | null
   avatar: string | null
   googleId: string | null
-  credits: number
   onboardingCompleted: boolean
   createdAt: string
   updatedAt: string | null
@@ -81,7 +80,6 @@ class GdprExportService {
   async generateExport(user: User): Promise<Buffer> {
     // Load all user data
     await user.load('organizations')
-    await user.load('creditTransactions')
 
     // Prepare export data
     const profile = this.exportProfile(user)
@@ -105,7 +103,6 @@ class GdprExportService {
       lastName: user.lastName,
       avatar: user.avatar,
       googleId: user.googleId,
-      credits: user.credits,
       onboardingCompleted: user.onboardingCompleted,
       createdAt: user.createdAt.toISO() || '',
       updatedAt: user.updatedAt?.toISO() || null,

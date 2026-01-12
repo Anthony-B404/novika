@@ -3,6 +3,7 @@ import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from './user.js'
 import Audio from './audio.js'
+import Organization from './organization.js'
 
 export enum CreditTransactionType {
   Usage = 'usage',
@@ -35,6 +36,9 @@ export default class CreditTransaction extends BaseModel {
   @column()
   declare audioId: number | null
 
+  @column()
+  declare organizationId: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -45,4 +49,7 @@ export default class CreditTransaction extends BaseModel {
 
   @belongsTo(() => Audio)
   declare audio: BelongsTo<typeof Audio>
+
+  @belongsTo(() => Organization)
+  declare organization: BelongsTo<typeof Organization>
 }

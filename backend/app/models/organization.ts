@@ -68,7 +68,6 @@ export default class Organization extends BaseModel {
   /**
    * Deduct credits from organization and create a transaction record
    * This is called when audio is processed
-   * NOTE: Phase 2 will add organization_id to credit_transactions
    */
   async deductCredits(
     amount: number,
@@ -83,9 +82,9 @@ export default class Organization extends BaseModel {
     this.credits -= amount
     await this.save()
 
-    // Note: organizationId will be added in Phase 2 migration
     const transaction = await CreditTransaction.create({
       userId,
+      organizationId: this.id,
       amount: -amount,
       balanceAfter: this.credits,
       type: CreditTransactionType.Usage,
@@ -98,7 +97,6 @@ export default class Organization extends BaseModel {
 
   /**
    * Add credits to organization (from reseller distribution)
-   * NOTE: Phase 2 will add organization_id to credit_transactions
    */
   async addCredits(
     amount: number,
@@ -109,9 +107,9 @@ export default class Organization extends BaseModel {
     this.credits += amount
     await this.save()
 
-    // Note: organizationId will be added in Phase 2 migration
     const transaction = await CreditTransaction.create({
       userId,
+      organizationId: this.id,
       amount: amount,
       balanceAfter: this.credits,
       type,

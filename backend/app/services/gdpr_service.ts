@@ -8,6 +8,7 @@ import Organization from '#models/organization'
 import Audio from '#models/audio'
 import Transcription from '#models/transcription'
 import Document from '#models/document'
+import CreditTransaction from '#models/credit_transaction'
 import DeletionRequest, {
   DeletionRequestStatus,
   OrphanOrgsDecision,
@@ -89,7 +90,6 @@ class GdprService {
    */
   async getDataSummary(user: User): Promise<DataSummary> {
     await user.load('organizations')
-    await user.load('creditTransactions')
 
     // Get audio stats
     const audioStats = await Audio.query()
@@ -110,6 +110,15 @@ class GdprService {
       .whereIn('audioId', Audio.query().select('id').where('userId', user.id))
       .count('* as count')
       .first()
+
+    // Get credit transactions count for this user
+    const creditTransactionsCount = await CreditTransaction.query()
+      .where('userId', user.id)
+      .count('* as count')
+      .first()
+
+    // Calculate total credits across user's organizations
+    const totalCredits = user.organizations.reduce((sum, org) => sum + (org.credits || 0), 0)
 
     const roleNames: Record<number, string> = {
       [UserRole.Owner]: 'Owner',
@@ -147,8 +156,8 @@ class GdprService {
         count: Number(documentCount?.$extras.count) || 0,
       },
       credits: {
-        balance: user.credits,
-        transactionsCount: user.creditTransactions.length,
+        balance: totalCredits,
+        transactionsCount: Number(creditTransactionsCount?.$extras.count) || 0,
       },
     }
   }

@@ -6,6 +6,7 @@ import AudioConverterService from '#services/audio_converter_service'
 import storageService from '#services/storage_service'
 import Audio, { AudioStatus } from '#models/audio'
 import User from '#models/user'
+import Organization from '#models/organization'
 import Transcription, { type TranscriptionTimestamp } from '#models/transcription'
 import type { TranscriptionJobData, TranscriptionJobResult } from '#services/queue_service'
 import { tmpdir } from 'node:os'
@@ -214,30 +215,40 @@ async function processTranscriptionJob(
     const durationMinutes = Math.ceil(chunkingResult.metadata.duration / 60)
     const creditsNeeded = Math.max(1, durationMinutes) // Minimum 1 credit
 
-    // Load user and check credits
+    // Load user and their organization to check credits
     const user = await User.find(job.data.userId)
     if (!user) {
       throw new Error('User not found')
     }
 
-    if (!user.hasEnoughCredits(creditsNeeded)) {
+    if (!user.currentOrganizationId) {
+      throw new Error('User has no current organization')
+    }
+
+    const organization = await Organization.find(user.currentOrganizationId)
+    if (!organization) {
+      throw new Error('Organization not found')
+    }
+
+    if (!organization.hasEnoughCredits(creditsNeeded)) {
       // Set audio status to failed with specific error
       if (audio) {
         audio.status = AudioStatus.Failed
-        audio.errorMessage = `Insufficient credits. Required: ${creditsNeeded}, Available: ${user.credits}`
+        audio.errorMessage = `Insufficient credits. Required: ${creditsNeeded}, Available: ${organization.credits}`
         audio.currentJobId = null
         await audio.save()
       }
       throw new Error(
-        `Insufficient credits. Required: ${creditsNeeded}, Available: ${user.credits}`
+        `Insufficient credits. Required: ${creditsNeeded}, Available: ${organization.credits}`
       )
     }
 
-    // Deduct credits
+    // Deduct credits from organization
     const fileNameWithoutExt = audioFileName.replace(/\.[^/.]+$/, '')
-    await user.deductCredits(
+    await organization.deductCredits(
       creditsNeeded,
       `Analyse audio: ${fileNameWithoutExt} (${Math.round(chunkingResult.metadata.duration)}s)`,
+      user.id,
       audioId
     )
 

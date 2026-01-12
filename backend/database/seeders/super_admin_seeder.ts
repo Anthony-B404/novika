@@ -28,7 +28,6 @@ export default class extends BaseSeeder {
         isSuperAdmin: true,
         onboardingCompleted: true,
         disabled: false,
-        credits: 0, // Super Admin doesn't need credits
       })
 
       console.log(`✅ Super Admin user created: "${superAdminEmail}" (${firstName} ${lastName})`)
