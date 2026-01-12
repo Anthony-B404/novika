@@ -1,0 +1,52 @@
+meta {
+  name: Get Reseller Profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/reseller/profile
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return reseller profile", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('id');
+    expect(data).to.have.property('name');
+    expect(data).to.have.property('email');
+    expect(data).to.have.property('company');
+    expect(data).to.have.property('creditBalance');
+    expect(data).to.have.property('isActive');
+  });
+
+  test("should include contact info", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('phone');
+    expect(data).to.have.property('address');
+  });
+
+  test("should include siret", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('siret');
+  });
+
+  test("should save reseller ID for later tests", function() {
+    const data = res.getBody();
+    bru.setVar("resellerId", data.id);
+  });
+}

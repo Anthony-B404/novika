@@ -1,0 +1,56 @@
+meta {
+  name: Get Reseller Organization
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/reseller/organizations/{{resellerOrgId}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return organization details", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('id');
+    expect(data).to.have.property('name');
+    expect(data).to.have.property('email');
+    expect(data).to.have.property('resellerId');
+    expect(data).to.have.property('credits');
+  });
+
+  test("should include user count", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('$extras');
+    expect(data.$extras).to.have.property('users_count');
+  });
+
+  test("should include preloaded users", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('users');
+    expect(Array.isArray(data.users)).to.be.true;
+  });
+
+  test("users should have required fields", function() {
+    const data = res.getBody();
+    if (data.users.length > 0) {
+      const user = data.users[0];
+      expect(user).to.have.property('id');
+      expect(user).to.have.property('email');
+    }
+  });
+}

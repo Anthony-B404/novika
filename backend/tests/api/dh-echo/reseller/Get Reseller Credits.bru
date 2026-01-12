@@ -1,0 +1,59 @@
+meta {
+  name: Get Reseller Credits
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/reseller/credits
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 10
+  ~type: distribution
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return credit balance", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('creditBalance');
+    expect(data.creditBalance).to.be.a('number');
+  });
+
+  test("should return paginated transactions", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('transactions');
+    expect(data.transactions).to.have.property('meta');
+    expect(data.transactions).to.have.property('data');
+    expect(data.transactions.meta).to.have.property('total');
+    expect(data.transactions.meta).to.have.property('perPage');
+    expect(data.transactions.meta).to.have.property('currentPage');
+  });
+
+  test("transactions should have required fields", function() {
+    const data = res.getBody();
+    if (data.transactions.data.length > 0) {
+      const tx = data.transactions.data[0];
+      expect(tx).to.have.property('id');
+      expect(tx).to.have.property('amount');
+      expect(tx).to.have.property('type');
+      expect(tx).to.have.property('createdAt');
+    }
+  });
+}

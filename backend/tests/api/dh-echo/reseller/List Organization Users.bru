@@ -1,0 +1,65 @@
+meta {
+  name: List Organization Users
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/reseller/organizations/{{resellerOrgId}}/users
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 10
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return paginated list", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('meta');
+    expect(data).to.have.property('data');
+    expect(data.meta).to.have.property('total');
+    expect(data.meta).to.have.property('perPage');
+    expect(data.meta).to.have.property('currentPage');
+  });
+
+  test("users should have required fields", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      const user = data.data[0];
+      expect(user).to.have.property('id');
+      expect(user).to.have.property('email');
+      expect(user).to.have.property('role');
+      expect(user).to.have.property('createdAt');
+    }
+  });
+
+  test("should have at least one user (owner)", function() {
+    const data = res.getBody();
+    expect(data.data.length).to.be.at.least(1);
+  });
+
+  test("should save first non-owner user ID if available", function() {
+    const data = res.getBody();
+    // Find a non-owner user (role !== 1)
+    const nonOwner = data.data.find(u => u.role !== 1);
+    if (nonOwner) {
+      bru.setVar("resellerOrgUserId", nonOwner.id);
+    }
+  });
+}

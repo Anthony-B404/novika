@@ -47,4 +47,5 @@ export const middleware = router.named({
   auth: () => import('#middleware/auth_middleware'),
   pendingDeletion: () => import('#middleware/pending_deletion_middleware'),
   superAdmin: () => import('#middleware/super_admin_middleware'),
+  reseller: () => import('#middleware/reseller_middleware'),
 })

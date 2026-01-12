@@ -394,17 +394,17 @@ if (user.isSuperAdmin) {
 - [x] **3.5** Policy `ResellerPolicy`
 - [x] **3.6** Routes `/admin/*`
 
-### Phase 4 : API Reseller
+### Phase 4 : API Reseller ✅
 **Priorité**: Haute
 **Estimation**: 2-3 jours
 
-- [ ] **4.1** Middleware `reseller_middleware.ts`
-- [ ] **4.2** `ResellerOrganizationsController`
-- [ ] **4.3** `ResellerUsersController`
-- [ ] **4.4** `ResellerCreditsDistributionController`
-- [ ] **4.5** Validators Reseller operations
-- [ ] **4.6** Policy `ResellerOrganizationPolicy`
-- [ ] **4.7** Routes `/api/reseller/*`
+- [x] **4.1** Middleware `reseller_middleware.ts`
+- [x] **4.2** `ResellerOrganizationsController`
+- [x] **4.3** `ResellerUsersController`
+- [x] **4.4** `ResellerCreditsController` (profil + historique)
+- [x] **4.5** Validators Reseller operations
+- [x] **4.6** Policy `ResellerOrganizationPolicy`
+- [x] **4.7** Routes `/api/reseller/*`
 
 ### Phase 5 : Frontend Super Admin
 **Priorité**: Haute

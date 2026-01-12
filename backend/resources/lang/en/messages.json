@@ -14,6 +14,21 @@
     "credits_added": "{amount} credits added successfully",
     "credits_added_by_admin": "Credits added by administrator"
   },
+  "reseller_api": {
+    "access_denied": "Access denied. Only reseller administrators can access this resource.",
+    "reseller_inactive": "Your reseller account is deactivated.",
+    "organization_access_denied": "You do not have access to this organization.",
+    "organization_created": "Organization created successfully",
+    "insufficient_credits": "Insufficient credits in your credit pool",
+    "credits_distributed": "{amount} credits distributed successfully",
+    "credit_distribution": "Credit distribution to {organization}",
+    "credits_from_reseller": "Credits received from reseller",
+    "initial_credits_distribution": "Initial credits for {organization}",
+    "initial_credits_from_reseller": "Initial credits from reseller",
+    "user_created": "User created and invitation sent",
+    "user_added_existing": "Existing user added to organization",
+    "cannot_remove_owner": "Cannot remove the organization owner"
+  },
   "auth": {
     "login_success": "Login successful",
     "logout_success": "Logout successful",

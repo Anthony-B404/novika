@@ -1,0 +1,71 @@
+meta {
+  name: List Reseller Organizations
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/reseller/organizations
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 10
+  ~search:
+  ~sortBy: createdAt
+  ~sortOrder: desc
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return paginated list", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('meta');
+    expect(data).to.have.property('data');
+    expect(data.meta).to.have.property('total');
+    expect(data.meta).to.have.property('perPage');
+    expect(data.meta).to.have.property('currentPage');
+  });
+
+  test("organizations should have required fields", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      const org = data.data[0];
+      expect(org).to.have.property('id');
+      expect(org).to.have.property('name');
+      expect(org).to.have.property('email');
+      expect(org).to.have.property('resellerId');
+      expect(org).to.have.property('credits');
+    }
+  });
+
+  test("should include user count", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      const org = data.data[0];
+      expect(org).to.have.property('$extras');
+      expect(org.$extras).to.have.property('users_count');
+    }
+  });
+
+  test("should save first organization ID if available", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      bru.setVar("resellerOrgId", data.data[0].id);
+    }
+  });
+}

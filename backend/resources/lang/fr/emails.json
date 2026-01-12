@@ -157,5 +157,41 @@
     "team": "L'équipe DH-Echo",
     "expires": "Ce lien expire le {date}.",
     "footer": "Si vous n'avez pas demandé ce compte, vous pouvez ignorer cet email."
+  },
+  "reseller_org_welcome": {
+    "subject": "Bienvenue sur DH-Echo - Configurez votre compte",
+    "preview": "Votre organisation {organization} a été créée",
+    "title": "Bienvenue sur DH-Echo !",
+    "greeting": "Bonjour {name}",
+    "intro": "Votre organisation {organization} a été créée par votre revendeur. Vous pouvez maintenant configurer votre compte et commencer à utiliser nos services.",
+    "credits_info": "Vous disposez de {credits} crédits pour démarrer.",
+    "button": "Configurer mon compte",
+    "closing": "Cordialement",
+    "team": "L'équipe DH-Echo",
+    "expires": "Ce lien expire le {date}.",
+    "footer": "Si vous n'attendiez pas cet email, vous pouvez l'ignorer."
+  },
+  "reseller_user_invitation": {
+    "subject": "Invitation à rejoindre {organization}",
+    "preview": "Vous êtes invité à rejoindre {organization}",
+    "title": "Vous êtes invité !",
+    "greeting": "Bonjour {name}",
+    "intro": "Vous avez été invité à rejoindre l'organisation {organization} en tant que {role}.",
+    "button": "Accepter et configurer mon compte",
+    "closing": "Cordialement",
+    "team": "L'équipe DH-Echo",
+    "expires": "Ce lien expire le {date}.",
+    "footer": "Si vous n'attendiez pas cette invitation, vous pouvez l'ignorer."
+  },
+  "reseller_user_added": {
+    "subject": "Vous avez été ajouté à {organization}",
+    "preview": "Vous avez été ajouté à l'organisation {organization}",
+    "title": "Nouveau accès à une organisation",
+    "greeting": "Bonjour {name}",
+    "intro": "Vous avez été ajouté à l'organisation {organization} en tant que {role}. Vous pouvez maintenant y accéder depuis votre compte.",
+    "button": "Se connecter",
+    "closing": "Cordialement",
+    "team": "L'équipe DH-Echo",
+    "footer": "Si vous n'attendiez pas cet ajout, veuillez contacter votre administrateur."
   }
 }

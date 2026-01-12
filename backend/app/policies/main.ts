@@ -17,4 +17,5 @@ export const policies = {
   InvitationPolicy: () => import('#policies/invitation_policy'),
   GdprPolicy: () => import('#policies/gdpr_policy'),
   ResellerPolicy: () => import('#policies/reseller_policy'),
+  ResellerOrganizationPolicy: () => import('#policies/reseller_organization_policy'),
 }

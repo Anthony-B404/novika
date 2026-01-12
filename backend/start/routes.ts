@@ -201,3 +201,38 @@ router
   })
   .prefix('/admin')
   .use([middleware.auth({ guards: ['api'] }), middleware.superAdmin()])
+
+// Reseller API controllers (lazy import)
+const ResellerProfileController = () =>
+  import('#controllers/reseller/reseller_profile_controller')
+const ResellerApiCreditsController = () =>
+  import('#controllers/reseller/reseller_credits_controller')
+const ResellerOrganizationsController = () =>
+  import('#controllers/reseller/reseller_organizations_controller')
+const ResellerUsersController = () => import('#controllers/reseller/reseller_users_controller')
+
+// Reseller API routes
+router
+  .group(() => {
+    // Profile
+    router.get('/profile', [ResellerProfileController, 'show'])
+
+    // Credits
+    router.get('/credits', [ResellerApiCreditsController, 'index'])
+
+    // Organizations
+    router.get('/organizations', [ResellerOrganizationsController, 'index'])
+    router.post('/organizations', [ResellerOrganizationsController, 'store'])
+    router.get('/organizations/:id', [ResellerOrganizationsController, 'show'])
+    router.put('/organizations/:id', [ResellerOrganizationsController, 'update'])
+
+    // Credit distribution
+    router.post('/organizations/:id/credits', [ResellerOrganizationsController, 'distributeCredits'])
+
+    // User management
+    router.get('/organizations/:id/users', [ResellerUsersController, 'index'])
+    router.post('/organizations/:id/users', [ResellerUsersController, 'store'])
+    router.delete('/organizations/:id/users/:userId', [ResellerUsersController, 'destroy'])
+  })
+  .prefix('/reseller')
+  .use([middleware.auth({ guards: ['api'] }), middleware.reseller()])

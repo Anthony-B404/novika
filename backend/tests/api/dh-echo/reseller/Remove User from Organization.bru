@@ -1,0 +1,31 @@
+meta {
+  name: Remove User from Organization
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/reseller/organizations/{{resellerOrgId}}/users/{{resellerOrgUserId}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should remove user successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+  });
+}

@@ -1,0 +1,51 @@
+meta {
+  name: Update Reseller Organization
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/reseller/organizations/{{resellerOrgId}}
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Updated Client Organization",
+    "email": "updated-client@example.com"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update organization successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('organization');
+  });
+
+  test("organization should have updated data", function() {
+    const data = res.getBody();
+    expect(data.organization.name).to.equal('Updated Client Organization');
+    expect(data.organization.email).to.equal('updated-client@example.com');
+  });
+
+  test("organization should keep reseller link", function() {
+    const data = res.getBody();
+    expect(data.organization).to.have.property('resellerId');
+    expect(data.organization.resellerId).to.not.be.null;
+  });
+}

@@ -14,6 +14,21 @@
     "credits_added": "{amount} crédits ajoutés avec succès",
     "credits_added_by_admin": "Crédits ajoutés par l'administrateur"
   },
+  "reseller_api": {
+    "access_denied": "Accès refusé. Seuls les administrateurs revendeurs peuvent accéder à cette ressource.",
+    "reseller_inactive": "Votre compte revendeur est désactivé.",
+    "organization_access_denied": "Vous n'avez pas accès à cette organisation.",
+    "organization_created": "Organisation créée avec succès",
+    "insufficient_credits": "Crédits insuffisants dans votre pool de crédits",
+    "credits_distributed": "{amount} crédits distribués avec succès",
+    "credit_distribution": "Distribution de crédits vers {organization}",
+    "credits_from_reseller": "Crédits reçus du revendeur",
+    "initial_credits_distribution": "Crédits initiaux pour {organization}",
+    "initial_credits_from_reseller": "Crédits initiaux du revendeur",
+    "user_created": "Utilisateur créé et invitation envoyée",
+    "user_added_existing": "Utilisateur existant ajouté à l'organisation",
+    "cannot_remove_owner": "Impossible de retirer le propriétaire de l'organisation"
+  },
   "auth": {
     "login_success": "Connexion réussie",
     "logout_success": "Déconnexion réussie",
