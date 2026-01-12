@@ -141,5 +141,21 @@
     "reregister": "Si vous souhaitez utiliser à nouveau nos services à l'avenir, vous êtes libre de créer un nouveau compte.",
     "closing": "Cordialement,\nL'équipe DH-Echo",
     "footer": "Cet email est la confirmation finale de la suppression de votre compte."
+  },
+  "reseller_welcome": {
+    "subject": "Bienvenue sur DH-Echo - Configurez votre compte revendeur",
+    "preview": "Votre compte revendeur {company} est prêt à être configuré",
+    "title": "Bienvenue sur DH-Echo !",
+    "greeting": "Bonjour {name}",
+    "intro": "Votre compte revendeur pour {company} a été créé avec succès. Vous pouvez maintenant commencer à gérer vos clients et distribuer des crédits.",
+    "features_intro": "En tant que revendeur, vous avez accès à :",
+    "feature_1": "Gestion de vos organisations clientes",
+    "feature_2": "Distribution de crédits à vos clients",
+    "feature_3": "Suivi des utilisations et statistiques",
+    "button": "Configurer mon compte",
+    "closing": "Cordialement",
+    "team": "L'équipe DH-Echo",
+    "expires": "Ce lien expire le {date}.",
+    "footer": "Si vous n'avez pas demandé ce compte, vous pouvez ignorer cet email."
   }
 }

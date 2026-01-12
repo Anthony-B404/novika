@@ -176,3 +176,28 @@ router
     router.post('/contact', [ContactController, 'send'])
   })
   .use([middleware.auth({ guards: ['api'] }), middleware.pendingDeletion()])
+
+// Admin controllers (lazy import)
+const ResellersController = () => import('#controllers/admin/resellers_controller')
+const ResellerCreditsController = () => import('#controllers/admin/reseller_credits_controller')
+const AdminStatsController = () => import('#controllers/admin/admin_stats_controller')
+
+// Super Admin routes - Reseller management
+router
+  .group(() => {
+    // Global stats
+    router.get('/stats', [AdminStatsController, 'index'])
+
+    // Reseller CRUD
+    router.get('/resellers', [ResellersController, 'index'])
+    router.post('/resellers', [ResellersController, 'store'])
+    router.get('/resellers/:id', [ResellersController, 'show'])
+    router.put('/resellers/:id', [ResellersController, 'update'])
+    router.delete('/resellers/:id', [ResellersController, 'destroy'])
+
+    // Reseller credits management
+    router.post('/resellers/:id/credits', [ResellerCreditsController, 'addCredits'])
+    router.get('/resellers/:id/transactions', [ResellerCreditsController, 'transactions'])
+  })
+  .prefix('/admin')
+  .use([middleware.auth({ guards: ['api'] }), middleware.superAdmin()])

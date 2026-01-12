@@ -1,0 +1,59 @@
+meta {
+  name: Create Reseller
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/admin/resellers
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Test Reseller",
+    "email": "test-reseller@example.com",
+    "company": "Test Company SAS",
+    "phone": "0123456789",
+    "siret": "12345678901234",
+    "address": "123 Test Street, Paris 75001",
+    "notes": "Test reseller for API testing",
+    "initialCredits": 100
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body: isJson
+}
+
+tests {
+  test("should create reseller successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('reseller');
+  });
+  
+  test("should save reseller ID for later tests", function() {
+    const data = res.getBody();
+    bru.setVar("resellerId", data.reseller.id);
+    expect(data.reseller).to.have.property('id');
+  });
+  
+  test("reseller should have correct data", function() {
+    const data = res.getBody();
+    expect(data.reseller.name).to.equal('Test Reseller');
+    expect(data.reseller.email).to.equal('test-reseller@example.com');
+    expect(data.reseller.company).to.equal('Test Company SAS');
+    expect(data.reseller.isActive).to.be.true;
+  });
+}

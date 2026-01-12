@@ -1,0 +1,54 @@
+meta {
+  name: Get Reseller
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/admin/resellers/{{resellerId}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return reseller details", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('id');
+    expect(data).to.have.property('name');
+    expect(data).to.have.property('email');
+    expect(data).to.have.property('company');
+    expect(data).to.have.property('creditBalance');
+    expect(data).to.have.property('isActive');
+  });
+  
+  test("should include organization count", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('$extras');
+    expect(data.$extras).to.have.property('organizations_count');
+  });
+  
+  test("should include preloaded organizations", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('organizations');
+    expect(Array.isArray(data.organizations)).to.be.true;
+  });
+  
+  test("should include preloaded admin users", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('adminUsers');
+    expect(Array.isArray(data.adminUsers)).to.be.true;
+  });
+}

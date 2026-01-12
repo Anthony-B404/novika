@@ -141,5 +141,21 @@
     "reregister": "If you wish to use our services again in the future, you are welcome to create a new account.",
     "closing": "Best regards,\nThe DH-Echo Team",
     "footer": "This email is the final confirmation of your account deletion."
+  },
+  "reseller_welcome": {
+    "subject": "Welcome to DH-Echo - Set up your reseller account",
+    "preview": "Your reseller account for {company} is ready to be configured",
+    "title": "Welcome to DH-Echo!",
+    "greeting": "Hello {name}",
+    "intro": "Your reseller account for {company} has been successfully created. You can now start managing your clients and distributing credits.",
+    "features_intro": "As a reseller, you have access to:",
+    "feature_1": "Management of your client organizations",
+    "feature_2": "Credit distribution to your clients",
+    "feature_3": "Usage tracking and statistics",
+    "button": "Set up my account",
+    "closing": "Best regards",
+    "team": "The DH-Echo Team",
+    "expires": "This link expires on {date}.",
+    "footer": "If you did not request this account, you can ignore this email."
   }
 }

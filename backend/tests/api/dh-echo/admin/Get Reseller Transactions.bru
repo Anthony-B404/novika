@@ -1,0 +1,59 @@
+meta {
+  name: Get Reseller Transactions
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/admin/resellers/{{resellerId}}/transactions
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 20
+  ~type: purchase
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return reseller info", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('reseller');
+    expect(data.reseller).to.have.property('id');
+    expect(data.reseller).to.have.property('name');
+    expect(data.reseller).to.have.property('creditBalance');
+  });
+  
+  test("should return paginated transactions", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('transactions');
+    expect(data.transactions).to.have.property('meta');
+    expect(data.transactions).to.have.property('data');
+  });
+  
+  test("transactions should have required fields", function() {
+    const data = res.getBody();
+    if (data.transactions.data.length > 0) {
+      const transaction = data.transactions.data[0];
+      expect(transaction).to.have.property('id');
+      expect(transaction).to.have.property('amount');
+      expect(transaction).to.have.property('type');
+      expect(transaction).to.have.property('description');
+      expect(transaction).to.have.property('createdAt');
+    }
+  });
+}

@@ -1,0 +1,55 @@
+meta {
+  name: List Resellers
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/resellers
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 10
+  ~search: 
+  ~isActive: true
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return paginated list", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('meta');
+    expect(data).to.have.property('data');
+    expect(data.meta).to.have.property('total');
+    expect(data.meta).to.have.property('perPage');
+    expect(data.meta).to.have.property('currentPage');
+  });
+  
+  test("resellers should have required fields", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      const reseller = data.data[0];
+      expect(reseller).to.have.property('id');
+      expect(reseller).to.have.property('name');
+      expect(reseller).to.have.property('email');
+      expect(reseller).to.have.property('company');
+      expect(reseller).to.have.property('creditBalance');
+      expect(reseller).to.have.property('isActive');
+    }
+  });
+}

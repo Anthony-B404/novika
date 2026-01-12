@@ -1,6 +1,19 @@
 {
   "welcome": "Welcome",
   "hello": "Hello {name}",
+  "admin": {
+    "access_denied": "Access denied. Only Super Administrators can access this resource."
+  },
+  "reseller": {
+    "created": "Reseller created successfully",
+    "updated": "Reseller updated successfully",
+    "deactivated": "Reseller deactivated successfully",
+    "not_found": "Reseller not found",
+    "inactive": "This reseller is deactivated",
+    "initial_credits": "Initial credits",
+    "credits_added": "{amount} credits added successfully",
+    "credits_added_by_admin": "Credits added by administrator"
+  },
   "auth": {
     "login_success": "Login successful",
     "logout_success": "Logout successful",

@@ -1,0 +1,48 @@
+meta {
+  name: Get Admin Stats
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/stats
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return stats object", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('resellers');
+    expect(data).to.have.property('organizations');
+    expect(data).to.have.property('credits');
+    expect(data).to.have.property('topResellers');
+    expect(data).to.have.property('recentTransactions');
+  });
+  
+  test("should have reseller stats", function() {
+    const data = res.getBody();
+    expect(data.resellers).to.have.property('total');
+    expect(data.resellers).to.have.property('active');
+  });
+  
+  test("should have credit stats", function() {
+    const data = res.getBody();
+    expect(data.credits).to.have.property('totalInPools');
+    expect(data.credits).to.have.property('distributedThisMonth');
+    expect(data.credits).to.have.property('purchasedThisMonth');
+  });
+}

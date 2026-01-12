@@ -129,18 +129,18 @@ Super Admin (DH-Echo)
 
 ### 2.3 Routes API
 
-#### Super Admin (`/api/admin/*`)
+#### Super Admin (`/admin/*`)
 ```
-GET    /api/admin/resellers              # Liste des resellers
-POST   /api/admin/resellers              # Créer un reseller
-GET    /api/admin/resellers/:id          # Détail reseller
-PUT    /api/admin/resellers/:id          # Modifier reseller
-DELETE /api/admin/resellers/:id          # Désactiver reseller
+GET    /admin/resellers              # Liste des resellers
+POST   /admin/resellers              # Créer un reseller
+GET    /admin/resellers/:id          # Détail reseller
+PUT    /admin/resellers/:id          # Modifier reseller
+DELETE /admin/resellers/:id          # Désactiver reseller
 
-POST   /api/admin/resellers/:id/credits  # Ajouter crédits au pool
-GET    /api/admin/resellers/:id/transactions  # Historique transactions
+POST   /admin/resellers/:id/credits  # Ajouter crédits au pool
+GET    /admin/resellers/:id/transactions  # Historique transactions
 
-GET    /api/admin/stats                  # Stats globales
+GET    /admin/stats                  # Stats globales
 ```
 
 #### Reseller (`/api/reseller/*`)
@@ -383,16 +383,16 @@ if (user.isSuperAdmin) {
 - [x] **2.4** Mettre à jour `transcription_job.ts` pour utiliser org.credits
 - [x] **2.5** Tests de non-régression
 
-### Phase 3 : API Super Admin
+### Phase 3 : API Super Admin ✅
 **Priorité**: Haute
 **Estimation**: 2 jours
 
-- [ ] **3.1** Middleware `super_admin_middleware.ts`
-- [ ] **3.2** `ResellersController` (CRUD)
-- [ ] **3.3** `ResellerCreditsController` (ajout crédits)
-- [ ] **3.4** Validators pour Reseller
-- [ ] **3.5** Policy `ResellerPolicy`
-- [ ] **3.6** Routes `/api/admin/*`
+- [x] **3.1** Middleware `super_admin_middleware.ts`
+- [x] **3.2** `ResellersController` (CRUD)
+- [x] **3.3** `ResellerCreditsController` (ajout crédits)
+- [x] **3.4** Validators pour Reseller
+- [x] **3.5** Policy `ResellerPolicy`
+- [x] **3.6** Routes `/admin/*`
 
 ### Phase 4 : API Reseller
 **Priorité**: Haute

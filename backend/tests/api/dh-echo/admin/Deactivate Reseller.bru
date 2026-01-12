@@ -1,0 +1,31 @@
+meta {
+  name: Deactivate Reseller
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/admin/resellers/{{resellerId}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should deactivate reseller successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+  });
+}

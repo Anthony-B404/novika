@@ -1,0 +1,45 @@
+meta {
+  name: Update Reseller
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/admin/resellers/{{resellerId}}
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Updated Reseller Name",
+    "notes": "Updated internal note"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update reseller successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('reseller');
+  });
+  
+  test("should have updated name", function() {
+    const data = res.getBody();
+    expect(data.reseller.name).to.equal('Updated Reseller Name');
+    expect(data.reseller.notes).to.equal('Updated internal note');
+  });
+}
