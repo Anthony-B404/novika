@@ -4,7 +4,7 @@ const router = useRouter();
 const { $localePath } = useNuxtApp();
 const toast = useToast();
 const { t } = useI18n();
-const { login } = useAuth();
+const { login, user } = useAuth();
 
 definePageMeta({
   layout: "auth",
@@ -67,6 +67,9 @@ onMounted(async () => {
     if (needsOnboarding) {
       console.log("Callback - Redirecting to complete-oauth-signup");
       await router.push($localePath("complete-oauth-signup"));
+    } else if (user.value?.isSuperAdmin) {
+      console.log("Callback - Redirecting to admin (superadmin)");
+      await router.push($localePath("/admin"));
     } else {
       console.log("Callback - Redirecting to dashboard");
       await router.push($localePath("dashboard"));

@@ -15,6 +15,8 @@ export interface User {
   avatar: string | null
   googleId: string | null
   onboardingCompleted: boolean
+  isSuperAdmin: boolean
+  resellerId: number | null
   createdAt: string
   updatedAt: string
 }

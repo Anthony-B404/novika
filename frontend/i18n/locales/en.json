@@ -238,8 +238,15 @@
       "buyNow": "Buy now",
       "deleteAccount": "Delete account",
       "loadMore": "Load more",
-      "close": "Close"
+      "close": "Close",
+      "viewAll": "View all",
+      "back": "Back",
+      "view": "View",
+      "edit": "Edit",
+      "deactivate": "Deactivate"
     },
+    "error": "Error",
+    "credits": "credits",
     "loading": "Loading...",
     "actions": {
       "copy": "Copy",
@@ -1004,6 +1011,161 @@
         "title": "Third-Party Cookies",
         "content": "We do not use advertising tracking cookies or social network cookies. No third-party cookies are placed for advertising targeting purposes."
       }
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "navigation": {
+      "dashboard": "Dashboard",
+      "resellers": "Resellers",
+      "backToApp": "Back to app"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Overview of the reseller system",
+      "stats": {
+        "totalResellers": "Total Resellers",
+        "activeResellers": "active",
+        "totalCreditsInPools": "Credits in Pools",
+        "inResellerPools": "in reseller pools",
+        "distributedThisMonth": "Distributed This Month",
+        "toOrganizations": "to organizations",
+        "managedOrganizations": "Managed Organizations",
+        "byResellers": "by resellers"
+      },
+      "topResellers": "Top Resellers",
+      "recentTransactions": "Recent Transactions",
+      "noResellers": "No resellers",
+      "noTransactions": "No recent transactions"
+    },
+    "resellers": {
+      "list": {
+        "title": "Resellers",
+        "subtitle": "Manage resellers and their credit pools",
+        "noResellers": "No resellers",
+        "noResellersDescription": "Create your first reseller to get started"
+      },
+      "create": {
+        "title": "Create Reseller",
+        "subtitle": "Add a new reseller to the platform",
+        "button": "Create reseller",
+        "success": "Reseller created!",
+        "successDescription": "The reseller has been created successfully",
+        "error": "Error",
+        "errorDescription": "An error occurred while creating the reseller"
+      },
+      "detail": {
+        "title": "Reseller Details",
+        "info": "Information",
+        "updateSuccess": "Reseller updated successfully",
+        "updateError": "Error updating reseller",
+        "organizations": "Organizations",
+        "noOrganizations": "No organizations linked to this reseller",
+        "adminUsers": "Administrator Users",
+        "noAdminUsers": "No administrator users",
+        "creditBalance": "Credit Balance",
+        "addCredits": "Add Credits",
+        "manageCredits": "Manage Credits"
+      },
+      "credits": {
+        "title": "Credit Management",
+        "currentBalance": "Current Balance",
+        "addCredits": "Add Credits",
+        "removeCredits": "Remove Credits",
+        "amount": "Amount",
+        "amountPlaceholder": "Number of credits to add",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Reason for adding credits...",
+        "removeDescriptionPlaceholder": "Reason for removal...",
+        "addButton": "Add Credits",
+        "removeButton": "Remove Credits",
+        "addSuccess": "Credits added successfully",
+        "addError": "Error adding credits",
+        "removeSuccess": "Credits removed successfully",
+        "removeError": "Error removing credits",
+        "removeAmountExceedsBalance": "Amount exceeds available balance",
+        "history": "Transaction History",
+        "filterByType": "Filter by type",
+        "noTransactions": "No transactions",
+        "validation": {
+          "amountPositive": "Amount must be positive"
+        },
+        "filters": {
+          "all": "All types"
+        }
+      },
+      "table": {
+        "columns": {
+          "name": "Name",
+          "company": "Company",
+          "email": "Email",
+          "credits": "Credits",
+          "organizations": "Organizations",
+          "status": "Status",
+          "actions": "Actions"
+        }
+      },
+      "filters": {
+        "searchPlaceholder": "Search by name, company or email...",
+        "status": "Status",
+        "all": "All",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "fields": {
+        "name": "Contact Name",
+        "namePlaceholder": "Full name",
+        "email": "Email",
+        "emailPlaceholder": "email{'@'}example.com",
+        "phone": "Phone",
+        "phonePlaceholder": "+33 1 23 45 67 89",
+        "company": "Company",
+        "companyPlaceholder": "Company name",
+        "siret": "SIRET",
+        "siretPlaceholder": "123 456 789 00012",
+        "address": "Address",
+        "addressPlaceholder": "Full address",
+        "notes": "Notes",
+        "notesPlaceholder": "Internal notes...",
+        "initialCredits": "Initial Credits",
+        "initialCreditsPlaceholder": "Starting credits",
+        "isActive": "Active",
+        "createdAt": "Created on"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameTooShort": "Name must be at least 2 characters",
+        "emailRequired": "Email is required",
+        "invalidEmail": "Invalid email",
+        "companyRequired": "Company is required",
+        "companyTooShort": "Company must be at least 2 characters"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "view": "View",
+        "edit": "Edit",
+        "credits": "Credits",
+        "deactivate": "Deactivate"
+      },
+      "deleteModal": {
+        "title": "Deactivate Reseller",
+        "description": "Are you sure you want to deactivate the reseller \"{name}\"?",
+        "warning": "This action will deactivate the reseller. They will no longer be able to manage their organizations.",
+        "confirm": "Deactivate"
+      },
+      "deactivateSuccess": "Reseller deactivated successfully",
+      "deactivateError": "Error deactivating reseller"
+    },
+    "transactions": {
+      "types": {
+        "purchase": "Purchase",
+        "distribution": "Distribution",
+        "adjustment": "Adjustment"
+      },
+      "noDescription": "No description"
     }
   }
 }

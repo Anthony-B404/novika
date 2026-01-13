@@ -240,8 +240,15 @@
       "buyNow": "Acheter maintenant",
       "deleteAccount": "Supprimer le compte",
       "loadMore": "Charger plus",
-      "close": "Fermer"
+      "close": "Fermer",
+      "viewAll": "Voir tout",
+      "back": "Retour",
+      "view": "Voir",
+      "edit": "Modifier",
+      "deactivate": "Désactiver"
     },
+    "error": "Erreur",
+    "credits": "crédits",
     "loading": "Chargement...",
     "actions": {
       "copy": "Copier",
@@ -1005,6 +1012,158 @@
       "thirdParty": {
         "title": "Cookies tiers",
         "content": "Nous n'utilisons pas de cookies de tracking publicitaire ni de cookies de réseaux sociaux. Aucun cookie tiers n'est déposé à des fins de ciblage publicitaire."
+      }
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "navigation": {
+      "dashboard": "Tableau de bord",
+      "resellers": "Revendeurs",
+      "backToApp": "Retour à l'application"
+    },
+    "dashboard": {
+      "title": "Tableau de bord Admin",
+      "subtitle": "Vue d'ensemble du système revendeurs",
+      "stats": {
+        "totalResellers": "Total revendeurs",
+        "activeResellers": "{count} actifs",
+        "managedOrganizations": "Organisations gérées",
+        "creditsInPools": "Crédits en pools",
+        "creditsUnit": "crédits disponibles",
+        "purchasedThisMonth": "Achetés ce mois",
+        "distributedThisMonth": "{count} distribués"
+      },
+      "topResellers": "Top revendeurs",
+      "recentTransactions": "Transactions récentes",
+      "noResellers": "Aucun revendeur",
+      "noTransactions": "Aucune transaction"
+    },
+    "resellers": {
+      "list": {
+        "title": "Revendeurs",
+        "subtitle": "Gérez votre réseau de revendeurs",
+        "noResellers": "Aucun revendeur",
+        "noResellersDescription": "Créez votre premier revendeur pour commencer"
+      },
+      "create": {
+        "title": "Créer un revendeur",
+        "subtitle": "Ajoutez un nouveau revendeur au réseau",
+        "button": "Nouveau revendeur",
+        "submit": "Créer le revendeur",
+        "success": "Revendeur créé",
+        "successDescription": "Le revendeur a été créé et notifié par email",
+        "error": "Erreur",
+        "errorDescription": "Impossible de créer le revendeur"
+      },
+      "detail": {
+        "title": "Détails du revendeur",
+        "info": "Informations",
+        "manageCredits": "Gérer les crédits",
+        "creditBalance": "Solde de crédits",
+        "addCredits": "Ajouter des crédits",
+        "organizations": "Organisations",
+        "noOrganizations": "Aucune organisation",
+        "adminUsers": "Utilisateurs admin",
+        "noAdminUsers": "Aucun utilisateur admin",
+        "updateSuccess": "Revendeur mis à jour",
+        "updateError": "Erreur lors de la mise à jour",
+        "save": "Enregistrer"
+      },
+      "credits": {
+        "title": "Gestion des crédits",
+        "currentBalance": "Solde actuel",
+        "addCredits": "Ajouter des crédits",
+        "removeCredits": "Retirer des crédits",
+        "amount": "Montant",
+        "amountPlaceholder": "Entrez le montant",
+        "description": "Description",
+        "descriptionPlaceholder": "Ex: Facture #123",
+        "removeDescriptionPlaceholder": "Ex: Correction d'erreur",
+        "addButton": "Ajouter les crédits",
+        "removeButton": "Retirer les crédits",
+        "addSuccess": "Crédits ajoutés avec succès",
+        "addError": "Erreur lors de l'ajout des crédits",
+        "removeSuccess": "Crédits retirés avec succès",
+        "removeError": "Erreur lors du retrait des crédits",
+        "removeAmountExceedsBalance": "Le montant dépasse le solde disponible",
+        "history": "Historique des transactions",
+        "filterByType": "Filtrer par type",
+        "filters": {
+          "all": "Tous les types"
+        },
+        "noTransactions": "Aucune transaction",
+        "noTransactionsDescription": "Les transactions de crédits apparaîtront ici",
+        "validation": {
+          "amountPositive": "Le montant doit être positif"
+        }
+      },
+      "delete": {
+        "title": "Désactiver le revendeur",
+        "message": "Êtes-vous sûr de vouloir désactiver {name} ?",
+        "warning": "Cela désactivera tous les utilisateurs admin de ce revendeur.",
+        "confirm": "Désactiver"
+      },
+      "deactivateSuccess": "Revendeur désactivé",
+      "deactivateError": "Erreur lors de la désactivation",
+      "table": {
+        "name": "Nom",
+        "company": "Société",
+        "email": "Email",
+        "credits": "Crédits",
+        "organizations": "Organisations",
+        "status": "Statut"
+      },
+      "filters": {
+        "searchPlaceholder": "Rechercher un revendeur...",
+        "status": "Statut",
+        "all": "Tous",
+        "active": "Actifs",
+        "inactive": "Inactifs"
+      },
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "actions": {
+        "deactivate": "Désactiver"
+      },
+      "fields": {
+        "name": "Nom du contact",
+        "email": "Email",
+        "phone": "Téléphone",
+        "company": "Raison sociale",
+        "siret": "SIRET",
+        "address": "Adresse",
+        "notes": "Notes",
+        "initialCredits": "Crédits initiaux",
+        "isActive": "Actif",
+        "createdAt": "Créé le"
+      },
+      "placeholders": {
+        "name": "Jean Dupont",
+        "email": "contact{'@'}entreprise.com",
+        "phone": "+33 6 12 34 56 78",
+        "company": "Acme Corp",
+        "siret": "12345678901234",
+        "address": "123 rue de Paris, 75001 Paris",
+        "notes": "Notes internes...",
+        "initialCredits": "0"
+      },
+      "validation": {
+        "nameMin": "Le nom doit contenir au moins 2 caractères",
+        "emailInvalid": "Email invalide",
+        "companyMin": "La raison sociale doit contenir au moins 2 caractères",
+        "phoneMin": "Le téléphone doit contenir au moins 10 caractères",
+        "siretLength": "Le SIRET doit contenir 14 chiffres",
+        "siretFormat": "Le SIRET ne doit contenir que des chiffres"
+      }
+    },
+    "transactions": {
+      "types": {
+        "purchase": "Achat",
+        "distribution": "Distribution",
+        "adjustment": "Ajustement"
       }
     }
   }

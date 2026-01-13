@@ -1,9 +1,26 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
+import db from '@adonisjs/lucid/services/db'
 import Organization from './organization.js'
 import ResellerTransaction, { ResellerTransactionType } from './reseller_transaction.js'
 import User from './user.js'
+
+/**
+ * Custom error for insufficient credits
+ */
+export class InsufficientCreditsError extends Error {
+  static readonly code = 'E_INSUFFICIENT_CREDITS'
+  readonly code = InsufficientCreditsError.code
+
+  constructor(
+    public readonly available: number,
+    public readonly requested: number
+  ) {
+    super(`Insufficient credits: ${available} available, ${requested} requested`)
+    this.name = 'InsufficientCreditsError'
+  }
+}
 
 export default class Reseller extends BaseModel {
   @column({ isPrimary: true })
@@ -65,6 +82,8 @@ export default class Reseller extends BaseModel {
   /**
    * Deduct credits from reseller pool and transfer to organization
    * Creates a distribution transaction record
+   *
+   * @throws {InsufficientCreditsError} If reseller doesn't have enough credits
    */
   async distributeCredits(
     amount: number,
@@ -73,65 +92,100 @@ export default class Reseller extends BaseModel {
     performedByUserId: number
   ): Promise<ResellerTransaction> {
     if (!this.hasEnoughCredits(amount)) {
-      throw new Error('Insufficient credits in reseller pool')
+      throw new InsufficientCreditsError(this.creditBalance, amount)
     }
 
-    this.creditBalance -= amount
-    await this.save()
+    const trx = await db.transaction()
 
-    const transaction = await ResellerTransaction.create({
-      resellerId: this.id,
-      amount: -amount,
-      type: ResellerTransactionType.Distribution,
-      targetOrganizationId: organizationId,
-      description,
-      performedByUserId,
-    })
+    try {
+      this.creditBalance -= amount
+      await this.useTransaction(trx).save()
 
-    return transaction
+      const transaction = await ResellerTransaction.create(
+        {
+          resellerId: this.id,
+          amount: -amount,
+          type: ResellerTransactionType.Distribution,
+          targetOrganizationId: organizationId,
+          description,
+          performedByUserId,
+        },
+        { client: trx }
+      )
+
+      await trx.commit()
+      return transaction
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
   }
 
   /**
    * Add credits to reseller pool (from Super Admin purchase)
+   * Uses database transaction to ensure consistency
    */
   async addCredits(
     amount: number,
     description: string,
     performedByUserId: number
   ): Promise<ResellerTransaction> {
-    this.creditBalance += amount
-    await this.save()
+    const trx = await db.transaction()
 
-    const transaction = await ResellerTransaction.create({
-      resellerId: this.id,
-      amount: amount,
-      type: ResellerTransactionType.Purchase,
-      description,
-      performedByUserId,
-    })
+    try {
+      this.creditBalance += amount
+      await this.useTransaction(trx).save()
 
-    return transaction
+      const transaction = await ResellerTransaction.create(
+        {
+          resellerId: this.id,
+          amount: amount,
+          type: ResellerTransactionType.Purchase,
+          description,
+          performedByUserId,
+        },
+        { client: trx }
+      )
+
+      await trx.commit()
+      return transaction
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
   }
 
   /**
    * Adjust credits (for corrections, refunds, etc.)
+   * Uses database transaction to ensure consistency
    */
   async adjustCredits(
     amount: number,
     description: string,
     performedByUserId: number
   ): Promise<ResellerTransaction> {
-    this.creditBalance += amount
-    await this.save()
+    const trx = await db.transaction()
 
-    const transaction = await ResellerTransaction.create({
-      resellerId: this.id,
-      amount: amount,
-      type: ResellerTransactionType.Adjustment,
-      description,
-      performedByUserId,
-    })
+    try {
+      this.creditBalance += amount
+      await this.useTransaction(trx).save()
 
-    return transaction
+      const transaction = await ResellerTransaction.create(
+        {
+          resellerId: this.id,
+          amount: amount,
+          type: ResellerTransactionType.Adjustment,
+          description,
+          performedByUserId,
+        },
+        { client: trx }
+      )
+
+      await trx.commit()
+      return transaction
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
   }
 }

@@ -31,7 +31,7 @@ onMounted(async () => {
   }
 
   try {
-    const { login } = useAuth();
+    const { login, user } = useAuth();
 
     const response = await api<{ token: string }>(
       `/verify-magic-link/${token.value}`,
@@ -46,8 +46,12 @@ onMounted(async () => {
       color: "success",
     });
 
-    // Redirect to dashboard
-    router.push($localePath("dashboard"));
+    // Redirect based on user role
+    if (user.value?.isSuperAdmin) {
+      router.push($localePath("/admin"));
+    } else {
+      router.push($localePath("dashboard"));
+    }
   } catch (error: any) {
     toast.add({
       title: t("auth.verifyLogin.error"),

@@ -12,7 +12,10 @@
     "inactive": "This reseller is deactivated",
     "initial_credits": "Initial credits",
     "credits_added": "{amount} credits added successfully",
-    "credits_added_by_admin": "Credits added by administrator"
+    "credits_added_by_admin": "Credits added by administrator",
+    "credits_removed": "{amount} credits removed successfully",
+    "credits_removed_by_admin": "Credits removed by administrator",
+    "insufficient_credits": "Insufficient credits in pool"
   },
   "reseller_api": {
     "access_denied": "Access denied. Only reseller administrators can access this resource.",

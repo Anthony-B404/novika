@@ -72,6 +72,16 @@ export const addCreditsValidator = vine.compile(
 )
 
 /**
+ * Validator for removing credits from a reseller
+ */
+export const removeCreditsValidator = vine.compile(
+  vine.object({
+    amount: vine.number().positive().min(1),
+    description: vine.string().maxLength(500).optional(),
+  })
+)
+
+/**
  * Validator for listing resellers (query params)
  */
 export const listResellersValidator = vine.compile(

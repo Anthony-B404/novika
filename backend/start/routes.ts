@@ -197,6 +197,7 @@ router
 
     // Reseller credits management
     router.post('/resellers/:id/credits', [ResellerCreditsController, 'addCredits'])
+    router.post('/resellers/:id/credits/remove', [ResellerCreditsController, 'removeCredits'])
     router.get('/resellers/:id/transactions', [ResellerCreditsController, 'transactions'])
   })
   .prefix('/admin')

@@ -12,7 +12,10 @@
     "inactive": "Ce revendeur est désactivé",
     "initial_credits": "Crédits initiaux",
     "credits_added": "{amount} crédits ajoutés avec succès",
-    "credits_added_by_admin": "Crédits ajoutés par l'administrateur"
+    "credits_added_by_admin": "Crédits ajoutés par l'administrateur",
+    "credits_removed": "{amount} crédits retirés avec succès",
+    "credits_removed_by_admin": "Crédits retirés par l'administrateur",
+    "insufficient_credits": "Crédits insuffisants dans le pool"
   },
   "reseller_api": {
     "access_denied": "Accès refusé. Seuls les administrateurs revendeurs peuvent accéder à cette ressource.",

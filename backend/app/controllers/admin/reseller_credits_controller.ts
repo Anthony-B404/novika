@@ -1,8 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { errors } from '@vinejs/vine'
-import Reseller from '#models/reseller'
+import Reseller, { InsufficientCreditsError } from '#models/reseller'
 import ResellerTransaction from '#models/reseller_transaction'
-import { addCreditsValidator, listTransactionsValidator } from '#validators/reseller'
+import {
+  addCreditsValidator,
+  removeCreditsValidator,
+  listTransactionsValidator,
+} from '#validators/reseller'
 
 export default class ResellerCreditsController {
   /**
@@ -25,9 +29,15 @@ export default class ResellerCreditsController {
       })
     }
 
+    if (!auth.user) {
+      return response.unauthorized({
+        message: i18n.t('messages.auth.unauthorized'),
+      })
+    }
+
     try {
       const payload = await request.validateUsing(addCreditsValidator)
-      const superAdmin = auth.user!
+      const superAdmin = auth.user
 
       const transaction = await reseller.addCredits(
         payload.amount,
@@ -45,6 +55,74 @@ export default class ResellerCreditsController {
         return response.unprocessableEntity({
           message: i18n.t('messages.errors.validation_failed'),
           errors: error.messages,
+        })
+      }
+      throw error
+    }
+  }
+
+  /**
+   * Remove credits from a reseller's pool.
+   *
+   * POST /admin/resellers/:id/credits/remove
+   */
+  async removeCredits({ params, request, response, auth, i18n }: HttpContext) {
+    const reseller = await Reseller.find(params.id)
+
+    if (!reseller) {
+      return response.notFound({
+        message: i18n.t('messages.reseller.not_found'),
+      })
+    }
+
+    if (!reseller.isActive) {
+      return response.badRequest({
+        message: i18n.t('messages.reseller.inactive'),
+      })
+    }
+
+    if (!auth.user) {
+      return response.unauthorized({
+        message: i18n.t('messages.auth.unauthorized'),
+      })
+    }
+
+    try {
+      const payload = await request.validateUsing(removeCreditsValidator)
+      const superAdmin = auth.user
+
+      // Check if reseller has enough credits
+      if (!reseller.hasEnoughCredits(payload.amount)) {
+        return response.badRequest({
+          message: i18n.t('messages.reseller.insufficient_credits'),
+        })
+      }
+
+      // Use adjustCredits with negative amount for removal
+      const transaction = await reseller.adjustCredits(
+        -payload.amount,
+        payload.description || i18n.t('messages.reseller.credits_removed_by_admin'),
+        superAdmin.id
+      )
+
+      return response.ok({
+        message: i18n.t('messages.reseller.credits_removed', { amount: payload.amount }),
+        transaction,
+        newBalance: reseller.creditBalance,
+      })
+    } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        return response.unprocessableEntity({
+          message: i18n.t('messages.errors.validation_failed'),
+          errors: error.messages,
+        })
+      }
+      if (error instanceof InsufficientCreditsError) {
+        return response.badRequest({
+          message: i18n.t('messages.reseller.insufficient_credits'),
+          code: error.code,
+          available: error.available,
+          requested: error.requested,
         })
       }
       throw error
