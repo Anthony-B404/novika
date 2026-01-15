@@ -48,27 +48,10 @@ nuxtApp.hooks.hookOnce("page:finish", () => {
 
     <template #right>
       <UColorModeButton />
-
-      <UButton
-        label="Sign up"
-        color="neutral"
-        trailing-icon="i-lucide-arrow-right"
-        class="hidden lg:inline-flex"
-        :to="$localePath('signup')"
-      />
     </template>
 
     <template #body>
       <UNavigationMenu :items="items" orientation="vertical" class="-mx-2.5" />
-
-      <USeparator class="my-6" />
-
-      <UButton
-        label="Sign up"
-        color="neutral"
-        :to="$localePath('signup')"
-        block
-      />
     </template>
   </UHeader>
 </template>

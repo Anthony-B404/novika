@@ -15,7 +15,6 @@ const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
 const OrganizationsController = () => import('#controllers/organizations_controller')
 const InvitationsController = () => import('#controllers/invitations_controller')
-const SocialAuthController = () => import('#controllers/social_auth_controller')
 const MembersController = () => import('#controllers/members_controller')
 const ContactController = () => import('#controllers/contact_controller')
 const AudioController = () => import('#controllers/audio_controller')
@@ -40,10 +39,6 @@ router.get('/health', async ({ response }) => {
     timestamp: new Date().toISOString(),
   })
 })
-
-// Public routes - Registration flow
-router.post('/register/request-magic-link', [AuthController, 'registerWithMagicLink'])
-router.post('/register/complete', [AuthController, 'completeRegistration'])
 
 // Public routes - Login flow
 router.post('/login/request-magic-link', [AuthController, 'loginWithMagicLink'])
@@ -70,10 +65,6 @@ router.post('/accept-invitation', [InvitationsController, 'acceptInvitation'])
 
 // Email verification route
 router.get('/verify-email-change/:token', [UsersController, 'verifyEmailChange'])
-
-// OAuth routes
-router.get('/auth/google/redirect', [SocialAuthController, 'googleRedirect'])
-router.get('/auth/google/callback', [SocialAuthController, 'googleCallback'])
 
 // Public routes for shared audios (no auth required)
 router.get('/shared/:identifier', [SharedAudioController, 'show'])
@@ -109,9 +100,6 @@ router
   .group(() => {
     // User routes
     router.put('/profile', [UsersController, 'updateProfile'])
-
-    // OAuth completion route (onboarding)
-    router.post('/oauth/complete-registration', [SocialAuthController, 'completeOAuthRegistration'])
 
     // Organization routes (write operations only - read operations are always accessible)
     router.post('/organizations', [OrganizationsController, 'createOrganization'])

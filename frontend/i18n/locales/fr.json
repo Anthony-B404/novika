@@ -3,6 +3,7 @@
     "login": {
       "title": "Heureux de vous revoir",
       "description": "Entrez votre email et nous vous enverrons un lien magique pour vous connecter. Vous n'avez pas de compte ?",
+      "descriptionNoSignup": "Entrez votre email et nous vous enverrons un lien magique pour vous connecter.",
       "signupLink": "S'inscrire",
       "email": "Email",
       "emailPlaceholder": "Entrez votre email",
@@ -13,6 +14,7 @@
       "errorDescription": "Échec de l'envoi du lien magique. Veuillez réessayer.",
       "accountDisabled": "Compte désactivé",
       "accountDisabledDescription": "Votre compte a été désactivé. Veuillez vous réinscrire pour le réactiver.",
+      "accountDisabledContactAdmin": "Votre compte a été désactivé. Veuillez contacter votre administrateur ou revendeur pour le réactiver.",
       "footer": "En vous connectant, vous acceptez nos",
       "termsOfService": "Conditions d'utilisation",
       "processing": "Connexion en cours...",

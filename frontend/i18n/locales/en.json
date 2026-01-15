@@ -16,6 +16,7 @@
     "login": {
       "title": "Welcome back",
       "description": "Enter your email and we'll send you a magic link to sign in. Don't have an account?",
+      "descriptionNoSignup": "Enter your email and we'll send you a magic link to sign in.",
       "signupLink": "Sign up",
       "email": "Email",
       "emailPlaceholder": "Enter your email",
@@ -26,6 +27,7 @@
       "errorDescription": "Failed to send magic link. Please try again.",
       "accountDisabled": "Account deactivated",
       "accountDisabledDescription": "Your account has been deactivated. Please sign up again to reactivate.",
+      "accountDisabledContactAdmin": "Your account has been deactivated. Please contact your administrator or reseller to reactivate it.",
       "footer": "By signing in, you agree to our",
       "termsOfService": "Terms of Service",
       "processing": "Logging in...",

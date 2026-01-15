@@ -44,7 +44,7 @@ Super Admin (DH-Echo)
 - [x] Reseller peut créer des Organizations et Users
 - [x] Reseller peut distribuer ses crédits aux Organizations
 - [x] Crédits consommés au niveau Organization
-- [ ] Inscription publique désactivée
+- [x] Inscription publique désactivée
 
 ---
 
@@ -439,10 +439,10 @@ if (user.isSuperAdmin) {
 
 - [x] **7.1** Modifier `/api/me` pour retourner le type de rôle (`isSuperAdmin`, `resellerId`)
 - [x] **7.2** Modifier login frontend pour redirection par rôle (middleware `auth.ts`)
-- [ ] **7.3** Supprimer route `/api/signup`
-- [ ] **7.4** Supprimer page `/signup`
-- [ ] **7.5** Redirect `/signup` → `/login`
-- [ ] **7.6** Retirer liens inscription
+- [x] **7.3** Supprimer route `/api/signup`
+- [x] **7.4** Supprimer page `/signup`
+- [x] **7.5** Redirect `/signup` → `/login`
+- [x] **7.6** Retirer liens inscription
 
 ### Phase 8 : Tests & Documentation
 **Priorité**: Moyenne
@@ -530,7 +530,7 @@ Opérations critiques à wrapper dans des transactions DB :
 - [x] Reseller peut créer des Users dans ses Organizations
 - [x] Client final peut se connecter et utiliser le service
 - [x] Crédits sont consommés au niveau Organization
-- [ ] Inscription publique est désactivée
+- [x] Inscription publique est désactivée
 - [x] Login redirige vers le bon dashboard selon le rôle
 
 ---

@@ -4,17 +4,13 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 
 const { t } = useI18n();
 const { $localePath } = useNuxtApp();
-const { isAuthenticated, user } = useAuth();
+const { isAuthenticated } = useAuth();
 const api = useApi();
 
-// Redirect based on authentication and onboarding status
+// Redirect authenticated users to dashboard
 onMounted(() => {
   if (isAuthenticated.value) {
-    if (user.value && !user.value.onboardingCompleted) {
-      navigateTo($localePath('complete-oauth-signup'));
-    } else {
-      navigateTo($localePath('dashboard'));
-    }
+    navigateTo($localePath('dashboard'));
   }
 });
 
@@ -28,7 +24,6 @@ useSeoMeta({
 });
 
 const toast = useToast();
-const config = useRuntimeConfig();
 
 const fields = computed(() => [
   {
@@ -37,16 +32,6 @@ const fields = computed(() => [
     label: t("auth.login.email"),
     placeholder: t("auth.login.emailPlaceholder"),
     required: true,
-  },
-]);
-
-const providers = computed(() => [
-  {
-    label: t("auth.login.providers.google"),
-    icon: "i-simple-icons-google",
-    onClick: () => {
-      window.location.href = `${config.public.apiUrl}/auth/google/redirect`;
-    },
   },
 ]);
 
@@ -88,17 +73,12 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   } catch (error: unknown) {
     const err = error as { data?: { code?: string; userData?: { email?: string } } };
 
-    // Handle disabled account - redirect to signup with pre-filled email
+    // Handle disabled account - show error message to contact administrator
     if (err.data?.code === "ACCOUNT_DISABLED") {
       toast.add({
         title: t("auth.login.accountDisabled"),
-        description: t("auth.login.accountDisabledDescription"),
-        color: "warning",
-      });
-
-      navigateTo({
-        path: $localePath("signup"),
-        query: { email: err.data.userData?.email },
+        description: t("auth.login.accountDisabledContactAdmin"),
+        color: "error",
       });
       return;
     }
@@ -116,18 +96,13 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <UAuthForm
     :fields="fields"
     :schema="schema"
-    :providers="providers"
     :title="$t('auth.login.title')"
     icon="i-lucide-mail"
     :submit="{ label: $t('auth.login.submitButton') }"
     @submit="onSubmit"
   >
     <template #description>
-      {{ $t("auth.login.description") }}
-      <ULink :to="$localePath('signup')" class="text-primary font-medium">{{
-        $t("auth.login.signupLink")
-      }}</ULink
-      >.
+      {{ $t("auth.login.descriptionNoSignup") }}
     </template>
 
     <template #footer>
