@@ -20,9 +20,18 @@ export const createResellerOrganizationValidator = (resellerId: number) =>
             .first()
           return !existing
         }),
-      email: vine.string().email(),
+      email: vine
+        .string()
+        .trim()
+        .email()
+        .unique(async (_db, value) => {
+          // Check email uniqueness globally
+          const existing = await Organization.findBy('email', value)
+          return !existing
+        }),
       ownerEmail: vine
         .string()
+        .trim()
         .email()
         .unique(async (_db, value) => {
           // Owner email must not exist as a user already
@@ -55,7 +64,19 @@ export const updateResellerOrganizationValidator = (resellerId: number, organiza
           return !existing
         })
         .optional(),
-      email: vine.string().email().optional(),
+      email: vine
+        .string()
+        .trim()
+        .email()
+        .unique(async (_db, value) => {
+          // Check email uniqueness excluding current organization
+          const existing = await Organization.query()
+            .where('email', value)
+            .where('id', '!=', organizationId)
+            .first()
+          return !existing
+        })
+        .optional(),
     })
   )
 
@@ -77,7 +98,7 @@ export const distributeCreditsValidator = vine.compile(
 export const createResellerOrgUserValidator = (_organizationId: number) =>
   vine.compile(
     vine.object({
-      email: vine.string().email(),
+      email: vine.string().trim().email(),
       firstName: vine.string().minLength(2).maxLength(100),
       lastName: vine.string().minLength(2).maxLength(100),
       role: vine.enum([UserRole.Administrator, UserRole.Member]),
