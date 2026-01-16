@@ -1,6 +1,8 @@
 import vine from '@vinejs/vine'
 import Reseller from '#models/reseller'
 
+import User from '#models/user'
+
 /**
  * Validator for creating a reseller
  */
@@ -12,7 +14,10 @@ export const createResellerValidator = vine.compile(
       .email()
       .unique(async (_db, value) => {
         const reseller = await Reseller.findBy('email', value)
-        return !reseller
+        if (reseller) return false
+
+        const user = await User.findBy('email', value)
+        return !user
       }),
     phone: vine.string().minLength(10).maxLength(20).optional(),
     company: vine.string().minLength(2).maxLength(255),

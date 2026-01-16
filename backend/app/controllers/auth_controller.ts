@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import env from '#start/env'
 import User, { UserRole } from '#models/user'
+import Reseller from '#models/reseller'
 import {
   registrationRequestValidator,
   completeRegistrationValidator,
@@ -82,7 +83,7 @@ export default class AuthController {
               locale: i18n.locale,
               i18n: i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-                apiUrl: 'https://api.dh-echo.cloud',
+              apiUrl: 'https://api.dh-echo.cloud',
             })
         })
 
@@ -128,7 +129,7 @@ export default class AuthController {
             locale: i18n.locale,
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-                apiUrl: 'https://api.dh-echo.cloud',
+            apiUrl: 'https://api.dh-echo.cloud',
           })
       })
 
@@ -240,10 +241,18 @@ export default class AuthController {
       // Calculate full name from first and last name
       const fullName = `${data.firstName} ${data.lastName}`
 
-      // Handle organization: create new if disabled user, update existing otherwise
-      let organization: Organization
+      // Handle organization/reseller: create new if disabled user, update existing otherwise
+      let organization: Organization | null = null
 
-      if (user.disabled) {
+      if (user.resellerId) {
+        // Reseller Admin flow
+        const reseller = await Reseller.findOrFail(user.resellerId)
+        reseller.company = data.organizationName
+        await reseller.save()
+
+        // We don't link to an organization for reseller admins in this flow
+        user.disabled = false
+      } else if (user.disabled) {
         // Disabled user re-registering: create new organization
         organization = await Organization.create({
           name: data.organizationName,
@@ -279,7 +288,9 @@ export default class AuthController {
       await user.save()
 
       // Seed default prompts for the organization (if not already seeded)
-      await defaultPromptsService.seedIfNeeded(organization.id)
+      if (organization) {
+        await defaultPromptsService.seedIfNeeded(organization.id)
+      }
 
       // Create access token
       const accessToken = await User.accessTokens.create(user)
@@ -367,7 +378,7 @@ export default class AuthController {
             locale: i18n.locale,
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-                apiUrl: 'https://api.dh-echo.cloud',
+            apiUrl: 'https://api.dh-echo.cloud',
           })
       })
 
