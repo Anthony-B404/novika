@@ -283,6 +283,10 @@
     "oauthCallback": {
       "title": "Logging in",
       "description": "Completing your login"
+    },
+    "organizationUnavailable": {
+      "title": "Organization Unavailable",
+      "description": "Your organization is currently unavailable"
     }
   },
   "common": {
@@ -951,6 +955,20 @@
       "exportData": "Export My Data",
       "logout": "Log Out",
       "info": "You can cancel the deletion or export your data before the deadline."
+    },
+    "organizationUnavailable": {
+      "title": "Organization Unavailable",
+      "suspendedTitle": "Organization Suspended",
+      "deletedTitle": "Organization Scheduled for Deletion",
+      "suspendedDescription": "Your organization has been suspended by your administrator.",
+      "deletedDescription": "Your organization is scheduled for deletion.",
+      "reason": "Reason",
+      "suspendedOn": "Suspended on",
+      "deletedOn": "Deletion requested on",
+      "daysUntilPurge": "{days} days until permanent deletion",
+      "contactReseller": "Contact your reseller",
+      "logout": "Log out",
+      "info": "For more information, please contact your organization's reseller."
     }
   },
   "terms": {
@@ -1139,8 +1157,20 @@
         "email": "Email",
         "credits": "Credits",
         "subscription": "Subscription",
+        "status": "Status",
         "users": "Users",
         "createdAt": "Created"
+      },
+      "status": {
+        "title": "Status Management",
+        "active": "Active",
+        "suspended": "Suspended",
+        "deleted": "Deleted",
+        "suspendedAt": "Suspended on",
+        "deletedAt": "Deleted on",
+        "daysUntilPurge": "Purge in {days} days",
+        "reason": "Reason",
+        "noActionsAvailable": "No actions available for this deleted organization."
       },
       "actions": {
         "view": "View",
@@ -1148,7 +1178,48 @@
         "users": "Users",
         "distributeCredits": "Distribute Credits",
         "manageUsers": "Manage Users",
-        "addUser": "Add User"
+        "addUser": "Add User",
+        "suspend": "Suspend",
+        "restore": "Restore",
+        "delete": "Delete"
+      },
+      "suspend": {
+        "title": "Suspend {name}",
+        "warning": "This action will block access for all users in the organization.",
+        "consequences": {
+          "title": "Consequences:",
+          "users": "Users will no longer be able to log in",
+          "credits": "Credits will be frozen",
+          "subscription": "Monthly subscription will be paused"
+        },
+        "reasonLabel": "Suspension reason (optional)",
+        "reasonPlaceholder": "E.g., Non-payment, Client request...",
+        "confirm": "Suspend",
+        "success": "Organization suspended",
+        "error": "Error suspending organization"
+      },
+      "restore": {
+        "title": "Restore {name}",
+        "message": "Access will be restored for all users.",
+        "note": "Note: The monthly subscription will remain paused. You will need to manually reactivate it if needed.",
+        "confirm": "Restore",
+        "success": "Organization restored",
+        "error": "Error restoring organization"
+      },
+      "delete": {
+        "title": "Delete {name}",
+        "warning": "This action is irreversible.",
+        "consequences": {
+          "title": "Consequences:",
+          "access": "All users will immediately lose access",
+          "purge": "Data will be permanently purged after 30 days",
+          "credits": "Remaining credits will be lost (non-refundable)"
+        },
+        "confirmLabel": "Type the organization name to confirm",
+        "confirmPlaceholder": "Organization name",
+        "confirm": "Delete permanently",
+        "success": "Organization deleted",
+        "error": "Error deleting organization"
       },
       "filters": {
         "searchPlaceholder": "Search organizations...",

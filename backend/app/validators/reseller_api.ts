@@ -132,3 +132,12 @@ export const listResellerOrgUsersValidator = vine.compile(
     limit: vine.number().positive().max(100).optional(),
   })
 )
+
+/**
+ * Validator for suspending an organization
+ */
+export const suspendOrganizationValidator = vine.compile(
+  vine.object({
+    reason: vine.string().maxLength(1000).optional(),
+  })
+)

@@ -3,7 +3,7 @@ import { AudioStatus } from '~/types/audio'
 import type { Audio } from '~/types/audio'
 
 definePageMeta({
-  middleware: ['auth', 'pending-deletion'],
+  middleware: ['auth', 'pending-deletion', 'organization-status'],
 })
 
 const { t } = useI18n()

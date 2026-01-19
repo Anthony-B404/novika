@@ -1,0 +1,50 @@
+meta {
+  name: Suspend Organization
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/reseller/organizations/{{resellerOrgId}}/suspend
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "reason": "Non-payment"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should suspend organization successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('organization');
+  });
+
+  test("organization status should be suspended", function() {
+    const data = res.getBody();
+    expect(data.organization.status).to.equal('suspended');
+  });
+
+  test("organization should have suspension details", function() {
+    const data = res.getBody();
+    expect(data.organization).to.have.property('suspendedAt');
+    expect(data.organization.suspendedAt).to.not.be.null;
+    expect(data.organization.suspensionReason).to.equal('Non-payment');
+  });
+}

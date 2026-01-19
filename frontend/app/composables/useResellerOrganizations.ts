@@ -13,6 +13,8 @@ import type {
   AddUserResponse,
   OrganizationsFilters,
   UsersFilters,
+  SuspendOrganizationPayload,
+  OrganizationStatusResponse,
 } from '~/types/reseller'
 import { getErrorMessage } from '~/utils/errors'
 
@@ -230,6 +232,82 @@ export function useResellerOrganizations() {
     }
   }
 
+  // ==========================================================================
+  // ORGANIZATION STATUS MANAGEMENT
+  // ==========================================================================
+
+  /**
+   * Suspend an organization
+   */
+  async function suspendOrganization(
+    organizationId: number,
+    payload?: SuspendOrganizationPayload
+  ): Promise<OrganizationStatusResponse | null> {
+    loading.value = true
+    error.value = null
+    try {
+      return await authenticatedFetch<OrganizationStatusResponse>(
+        `/reseller/organizations/${organizationId}/suspend`,
+        {
+          method: 'POST',
+          body: payload ? JSON.stringify(payload) : undefined,
+          headers: payload ? { 'Content-Type': 'application/json' } : undefined,
+        }
+      )
+    } catch (e: unknown) {
+      error.value = getErrorMessage(e, 'Failed to suspend organization')
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Restore a suspended organization
+   */
+  async function restoreOrganization(
+    organizationId: number
+  ): Promise<OrganizationStatusResponse | null> {
+    loading.value = true
+    error.value = null
+    try {
+      return await authenticatedFetch<OrganizationStatusResponse>(
+        `/reseller/organizations/${organizationId}/restore`,
+        {
+          method: 'POST',
+        }
+      )
+    } catch (e: unknown) {
+      error.value = getErrorMessage(e, 'Failed to restore organization')
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Delete an organization (soft delete with 30-day purge)
+   */
+  async function deleteOrganization(
+    organizationId: number
+  ): Promise<OrganizationStatusResponse | null> {
+    loading.value = true
+    error.value = null
+    try {
+      return await authenticatedFetch<OrganizationStatusResponse>(
+        `/reseller/organizations/${organizationId}`,
+        {
+          method: 'DELETE',
+        }
+      )
+    } catch (e: unknown) {
+      error.value = getErrorMessage(e, 'Failed to delete organization')
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // State
     loading,
@@ -240,6 +318,11 @@ export function useResellerOrganizations() {
     fetchOrganization,
     createOrganization,
     updateOrganization,
+
+    // Organization Status
+    suspendOrganization,
+    restoreOrganization,
+    deleteOrganization,
 
     // Credits
     distributeCredits,

@@ -2,7 +2,7 @@
 import { AudioStatus } from '~/types/audio'
 
 definePageMeta({
-  middleware: ['auth', 'pending-deletion'],
+  middleware: ['auth', 'pending-deletion', 'organization-status'],
 })
 
 const route = useRoute()

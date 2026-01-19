@@ -285,6 +285,10 @@
     "oauthCallback": {
       "title": "Connexion en cours",
       "description": "Finalisation de votre connexion"
+    },
+    "organizationUnavailable": {
+      "title": "Organisation indisponible",
+      "description": "Votre organisation est actuellement indisponible"
     }
   },
   "common": {
@@ -953,6 +957,20 @@
       "exportData": "Exporter mes données",
       "logout": "Se déconnecter",
       "info": "Vous pouvez annuler la suppression ou exporter vos données avant la date limite."
+    },
+    "organizationUnavailable": {
+      "title": "Organisation indisponible",
+      "suspendedTitle": "Organisation suspendue",
+      "deletedTitle": "Organisation en cours de suppression",
+      "suspendedDescription": "Votre organisation a été suspendue par votre administrateur.",
+      "deletedDescription": "Votre organisation est programmée pour suppression.",
+      "reason": "Raison",
+      "suspendedOn": "Suspendue le",
+      "deletedOn": "Suppression demandée le",
+      "daysUntilPurge": "{days} jours avant suppression définitive",
+      "contactReseller": "Contacter votre revendeur",
+      "logout": "Se déconnecter",
+      "info": "Pour plus d'informations, veuillez contacter le revendeur de votre organisation."
     }
   },
   "terms": {
@@ -1141,8 +1159,20 @@
         "email": "Email",
         "credits": "Crédits",
         "subscription": "Abonnement",
+        "status": "Statut",
         "users": "Utilisateurs",
         "createdAt": "Créé le"
+      },
+      "status": {
+        "title": "Gestion du statut",
+        "active": "Active",
+        "suspended": "Suspendue",
+        "deleted": "Supprimée",
+        "suspendedAt": "Suspendue le",
+        "deletedAt": "Supprimée le",
+        "daysUntilPurge": "Purge dans {days} jours",
+        "reason": "Raison",
+        "noActionsAvailable": "Aucune action disponible pour cette organisation supprimée."
       },
       "actions": {
         "view": "Voir",
@@ -1150,7 +1180,48 @@
         "users": "Utilisateurs",
         "distributeCredits": "Distribuer des crédits",
         "manageUsers": "Gérer les utilisateurs",
-        "addUser": "Ajouter un utilisateur"
+        "addUser": "Ajouter un utilisateur",
+        "suspend": "Suspendre",
+        "restore": "Restaurer",
+        "delete": "Supprimer"
+      },
+      "suspend": {
+        "title": "Suspendre {name}",
+        "warning": "Cette action va bloquer l'accès à tous les utilisateurs de l'organisation.",
+        "consequences": {
+          "title": "Conséquences :",
+          "users": "Les utilisateurs ne pourront plus se connecter",
+          "credits": "Les crédits seront gelés",
+          "subscription": "L'abonnement mensuel sera pausé"
+        },
+        "reasonLabel": "Raison de la suspension (optionnel)",
+        "reasonPlaceholder": "Ex: Impayé, Demande client...",
+        "confirm": "Suspendre",
+        "success": "Organisation suspendue",
+        "error": "Erreur lors de la suspension"
+      },
+      "restore": {
+        "title": "Restaurer {name}",
+        "message": "L'accès sera rétabli pour tous les utilisateurs.",
+        "note": "Note : L'abonnement mensuel restera en pause. Vous devrez le réactiver manuellement si nécessaire.",
+        "confirm": "Restaurer",
+        "success": "Organisation restaurée",
+        "error": "Erreur lors de la restauration"
+      },
+      "delete": {
+        "title": "Supprimer {name}",
+        "warning": "Cette action est irréversible.",
+        "consequences": {
+          "title": "Conséquences :",
+          "access": "Tous les utilisateurs perdront immédiatement l'accès",
+          "purge": "Les données seront définitivement purgées après 30 jours",
+          "credits": "Les crédits restants seront perdus (non remboursables)"
+        },
+        "confirmLabel": "Tapez le nom de l'organisation pour confirmer",
+        "confirmPlaceholder": "Nom de l'organisation",
+        "confirm": "Supprimer définitivement",
+        "success": "Organisation supprimée",
+        "error": "Erreur lors de la suppression"
       },
       "filters": {
         "searchPlaceholder": "Rechercher une organisation...",

@@ -4,7 +4,7 @@ import type { Audio } from "~/types/audio";
 import { getAudioDuration } from "~/utils/audio";
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion"],
+  middleware: ["auth", "pending-deletion", "organization-status"],
 });
 
 const { t } = useI18n();

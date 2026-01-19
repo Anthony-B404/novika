@@ -585,7 +585,34 @@ export const middleware = router.named({
   superAdmin: () => import('#middleware/super_admin_middleware'),
   reseller: () => import('#middleware/reseller_middleware'),
   pendingDeletion: () => import('#middleware/pending_deletion_middleware'),
+  organizationStatus: () => import('#middleware/organization_status_middleware'),
 })
+```
+
+### Organization Status Middleware Details
+
+The `organizationStatus` middleware blocks access for users whose current organization is suspended or deleted:
+
+1. **Applied to**: All protected routes that modify data (after `auth` and `pendingDeletion`)
+2. **Skipped for**: Super Admin, Reseller Admin, users without current organization
+3. **Returns**: `403 Forbidden` with `ORGANIZATION_SUSPENDED` or `ORGANIZATION_DELETED` code
+
+```typescript
+// Error response for suspended organization
+{
+  code: 'ORGANIZATION_SUSPENDED',
+  message: 'Your organization has been suspended',
+  suspendedAt: '2024-01-15T10:30:00.000Z',
+  suspensionReason: 'Non-payment'
+}
+
+// Error response for deleted organization
+{
+  code: 'ORGANIZATION_DELETED',
+  message: 'Your organization has been deleted',
+  deletedAt: '2024-01-15T10:30:00.000Z',
+  daysUntilPurge: 25
+}
 ```
 
 ### Reseller Middleware Details

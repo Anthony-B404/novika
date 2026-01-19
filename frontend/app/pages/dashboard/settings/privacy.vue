@@ -2,7 +2,7 @@
 import type { OrphanDecision } from "~/stores/gdpr";
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion"],
+  middleware: ["auth", "pending-deletion", "organization-status"],
 });
 
 const { t } = useI18n();

@@ -83,6 +83,17 @@
     "switched": "Organization switched successfully",
     "not_found": "Organization not found"
   },
+  "organization_status": {
+    "suspended": "Your organization has been suspended. Please contact your reseller for more information.",
+    "deleted": "Your organization has been deleted and is pending permanent removal. Please contact your reseller for more information.",
+    "already_suspended": "This organization is already suspended",
+    "already_deleted": "This organization is already deleted",
+    "not_suspended": "This organization is not suspended",
+    "cannot_suspend_deleted": "Cannot suspend a deleted organization",
+    "suspended_success": "Organization suspended successfully",
+    "restored_success": "Organization restored successfully",
+    "deleted_success": "Organization deleted successfully. It will be permanently removed in 30 days."
+  },
   "invitation": {
     "sent": "Invitation sent successfully",
     "accepted": "Invitation accepted successfully",

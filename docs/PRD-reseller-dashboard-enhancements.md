@@ -158,12 +158,12 @@ if (user.currentOrganization?.status === "suspended") {
 
 ### 3.6 Critères d'acceptation
 
-- [ ] Le reseller peut suspendre une organisation active
-- [ ] Les utilisateurs d'une organisation suspendue ne peuvent plus accéder au service
-- [ ] Le reseller peut réactiver une organisation suspendue
-- [ ] Le reseller peut supprimer une organisation (soft delete)
-- [ ] Un message d'avertissement clair est affiché avant suppression
-- [ ] Le statut est visible sur la liste et le détail des organisations
+- [x] Le reseller peut suspendre une organisation active
+- [x] Les utilisateurs d'une organisation suspendue ne peuvent plus accéder au service
+- [x] Le reseller peut réactiver une organisation suspendue
+- [x] Le reseller peut supprimer une organisation (soft delete)
+- [x] Un message d'avertissement clair est affiché avant suppression
+- [x] Le statut est visible sur la liste et le détail des organisations
 
 ---
 

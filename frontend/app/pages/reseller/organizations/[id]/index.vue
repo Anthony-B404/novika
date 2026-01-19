@@ -26,11 +26,18 @@ useSeoMeta({
   title: t('reseller.organizations.detail.title'),
 })
 
-const { fetchOrganization, updateOrganization, loading, error } = useResellerOrganizations()
+const { fetchOrganization, updateOrganization, suspendOrganization, restoreOrganization, deleteOrganization, loading, error } = useResellerOrganizations()
 const { fetchSubscription, configureSubscription, pauseSubscription, resumeSubscription, loading: subscriptionLoading } = useResellerSubscriptions()
+const router = useRouter()
 const organization = ref<ResellerOrganization | null>(null)
 const subscription = ref<SubscriptionStatus | null>(null)
 const isEditing = ref(false)
+
+// Status management modal states
+const suspendModalOpen = ref(false)
+const restoreModalOpen = ref(false)
+const deleteModalOpen = ref(false)
+const statusLoading = ref(false)
 
 // Badge color type for Nuxt UI
 type BadgeColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral'
@@ -142,6 +149,85 @@ async function handleResumeSubscription() {
     })
   }
 }
+
+// Status management handlers
+async function handleSuspend(reason?: string) {
+  statusLoading.value = true
+  try {
+    const result = await suspendOrganization(organizationId.value, reason ? { reason } : undefined)
+    if (result) {
+      organization.value = result.organization
+      suspendModalOpen.value = false
+      toast.add({
+        title: t('reseller.organizations.suspend.success'),
+        color: 'success',
+      })
+    }
+  } catch (e) {
+    toast.add({
+      title: error.value || t('reseller.organizations.suspend.error'),
+      color: 'error',
+    })
+  } finally {
+    statusLoading.value = false
+  }
+}
+
+async function handleRestore() {
+  statusLoading.value = true
+  try {
+    const result = await restoreOrganization(organizationId.value)
+    if (result) {
+      organization.value = result.organization
+      restoreModalOpen.value = false
+      toast.add({
+        title: t('reseller.organizations.restore.success'),
+        color: 'success',
+      })
+    }
+  } catch (e) {
+    toast.add({
+      title: error.value || t('reseller.organizations.restore.error'),
+      color: 'error',
+    })
+  } finally {
+    statusLoading.value = false
+  }
+}
+
+async function handleDelete() {
+  statusLoading.value = true
+  try {
+    const result = await deleteOrganization(organizationId.value)
+    if (result) {
+      deleteModalOpen.value = false
+      toast.add({
+        title: t('reseller.organizations.delete.success'),
+        color: 'success',
+      })
+      // Redirect to organizations list after deletion
+      router.push(localePath('/reseller/organizations'))
+    }
+  } catch (e) {
+    toast.add({
+      title: error.value || t('reseller.organizations.delete.error'),
+      color: 'error',
+    })
+  } finally {
+    statusLoading.value = false
+  }
+}
+
+// Computed for days until purge (for deleted organizations)
+const daysUntilPurge = computed(() => {
+  if (!organization.value?.deletedAt) return null
+  const deletedDate = new Date(organization.value.deletedAt)
+  const purgeDate = new Date(deletedDate)
+  purgeDate.setDate(purgeDate.getDate() + 30)
+  const now = new Date()
+  const diff = purgeDate.getTime() - now.getTime()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+})
 </script>
 
 <template>
@@ -347,6 +433,92 @@ async function handleResumeSubscription() {
             />
           </UCard>
 
+          <!-- Status management card -->
+          <UCard>
+            <template #header>
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold">{{ t('reseller.organizations.status.title') }}</h2>
+                <ResellerOrganizationStatusBadge
+                  :status="organization.status"
+                  :suspended-at="organization.suspendedAt"
+                  :deleted-at="organization.deletedAt"
+                />
+              </div>
+            </template>
+
+            <div class="space-y-4">
+              <!-- Status details -->
+              <div v-if="organization.status === 'suspended' && organization.suspendedAt" class="text-sm text-gray-600 dark:text-gray-400">
+                <p>
+                  <span class="font-medium">{{ t('reseller.organizations.status.suspendedAt') }}:</span>
+                  {{ formatDate(organization.suspendedAt) }}
+                </p>
+                <p v-if="organization.suspensionReason" class="mt-1">
+                  <span class="font-medium">{{ t('reseller.organizations.status.reason') }}:</span>
+                  {{ organization.suspensionReason }}
+                </p>
+              </div>
+
+              <div v-if="organization.status === 'deleted' && organization.deletedAt" class="text-sm text-gray-600 dark:text-gray-400">
+                <p>
+                  <span class="font-medium">{{ t('reseller.organizations.status.deletedAt') }}:</span>
+                  {{ formatDate(organization.deletedAt) }}
+                </p>
+                <p v-if="daysUntilPurge !== null" class="mt-1 text-error-500">
+                  {{ t('reseller.organizations.status.daysUntilPurge', { days: daysUntilPurge }) }}
+                </p>
+              </div>
+
+              <!-- Action buttons based on status -->
+              <div v-if="organization.status === 'active'" class="space-y-2">
+                <UButton
+                  color="warning"
+                  variant="outline"
+                  block
+                  icon="i-lucide-pause-circle"
+                  @click="suspendModalOpen = true"
+                >
+                  {{ t('reseller.organizations.actions.suspend') }}
+                </UButton>
+                <UButton
+                  color="error"
+                  variant="outline"
+                  block
+                  icon="i-lucide-trash-2"
+                  @click="deleteModalOpen = true"
+                >
+                  {{ t('reseller.organizations.actions.delete') }}
+                </UButton>
+              </div>
+
+              <div v-else-if="organization.status === 'suspended'" class="space-y-2">
+                <UButton
+                  color="primary"
+                  variant="outline"
+                  block
+                  icon="i-lucide-rotate-ccw"
+                  @click="restoreModalOpen = true"
+                >
+                  {{ t('reseller.organizations.actions.restore') }}
+                </UButton>
+                <UButton
+                  color="error"
+                  variant="outline"
+                  block
+                  icon="i-lucide-trash-2"
+                  @click="deleteModalOpen = true"
+                >
+                  {{ t('reseller.organizations.actions.delete') }}
+                </UButton>
+              </div>
+
+              <!-- Deleted status: no actions available -->
+              <div v-else-if="organization.status === 'deleted'" class="text-sm text-gray-500 italic">
+                {{ t('reseller.organizations.status.noActionsAvailable') }}
+              </div>
+            </div>
+          </UCard>
+
           <!-- Quick actions -->
           <UCard>
             <template #header>
@@ -367,6 +539,31 @@ async function handleResumeSubscription() {
           </UCard>
         </div>
       </div>
+
+      <!-- Modals -->
+      <ResellerOrganizationSuspendModal
+        v-model:open="suspendModalOpen"
+        :organization="organization"
+        :loading="statusLoading"
+        @confirm="handleSuspend"
+        @cancel="suspendModalOpen = false"
+      />
+
+      <ResellerOrganizationRestoreModal
+        v-model:open="restoreModalOpen"
+        :organization="organization"
+        :loading="statusLoading"
+        @confirm="handleRestore"
+        @cancel="restoreModalOpen = false"
+      />
+
+      <ResellerOrganizationDeleteModal
+        v-model:open="deleteModalOpen"
+        :organization="organization"
+        :loading="statusLoading"
+        @confirm="handleDelete"
+        @cancel="deleteModalOpen = false"
+      />
     </template>
   </div>
 </template>

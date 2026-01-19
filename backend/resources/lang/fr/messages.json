@@ -83,6 +83,17 @@
     "switched": "Organisation changée avec succès",
     "not_found": "Organisation introuvable"
   },
+  "organization_status": {
+    "suspended": "Votre organisation a été suspendue. Veuillez contacter votre revendeur pour plus d'informations.",
+    "deleted": "Votre organisation a été supprimée et est en attente de suppression définitive. Veuillez contacter votre revendeur pour plus d'informations.",
+    "already_suspended": "Cette organisation est déjà suspendue",
+    "already_deleted": "Cette organisation est déjà supprimée",
+    "not_suspended": "Cette organisation n'est pas suspendue",
+    "cannot_suspend_deleted": "Impossible de suspendre une organisation supprimée",
+    "suspended_success": "Organisation suspendue avec succès",
+    "restored_success": "Organisation restaurée avec succès",
+    "deleted_success": "Organisation supprimée avec succès. Elle sera définitivement supprimée dans 30 jours."
+  },
   "invitation": {
     "sent": "Invitation envoyée avec succès",
     "accepted": "Invitation acceptée avec succès",

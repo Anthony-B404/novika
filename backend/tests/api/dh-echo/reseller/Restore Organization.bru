@@ -1,0 +1,43 @@
+meta {
+  name: Restore Organization
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/reseller/organizations/{{resellerOrgId}}/restore
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should restore organization successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('organization');
+  });
+
+  test("organization status should be active", function() {
+    const data = res.getBody();
+    expect(data.organization.status).to.equal('active');
+  });
+
+  test("organization should have id and name", function() {
+    const data = res.getBody();
+    expect(data.organization).to.have.property('id');
+    expect(data.organization).to.have.property('name');
+  });
+}

@@ -20,6 +20,16 @@ export const useOrganizationStore = defineStore("organization", {
     organizationLogo: (state) => state.organization?.logo || null,
     organizationUsers: (state) => state.organization?.users || [],
     organizationInvitations: (state) => state.organization?.invitations || [],
+    // Organization status getters
+    organizationStatus: (state) => state.organization?.status || 'active',
+    isOrganizationSuspended: (state) => state.organization?.status === 'suspended',
+    isOrganizationDeleted: (state) => state.organization?.status === 'deleted',
+    isOrganizationUnavailable: (state) =>
+      state.organization?.status === 'suspended' ||
+      state.organization?.status === 'deleted',
+    suspensionReason: (state) => state.organization?.suspensionReason || null,
+    suspendedAt: (state) => state.organization?.suspendedAt || null,
+    deletedAt: (state) => state.organization?.deletedAt || null,
   },
 
   actions: {

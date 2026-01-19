@@ -1,5 +1,7 @@
 import type { UserRole } from './auth'
 
+export type OrganizationStatus = 'active' | 'suspended' | 'deleted'
+
 export interface User {
   id: number
   fullName: string | null
@@ -18,6 +20,10 @@ export interface Organization {
   name: string
   logo: string | null
   email: string
+  status: OrganizationStatus
+  suspendedAt: string | null
+  suspensionReason: string | null
+  deletedAt: string | null
   users?: User[]
   invitations?: Invitation[]
 }

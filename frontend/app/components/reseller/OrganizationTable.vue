@@ -11,6 +11,9 @@ const emit = defineEmits<{
   view: [organization: ResellerOrganization]
   credits: [organization: ResellerOrganization]
   users: [organization: ResellerOrganization]
+  suspend: [organization: ResellerOrganization]
+  restore: [organization: ResellerOrganization]
+  delete: [organization: ResellerOrganization]
 }>()
 
 const { t } = useI18n()
@@ -34,6 +37,10 @@ const columns: TableColumn<ResellerOrganization>[] = [
     header: t('reseller.organizations.table.subscription'),
   },
   {
+    accessorKey: 'status',
+    header: t('reseller.organizations.table.status'),
+  },
+  {
     accessorKey: 'usersCount',
     header: t('reseller.organizations.table.users'),
   },
@@ -48,23 +55,54 @@ const columns: TableColumn<ResellerOrganization>[] = [
 ]
 
 function getRowActions(organization: ResellerOrganization) {
-  return [
-    {
-      label: t('common.buttons.view'),
-      icon: 'i-lucide-eye',
-      onSelect: () => emit('view', organization),
-    },
-    {
+  const actions = []
+
+  // View action is always available
+  actions.push({
+    label: t('common.buttons.view'),
+    icon: 'i-lucide-eye',
+    onSelect: () => emit('view', organization),
+  })
+
+  // Actions depend on status
+  if (organization.status === 'active') {
+    // Active: View, Credits, Users, Suspend, Delete
+    actions.push({
       label: t('reseller.organizations.actions.distributeCredits'),
       icon: 'i-lucide-coins',
       onSelect: () => emit('credits', organization),
-    },
-    {
+    })
+    actions.push({
       label: t('reseller.organizations.actions.manageUsers'),
       icon: 'i-lucide-users',
       onSelect: () => emit('users', organization),
-    },
-  ]
+    })
+    actions.push({
+      label: t('reseller.organizations.actions.suspend'),
+      icon: 'i-lucide-pause-circle',
+      onSelect: () => emit('suspend', organization),
+    })
+    actions.push({
+      label: t('reseller.organizations.actions.delete'),
+      icon: 'i-lucide-trash-2',
+      onSelect: () => emit('delete', organization),
+    })
+  } else if (organization.status === 'suspended') {
+    // Suspended: View, Restore, Delete
+    actions.push({
+      label: t('reseller.organizations.actions.restore'),
+      icon: 'i-lucide-rotate-ccw',
+      onSelect: () => emit('restore', organization),
+    })
+    actions.push({
+      label: t('reseller.organizations.actions.delete'),
+      icon: 'i-lucide-trash-2',
+      onSelect: () => emit('delete', organization),
+    })
+  }
+  // Deleted: View only (already added above)
+
+  return actions
 }
 </script>
 
@@ -106,6 +144,14 @@ function getRowActions(organization: ResellerOrganization) {
           {{ t('reseller.subscription.status.manual') }}
         </UBadge>
       </div>
+    </template>
+
+    <template #status-cell="{ row }">
+      <ResellerOrganizationStatusBadge
+        :status="row.original.status"
+        :suspended-at="row.original.suspendedAt"
+        :deleted-at="row.original.deletedAt"
+      />
     </template>
 
     <template #usersCount-cell="{ row }">

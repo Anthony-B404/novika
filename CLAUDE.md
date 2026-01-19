@@ -249,6 +249,7 @@ const data = await authenticatedFetch('/protected-endpoint')
   - `superAdmin` - Super Admin access check
   - `reseller` - Reseller Admin access check
   - `pendingDeletion` - Block writes during GDPR deletion
+  - `organizationStatus` - Block access for suspended/deleted organizations
   - `detect_user_locale` - i18n detection
 - **Import Aliases**: Use `#controllers/*`, `#models/*`, `#validators/*`, etc. (defined in package.json)
 

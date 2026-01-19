@@ -166,7 +166,11 @@ router
     // Contact support route
     router.post('/contact', [ContactController, 'send'])
   })
-  .use([middleware.auth({ guards: ['api'] }), middleware.pendingDeletion()])
+  .use([
+    middleware.auth({ guards: ['api'] }),
+    middleware.pendingDeletion(),
+    middleware.organizationStatus(),
+  ])
 
 // Admin controllers (lazy import)
 const ResellersController = () => import('#controllers/admin/resellers_controller')
@@ -219,6 +223,11 @@ router
     router.post('/organizations', [ResellerOrganizationsController, 'store'])
     router.get('/organizations/:id', [ResellerOrganizationsController, 'show'])
     router.put('/organizations/:id', [ResellerOrganizationsController, 'update'])
+    router.delete('/organizations/:id', [ResellerOrganizationsController, 'destroy'])
+
+    // Organization status management
+    router.post('/organizations/:id/suspend', [ResellerOrganizationsController, 'suspend'])
+    router.post('/organizations/:id/restore', [ResellerOrganizationsController, 'restore'])
 
     // Credit distribution
     router.post('/organizations/:id/credits', [ResellerOrganizationsController, 'distributeCredits'])

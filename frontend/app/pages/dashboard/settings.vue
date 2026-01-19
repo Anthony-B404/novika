@@ -2,7 +2,7 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion"],
+  middleware: ["auth", "pending-deletion", "organization-status"],
 });
 
 const { t } = useI18n();

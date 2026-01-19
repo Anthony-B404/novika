@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto'
 import db from '@adonisjs/lucid/services/db'
 import mail from '@adonisjs/mail/services/main'
 import env from '#start/env'
-import Organization from '#models/organization'
+import Organization, { OrganizationStatus } from '#models/organization'
 import User, { UserRole } from '#models/user'
 import { CreditTransactionType } from '#models/credit_transaction'
 import {
@@ -13,6 +13,7 @@ import {
   updateResellerOrganizationValidator,
   listResellerOrganizationsValidator,
   distributeCreditsValidator,
+  suspendOrganizationValidator,
 } from '#validators/reseller_api'
 
 export default class ResellerOrganizationsController {
@@ -386,5 +387,156 @@ export default class ResellerOrganizationsController {
       }
       throw error
     }
+  }
+
+  /**
+   * Suspend an organization
+   * POST /api/reseller/organizations/:id/suspend
+   *
+   * Suspends the organization, blocking user access and pausing subscriptions
+   */
+  async suspend({ params, request, response, reseller, i18n }: HttpContext) {
+    const organization = await Organization.find(params.id)
+
+    if (!organization) {
+      return response.notFound({
+        message: i18n.t('messages.organization.not_found'),
+      })
+    }
+
+    // Policy check: organization must belong to reseller
+    if (organization.resellerId !== reseller!.id) {
+      return response.forbidden({
+        message: i18n.t('messages.reseller_api.organization_access_denied'),
+      })
+    }
+
+    // Check if organization is already suspended or deleted
+    if (organization.status === OrganizationStatus.Suspended) {
+      return response.badRequest({
+        code: 'ALREADY_SUSPENDED',
+        message: i18n.t('messages.organization_status.already_suspended'),
+      })
+    }
+
+    if (organization.status === OrganizationStatus.Deleted) {
+      return response.badRequest({
+        code: 'ORGANIZATION_DELETED',
+        message: i18n.t('messages.organization_status.cannot_suspend_deleted'),
+      })
+    }
+
+    try {
+      const payload = await request.validateUsing(suspendOrganizationValidator)
+
+      await organization.suspend(payload.reason)
+
+      return response.ok({
+        message: i18n.t('messages.organization_status.suspended_success'),
+        organization: {
+          id: organization.id,
+          name: organization.name,
+          status: organization.status,
+          suspendedAt: organization.suspendedAt?.toISO(),
+          suspensionReason: organization.suspensionReason,
+        },
+      })
+    } catch (error) {
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        return response.unprocessableEntity({
+          message: i18n.t('messages.errors.validation_failed'),
+          errors: error.messages,
+        })
+      }
+      throw error
+    }
+  }
+
+  /**
+   * Restore a suspended organization
+   * POST /api/reseller/organizations/:id/restore
+   *
+   * Restores the organization to active status
+   * Note: Subscription is NOT automatically resumed
+   */
+  async restore({ params, response, reseller, i18n }: HttpContext) {
+    const organization = await Organization.find(params.id)
+
+    if (!organization) {
+      return response.notFound({
+        message: i18n.t('messages.organization.not_found'),
+      })
+    }
+
+    // Policy check: organization must belong to reseller
+    if (organization.resellerId !== reseller!.id) {
+      return response.forbidden({
+        message: i18n.t('messages.reseller_api.organization_access_denied'),
+      })
+    }
+
+    // Check if organization is not suspended
+    if (organization.status !== OrganizationStatus.Suspended) {
+      return response.badRequest({
+        code: 'NOT_SUSPENDED',
+        message: i18n.t('messages.organization_status.not_suspended'),
+      })
+    }
+
+    await organization.restore()
+
+    return response.ok({
+      message: i18n.t('messages.organization_status.restored_success'),
+      organization: {
+        id: organization.id,
+        name: organization.name,
+        status: organization.status,
+      },
+    })
+  }
+
+  /**
+   * Soft delete an organization
+   * DELETE /api/reseller/organizations/:id
+   *
+   * Soft deletes the organization (GDPR compliant)
+   * Organization will be purged after 30 days
+   */
+  async destroy({ params, response, reseller, i18n }: HttpContext) {
+    const organization = await Organization.find(params.id)
+
+    if (!organization) {
+      return response.notFound({
+        message: i18n.t('messages.organization.not_found'),
+      })
+    }
+
+    // Policy check: organization must belong to reseller
+    if (organization.resellerId !== reseller!.id) {
+      return response.forbidden({
+        message: i18n.t('messages.reseller_api.organization_access_denied'),
+      })
+    }
+
+    // Check if organization is already deleted
+    if (organization.status === OrganizationStatus.Deleted) {
+      return response.badRequest({
+        code: 'ALREADY_DELETED',
+        message: i18n.t('messages.organization_status.already_deleted'),
+      })
+    }
+
+    await organization.softDelete()
+
+    return response.ok({
+      message: i18n.t('messages.organization_status.deleted_success'),
+      organization: {
+        id: organization.id,
+        name: organization.name,
+        status: organization.status,
+        deletedAt: organization.deletedAt?.toISO(),
+        daysUntilPurge: organization.getDaysUntilPurge(),
+      },
+    })
   }
 }

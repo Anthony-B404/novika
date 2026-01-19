@@ -8,6 +8,17 @@ import type { ManyToMany, HasMany, BelongsTo } from '@adonisjs/lucid/types/relat
 
 export type RenewalType = 'first_of_month' | 'anniversary'
 
+export enum OrganizationStatus {
+  Active = 'active',
+  Suspended = 'suspended',
+  Deleted = 'deleted',
+}
+
+/**
+ * Number of days before soft-deleted organizations are purged (GDPR compliance)
+ */
+export const PURGE_DELAY_DAYS = 30
+
 export default class Organization extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
@@ -51,6 +62,19 @@ export default class Organization extends BaseModel {
 
   @column.dateTime()
   declare nextRenewalAt: DateTime | null
+
+  // Status fields
+  @column()
+  declare status: OrganizationStatus
+
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+
+  @column.dateTime()
+  declare suspendedAt: DateTime | null
+
+  @column()
+  declare suspensionReason: string | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -210,5 +234,110 @@ export default class Organization extends BaseModel {
       return false
     }
     return this.nextRenewalAt <= DateTime.now()
+  }
+
+  // Status getters
+
+  /**
+   * Check if organization is active
+   */
+  get isActive(): boolean {
+    return this.status === OrganizationStatus.Active
+  }
+
+  /**
+   * Check if organization is suspended
+   */
+  get isSuspended(): boolean {
+    return this.status === OrganizationStatus.Suspended
+  }
+
+  /**
+   * Check if organization is soft-deleted
+   */
+  get isDeleted(): boolean {
+    return this.status === OrganizationStatus.Deleted
+  }
+
+  // Status management methods
+
+  /**
+   * Suspend the organization and pause any active subscription
+   * @param reason Optional reason for suspension
+   * @throws Error if organization is already suspended or deleted
+   */
+  async suspend(reason?: string): Promise<void> {
+    if (this.status === OrganizationStatus.Suspended) {
+      throw new Error('ALREADY_SUSPENDED')
+    }
+    if (this.status === OrganizationStatus.Deleted) {
+      throw new Error('ORGANIZATION_DELETED')
+    }
+
+    this.status = OrganizationStatus.Suspended
+    this.suspendedAt = DateTime.now()
+    this.suspensionReason = reason || null
+
+    // Pause subscription if active
+    if (this.subscriptionEnabled && !this.subscriptionPausedAt) {
+      this.subscriptionPausedAt = DateTime.now()
+    }
+
+    await this.save()
+  }
+
+  /**
+   * Restore a suspended organization to active status
+   * Note: Does NOT automatically resume subscription - that should be done explicitly
+   * @throws Error if organization is not suspended (cannot restore deleted orgs)
+   */
+  async restore(): Promise<void> {
+    if (this.status === OrganizationStatus.Active) {
+      throw new Error('ALREADY_ACTIVE')
+    }
+    if (this.status === OrganizationStatus.Deleted) {
+      throw new Error('CANNOT_RESTORE_DELETED')
+    }
+
+    this.status = OrganizationStatus.Active
+    this.suspendedAt = null
+    this.suspensionReason = null
+
+    await this.save()
+  }
+
+  /**
+   * Soft delete the organization (GDPR compliant - will be purged after PURGE_DELAY_DAYS)
+   * @throws Error if organization is already deleted
+   */
+  async softDelete(): Promise<void> {
+    if (this.status === OrganizationStatus.Deleted) {
+      throw new Error('ALREADY_DELETED')
+    }
+
+    this.status = OrganizationStatus.Deleted
+    this.deletedAt = DateTime.now()
+
+    // Pause subscription if active
+    if (this.subscriptionEnabled && !this.subscriptionPausedAt) {
+      this.subscriptionPausedAt = DateTime.now()
+    }
+
+    await this.save()
+  }
+
+  /**
+   * Get the number of days until this organization will be purged
+   * Returns null if organization is not soft-deleted
+   */
+  getDaysUntilPurge(): number | null {
+    if (!this.isDeleted || !this.deletedAt) {
+      return null
+    }
+
+    const purgeDate = this.deletedAt.plus({ days: PURGE_DELAY_DAYS })
+    const daysRemaining = Math.ceil(purgeDate.diff(DateTime.now(), 'days').days)
+
+    return Math.max(0, daysRemaining)
   }
 }

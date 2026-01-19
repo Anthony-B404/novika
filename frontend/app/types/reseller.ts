@@ -6,6 +6,12 @@ import type { PaginationMeta } from './admin'
  */
 
 // =============================================================================
+// ORGANIZATION STATUS
+// =============================================================================
+
+export type OrganizationStatus = 'active' | 'suspended' | 'deleted'
+
+// =============================================================================
 // ROLE CONSTANTS
 // =============================================================================
 
@@ -37,6 +43,11 @@ export interface ResellerOrganization {
   updatedAt: string
   usersCount?: number
   users?: OrganizationUser[]
+  // Status fields
+  status: OrganizationStatus
+  suspendedAt: string | null
+  suspensionReason: string | null
+  deletedAt: string | null
   // Subscription fields
   subscriptionEnabled?: boolean
   monthlyCreditsTarget?: number | null
@@ -129,6 +140,16 @@ export interface UpdateOrganizationPayload {
 export interface DistributeCreditsPayload {
   amount: number
   description?: string
+}
+
+export interface SuspendOrganizationPayload {
+  reason?: string
+}
+
+export interface OrganizationStatusResponse {
+  message: string
+  organization: ResellerOrganization
+  daysUntilPurge?: number // For delete response only
 }
 
 export interface AddUserPayload {
