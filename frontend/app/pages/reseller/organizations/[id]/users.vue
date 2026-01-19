@@ -178,7 +178,7 @@ function handlePageChange(page: number) {
 
     <!-- Content -->
     <template v-else-if="organization">
-      <UCard :ui="{ body: { padding: 'p-0' } }">
+      <UCard :ui="{ body: 'p-0' }">
         <ResellerUserTable
           :users="users"
           :loading="loading"

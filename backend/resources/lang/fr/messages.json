@@ -32,6 +32,19 @@
     "user_added_existing": "Utilisateur existant ajouté à l'organisation",
     "cannot_remove_owner": "Impossible de retirer le propriétaire de l'organisation"
   },
+  "subscription": {
+    "updated": "Configuration d'abonnement mise à jour avec succès",
+    "paused": "Abonnement suspendu avec succès",
+    "resumed": "Abonnement repris avec succès",
+    "not_enabled": "L'abonnement n'est pas activé pour cette organisation",
+    "already_paused": "L'abonnement est déjà en pause",
+    "not_paused": "L'abonnement n'est pas en pause",
+    "target_required": "Le montant cible de crédits mensuels est requis",
+    "renewal_type_required": "Le type de renouvellement est requis",
+    "renewal_day_required": "Le jour de renouvellement est requis pour le type anniversaire",
+    "renewal_success": "Recharge automatique effectuée avec succès",
+    "renewal_failed": "Échec de la recharge automatique"
+  },
   "auth": {
     "login_success": "Connexion réussie",
     "logout_success": "Déconnexion réussie",

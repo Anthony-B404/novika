@@ -1140,6 +1140,7 @@
         "name": "Nom",
         "email": "Email",
         "credits": "Crédits",
+        "subscription": "Abonnement",
         "users": "Utilisateurs",
         "createdAt": "Créé le"
       },
@@ -1204,10 +1205,36 @@
       "steps": {
         "organization": "Organisation",
         "organizationDesc": "Informations de base",
+        "credits": "Crédits",
+        "creditsDesc": "Mode de facturation",
         "owner": "Propriétaire",
         "ownerDesc": "Compte propriétaire",
         "members": "Membres",
         "membersDesc": "Invitations (optionnel)"
+      },
+      "billing": {
+        "title": "Comment souhaitez-vous gérer les crédits ?",
+        "description": "Choisissez le mode de gestion des crédits pour cette organisation",
+        "oneTime": "Ponctuel",
+        "oneTimeDesc": "Distribution manuelle des crédits selon vos besoins",
+        "subscription": "Abonnement mensuel",
+        "subscriptionDesc": "Recharge automatique chaque mois jusqu'à un montant cible",
+        "initialCreditsTitle": "Crédits initiaux",
+        "initialCreditsHint": "Crédits à attribuer immédiatement (max: {max})",
+        "subscriptionConfigTitle": "Configuration de l'abonnement",
+        "monthlyCreditsTarget": "Crédits mensuels cibles",
+        "monthlyCreditsTargetHint": "Le solde sera complété jusqu'à ce montant chaque mois",
+        "renewalType": "Type de renouvellement",
+        "renewalTypeFirstOfMonth": "Premier du mois",
+        "renewalTypeAnniversary": "Date anniversaire",
+        "renewalDay": "Jour du mois",
+        "renewalDayHint": "Jour de renouvellement (1-28)",
+        "initialCreditsOptional": "Crédits initiaux (optionnel)",
+        "initialCreditsOptionalHint": "Crédits à attribuer immédiatement en plus de l'abonnement",
+        "validation": {
+          "monthlyCreditsTargetRequired": "L'objectif de crédits mensuels est requis",
+          "monthlyCreditsTargetPositive": "L'objectif doit être supérieur à 0"
+        }
       },
       "members": {
         "title": "Inviter des membres",
@@ -1373,10 +1400,62 @@
       "types": {
         "purchase": "Achat",
         "distribution": "Distribution",
-        "adjustment": "Ajustement"
+        "adjustment": "Ajustement",
+        "subscription_renewal": "Renouvellement abonnement"
       },
       "to": "vers",
       "noDescription": "Aucune description"
+    },
+    "subscription": {
+      "title": "Abonnement mensuel",
+      "credits": "crédits",
+      "status": {
+        "active": "Abonnement",
+        "paused": "Suspendu",
+        "inactive": "Inactif",
+        "manual": "Ponctuel"
+      },
+      "fields": {
+        "enabled": "Activer l'abonnement",
+        "enabledDescription": "Active le renouvellement automatique des crédits chaque mois",
+        "monthlyCreditsTarget": "Objectif mensuel de crédits",
+        "monthlyCreditsTargetDescription": "Le solde sera complété jusqu'à ce montant chaque mois",
+        "renewalType": "Type de renouvellement",
+        "renewalTypeDescription": "Choisissez quand les crédits sont renouvelés",
+        "renewalDay": "Jour de renouvellement",
+        "renewalDayDescription": "Jour du mois pour le renouvellement (1-28)"
+      },
+      "placeholders": {
+        "monthlyCreditsTarget": "Ex: 1000"
+      },
+      "renewalType": {
+        "firstOfMonth": "Premier du mois",
+        "anniversary": "Date anniversaire"
+      },
+      "currentCredits": "Crédits actuels : {count}",
+      "creditsNeededForRenewal": "Crédits nécessaires au prochain renouvellement",
+      "nextRenewal": "Prochain renouvellement : {date}",
+      "pause": "Suspendre",
+      "resume": "Reprendre",
+      "configureSuccess": "Configuration de l'abonnement mise à jour",
+      "configureError": "Erreur lors de la configuration de l'abonnement",
+      "pauseSuccess": "Abonnement suspendu",
+      "pauseError": "Erreur lors de la suspension de l'abonnement",
+      "resumeSuccess": "Abonnement repris",
+      "resumeError": "Erreur lors de la reprise de l'abonnement",
+      "validation": {
+        "targetRequired": "L'objectif de crédits est requis",
+        "targetInvalid": "L'objectif doit être un nombre valide",
+        "targetPositive": "L'objectif doit être positif",
+        "renewalTypeRequired": "Le type de renouvellement est requis"
+      },
+      "alerts": {
+        "insufficientCredits": "Crédits insuffisants pour les renouvellements à venir",
+        "insufficientCreditsDescription": "{count} organisation(s) ont des renouvellements prévus. Total nécessaire : {needed} crédits. Votre solde : {available} crédits. Manque : {shortfall} crédits.",
+        "affectedOrganizations": "Organisations concernées :",
+        "andMore": "... et {count} autre(s)",
+        "addCredits": "Ajouter des crédits"
+      }
     }
   },
   "admin": {

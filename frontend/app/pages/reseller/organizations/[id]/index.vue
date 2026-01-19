@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ResellerOrganization, UpdateOrganizationPayload } from '~/types/reseller'
+import type { ResellerOrganization, UpdateOrganizationPayload, SubscriptionStatus, ConfigureSubscriptionPayload } from '~/types/reseller'
 import { USER_ROLES } from '~/types/reseller'
 
 definePageMeta({
@@ -27,11 +27,16 @@ useSeoMeta({
 })
 
 const { fetchOrganization, updateOrganization, loading, error } = useResellerOrganizations()
+const { fetchSubscription, configureSubscription, pauseSubscription, resumeSubscription, loading: subscriptionLoading } = useResellerSubscriptions()
 const organization = ref<ResellerOrganization | null>(null)
+const subscription = ref<SubscriptionStatus | null>(null)
 const isEditing = ref(false)
 
+// Badge color type for Nuxt UI
+type BadgeColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral'
+
 // Role configuration
-const roleConfig: Record<number, { label: string; color: string }> = {
+const roleConfig: Record<number, { label: string; color: BadgeColor }> = {
   [USER_ROLES.OWNER]: { label: t('reseller.users.roles.owner'), color: 'primary' },
   [USER_ROLES.ADMINISTRATOR]: { label: t('reseller.users.roles.administrator'), color: 'info' },
   [USER_ROLES.MEMBER]: { label: t('reseller.users.roles.member'), color: 'neutral' },
@@ -41,13 +46,14 @@ function getRoleLabel(role: number) {
   return roleConfig[role]?.label || '-'
 }
 
-function getRoleColor(role: number) {
+function getRoleColor(role: number): BadgeColor {
   return roleConfig[role]?.color || 'neutral'
 }
 
-// Load organization
+// Load organization and subscription
 onMounted(async () => {
   organization.value = await fetchOrganization(organizationId.value)
+  subscription.value = await fetchSubscription(organizationId.value)
 })
 
 // Watch for route param changes
@@ -55,6 +61,7 @@ watch(organizationId, async (newId) => {
   if (newId) {
     isEditing.value = false
     organization.value = await fetchOrganization(newId)
+    subscription.value = await fetchSubscription(newId)
   }
 })
 
@@ -79,6 +86,61 @@ async function handleSubmit(data: UpdateOrganizationPayload) {
 
 function handleCancel() {
   isEditing.value = false
+}
+
+// Subscription handlers
+async function handleSubscriptionSubmit(data: ConfigureSubscriptionPayload) {
+  try {
+    const result = await configureSubscription(organizationId.value, data)
+    if (result) {
+      subscription.value = result.subscription
+      toast.add({
+        title: t('reseller.subscription.configureSuccess'),
+        color: 'success',
+      })
+    }
+  } catch (e) {
+    toast.add({
+      title: t('reseller.subscription.configureError'),
+      color: 'error',
+    })
+  }
+}
+
+async function handlePauseSubscription() {
+  try {
+    const result = await pauseSubscription(organizationId.value)
+    if (result) {
+      subscription.value = result.subscription
+      toast.add({
+        title: t('reseller.subscription.pauseSuccess'),
+        color: 'success',
+      })
+    }
+  } catch (e) {
+    toast.add({
+      title: t('reseller.subscription.pauseError'),
+      color: 'error',
+    })
+  }
+}
+
+async function handleResumeSubscription() {
+  try {
+    const result = await resumeSubscription(organizationId.value)
+    if (result) {
+      subscription.value = result.subscription
+      toast.add({
+        title: t('reseller.subscription.resumeSuccess'),
+        color: 'success',
+      })
+    }
+  } catch (e) {
+    toast.add({
+      title: t('reseller.subscription.resumeError'),
+      color: 'error',
+    })
+  }
 }
 </script>
 
@@ -264,6 +326,25 @@ function handleCancel() {
             >
               {{ t('reseller.organizations.actions.distributeCredits') }}
             </UButton>
+          </UCard>
+
+          <!-- Subscription card -->
+          <UCard>
+            <template #header>
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold">{{ t('reseller.subscription.title') }}</h2>
+                <ResellerSubscriptionStatusBadge :subscription="subscription" />
+              </div>
+            </template>
+
+            <ResellerSubscriptionConfigForm
+              :subscription="subscription"
+              :current-credits="organization.credits"
+              :loading="subscriptionLoading"
+              @submit="handleSubscriptionSubmit"
+              @pause="handlePauseSubscription"
+              @resume="handleResumeSubscription"
+            />
           </UCard>
 
           <!-- Quick actions -->

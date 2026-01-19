@@ -1138,6 +1138,7 @@
         "name": "Name",
         "email": "Email",
         "credits": "Credits",
+        "subscription": "Subscription",
         "users": "Users",
         "createdAt": "Created"
       },
@@ -1202,10 +1203,36 @@
       "steps": {
         "organization": "Organization",
         "organizationDesc": "Basic information",
+        "credits": "Credits",
+        "creditsDesc": "Billing mode",
         "owner": "Owner",
         "ownerDesc": "Owner account",
         "members": "Members",
         "membersDesc": "Invitations (optional)"
+      },
+      "billing": {
+        "title": "How would you like to manage credits?",
+        "description": "Choose how credits will be managed for this organization",
+        "oneTime": "One-time",
+        "oneTimeDesc": "Manual credit distribution as needed",
+        "subscription": "Monthly subscription",
+        "subscriptionDesc": "Automatic monthly top-up to a target amount",
+        "initialCreditsTitle": "Initial Credits",
+        "initialCreditsHint": "Credits to assign immediately (max: {max})",
+        "subscriptionConfigTitle": "Subscription Configuration",
+        "monthlyCreditsTarget": "Monthly credits target",
+        "monthlyCreditsTargetHint": "Balance will be topped up to this amount each month",
+        "renewalType": "Renewal type",
+        "renewalTypeFirstOfMonth": "First of month",
+        "renewalTypeAnniversary": "Anniversary date",
+        "renewalDay": "Day of month",
+        "renewalDayHint": "Renewal day (1-28)",
+        "initialCreditsOptional": "Initial credits (optional)",
+        "initialCreditsOptionalHint": "Credits to assign immediately in addition to the subscription",
+        "validation": {
+          "monthlyCreditsTargetRequired": "Monthly credits target is required",
+          "monthlyCreditsTargetPositive": "Target must be greater than 0"
+        }
       },
       "members": {
         "title": "Invite Members",
@@ -1371,10 +1398,62 @@
       "types": {
         "purchase": "Purchase",
         "distribution": "Distribution",
-        "adjustment": "Adjustment"
+        "adjustment": "Adjustment",
+        "subscription_renewal": "Subscription renewal"
       },
       "to": "to",
       "noDescription": "No description"
+    },
+    "subscription": {
+      "title": "Monthly Subscription",
+      "credits": "credits",
+      "status": {
+        "active": "Subscription",
+        "paused": "Paused",
+        "inactive": "Inactive",
+        "manual": "Manual"
+      },
+      "fields": {
+        "enabled": "Enable subscription",
+        "enabledDescription": "Enable automatic monthly credit renewal",
+        "monthlyCreditsTarget": "Monthly credits target",
+        "monthlyCreditsTargetDescription": "The balance will be topped up to this amount each month",
+        "renewalType": "Renewal type",
+        "renewalTypeDescription": "Choose when credits are renewed",
+        "renewalDay": "Renewal day",
+        "renewalDayDescription": "Day of the month for renewal (1-28)"
+      },
+      "placeholders": {
+        "monthlyCreditsTarget": "E.g. 1000"
+      },
+      "renewalType": {
+        "firstOfMonth": "First of month",
+        "anniversary": "Anniversary date"
+      },
+      "currentCredits": "Current credits: {count}",
+      "creditsNeededForRenewal": "Credits needed for next renewal",
+      "nextRenewal": "Next renewal: {date}",
+      "pause": "Pause",
+      "resume": "Resume",
+      "configureSuccess": "Subscription configuration updated",
+      "configureError": "Error configuring subscription",
+      "pauseSuccess": "Subscription paused",
+      "pauseError": "Error pausing subscription",
+      "resumeSuccess": "Subscription resumed",
+      "resumeError": "Error resuming subscription",
+      "validation": {
+        "targetRequired": "Credits target is required",
+        "targetInvalid": "Target must be a valid number",
+        "targetPositive": "Target must be positive",
+        "renewalTypeRequired": "Renewal type is required"
+      },
+      "alerts": {
+        "insufficientCredits": "Insufficient credits for upcoming renewals",
+        "insufficientCreditsDescription": "{count} organization(s) have upcoming renewals. Total needed: {needed} credits. Your balance: {available} credits. Shortfall: {shortfall} credits.",
+        "affectedOrganizations": "Affected organizations:",
+        "andMore": "... and {count} more",
+        "addCredits": "Add credits"
+      }
     }
   },
   "admin": {

@@ -115,16 +115,31 @@ export default class ResellerOrganizationsController {
       }
 
       const result = await db.transaction(async (trx) => {
-        // 1. Create organization
-        const organization = await Organization.create(
-          {
-            name: payload.name,
-            email: payload.email,
-            resellerId: reseller!.id,
-            credits: 0,
-          },
-          { client: trx }
-        )
+        // 1. Create organization with optional subscription configuration
+        const organizationData: Partial<Organization> = {
+          name: payload.name,
+          email: payload.email,
+          resellerId: reseller!.id,
+          credits: 0,
+        }
+
+        // Configure subscription if enabled
+        if (payload.subscriptionEnabled) {
+          organizationData.subscriptionEnabled = true
+          organizationData.monthlyCreditsTarget = payload.monthlyCreditsTarget || null
+          organizationData.renewalType = payload.renewalType || 'first_of_month'
+          organizationData.renewalDay =
+            payload.renewalType === 'anniversary' ? payload.renewalDay || 1 : null
+          organizationData.subscriptionCreatedAt = DateTime.now()
+        }
+
+        const organization = await Organization.create(organizationData, { client: trx })
+
+        // Calculate and set next renewal date if subscription is enabled
+        if (payload.subscriptionEnabled) {
+          organization.nextRenewalAt = organization.calculateNextRenewalDate()
+          await organization.useTransaction(trx).save()
+        }
 
         // 2. Create owner user with magic link
         const magicLinkToken = randomUUID()

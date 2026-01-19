@@ -33,6 +33,10 @@ export interface QueueConfig {
       name: string
       concurrency: number
     }
+    subscriptionRenewal: {
+      name: string
+      concurrency: number
+    }
   }
 }
 
@@ -74,6 +78,10 @@ const queueConfig: QueueConfig = {
     gdprReminder: {
       name: 'gdpr-reminder',
       concurrency: 1, // Process one reminder at a time
+    },
+    subscriptionRenewal: {
+      name: 'subscription-renewal',
+      concurrency: 2, // Process two renewals at a time
     },
   },
 }

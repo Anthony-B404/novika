@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ResellerOrganization, CreditsResponse } from '~/types/reseller'
+import type { ResellerOrganization, CreditsResponse, UpcomingRenewalsResponse } from '~/types/reseller'
 
 definePageMeta({
   layout: 'reseller',
@@ -23,6 +23,7 @@ useSeoMeta({
 // Composables
 const { fetchProfile, fetchCredits } = useResellerProfile()
 const { fetchOrganizations } = useResellerOrganizations()
+const { fetchUpcomingRenewals } = useResellerSubscriptions()
 
 // State
 const loading = ref(true)
@@ -30,6 +31,7 @@ const error = ref<string | null>(null)
 const creditBalance = ref(0)
 const organizations = ref<ResellerOrganization[]>([])
 const creditsData = ref<CreditsResponse | null>(null)
+const upcomingRenewals = ref<UpcomingRenewalsResponse | null>(null)
 
 // Computed stats
 const totalDistributed = computed(() => {
@@ -48,10 +50,11 @@ const totalConsumed = computed(() => {
 // Load data
 onMounted(async () => {
   try {
-    const [profileData, creditsResult, orgsResult] = await Promise.all([
+    const [profileData, creditsResult, orgsResult, renewalsResult] = await Promise.all([
       fetchProfile(),
       fetchCredits({ limit: 5 }),
       fetchOrganizations({ limit: 5, sortBy: 'createdAt', sortOrder: 'desc' }),
+      fetchUpcomingRenewals(7),
     ])
 
     if (profileData) {
@@ -63,6 +66,9 @@ onMounted(async () => {
     }
     if (orgsResult) {
       organizations.value = orgsResult.data
+    }
+    if (renewalsResult) {
+      upcomingRenewals.value = renewalsResult
     }
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to load dashboard'
@@ -100,6 +106,9 @@ onMounted(async () => {
 
     <!-- Dashboard content -->
     <template v-else>
+      <!-- Upcoming renewals alert (if insufficient credits) -->
+      <ResellerUpcomingRenewalsAlert :data="upcomingRenewals" />
+
       <!-- Stats grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <ResellerStatsCard

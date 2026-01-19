@@ -41,6 +41,11 @@ export const createResellerOrganizationValidator = (resellerId: number) =>
       ownerFirstName: vine.string().minLength(2).maxLength(100),
       ownerLastName: vine.string().minLength(2).maxLength(100),
       initialCredits: vine.number().min(0).optional(),
+      // Subscription configuration
+      subscriptionEnabled: vine.boolean().optional(),
+      monthlyCreditsTarget: vine.number().positive().optional(),
+      renewalType: vine.enum(['first_of_month', 'anniversary']).optional(),
+      renewalDay: vine.number().min(1).max(28).optional(),
     })
   )
 

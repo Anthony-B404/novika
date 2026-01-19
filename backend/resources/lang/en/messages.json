@@ -32,6 +32,19 @@
     "user_added_existing": "Existing user added to organization",
     "cannot_remove_owner": "Cannot remove the organization owner"
   },
+  "subscription": {
+    "updated": "Subscription configuration updated successfully",
+    "paused": "Subscription paused successfully",
+    "resumed": "Subscription resumed successfully",
+    "not_enabled": "Subscription is not enabled for this organization",
+    "already_paused": "Subscription is already paused",
+    "not_paused": "Subscription is not paused",
+    "target_required": "Monthly credits target is required",
+    "renewal_type_required": "Renewal type is required",
+    "renewal_day_required": "Renewal day is required for anniversary type",
+    "renewal_success": "Automatic renewal completed successfully",
+    "renewal_failed": "Automatic renewal failed"
+  },
   "auth": {
     "login_success": "Login successful",
     "logout_success": "Logout successful",

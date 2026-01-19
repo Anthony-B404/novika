@@ -34,7 +34,7 @@ const schema = z.object({
   firstName: z.string().min(2, t('reseller.users.validation.firstNameMin')),
   lastName: z.string().min(2, t('reseller.users.validation.lastNameMin')),
   role: z.union([z.literal(2), z.literal(3)], {
-    errorMap: () => ({ message: t('reseller.users.validation.roleInvalid') }),
+    message: t('reseller.users.validation.roleInvalid'),
   }),
 })
 

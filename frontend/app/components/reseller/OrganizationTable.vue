@@ -30,6 +30,10 @@ const columns: TableColumn<ResellerOrganization>[] = [
     header: t('reseller.organizations.table.credits'),
   },
   {
+    accessorKey: 'subscription',
+    header: t('reseller.organizations.table.subscription'),
+  },
+  {
     accessorKey: 'usersCount',
     header: t('reseller.organizations.table.users'),
   },
@@ -82,6 +86,26 @@ function getRowActions(organization: ResellerOrganization) {
       <UBadge color="success" variant="subtle">
         {{ formatCredits(row.original.credits) }}
       </UBadge>
+    </template>
+
+    <template #subscription-cell="{ row }">
+      <div class="flex items-center gap-2">
+        <UBadge
+          v-if="row.original.subscriptionEnabled"
+          :color="row.original.subscriptionPausedAt ? 'warning' : 'primary'"
+          variant="subtle"
+          :icon="row.original.subscriptionPausedAt ? 'i-lucide-pause-circle' : 'i-lucide-repeat'"
+        >
+          {{
+            row.original.subscriptionPausedAt
+              ? t('reseller.subscription.status.paused')
+              : t('reseller.subscription.status.active')
+          }}
+        </UBadge>
+        <UBadge v-else color="neutral" variant="subtle" icon="i-lucide-credit-card">
+          {{ t('reseller.subscription.status.manual') }}
+        </UBadge>
+      </div>
     </template>
 
     <template #usersCount-cell="{ row }">

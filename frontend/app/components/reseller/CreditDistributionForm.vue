@@ -24,10 +24,7 @@ const state = reactive({
 const schema = computed(() =>
   z.object({
     amount: z
-      .number({
-        required_error: t('reseller.credits.validation.amountRequired'),
-        invalid_type_error: t('reseller.credits.validation.amountInvalid'),
-      })
+      .number({ message: t('reseller.credits.validation.amountRequired') })
       .positive(t('reseller.credits.validation.amountPositive'))
       .max(props.maxCredits || Infinity, t('reseller.credits.validation.amountMax')),
     description: z.string().max(500).optional(),

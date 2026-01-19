@@ -38,8 +38,11 @@ const columns: TableColumn<OrganizationUser>[] = [
   },
 ]
 
+// Badge color type for Nuxt UI
+type BadgeColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral'
+
 // Role configuration - single source of truth for labels and colors
-const roleConfig: Record<number, { label: string; color: string }> = {
+const roleConfig: Record<number, { label: string; color: BadgeColor }> = {
   [USER_ROLES.OWNER]: {
     label: t('reseller.users.roles.owner'),
     color: 'primary',
@@ -58,7 +61,7 @@ function getRoleLabel(role: number) {
   return roleConfig[role]?.label || '-'
 }
 
-function getRoleColor(role: number) {
+function getRoleColor(role: number): BadgeColor {
   return roleConfig[role]?.color || 'neutral'
 }
 

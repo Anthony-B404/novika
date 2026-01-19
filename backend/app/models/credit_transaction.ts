@@ -10,6 +10,7 @@ export enum CreditTransactionType {
   Purchase = 'purchase',
   Bonus = 'bonus',
   Refund = 'refund',
+  Subscription = 'subscription',
 }
 
 export default class CreditTransaction extends BaseModel {
@@ -19,7 +20,7 @@ export default class CreditTransaction extends BaseModel {
   declare id: number
 
   @column()
-  declare userId: number
+  declare userId: number | null
 
   @column()
   declare amount: number

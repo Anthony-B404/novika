@@ -3,6 +3,7 @@ import { z } from "zod";
 import type {
   CreateOrganizationPayload,
   AddUserPayload,
+  RenewalType,
 } from "~/types/reseller";
 import type { FormSubmitEvent } from "#ui/types";
 
@@ -17,9 +18,17 @@ const toast = useToast();
 
 // Breadcrumb
 const breadcrumbItems = computed(() => [
-  { label: t('reseller.navigation.dashboard'), icon: 'i-lucide-home', to: localePath('/reseller') },
-  { label: t('reseller.navigation.organizations'), icon: 'i-lucide-building-2', to: localePath('/reseller/organizations') },
-  { label: t('reseller.organizations.create.title'), icon: 'i-lucide-plus' },
+  {
+    label: t("reseller.navigation.dashboard"),
+    icon: "i-lucide-home",
+    to: localePath("/reseller"),
+  },
+  {
+    label: t("reseller.navigation.organizations"),
+    icon: "i-lucide-building-2",
+    to: localePath("/reseller/organizations"),
+  },
+  { label: t("reseller.organizations.create.title"), icon: "i-lucide-plus" },
 ]);
 
 useSeoMeta({
@@ -52,6 +61,12 @@ const steps = computed(() => [
     icon: "i-lucide-building-2",
   },
   {
+    value: "credits",
+    title: t("reseller.organizations.steps.credits"),
+    description: t("reseller.organizations.steps.creditsDesc"),
+    icon: "i-lucide-coins",
+  },
+  {
     value: "owner",
     title: t("reseller.organizations.steps.owner"),
     description: t("reseller.organizations.steps.ownerDesc"),
@@ -67,13 +82,18 @@ const steps = computed(() => [
 
 // Form refs for validation
 const orgFormRef = useTemplateRef("orgForm");
+const creditsFormRef = useTemplateRef("creditsForm");
 const ownerFormRef = useTemplateRef("ownerForm");
 
 // Mapping field names to steps for backend error handling
 const fieldToStep: Record<string, string> = {
   name: "organization",
   email: "organization",
-  initialCredits: "organization",
+  initialCredits: "credits",
+  subscriptionEnabled: "credits",
+  monthlyCreditsTarget: "credits",
+  renewalType: "credits",
+  renewalDay: "credits",
   ownerEmail: "owner",
   ownerFirstName: "owner",
   ownerLastName: "owner",
@@ -99,9 +119,15 @@ function handleBackendErrors(e: unknown): boolean {
 
         // 2. Inject error into the form for inline display
         nextTick(() => {
-          const formRef =
-            targetStep === "organization" ? orgFormRef : ownerFormRef;
-          formRef.value?.setErrors([
+          let formRef;
+          if (targetStep === "organization") {
+            formRef = orgFormRef;
+          } else if (targetStep === "credits") {
+            formRef = creditsFormRef;
+          } else if (targetStep === "owner") {
+            formRef = ownerFormRef;
+          }
+          formRef?.value?.setErrors([
             {
               name: firstError.field,
               message: firstError.message,
@@ -124,14 +150,57 @@ const organizationSchema = computed(() =>
     email: z
       .string()
       .email(t("reseller.organizations.validation.emailInvalid")),
-    initialCredits: z
-      .number()
-      .max(
-        availableCredits.value,
-        t("reseller.organizations.validation.initialCreditsMax"),
-      )
-      .optional(),
   }),
+);
+
+const creditsSchema = computed(() =>
+  z
+    .object({
+      billingType: z.enum(["one_time", "subscription"]),
+      initialCredits: z
+        .number()
+        .min(0, t("reseller.organizations.validation.initialCreditsMin"))
+        .max(
+          availableCredits.value,
+          t("reseller.organizations.validation.initialCreditsMax"),
+        )
+        .optional(),
+      monthlyCreditsTarget: z
+        .number()
+        .min(1, t("reseller.subscription.validation.targetPositive"))
+        .optional(),
+      renewalType: z.enum(["first_of_month", "anniversary"]).optional(),
+      renewalDay: z.number().min(1).max(28).optional(),
+    })
+    .refine(
+      (data) => {
+        // If subscription, monthlyCreditsTarget is required
+        if (data.billingType === "subscription") {
+          return (
+            data.monthlyCreditsTarget !== undefined &&
+            data.monthlyCreditsTarget > 0
+          );
+        }
+        return true;
+      },
+      {
+        message: t("reseller.subscription.validation.targetRequired"),
+        path: ["monthlyCreditsTarget"],
+      },
+    )
+    .refine(
+      (data) => {
+        // If subscription, renewalType is required
+        if (data.billingType === "subscription") {
+          return data.renewalType !== undefined;
+        }
+        return true;
+      },
+      {
+        message: t("reseller.subscription.validation.renewalTypeRequired"),
+        path: ["renewalType"],
+      },
+    ),
 );
 
 const ownerSchema = computed(() =>
@@ -161,7 +230,15 @@ const memberSchema = computed(() =>
 const organizationState = reactive({
   name: "",
   email: "",
+});
+
+const creditsState = reactive({
+  billingType: "one_time" as "one_time" | "subscription",
   initialCredits: undefined as number | undefined,
+  // Subscription fields
+  monthlyCreditsTarget: undefined as number | undefined,
+  renewalType: "first_of_month" as RenewalType,
+  renewalDay: 1,
 });
 
 const ownerState = reactive({
@@ -181,15 +258,51 @@ const membersState = reactive({
 
 // Helper function to set credits from preset buttons
 function setCredits(amount: number) {
-  organizationState.initialCredits = Math.min(amount, availableCredits.value);
+  creditsState.initialCredits = Math.min(amount, availableCredits.value);
 }
 
 // Computed for credit progress bar
 const creditsUsedPercentage = computed(() => {
   if (availableCredits.value === 0) return 0;
-  const used = organizationState.initialCredits || 0;
+  const used = creditsState.initialCredits || 0;
   return Math.round((used / availableCredits.value) * 100);
 });
+
+// Billing type options
+const billingTypeOptions = computed(() => [
+  {
+    value: "one_time",
+    label: t("reseller.organizations.billing.oneTime"),
+    description: t("reseller.organizations.billing.oneTimeDesc"),
+    icon: "i-lucide-credit-card",
+  },
+  {
+    value: "subscription",
+    label: t("reseller.organizations.billing.subscription"),
+    description: t("reseller.organizations.billing.subscriptionDesc"),
+    icon: "i-lucide-refresh-cw",
+  },
+]);
+
+// Renewal type options
+const renewalTypeOptions = computed(() => [
+  {
+    value: "first_of_month",
+    label: t("reseller.subscription.renewalType.firstOfMonth"),
+  },
+  {
+    value: "anniversary",
+    label: t("reseller.subscription.renewalType.anniversary"),
+  },
+]);
+
+// Day options for anniversary renewal (1-28)
+const renewalDayOptions = computed(() =>
+  Array.from({ length: 28 }, (_, i) => ({
+    value: i + 1,
+    label: String(i + 1),
+  })),
+);
 
 // Check if current step is valid (for disabling Next button)
 const isCurrentStepValid = computed(() => {
@@ -198,9 +311,19 @@ const isCurrentStepValid = computed(() => {
     const data = {
       name: organizationState.name,
       email: organizationState.email,
-      initialCredits: organizationState.initialCredits,
     };
     const result = organizationSchema.value.safeParse(data);
+    return result.success;
+  } else if (currentStep.value === "credits") {
+    // Explicitly access properties to trigger Vue reactivity
+    const data = {
+      billingType: creditsState.billingType,
+      initialCredits: creditsState.initialCredits,
+      monthlyCreditsTarget: creditsState.monthlyCreditsTarget,
+      renewalType: creditsState.renewalType,
+      renewalDay: creditsState.renewalDay,
+    };
+    const result = creditsSchema.value.safeParse(data);
     return result.success;
   } else if (currentStep.value === "owner") {
     // Explicitly access properties to trigger Vue reactivity
@@ -242,6 +365,16 @@ async function nextStep() {
         return;
       }
     }
+  } else if (currentStep.value === "credits") {
+    const form = creditsFormRef.value;
+    if (form) {
+      try {
+        await form.validate({ silent: false });
+      } catch {
+        // Validation failed, errors will be displayed
+        return;
+      }
+    }
   } else if (currentStep.value === "owner") {
     const form = ownerFormRef.value;
     if (form) {
@@ -254,8 +387,8 @@ async function nextStep() {
     }
   }
 
-  // Pre-fill owner email from organization email if empty
-  if (currentStep.value === "organization" && !ownerState.ownerEmail) {
+  // Pre-fill owner email from organization email if empty (when moving from credits to owner)
+  if (currentStep.value === "credits" && !ownerState.ownerEmail) {
     ownerState.ownerEmail = organizationState.email;
   }
 
@@ -308,7 +441,17 @@ async function handleSubmit() {
       ownerEmail: ownerState.ownerEmail,
       ownerFirstName: ownerState.ownerFirstName,
       ownerLastName: ownerState.ownerLastName,
-      initialCredits: organizationState.initialCredits,
+      initialCredits: creditsState.initialCredits,
+      // Subscription configuration
+      subscriptionEnabled: creditsState.billingType === "subscription",
+      ...(creditsState.billingType === "subscription" && {
+        monthlyCreditsTarget: creditsState.monthlyCreditsTarget,
+        renewalType: creditsState.renewalType,
+        renewalDay:
+          creditsState.renewalType === "anniversary"
+            ? creditsState.renewalDay
+            : undefined,
+      }),
     };
 
     const result = await createOrganization(payload);
@@ -408,7 +551,7 @@ function handleCancel() {
                 </h3>
 
                 <!-- Nom de l'organisation (full width) -->
-                <UFormField name="name" required>
+                <UFormField name="name">
                   <template #label>
                     <span class="flex items-center gap-1.5">
                       <UIcon
@@ -416,6 +559,7 @@ function handleCancel() {
                         class="h-4 w-4 text-gray-500"
                       />
                       {{ t("reseller.organizations.fields.name") }}
+                      <span class="text-error-500">*</span>
                     </span>
                   </template>
                   <UInput
@@ -431,7 +575,7 @@ function handleCancel() {
                 </UFormField>
 
                 <!-- Email de l'organisation (full width) -->
-                <UFormField name="email" required>
+                <UFormField name="email">
                   <template #label>
                     <span class="flex items-center gap-1.5">
                       <UIcon
@@ -439,6 +583,7 @@ function handleCancel() {
                         class="h-4 w-4 text-gray-500"
                       />
                       {{ t("reseller.organizations.fields.email") }}
+                      <span class="text-error-500">*</span>
                     </span>
                   </template>
                   <UInput
@@ -455,92 +600,371 @@ function handleCancel() {
                     </span>
                   </template>
                 </UFormField>
-
-                <!-- Crédits initiaux avec presets et progress bar -->
-                <UFormField name="initialCredits">
-                  <template #label>
-                    <span class="flex items-center gap-1.5">
-                      <UIcon
-                        name="i-lucide-coins"
-                        class="h-4 w-4 text-gray-500"
-                      />
-                      {{ t("reseller.organizations.fields.initialCredits") }}
-                    </span>
-                  </template>
-                  <div class="space-y-3">
-                    <!-- Input principal -->
-                    <UInput
-                      v-model.number="organizationState.initialCredits"
-                      type="number"
-                      class="w-full text-center"
-                      :placeholder="
-                        t('reseller.organizations.placeholders.initialCredits')
-                      "
-                      :min="0"
-                      :max="availableCredits"
-                    />
-
-                    <!-- Preset buttons -->
-                    <div class="flex flex-wrap gap-2">
-                      <UButton
-                        size="sm"
-                        variant="soft"
-                        color="neutral"
-                        :disabled="availableCredits < 100"
-                        @click="setCredits(100)"
-                      >
-                        100
-                      </UButton>
-                      <UButton
-                        size="sm"
-                        variant="soft"
-                        color="neutral"
-                        :disabled="availableCredits < 500"
-                        @click="setCredits(500)"
-                      >
-                        500
-                      </UButton>
-                      <UButton
-                        size="sm"
-                        variant="soft"
-                        color="neutral"
-                        :disabled="availableCredits < 1000"
-                        @click="setCredits(1000)"
-                      >
-                        1000
-                      </UButton>
-                      <UButton
-                        size="sm"
-                        variant="soft"
-                        color="primary"
-                        :disabled="availableCredits === 0"
-                        @click="setCredits(availableCredits)"
-                      >
-                        {{ t("reseller.organizations.credits.max") }}
-                      </UButton>
-                    </div>
-
-                    <!-- Progress bar et crédits disponibles -->
-                    <div class="flex items-center gap-3">
-                      <UProgress
-                        :model-value="creditsUsedPercentage"
-                        class="flex-1"
-                        size="sm"
-                      />
-                      <span class="text-sm whitespace-nowrap text-gray-500">
-                        {{
-                          t("reseller.organizations.form.availableCredits", {
-                            count: availableCredits,
-                          })
-                        }}
-                      </span>
-                    </div>
-                  </div>
-                </UFormField>
               </UForm>
             </div>
 
-            <!-- Step 2: Owner Info -->
+            <!-- Step 2: Credits & Billing -->
+            <div
+              v-else-if="item.value === 'credits'"
+              class="w-full space-y-6 lg:ml-[9%] lg:max-w-2xl 2xl:ml-[11%]"
+            >
+              <UForm
+                ref="creditsForm"
+                :schema="creditsSchema"
+                :state="creditsState"
+                :validate-on="['blur', 'change']"
+                class="space-y-6"
+              >
+                <div>
+                  <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    {{ t("reseller.organizations.billing.title") }}
+                  </h3>
+                  <p class="mt-1 text-sm text-gray-500">
+                    {{ t("reseller.organizations.billing.description") }}
+                  </p>
+                </div>
+
+                <!-- Billing Type Selection -->
+                <UFormField name="billingType">
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <button
+                      v-for="option in billingTypeOptions"
+                      :key="option.value"
+                      type="button"
+                      class="relative flex cursor-pointer flex-col rounded-lg border-2 p-4 transition-all"
+                      :class="[
+                        creditsState.billingType === option.value
+                          ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
+                          : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600',
+                      ]"
+                      @click="creditsState.billingType = option.value as 'one_time' | 'subscription'"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex h-10 w-10 items-center justify-center rounded-lg"
+                        >
+                          <UIcon
+                            :name="option.icon"
+                            class="h-5 w-5"
+                            :class="[
+                              creditsState.billingType === option.value
+                                ? 'text-primary-600 dark:text-primary-400'
+                                : 'text-gray-500 dark:text-gray-400',
+                            ]"
+                          />
+                        </div>
+                        <div class="text-left">
+                          <p
+                            class="font-medium"
+                            :class="[
+                              creditsState.billingType === option.value
+                                ? 'text-primary-700 dark:text-primary-300'
+                                : 'text-gray-900 dark:text-white',
+                            ]"
+                          >
+                            {{ option.label }}
+                          </p>
+                          <p class="text-sm text-gray-500">
+                            {{ option.description }}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </UFormField>
+
+                <UDivider />
+
+                <!-- One-time mode: Initial credits only -->
+                <div
+                  v-if="creditsState.billingType === 'one_time'"
+                  class="space-y-4"
+                >
+                  <UFormField name="initialCredits">
+                    <template #label>
+                      <span class="flex items-center gap-1.5">
+                        <UIcon
+                          name="i-lucide-coins"
+                          class="h-4 w-4 text-gray-500"
+                        />
+                        {{ t("reseller.organizations.fields.initialCredits") }}
+                      </span>
+                    </template>
+                    <div class="space-y-3">
+                      <UInput
+                        v-model.number="creditsState.initialCredits"
+                        type="number"
+                        class="w-full"
+                        :placeholder="
+                          t(
+                            'reseller.organizations.placeholders.initialCredits',
+                          )
+                        "
+                        :min="0"
+                        :max="availableCredits"
+                      />
+
+                      <!-- Preset buttons -->
+                      <div class="flex flex-wrap gap-2">
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          :disabled="availableCredits < 100"
+                          @click="setCredits(100)"
+                        >
+                          100
+                        </UButton>
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          :disabled="availableCredits < 500"
+                          @click="setCredits(500)"
+                        >
+                          500
+                        </UButton>
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          :disabled="availableCredits < 1000"
+                          @click="setCredits(1000)"
+                        >
+                          1000
+                        </UButton>
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="primary"
+                          :disabled="availableCredits === 0"
+                          @click="setCredits(availableCredits)"
+                        >
+                          {{ t("reseller.organizations.credits.max") }}
+                        </UButton>
+                      </div>
+
+                      <!-- Progress bar -->
+                      <div class="flex items-center gap-3">
+                        <UProgress
+                          :model-value="creditsUsedPercentage"
+                          class="flex-1"
+                          size="sm"
+                        />
+                        <span class="text-sm whitespace-nowrap text-gray-500">
+                          {{
+                            t("reseller.organizations.form.availableCredits", {
+                              count: availableCredits,
+                            })
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </UFormField>
+                </div>
+
+                <!-- Subscription mode: Monthly target + renewal config -->
+                <div
+                  v-else-if="creditsState.billingType === 'subscription'"
+                  class="space-y-5"
+                >
+                  <!-- Monthly Credits Target -->
+                  <UFormField name="monthlyCreditsTarget">
+                    <template #label>
+                      <span class="flex items-center gap-1.5">
+                        <UIcon
+                          name="i-lucide-target"
+                          class="h-4 w-4 text-gray-500"
+                        />
+                        {{
+                          t("reseller.subscription.fields.monthlyCreditsTarget")
+                        }}
+                        <span class="text-error-500">*</span>
+                      </span>
+                    </template>
+                    <UInput
+                      v-model.number="creditsState.monthlyCreditsTarget"
+                      type="number"
+                      class="w-full"
+                      :placeholder="
+                        t(
+                          'reseller.subscription.placeholders.monthlyCreditsTarget',
+                        )
+                      "
+                      :min="1"
+                    />
+                    <template #hint>
+                      <span class="text-xs text-gray-500">
+                        {{
+                          t(
+                            "reseller.subscription.fields.monthlyCreditsTargetDescription",
+                          )
+                        }}
+                      </span>
+                    </template>
+                  </UFormField>
+
+                  <!-- Renewal Type -->
+                  <UFormField name="renewalType">
+                    <template #label>
+                      <span class="flex items-center gap-1.5">
+                        <UIcon
+                          name="i-lucide-calendar"
+                          class="h-4 w-4 text-gray-500"
+                        />
+                        {{ t("reseller.subscription.fields.renewalType") }}
+                        <span class="text-error-500">*</span>
+                      </span>
+                    </template>
+                    <USelect
+                      v-model="creditsState.renewalType"
+                      :items="renewalTypeOptions"
+                      value-key="value"
+                      class="w-full"
+                    />
+                    <template #hint>
+                      <span class="text-xs text-gray-500">
+                        {{
+                          t(
+                            "reseller.subscription.fields.renewalTypeDescription",
+                          )
+                        }}
+                      </span>
+                    </template>
+                  </UFormField>
+
+                  <!-- Renewal Day (only for anniversary) -->
+                  <UFormField
+                    v-if="creditsState.renewalType === 'anniversary'"
+                    name="renewalDay"
+                  >
+                    <template #label>
+                      <span class="flex items-center gap-1.5">
+                        <UIcon
+                          name="i-lucide-calendar-days"
+                          class="h-4 w-4 text-gray-500"
+                        />
+                        {{ t("reseller.subscription.fields.renewalDay") }}
+                        <span class="text-error-500">*</span>
+                      </span>
+                    </template>
+                    <USelect
+                      v-model="creditsState.renewalDay"
+                      :items="renewalDayOptions"
+                      value-key="value"
+                      class="w-32"
+                    />
+                    <template #hint>
+                      <span class="text-xs text-gray-500">
+                        {{
+                          t(
+                            "reseller.subscription.fields.renewalDayDescription",
+                          )
+                        }}
+                      </span>
+                    </template>
+                  </UFormField>
+
+                  <UDivider />
+
+                  <!-- Initial Credits (optional for subscription) -->
+                  <UFormField name="initialCredits">
+                    <template #label>
+                      <span class="flex items-center gap-1.5">
+                        <UIcon
+                          name="i-lucide-coins"
+                          class="h-4 w-4 text-gray-500"
+                        />
+                        {{
+                          t(
+                            "reseller.organizations.billing.initialCreditsOptional",
+                          )
+                        }}
+                      </span>
+                    </template>
+                    <div class="space-y-3">
+                      <UInput
+                        v-model.number="creditsState.initialCredits"
+                        type="number"
+                        class="w-full"
+                        :placeholder="
+                          t(
+                            'reseller.organizations.placeholders.initialCredits',
+                          )
+                        "
+                        :min="0"
+                        :max="availableCredits"
+                      />
+
+                      <!-- Preset buttons -->
+                      <div class="flex flex-wrap gap-2">
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          :disabled="availableCredits < 100"
+                          @click="setCredits(100)"
+                        >
+                          100
+                        </UButton>
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          :disabled="availableCredits < 500"
+                          @click="setCredits(500)"
+                        >
+                          500
+                        </UButton>
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="neutral"
+                          :disabled="availableCredits < 1000"
+                          @click="setCredits(1000)"
+                        >
+                          1000
+                        </UButton>
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          color="primary"
+                          :disabled="availableCredits === 0"
+                          @click="setCredits(availableCredits)"
+                        >
+                          {{ t("reseller.organizations.credits.max") }}
+                        </UButton>
+                      </div>
+
+                      <!-- Progress bar -->
+                      <div class="flex items-center gap-3">
+                        <UProgress
+                          :model-value="creditsUsedPercentage"
+                          class="flex-1"
+                          size="sm"
+                        />
+                        <span class="text-sm whitespace-nowrap text-gray-500">
+                          {{
+                            t("reseller.organizations.form.availableCredits", {
+                              count: availableCredits,
+                            })
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                    <template #hint>
+                      <span class="text-xs text-gray-500">
+                        {{
+                          t("reseller.organizations.billing.initialCreditsHint")
+                        }}
+                      </span>
+                    </template>
+                  </UFormField>
+                </div>
+              </UForm>
+            </div>
+
+            <!-- Step 3: Owner Info -->
             <div
               v-else-if="item.value === 'owner'"
               class="w-full space-y-6 lg:ml-[9%] lg:max-w-2xl 2xl:ml-[11%]"
@@ -562,7 +986,7 @@ function handleCancel() {
                 </div>
 
                 <!-- Email du propriétaire (full width) -->
-                <UFormField name="ownerEmail" required>
+                <UFormField name="ownerEmail">
                   <template #label>
                     <span class="flex items-center gap-1.5">
                       <UIcon
@@ -570,6 +994,7 @@ function handleCancel() {
                         class="h-4 w-4 text-gray-500"
                       />
                       {{ t("reseller.organizations.fields.ownerEmail") }}
+                      <span class="text-error-500">*</span>
                     </span>
                   </template>
                   <UInput
@@ -589,7 +1014,7 @@ function handleCancel() {
 
                 <!-- Prénom et Nom côte à côte -->
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <UFormField name="ownerFirstName" required>
+                  <UFormField name="ownerFirstName">
                     <template #label>
                       <span class="flex items-center gap-1.5">
                         <UIcon
@@ -597,6 +1022,7 @@ function handleCancel() {
                           class="h-4 w-4 text-gray-500"
                         />
                         {{ t("reseller.organizations.fields.ownerFirstName") }}
+                        <span class="text-error-500">*</span>
                       </span>
                     </template>
                     <UInput
@@ -608,7 +1034,7 @@ function handleCancel() {
                     />
                   </UFormField>
 
-                  <UFormField name="ownerLastName" required>
+                  <UFormField name="ownerLastName">
                     <template #label>
                       <span class="flex items-center gap-1.5">
                         <UIcon
@@ -616,6 +1042,7 @@ function handleCancel() {
                           class="h-4 w-4 text-gray-500"
                         />
                         {{ t("reseller.organizations.fields.ownerLastName") }}
+                        <span class="text-error-500">*</span>
                       </span>
                     </template>
                     <UInput
@@ -699,10 +1126,13 @@ function handleCancel() {
                     </div>
 
                     <!-- Email sur toute la largeur -->
-                    <UFormField
-                      :label="t('reseller.organizations.members.fields.email')"
-                      required
-                    >
+                    <UFormField>
+                      <template #label>
+                        <span class="flex items-center gap-1.5">
+                          {{ t('reseller.organizations.members.fields.email') }}
+                          <span class="text-error-500">*</span>
+                        </span>
+                      </template>
                       <UInput
                         v-model="member.email"
                         class="w-full"
@@ -715,12 +1145,15 @@ function handleCancel() {
 
                     <!-- Prénom et Nom côte à côte -->
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                      <UFormField
-                        :label="
-                          t('reseller.organizations.members.fields.firstName')
-                        "
-                        required
-                      >
+                      <UFormField>
+                        <template #label>
+                          <span class="flex items-center gap-1.5">
+                            {{
+                              t('reseller.organizations.members.fields.firstName')
+                            }}
+                            <span class="text-error-500">*</span>
+                          </span>
+                        </template>
                         <UInput
                           v-model="member.firstName"
                           class="w-full"
@@ -732,12 +1165,15 @@ function handleCancel() {
                         />
                       </UFormField>
 
-                      <UFormField
-                        :label="
-                          t('reseller.organizations.members.fields.lastName')
-                        "
-                        required
-                      >
+                      <UFormField>
+                        <template #label>
+                          <span class="flex items-center gap-1.5">
+                            {{
+                              t('reseller.organizations.members.fields.lastName')
+                            }}
+                            <span class="text-error-500">*</span>
+                          </span>
+                        </template>
                         <UInput
                           v-model="member.lastName"
                           class="w-full"
@@ -751,10 +1187,13 @@ function handleCancel() {
                     </div>
 
                     <!-- Rôle sur toute la largeur -->
-                    <UFormField
-                      :label="t('reseller.organizations.members.fields.role')"
-                      required
-                    >
+                    <UFormField>
+                      <template #label>
+                        <span class="flex items-center gap-1.5">
+                          {{ t('reseller.organizations.members.fields.role') }}
+                          <span class="text-error-500">*</span>
+                        </span>
+                      </template>
                       <USelect
                         v-model="member.role"
                         class="w-full"

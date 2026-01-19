@@ -202,6 +202,8 @@ const ResellerApiCreditsController = () =>
 const ResellerOrganizationsController = () =>
   import('#controllers/reseller/reseller_organizations_controller')
 const ResellerUsersController = () => import('#controllers/reseller/reseller_users_controller')
+const ResellerSubscriptionsController = () =>
+  import('#controllers/reseller/reseller_subscriptions_controller')
 
 // Reseller API routes
 router
@@ -225,6 +227,13 @@ router
     router.get('/organizations/:id/users', [ResellerUsersController, 'index'])
     router.post('/organizations/:id/users', [ResellerUsersController, 'store'])
     router.delete('/organizations/:id/users/:userId', [ResellerUsersController, 'destroy'])
+
+    // Subscription management
+    router.get('/subscriptions/upcoming', [ResellerSubscriptionsController, 'upcoming'])
+    router.get('/organizations/:id/subscription', [ResellerSubscriptionsController, 'show'])
+    router.put('/organizations/:id/subscription', [ResellerSubscriptionsController, 'update'])
+    router.post('/organizations/:id/subscription/pause', [ResellerSubscriptionsController, 'pause'])
+    router.post('/organizations/:id/subscription/resume', [ResellerSubscriptionsController, 'resume'])
   })
   .prefix('/reseller')
   .use([middleware.auth({ guards: ['api'] }), middleware.reseller()])

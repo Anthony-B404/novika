@@ -9,6 +9,7 @@ export enum ResellerTransactionType {
   Purchase = 'purchase',
   Distribution = 'distribution',
   Adjustment = 'adjustment',
+  SubscriptionRenewal = 'subscription_renewal',
 }
 
 export default class ResellerTransaction extends BaseModel {
@@ -33,7 +34,7 @@ export default class ResellerTransaction extends BaseModel {
   declare description: string | null
 
   @column()
-  declare performedByUserId: number
+  declare performedByUserId: number | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

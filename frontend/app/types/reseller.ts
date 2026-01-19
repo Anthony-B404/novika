@@ -24,6 +24,8 @@ export type UserRoleValue = (typeof USER_ROLES)[keyof typeof USER_ROLES]
 // ORGANIZATION TYPES
 // =============================================================================
 
+export type RenewalType = 'first_of_month' | 'anniversary'
+
 export interface ResellerOrganization {
   id: number
   name: string
@@ -35,6 +37,15 @@ export interface ResellerOrganization {
   updatedAt: string
   usersCount?: number
   users?: OrganizationUser[]
+  // Subscription fields
+  subscriptionEnabled?: boolean
+  monthlyCreditsTarget?: number | null
+  renewalType?: RenewalType | null
+  renewalDay?: number | null
+  subscriptionCreatedAt?: string | null
+  subscriptionPausedAt?: string | null
+  lastRenewalAt?: string | null
+  nextRenewalAt?: string | null
 }
 
 export interface OrganizationUser {
@@ -69,7 +80,7 @@ export interface ResellerProfile {
 // TRANSACTION TYPES
 // =============================================================================
 
-export type ResellerTransactionType = 'purchase' | 'distribution' | 'adjustment'
+export type ResellerTransactionType = 'purchase' | 'distribution' | 'adjustment' | 'subscription_renewal'
 
 export interface ResellerTransaction {
   id: number
@@ -103,6 +114,11 @@ export interface CreateOrganizationPayload {
   ownerFirstName: string
   ownerLastName: string
   initialCredits?: number
+  // Subscription configuration (optional)
+  subscriptionEnabled?: boolean
+  monthlyCreditsTarget?: number
+  renewalType?: RenewalType
+  renewalDay?: number
 }
 
 export interface UpdateOrganizationPayload {
@@ -202,4 +218,56 @@ export interface ResellerStats {
     'id' | 'name' | 'credits' | 'createdAt'
   >[]
   recentTransactions: ResellerTransaction[]
+}
+
+// =============================================================================
+// SUBSCRIPTION TYPES
+// =============================================================================
+
+export interface SubscriptionStatus {
+  subscriptionEnabled: boolean
+  monthlyCreditsTarget: number | null
+  renewalType: RenewalType | null
+  renewalDay: number | null
+  subscriptionCreatedAt: string | null
+  subscriptionPausedAt: string | null
+  lastRenewalAt: string | null
+  nextRenewalAt: string | null
+  isActive: boolean
+  creditsNeededForRenewal: number
+  currentCredits: number
+}
+
+export interface ConfigureSubscriptionPayload {
+  enabled: boolean
+  monthlyCreditsTarget?: number | null
+  renewalType?: RenewalType | null
+  renewalDay?: number | null
+}
+
+export interface SubscriptionResponse {
+  message: string
+  subscription: SubscriptionStatus
+}
+
+export interface UpcomingRenewal {
+  id: number
+  name: string
+  nextRenewalAt: string | null
+  currentCredits: number
+  monthlyCreditsTarget: number | null
+  creditsNeeded: number
+}
+
+export interface UpcomingRenewalsSummary {
+  count: number
+  totalCreditsNeeded: number
+  resellerBalance: number
+  hasSufficientCredits: boolean
+  shortfall: number
+}
+
+export interface UpcomingRenewalsResponse {
+  renewals: UpcomingRenewal[]
+  summary: UpcomingRenewalsSummary
 }

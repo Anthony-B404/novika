@@ -210,7 +210,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     // Add logo if file was selected
     const fileInput = fileRef.value;
     if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append("logo", fileInput.files[0]);
+      const file = fileInput.files[0];
+      if (file) {
+        formData.append("logo", file);
+      }
     }
 
     const response = await api<{ token: string; message: string }>(

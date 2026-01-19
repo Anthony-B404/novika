@@ -32,6 +32,11 @@ const transactionStyles: Record<
     bgColor: 'bg-orange-100 dark:bg-orange-900/30',
     iconColor: 'text-orange-500',
   },
+  subscription_renewal: {
+    icon: 'i-lucide-refresh-cw',
+    bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+    iconColor: 'text-purple-500',
+  },
   default: {
     icon: 'i-lucide-circle',
     bgColor: 'bg-gray-100 dark:bg-gray-800',

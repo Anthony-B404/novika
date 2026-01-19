@@ -4,17 +4,19 @@ export default class extends BaseSchema {
   protected tableName = 'organizations'
 
   async up() {
-    this.schema.alterTable(this.tableName, (table) => {
-      // Use nullsNotDistinct to prevent multiple NULL emails
-      // PostgreSQL by default treats NULL != NULL, so without this
-      // multiple organizations could have NULL emails
-      table.unique(['email'], { nullsNotDistinct: true })
-    })
+    // Use raw SQL for partial unique index on non-null emails
+    // This prevents multiple organizations from having the same email
+    // while allowing multiple NULL emails (PostgreSQL default behavior)
+    this.schema.raw(`
+      CREATE UNIQUE INDEX organizations_email_unique
+      ON ${this.tableName} (email)
+      WHERE email IS NOT NULL
+    `)
   }
 
   async down() {
-    this.schema.alterTable(this.tableName, (table) => {
-      table.dropUnique(['email'])
-    })
+    this.schema.raw(`
+      DROP INDEX IF EXISTS organizations_email_unique
+    `)
   }
 }
