@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   open: boolean
   count: number
   loading?: boolean
@@ -13,12 +13,12 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-function handleClose() {
+function handleClose () {
   emit('update:open', false)
   emit('cancel')
 }
 
-function handleConfirm() {
+function handleConfirm () {
   emit('confirm')
 }
 </script>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Reseller } from '~/types/admin'
 import type { TableColumn } from '@nuxt/ui'
+import type { Reseller } from '~/types/admin'
 
-const props = defineProps<{
+defineProps<{
   resellers: Reseller[]
   loading?: boolean
 }>()
@@ -14,74 +14,66 @@ const emit = defineEmits<{
   delete: [reseller: Reseller]
 }>()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 const columns: TableColumn<Reseller>[] = [
   {
     accessorKey: 'name',
-    header: t('admin.resellers.table.name'),
+    header: t('admin.resellers.table.name')
   },
   {
     accessorKey: 'company',
-    header: t('admin.resellers.table.company'),
+    header: t('admin.resellers.table.company')
   },
   {
     accessorKey: 'email',
-    header: t('admin.resellers.table.email'),
+    header: t('admin.resellers.table.email')
   },
   {
     accessorKey: 'creditBalance',
-    header: t('admin.resellers.table.credits'),
+    header: t('admin.resellers.table.credits')
   },
   {
     accessorKey: 'organizationsCount',
-    header: t('admin.resellers.table.organizations'),
+    header: t('admin.resellers.table.organizations')
   },
   {
     accessorKey: 'isActive',
-    header: t('admin.resellers.table.status'),
+    header: t('admin.resellers.table.status')
   },
   {
     accessorKey: 'actions',
-    header: '',
-  },
+    header: ''
+  }
 ]
 
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString(locale.value, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-function getRowActions(reseller: Reseller) {
+function getRowActions (reseller: Reseller) {
   return [
     {
       label: t('common.buttons.view'),
       icon: 'i-lucide-eye',
-      onSelect: () => emit('view', reseller),
+      onSelect: () => emit('view', reseller)
     },
     {
       label: t('common.buttons.edit'),
       icon: 'i-lucide-edit',
-      onSelect: () => emit('edit', reseller),
+      onSelect: () => emit('edit', reseller)
     },
     {
       label: t('admin.resellers.detail.manageCredits'),
       icon: 'i-lucide-coins',
-      onSelect: () => emit('credits', reseller),
+      onSelect: () => emit('credits', reseller)
     },
     {
-      type: 'separator' as const,
+      type: 'separator' as const
     },
     {
       label: t('admin.resellers.actions.deactivate'),
       icon: 'i-lucide-power-off',
       color: 'error' as const,
       onSelect: () => emit('delete', reseller),
-      disabled: !reseller.isActive,
-    },
+      disabled: !reseller.isActive
+    }
   ]
 }
 </script>
@@ -95,7 +87,9 @@ function getRowActions(reseller: Reseller) {
   >
     <template #name-cell="{ row }">
       <div>
-        <p class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</p>
+        <p class="font-medium text-gray-900 dark:text-white">
+          {{ row.original.name }}
+        </p>
       </div>
     </template>
 

@@ -2,7 +2,7 @@ import type {
   SubscriptionStatus,
   ConfigureSubscriptionPayload,
   SubscriptionResponse,
-  UpcomingRenewalsResponse,
+  UpcomingRenewalsResponse
 } from '~/types/reseller'
 import { getErrorMessage } from '~/utils/errors'
 
@@ -10,7 +10,7 @@ import { getErrorMessage } from '~/utils/errors'
  * Reseller Subscriptions composable
  * Provides subscription management operations for organizations (Reseller Admin only)
  */
-export function useResellerSubscriptions() {
+export function useResellerSubscriptions () {
   const { authenticatedFetch } = useAuth()
 
   const loading = ref(false)
@@ -23,7 +23,7 @@ export function useResellerSubscriptions() {
   /**
    * Fetch subscription status for an organization
    */
-  async function fetchSubscription(organizationId: number): Promise<SubscriptionStatus | null> {
+  async function fetchSubscription (organizationId: number): Promise<SubscriptionStatus | null> {
     loading.value = true
     error.value = null
     try {
@@ -45,7 +45,7 @@ export function useResellerSubscriptions() {
   /**
    * Configure subscription for an organization
    */
-  async function configureSubscription(
+  async function configureSubscription (
     organizationId: number,
     payload: ConfigureSubscriptionPayload
   ): Promise<SubscriptionResponse | null> {
@@ -57,7 +57,7 @@ export function useResellerSubscriptions() {
         {
           method: 'PUT',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     } catch (e: unknown) {
@@ -71,14 +71,14 @@ export function useResellerSubscriptions() {
   /**
    * Pause a subscription
    */
-  async function pauseSubscription(organizationId: number): Promise<SubscriptionResponse | null> {
+  async function pauseSubscription (organizationId: number): Promise<SubscriptionResponse | null> {
     loading.value = true
     error.value = null
     try {
       return await authenticatedFetch<SubscriptionResponse>(
         `/reseller/organizations/${organizationId}/subscription/pause`,
         {
-          method: 'POST',
+          method: 'POST'
         }
       )
     } catch (e: unknown) {
@@ -92,14 +92,14 @@ export function useResellerSubscriptions() {
   /**
    * Resume a paused subscription
    */
-  async function resumeSubscription(organizationId: number): Promise<SubscriptionResponse | null> {
+  async function resumeSubscription (organizationId: number): Promise<SubscriptionResponse | null> {
     loading.value = true
     error.value = null
     try {
       return await authenticatedFetch<SubscriptionResponse>(
         `/reseller/organizations/${organizationId}/subscription/resume`,
         {
-          method: 'POST',
+          method: 'POST'
         }
       )
     } catch (e: unknown) {
@@ -117,7 +117,7 @@ export function useResellerSubscriptions() {
   /**
    * Fetch upcoming renewals for alert display
    */
-  async function fetchUpcomingRenewals(days: number = 7): Promise<UpcomingRenewalsResponse | null> {
+  async function fetchUpcomingRenewals (days: number = 7): Promise<UpcomingRenewalsResponse | null> {
     loading.value = true
     error.value = null
     try {
@@ -146,6 +146,6 @@ export function useResellerSubscriptions() {
     resumeSubscription,
 
     // Upcoming renewals
-    fetchUpcomingRenewals,
+    fetchUpcomingRenewals
   }
 }

@@ -43,7 +43,11 @@ async function processReminderJob(
       console.log(
         `[ReminderJob ${job.id}] Deletion request status is ${deletionRequest.status}, skipping`
       )
-      return { success: true, emailSent: false, error: `Request status is ${deletionRequest.status}` }
+      return {
+        success: true,
+        emailSent: false,
+        error: `Request status is ${deletionRequest.status}`,
+      }
     }
 
     // Load the user
@@ -161,7 +165,9 @@ export async function queuePendingReminders(): Promise<number> {
           },
         }
       )
-      console.log(`[ReminderScheduler] Queued reminder for request ${request.id} (J-${daysRemaining})`)
+      console.log(
+        `[ReminderScheduler] Queued reminder for request ${request.id} (J-${daysRemaining})`
+      )
       totalQueued++
     }
   }

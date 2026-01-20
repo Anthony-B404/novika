@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PromptCategory, CreateCategoryPayload, UpdateCategoryPayload } from '~/types/prompt'
 
-const props = defineProps<{
+defineProps<{
   open: boolean
   categories: PromptCategory[]
 }>()
@@ -21,11 +21,11 @@ const isCreating = ref(false)
 const form = reactive({
   name: '',
   description: '',
-  color: '#3B82F6',
+  color: '#3B82F6'
 })
 
 const errors = reactive({
-  name: '',
+  name: ''
 })
 
 const colorOptions = [
@@ -36,10 +36,10 @@ const colorOptions = [
   '#EF4444', // red
   '#EC4899', // pink
   '#6366F1', // indigo
-  '#14B8A6', // teal
+  '#14B8A6' // teal
 ]
 
-function resetForm() {
+function resetForm () {
   form.name = ''
   form.description = ''
   form.color = '#3B82F6'
@@ -48,12 +48,12 @@ function resetForm() {
   isCreating.value = false
 }
 
-function startCreate() {
+function startCreate () {
   resetForm()
   isCreating.value = true
 }
 
-function startEdit(category: PromptCategory) {
+function startEdit (category: PromptCategory) {
   form.name = category.name
   form.description = category.description || ''
   form.color = category.color || '#3B82F6'
@@ -61,11 +61,11 @@ function startEdit(category: PromptCategory) {
   isCreating.value = false
 }
 
-function cancelEdit() {
+function cancelEdit () {
   resetForm()
 }
 
-function validate(): boolean {
+function validate (): boolean {
   errors.name = ''
 
   if (!form.name.trim()) {
@@ -81,13 +81,13 @@ function validate(): boolean {
   return true
 }
 
-function handleSave() {
-  if (!validate()) return
+function handleSave () {
+  if (!validate()) { return }
 
   const payload = {
     name: form.name.trim(),
     description: form.description.trim() || null,
-    color: form.color,
+    color: form.color
   }
 
   if (editingCategory.value) {
@@ -99,7 +99,7 @@ function handleSave() {
   resetForm()
 }
 
-function handleDelete(category: PromptCategory) {
+function handleDelete (category: PromptCategory) {
   if (category.promptsCount && category.promptsCount > 0) {
     // Show error toast - category has prompts
     return
@@ -107,7 +107,7 @@ function handleDelete(category: PromptCategory) {
   emit('delete', category.id)
 }
 
-function handleClose() {
+function handleClose () {
   resetForm()
   emit('update:open', false)
 }

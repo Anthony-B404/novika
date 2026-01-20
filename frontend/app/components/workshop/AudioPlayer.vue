@@ -5,7 +5,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'timeupdate', time: number): void
+  timeupdate: [time: number]
 }>()
 
 const audioRef = ref<HTMLAudioElement | null>(null)
@@ -15,14 +15,14 @@ const totalDuration = ref(props.duration || 0)
 const volume = ref(1)
 const isMuted = ref(false)
 
-function formatTime(seconds: number): string {
+function formatTime (seconds: number): string {
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
-function togglePlay() {
-  if (!audioRef.value) return
+function togglePlay () {
+  if (!audioRef.value) { return }
 
   if (isPlaying.value) {
     audioRef.value.pause()
@@ -31,20 +31,20 @@ function togglePlay() {
   }
 }
 
-function toggleMute() {
-  if (!audioRef.value) return
+function toggleMute () {
+  if (!audioRef.value) { return }
   isMuted.value = !isMuted.value
   audioRef.value.muted = isMuted.value
 }
 
-function handleTimeUpdate() {
+function handleTimeUpdate () {
   if (audioRef.value) {
     currentTime.value = audioRef.value.currentTime
     emit('timeupdate', currentTime.value)
   }
 }
 
-function handleLoadedMetadata() {
+function handleLoadedMetadata () {
   if (audioRef.value) {
     const audioDuration = audioRef.value.duration
     // Use browser duration if valid, otherwise fallback to prop duration
@@ -56,14 +56,14 @@ function handleLoadedMetadata() {
   }
 }
 
-function handleSeek(value: number) {
+function handleSeek (value: number) {
   if (audioRef.value) {
     audioRef.value.currentTime = value
     currentTime.value = value
   }
 }
 
-function handleVolumeChange(value: number) {
+function handleVolumeChange (value: number) {
   if (audioRef.value) {
     volume.value = value
     audioRef.value.volume = value
@@ -71,18 +71,18 @@ function handleVolumeChange(value: number) {
   }
 }
 
-function handleEnded() {
+function handleEnded () {
   isPlaying.value = false
   currentTime.value = 0
 }
 
-function skipBackward() {
+function skipBackward () {
   if (audioRef.value) {
     audioRef.value.currentTime = Math.max(0, audioRef.value.currentTime - 10)
   }
 }
 
-function skipForward() {
+function skipForward () {
   if (audioRef.value) {
     audioRef.value.currentTime = Math.min(totalDuration.value, audioRef.value.currentTime + 10)
   }
@@ -109,7 +109,7 @@ watch(
 // Expose methods for parent component
 defineExpose({
   seekTo: handleSeek,
-  currentTime,
+  currentTime
 })
 </script>
 

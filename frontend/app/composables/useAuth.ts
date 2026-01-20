@@ -1,44 +1,44 @@
-import { useAuthStore } from "~/stores/auth";
-import { storeToRefs } from "pinia";
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '~/stores/auth'
 
 /**
  * Authentication composable
  * Provides easy access to auth state and methods
  */
 export const useAuth = () => {
-  const authStore = useAuthStore();
-  const { user, token, isAuthenticated, loading } = storeToRefs(authStore);
+  const authStore = useAuthStore()
+  const { user, token, isAuthenticated, loading } = storeToRefs(authStore)
 
   /**
    * Get authorization headers for API requests
    */
   const getAuthHeaders = () => {
     if (!token.value) {
-      return {};
+      return {}
     }
 
     return {
-      Authorization: `Bearer ${token.value}`,
-    };
-  };
+      Authorization: `Bearer ${token.value}`
+    }
+  }
 
   /**
    * Make authenticated API request
    */
   const authenticatedFetch = async <T>(
     url: string,
-    options: RequestInit = {},
+    options: RequestInit = {}
   ): Promise<T> => {
-    const api = useApi();
+    const api = useApi()
 
     return await api<T>(url, {
       ...options,
       headers: {
         ...options.headers,
-        ...getAuthHeaders(),
-      },
-    });
-  };
+        ...getAuthHeaders()
+      }
+    })
+  }
 
   return {
     // State
@@ -56,6 +56,6 @@ export const useAuth = () => {
 
     // Helpers
     getAuthHeaders,
-    authenticatedFetch,
-  };
-};
+    authenticatedFetch
+  }
+}

@@ -1,84 +1,84 @@
 <script setup lang="ts">
-import type { OrphanDecision } from "~/stores/gdpr";
+import type { OrphanDecision } from '~/stores/gdpr'
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion", "organization-status"],
-});
+  middleware: ['auth', 'pending-deletion', 'organization-status']
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.settingsPrivacy.title"),
-  description: t("seo.settingsPrivacy.description"),
-});
+  title: t('seo.settingsPrivacy.title'),
+  description: t('seo.settingsPrivacy.description')
+})
 
-const toast = useToast();
-const gdprStore = useGdprStore();
+const toast = useToast()
+const gdprStore = useGdprStore()
 
 // Modal state
-const showOrphanModal = ref(false);
+const showOrphanModal = ref(false)
 
 // Load data on mount
 onMounted(async () => {
   await Promise.all([
     gdprStore.fetchDataSummary(),
-    gdprStore.fetchDeletionStatus(),
-  ]);
-});
+    gdprStore.fetchDeletionStatus()
+  ])
+})
 
 // Export data
-async function handleExport() {
+async function handleExport () {
   try {
-    await gdprStore.downloadExport();
+    await gdprStore.downloadExport()
     toast.add({
-      title: t("pages.dashboard.settings.privacy.export.success"),
-      color: "success",
-    });
+      title: t('pages.dashboard.settings.privacy.export.success'),
+      color: 'success'
+    })
   } catch {
     toast.add({
-      title: t("pages.dashboard.settings.privacy.export.error"),
-      color: "error",
-    });
+      title: t('pages.dashboard.settings.privacy.export.error'),
+      color: 'error'
+    })
   }
 }
 
 // Request deletion
-async function handleRequestDeletion() {
+async function handleRequestDeletion () {
   // First check for orphan organizations
-  await gdprStore.fetchOrphanOrganizations();
+  await gdprStore.fetchOrphanOrganizations()
 
   if (gdprStore.hasOrphanOrganizations) {
-    showOrphanModal.value = true;
+    showOrphanModal.value = true
   } else {
-    await submitDeletionRequest([]);
+    await submitDeletionRequest([])
   }
 }
 
 // Submit deletion request with decisions
-async function submitDeletionRequest(decisions: OrphanDecision[]) {
+async function submitDeletionRequest (decisions: OrphanDecision[]) {
   try {
-    await gdprStore.requestDeletion(decisions);
-    showOrphanModal.value = false;
+    await gdprStore.requestDeletion(decisions)
+    showOrphanModal.value = false
     toast.add({
-      title: t("pages.dashboard.settings.privacy.deletion.pendingTitle"),
-      color: "success",
-    });
+      title: t('pages.dashboard.settings.privacy.deletion.pendingTitle'),
+      color: 'success'
+    })
   } catch {
     toast.add({
-      title: t("pages.dashboard.settings.privacy.errors.requestDeletion"),
-      color: "error",
-    });
+      title: t('pages.dashboard.settings.privacy.errors.requestDeletion'),
+      color: 'error'
+    })
   }
 }
 
 // Format date for display
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString();
+function formatDate (dateStr: string) {
+  return new Date(dateStr).toLocaleDateString()
 }
 
 // Format bytes to MB
-function formatSize(bytes: number) {
-  return (bytes / (1024 * 1024)).toFixed(2);
+function formatSize (bytes: number) {
+  return (bytes / (1024 * 1024)).toFixed(2)
 }
 </script>
 
@@ -129,7 +129,9 @@ function formatSize(bytes: number) {
             {{ t("pages.dashboard.settings.privacy.summary.organizations") }}
           </div>
           <div class="mt-2">
-            <p class="text-2xl font-bold">{{ gdprStore.dataSummary.organizations.count }}</p>
+            <p class="text-2xl font-bold">
+              {{ gdprStore.dataSummary.organizations.count }}
+            </p>
             <p class="text-sm text-gray-500">
               {{ t("pages.dashboard.settings.privacy.summary.organizationsCount", gdprStore.dataSummary.organizations.count) }}
             </p>
@@ -143,7 +145,9 @@ function formatSize(bytes: number) {
             {{ t("pages.dashboard.settings.privacy.summary.audios") }}
           </div>
           <div class="mt-2">
-            <p class="text-2xl font-bold">{{ gdprStore.dataSummary.audios.count }}</p>
+            <p class="text-2xl font-bold">
+              {{ gdprStore.dataSummary.audios.count }}
+            </p>
             <p class="text-sm text-gray-500">
               {{ t("pages.dashboard.settings.privacy.summary.audiosCount", gdprStore.dataSummary.audios.count) }}
             </p>
@@ -163,7 +167,9 @@ function formatSize(bytes: number) {
             {{ t("pages.dashboard.settings.privacy.summary.transcriptions") }}
           </div>
           <div class="mt-2">
-            <p class="text-2xl font-bold">{{ gdprStore.dataSummary.transcriptions.count }}</p>
+            <p class="text-2xl font-bold">
+              {{ gdprStore.dataSummary.transcriptions.count }}
+            </p>
             <p class="text-sm text-gray-500">
               {{ t("pages.dashboard.settings.privacy.summary.transcriptionsCount", gdprStore.dataSummary.transcriptions.count) }}
             </p>
@@ -177,7 +183,9 @@ function formatSize(bytes: number) {
             {{ t("pages.dashboard.settings.privacy.summary.documents") }}
           </div>
           <div class="mt-2">
-            <p class="text-2xl font-bold">{{ gdprStore.dataSummary.documents.count }}</p>
+            <p class="text-2xl font-bold">
+              {{ gdprStore.dataSummary.documents.count }}
+            </p>
             <p class="text-sm text-gray-500">
               {{ t("pages.dashboard.settings.privacy.summary.documentsCount", gdprStore.dataSummary.documents.count) }}
             </p>
@@ -191,7 +199,9 @@ function formatSize(bytes: number) {
             {{ t("pages.dashboard.settings.privacy.summary.credits") }}
           </div>
           <div class="mt-2">
-            <p class="text-2xl font-bold">{{ gdprStore.dataSummary.credits.balance }}</p>
+            <p class="text-2xl font-bold">
+              {{ gdprStore.dataSummary.credits.balance }}
+            </p>
             <p class="text-sm text-gray-500">
               {{ t("pages.dashboard.settings.privacy.summary.creditsBalance", gdprStore.dataSummary.credits.balance) }}
             </p>

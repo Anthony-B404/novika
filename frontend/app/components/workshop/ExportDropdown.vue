@@ -43,7 +43,7 @@ const formatOptions = computed(() => [
     value: 'md' as ExportFormat,
     icon: 'i-lucide-file-code',
     extension: '.md'
-  },
+  }
 ])
 
 // Content options
@@ -85,8 +85,8 @@ watch([() => props.hasTranscription, () => props.hasAnalysis], ([hasTrans, hasAn
   }
 }, { immediate: true })
 
-async function exportDocument(format: ExportFormat) {
-  if (loading.value) return
+async function exportDocument (format: ExportFormat) {
+  if (loading.value) { return }
 
   loading.value = true
   open.value = false
@@ -99,7 +99,7 @@ async function exportDocument(format: ExportFormat) {
       headers: {
         'Content-Type': 'application/json',
         'Accept-Language': locale.value,
-        'Authorization': `Bearer ${token.value}`,
+        Authorization: `Bearer ${token.value}`
       },
       body: JSON.stringify({
         format,
@@ -137,7 +137,6 @@ async function exportDocument(format: ExportFormat) {
       title: t('components.workshop.export.success'),
       color: 'success'
     })
-
   } catch (error) {
     console.error('Export error:', error)
     toast.add({

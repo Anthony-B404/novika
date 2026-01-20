@@ -22,7 +22,15 @@ export default class extends BaseSchema {
       table.string('lemon_squeezy_customer_id')
       table.string('lemon_squeezy_variant_id')
       table
-        .enum('status', ['active', 'cancelled', 'expired', 'paused', 'past_due', 'unpaid', 'on_trial'])
+        .enum('status', [
+          'active',
+          'cancelled',
+          'expired',
+          'paused',
+          'past_due',
+          'unpaid',
+          'on_trial',
+        ])
         .defaultTo('active')
       table.string('card_brand').nullable()
       table.string('card_last_four').nullable()

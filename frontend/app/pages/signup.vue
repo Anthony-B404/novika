@@ -6,7 +6,7 @@
 const { $localePath } = useNuxtApp()
 
 definePageMeta({
-  layout: 'auth',
+  layout: 'auth'
 })
 
 // Redirect to login page

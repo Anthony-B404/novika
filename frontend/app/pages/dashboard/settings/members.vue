@@ -1,269 +1,267 @@
 <script setup lang="ts">
-import type { Member, Invitation } from "~/types";
-import { UserRole } from "~/types/auth";
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
-import type { SelectItem } from "@nuxt/ui";
+import * as z from 'zod'
+import type { FormSubmitEvent, SelectItem } from '@nuxt/ui'
+import { UserRole } from '~/types/auth'
+import type { Member, Invitation } from '~/types'
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion", "organization-status"],
-});
+  middleware: ['auth', 'pending-deletion', 'organization-status']
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.settingsMembers.title"),
-  description: t("seo.settingsMembers.description"),
-});
+  title: t('seo.settingsMembers.title'),
+  description: t('seo.settingsMembers.description')
+})
 
-const toast = useToast();
-const { authenticatedFetch } = useAuth();
-const authStore = useAuthStore();
-const { canManageMembers } = useSettingsPermissions();
+const toast = useToast()
+const { authenticatedFetch } = useAuth()
+const { canManageMembers } = useSettingsPermissions()
 
-const members = ref<Member[]>([]);
-const invitations = ref<Invitation[]>([]);
+const members = ref<Member[]>([])
+const invitations = ref<Invitation[]>([])
 
 const loadMembers = async () => {
   try {
-    const data = await authenticatedFetch<Member[]>("/members");
-    members.value = data || [];
+    const data = await authenticatedFetch<Member[]>('/members')
+    members.value = data || []
   } catch (error) {
     toast.add({
-      title: t("components.settings.members.errorLoadingTitle"),
-      description: t("components.settings.members.errorLoadingDescription"),
-      color: "error",
-    });
+      title: t('components.settings.members.errorLoadingTitle'),
+      description: t('components.settings.members.errorLoadingDescription'),
+      color: 'error'
+    })
   }
-};
+}
 
 const loadInvitations = async () => {
   try {
-    const data = await authenticatedFetch<Invitation[]>("/invitations");
-    invitations.value = data || [];
+    const data = await authenticatedFetch<Invitation[]>('/invitations')
+    invitations.value = data || []
   } catch (error) {
     toast.add({
-      title: t("components.settings.invitations.errorLoadingTitle"),
-      description: t("components.settings.invitations.errorLoadingDescription"),
-      color: "error",
-    });
+      title: t('components.settings.invitations.errorLoadingTitle'),
+      description: t('components.settings.invitations.errorLoadingDescription'),
+      color: 'error'
+    })
   }
-};
+}
 
-const organizationStore = useOrganizationStore();
+const organizationStore = useOrganizationStore()
 
 // Load data on mount
 onMounted(async () => {
-  await loadMembers();
+  await loadMembers()
 
   // Only load invitations if user can manage members (Owner/Admin)
   // Wait for organization data to be available
   if (organizationStore.currentOrganization && canManageMembers.value) {
-    await loadInvitations();
+    await loadInvitations()
   }
-});
+})
 
-const refreshMembers = loadMembers;
+const refreshMembers = loadMembers
 const refreshInvitations = async () => {
   // Only refresh invitations if user can manage members
   if (canManageMembers.value) {
-    await loadInvitations();
+    await loadInvitations()
   }
-};
+}
 
 // Get current user's role in the organization
 const currentUserRole = computed(() => {
   // Find current user in members list to get their role
-  const currentMember = members.value.find((m) => m.isCurrentUser);
-  return currentMember?.role ?? UserRole.Member;
-});
+  const currentMember = members.value.find(m => m.isCurrentUser)
+  return currentMember?.role ?? UserRole.Member
+})
 
 // Collapsible state for invitations - open by default if there are invitations
-const invitationsOpen = ref(invitations.value.length > 0);
+const invitationsOpen = ref(invitations.value.length > 0)
 
 // Update collapsible state when invitations change
 watch(invitations, (newInvitations) => {
   if (newInvitations.length > 0 && !invitationsOpen.value) {
-    invitationsOpen.value = true;
+    invitationsOpen.value = true
   }
-});
+})
 
-const q = ref("");
+const q = ref('')
 
 const filteredMembers = computed(() => {
   return members.value.filter((member) => {
-    const name = member.fullName || "";
-    const email = member.email || "";
+    const name = member.fullName || ''
+    const email = member.email || ''
     return (
-      name.search(new RegExp(q.value, "i")) !== -1 ||
-      email.search(new RegExp(q.value, "i")) !== -1
-    );
-  });
-});
+      name.search(new RegExp(q.value, 'i')) !== -1 ||
+      email.search(new RegExp(q.value, 'i')) !== -1
+    )
+  })
+})
 
 // Invitation modal state
-const inviteModalOpen = ref(false);
-const formRef = ref();
-const submitting = ref(false);
+const inviteModalOpen = ref(false)
+const formRef = ref()
+const submitting = ref(false)
 
 // Role options for select (UserRole imported from ~/types/auth)
 const roleOptions = ref<SelectItem[]>([
   {
-    label: t("components.settings.members.inviteModal.roles.administrator"),
-    value: UserRole.Administrator,
+    label: t('components.settings.members.inviteModal.roles.administrator'),
+    value: UserRole.Administrator
   },
   {
-    label: t("components.settings.members.inviteModal.roles.member"),
-    value: UserRole.Member,
-  },
-]);
+    label: t('components.settings.members.inviteModal.roles.member'),
+    value: UserRole.Member
+  }
+])
 
 // Validation schema
 const schema = z.object({
   email: z.preprocess(
-    (val) => val ?? "",
+    val => val ?? '',
     z.string().superRefine((val, ctx) => {
       if (!val || val.length === 0) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: t(
-            "components.settings.members.inviteModal.validation.emailRequired",
-          ),
-        });
+            'components.settings.members.inviteModal.validation.emailRequired'
+          )
+        })
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: t(
-            "components.settings.members.inviteModal.validation.invalidEmail",
-          ),
-        });
+            'components.settings.members.inviteModal.validation.invalidEmail'
+          )
+        })
       }
-    }),
+    })
   ),
   role: z.preprocess(
-    (val) => (val === undefined || val === null ? undefined : val),
+    val => (val === undefined || val === null ? undefined : val),
     z.number().superRefine((val, ctx) => {
       if (val === undefined) {
         ctx.addIssue({
-          code: "custom",
+          code: 'custom',
           message: t(
-            "components.settings.members.inviteModal.validation.roleRequired",
-          ),
-        });
+            'components.settings.members.inviteModal.validation.roleRequired'
+          )
+        })
       }
-    }),
-  ),
-});
+    })
+  )
+})
 
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
   email: undefined,
-  role: UserRole.Member,
-});
+  role: UserRole.Member
+})
 
 // Submit handler
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  submitting.value = true;
+async function onSubmit (event: FormSubmitEvent<Schema>) {
+  submitting.value = true
 
   try {
-    await authenticatedFetch("/invite-member", {
-      method: "POST",
+    await authenticatedFetch('/invite-member', {
+      method: 'POST',
       body: {
         email: event.data.email,
-        role: event.data.role,
-      },
-    });
+        role: event.data.role
+      }
+    })
 
     toast.add({
-      title: t("components.settings.members.inviteModal.successTitle"),
+      title: t('components.settings.members.inviteModal.successTitle'),
       description: t(
-        "components.settings.members.inviteModal.successDescription",
+        'components.settings.members.inviteModal.successDescription',
         {
-          email: event.data.email,
-        },
+          email: event.data.email
+        }
       ),
-      color: "success",
-    });
+      color: 'success'
+    })
 
     // Close modal and reset form
-    inviteModalOpen.value = false;
-    state.email = undefined;
-    state.role = UserRole.Member;
+    inviteModalOpen.value = false
+    state.email = undefined
+    state.role = UserRole.Member
 
     // Refresh members list and invitations list
-    await refreshMembers();
-    await refreshInvitations();
+    await refreshMembers()
+    await refreshInvitations()
   } catch (error: any) {
     toast.add({
-      title: t("components.settings.members.inviteModal.errorTitle"),
+      title: t('components.settings.members.inviteModal.errorTitle'),
       description:
         error.data?.message ||
-        t("components.settings.members.inviteModal.errorDescription"),
-      color: "error",
-    });
+        t('components.settings.members.inviteModal.errorDescription'),
+      color: 'error'
+    })
   } finally {
-    submitting.value = false;
+    submitting.value = false
   }
 }
 
 // Resend invitation
-const resendingInvitation = ref<number | null>(null);
+const resendingInvitation = ref<number | null>(null)
 
-async function resendInvitation(id: number) {
-  resendingInvitation.value = id;
+async function resendInvitation (id: number) {
+  resendingInvitation.value = id
 
   try {
     await authenticatedFetch(`/resend-invitation/${id}`, {
-      method: "POST",
-    });
+      method: 'POST'
+    })
 
     toast.add({
-      title: t("components.settings.invitations.resendSuccess"),
-      color: "success",
-    });
+      title: t('components.settings.invitations.resendSuccess'),
+      color: 'success'
+    })
 
     // Refresh invitations list
-    await refreshInvitations();
+    await refreshInvitations()
   } catch (error: any) {
     toast.add({
-      title: t("components.settings.invitations.resendError"),
+      title: t('components.settings.invitations.resendError'),
       description:
-        error.data?.message || t("components.settings.invitations.resendError"),
-      color: "error",
-    });
+        error.data?.message || t('components.settings.invitations.resendError'),
+      color: 'error'
+    })
   } finally {
-    resendingInvitation.value = null;
+    resendingInvitation.value = null
   }
 }
 
 // Delete invitation
-const deletingInvitation = ref<number | null>(null);
+const deletingInvitation = ref<number | null>(null)
 
-async function deleteInvitation(id: number) {
-  deletingInvitation.value = id;
+async function deleteInvitation (id: number) {
+  deletingInvitation.value = id
 
   try {
     await authenticatedFetch(`/delete-invitation/${id}`, {
-      method: "DELETE",
-    });
+      method: 'DELETE'
+    })
 
     toast.add({
-      title: t("components.settings.invitations.deleteSuccess"),
-      color: "success",
-    });
+      title: t('components.settings.invitations.deleteSuccess'),
+      color: 'success'
+    })
 
     // Refresh invitations list
-    await refreshInvitations();
+    await refreshInvitations()
   } catch (error: any) {
     toast.add({
-      title: t("components.settings.invitations.deleteError"),
+      title: t('components.settings.invitations.deleteError'),
       description:
-        error.data?.message || t("components.settings.invitations.deleteError"),
-      color: "error",
-    });
+        error.data?.message || t('components.settings.invitations.deleteError'),
+      color: 'error'
+    })
   } finally {
-    deletingInvitation.value = null;
+    deletingInvitation.value = null
   }
 }
 </script>

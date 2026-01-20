@@ -1,60 +1,60 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-const { t } = useI18n();
-const { $localePath } = useNuxtApp();
-const { authenticatedFetch } = useAuth();
-const config = useRuntimeConfig();
-const toast = useToast();
+const { t } = useI18n()
+const { $localePath } = useNuxtApp()
+const { authenticatedFetch } = useAuth()
+const config = useRuntimeConfig()
+const toast = useToast()
 
 definePageMeta({
-  layout: "auth",
-  middleware: "auth",
-});
+  layout: 'auth',
+  middleware: 'auth'
+})
 
 useSeoMeta({
-  title: t("pages.createOrganization.seoTitle"),
-  description: t("pages.createOrganization.seoDescription"),
-});
+  title: t('pages.createOrganization.seoTitle'),
+  description: t('pages.createOrganization.seoDescription')
+})
 
-const fileRef = ref<HTMLInputElement>();
-const loading = ref(false);
+const fileRef = ref<HTMLInputElement>()
+const loading = ref(false)
 
 const organizationSchema = z.object({
   name: z
     .string()
-    .min(2, t("pages.createOrganization.validation.nameTooShort")),
+    .min(2, t('pages.createOrganization.validation.nameTooShort')),
   email: z
     .string()
-    .email(t("pages.createOrganization.validation.invalidEmail")),
-  logo: z.string().optional(),
-});
+    .email(t('pages.createOrganization.validation.invalidEmail')),
+  logo: z.string().optional()
+})
 
 type OrganizationSchema = z.output<typeof organizationSchema>;
 
 const organization = reactive<OrganizationSchema>({
-  name: "",
-  email: "",
-  logo: undefined,
-});
+  name: '',
+  email: '',
+  logo: undefined
+})
 
-async function onSubmit(event: FormSubmitEvent<OrganizationSchema>) {
-  loading.value = true;
+async function onSubmit (event: FormSubmitEvent<OrganizationSchema>) {
+  loading.value = true
   try {
-    const formData = new FormData();
+    const formData = new FormData()
 
     // Create organization payload as JSON string
     const organizationData = {
       name: event.data.name,
-      email: event.data.email,
-    };
-    formData.append("organization", JSON.stringify(organizationData));
+      email: event.data.email
+    }
+    formData.append('organization', JSON.stringify(organizationData))
 
     // Add logo if file was selected
-    const fileInput = fileRef.value;
+    const fileInput = fileRef.value
     if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append("logo", fileInput.files[0]);
+      formData.append('logo', fileInput.files[0])
     }
 
     const response = await authenticatedFetch<{
@@ -66,73 +66,73 @@ async function onSubmit(event: FormSubmitEvent<OrganizationSchema>) {
         logo: string | null;
       };
       needsCheckout: boolean;
-    }>("/organizations", {
-      method: "POST",
-      body: formData,
-    });
+    }>('/organizations', {
+      method: 'POST',
+      body: formData
+    })
 
     toast.add({
-      title: t("pages.createOrganization.successTitle"),
-      description: t("pages.createOrganization.successDescription"),
-      icon: "i-lucide-check",
-      color: "success",
-    });
+      title: t('pages.createOrganization.successTitle'),
+      description: t('pages.createOrganization.successDescription'),
+      icon: 'i-lucide-check',
+      color: 'success'
+    })
 
     // Redirect based on needsCheckout
     if (response.needsCheckout) {
       // User needs to checkout - redirect to billing page
-      navigateTo($localePath("/dashboard/settings/billing"));
+      navigateTo($localePath('/dashboard/settings/billing'))
     } else {
       // User has active trial - redirect to dashboard
-      navigateTo($localePath("/dashboard"));
+      navigateTo($localePath('/dashboard'))
     }
   } catch (error: any) {
     toast.add({
-      title: t("pages.createOrganization.errorTitle"),
+      title: t('pages.createOrganization.errorTitle'),
       description:
-        error.data?.message || t("pages.createOrganization.errorDescription"),
-      icon: "i-lucide-x",
-      color: "error",
-    });
+        error.data?.message || t('pages.createOrganization.errorDescription'),
+      icon: 'i-lucide-x',
+      color: 'error'
+    })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
+function onFileChange (e: Event) {
+  const input = e.target as HTMLInputElement
 
   if (!input.files?.length) {
-    return;
+    return
   }
 
-  organization.logo = URL.createObjectURL(input.files[0]!);
+  organization.logo = URL.createObjectURL(input.files[0]!)
 }
 
-function onFileClick() {
-  fileRef.value?.click();
+function onFileClick () {
+  fileRef.value?.click()
 }
 
-function onRemoveLogo() {
-  organization.logo = undefined;
+function onRemoveLogo () {
+  organization.logo = undefined
   if (fileRef.value) {
-    fileRef.value.value = "";
+    fileRef.value.value = ''
   }
 }
 
 // Get logo URL for preview
 const logoUrl = computed(() => {
-  if (!organization.logo) return undefined;
-  if (organization.logo.startsWith("blob:")) {
-    return organization.logo;
+  if (!organization.logo) { return undefined }
+  if (organization.logo.startsWith('blob:')) {
+    return organization.logo
   }
-  return `${config.public.apiUrl}/${organization.logo}`;
-});
+  return `${config.public.apiUrl}/${organization.logo}`
+})
 
 // Compute organization name for display
 const organizationName = computed(() => {
-  return organization.name.trim() || t("pages.createOrganization.newOrg");
-});
+  return organization.name.trim() || t('pages.createOrganization.newOrg')
+})
 </script>
 
 <template>
@@ -206,7 +206,7 @@ const organizationName = computed(() => {
             class="hidden"
             accept=".jpg, .jpeg, .png, .gif"
             @change="onFileChange"
-          />
+          >
         </div>
       </UFormField>
 

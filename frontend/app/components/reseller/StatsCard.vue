@@ -26,9 +26,15 @@ defineProps<{
         <UIcon :name="icon" class="w-6 h-6" />
       </div>
       <div>
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ title }}</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ value }}</p>
-        <p v-if="subtitle" class="text-xs text-gray-400">{{ subtitle }}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ title }}
+        </p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+          {{ value }}
+        </p>
+        <p v-if="subtitle" class="text-xs text-gray-400">
+          {{ subtitle }}
+        </p>
       </div>
     </div>
   </UCard>

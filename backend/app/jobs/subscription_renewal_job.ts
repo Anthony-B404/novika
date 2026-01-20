@@ -72,7 +72,12 @@ async function processSubscriptionRenewal(
       organization.lastRenewalAt = DateTime.now()
       organization.nextRenewalAt = organization.calculateNextRenewalDate()
       await organization.save()
-      return { success: true, skipped: true, skipReason: 'Credits already at target', creditsTransferred: 0 }
+      return {
+        success: true,
+        skipped: true,
+        skipReason: 'Credits already at target',
+        creditsTransferred: 0,
+      }
     }
 
     // Get reseller
@@ -190,7 +195,9 @@ export function createSubscriptionRenewalWorker(): Worker<
 export async function processSubscriptionRenewals(): Promise<SubscriptionRenewalBatchResult> {
   const now = DateTime.now()
 
-  logger.info(`[SubscriptionRenewalScheduler] Starting subscription renewal process at ${now.toISO()}`)
+  logger.info(
+    `[SubscriptionRenewalScheduler] Starting subscription renewal process at ${now.toISO()}`
+  )
 
   // Find all active subscriptions that are due for renewal
   const organizations = await Organization.query()
@@ -199,7 +206,9 @@ export async function processSubscriptionRenewals(): Promise<SubscriptionRenewal
     .where('next_renewal_at', '<=', now.toSQL())
     .preload('reseller')
 
-  logger.info(`[SubscriptionRenewalScheduler] Found ${organizations.length} subscription(s) due for renewal`)
+  logger.info(
+    `[SubscriptionRenewalScheduler] Found ${organizations.length} subscription(s) due for renewal`
+  )
 
   const result: SubscriptionRenewalBatchResult = {
     processed: organizations.length,
@@ -315,10 +324,7 @@ export async function processSubscriptionRenewals(): Promise<SubscriptionRenewal
         status: 'failed',
         reason: error instanceof Error ? error.message : 'Unknown error',
       })
-      logger.error(
-        `[SubscriptionRenewalScheduler] Error processing ${organization.name}:`,
-        error
-      )
+      logger.error(`[SubscriptionRenewalScheduler] Error processing ${organization.name}:`, error)
     }
   }
 

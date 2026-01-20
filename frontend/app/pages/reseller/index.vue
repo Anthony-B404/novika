@@ -3,7 +3,7 @@ import type { ResellerOrganization, CreditsResponse, UpcomingRenewalsResponse } 
 
 definePageMeta({
   layout: 'reseller',
-  middleware: ['auth', 'reseller'],
+  middleware: ['auth', 'reseller']
 })
 
 const { t } = useI18n()
@@ -12,12 +12,12 @@ const { formatCredits } = useFormatters()
 
 // Breadcrumb
 const breadcrumbItems = computed(() => [
-  { label: t('reseller.navigation.dashboard'), icon: 'i-lucide-home' },
+  { label: t('reseller.navigation.dashboard'), icon: 'i-lucide-home' }
 ])
 
 useSeoMeta({
   title: t('reseller.dashboard.title'),
-  description: t('reseller.dashboard.subtitle'),
+  description: t('reseller.dashboard.subtitle')
 })
 
 // Composables
@@ -35,9 +35,9 @@ const upcomingRenewals = ref<UpcomingRenewalsResponse | null>(null)
 
 // Computed stats
 const totalDistributed = computed(() => {
-  if (!creditsData.value?.transactions?.data) return 0
+  if (!creditsData.value?.transactions?.data) { return 0 }
   return creditsData.value.transactions.data
-    .filter((t) => t.type === 'distribution')
+    .filter(t => t.type === 'distribution')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0)
 })
 
@@ -54,7 +54,7 @@ onMounted(async () => {
       fetchProfile(),
       fetchCredits({ limit: 5 }),
       fetchOrganizations({ limit: 5, sortBy: 'createdAt', sortOrder: 'desc' }),
-      fetchUpcomingRenewals(7),
+      fetchUpcomingRenewals(7)
     ])
 
     if (profileData) {
@@ -144,7 +144,9 @@ onMounted(async () => {
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold">{{ t('reseller.dashboard.recentOrganizations') }}</h2>
+              <h2 class="text-lg font-semibold">
+                {{ t('reseller.dashboard.recentOrganizations') }}
+              </h2>
               <UButton
                 :to="localePath('/reseller/organizations')"
                 color="neutral"
@@ -168,8 +170,12 @@ onMounted(async () => {
               class="flex items-center justify-between py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 -mx-4 px-4 transition-colors"
             >
               <div>
-                <p class="font-medium text-gray-900 dark:text-white">{{ org.name }}</p>
-                <p class="text-sm text-gray-500">{{ org.email }}</p>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  {{ org.name }}
+                </p>
+                <p class="text-sm text-gray-500">
+                  {{ org.email }}
+                </p>
               </div>
               <UBadge color="success" variant="subtle">
                 {{ formatCredits(org.credits) }} {{ t('common.credits') }}
@@ -185,7 +191,9 @@ onMounted(async () => {
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold">{{ t('reseller.dashboard.recentTransactions') }}</h2>
+              <h2 class="text-lg font-semibold">
+                {{ t('reseller.dashboard.recentTransactions') }}
+              </h2>
               <UButton
                 :to="localePath('/reseller/credits')"
                 color="neutral"

@@ -1,25 +1,25 @@
 <script setup lang="ts">
-const colorMode = useColorMode();
-const themeStore = useThemeStore();
+const colorMode = useColorMode()
+const themeStore = useThemeStore()
 
 const color = computed(() =>
-  colorMode.value === "dark" ? "#171717" : "white",
-);
+  colorMode.value === 'dark' ? '#171717' : 'white'
+)
 
 useHead({
   meta: [
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-    { key: "theme-color", name: "theme-color", content: color },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { key: 'theme-color', name: 'theme-color', content: color }
   ],
-  link: [{ rel: "icon", href: "/favicon.ico" }],
+  link: [{ rel: 'icon', href: '/favicon.ico' }],
   htmlAttrs: {
-    lang: "fr",
-  },
-});
+    lang: 'fr'
+  }
+})
 
 onMounted(() => {
-  themeStore.restoreTheme();
-});
+  themeStore.restoreTheme()
+})
 </script>
 
 <template>

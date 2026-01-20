@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-const { t } = useI18n();
-const route = useRoute();
-const router = useRouter();
-const { $localePath } = useNuxtApp();
-const toast = useToast();
-const { login } = useAuth();
-const api = useApi();
-const config = useRuntimeConfig();
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const { $localePath } = useNuxtApp()
+const toast = useToast()
+const { login } = useAuth()
+const api = useApi()
+const config = useRuntimeConfig()
 
 definePageMeta({
-  layout: "auth",
-});
+  layout: 'auth'
+})
 
 useSeoMeta({
-  title: t("seo.acceptInvitation.title"),
-  description: t("seo.acceptInvitation.description"),
-});
+  title: t('seo.acceptInvitation.title'),
+  description: t('seo.acceptInvitation.description')
+})
 
-const identifier = ref(route.params.identifier as string);
-const isVerifying = ref(true);
-const isValid = ref(false);
-const userExists = ref(false);
+const identifier = ref(route.params.identifier as string)
+const isVerifying = ref(true)
+const isValid = ref(false)
+const userExists = ref(false)
 const invitationData = ref<{
   email: string;
   organizationName: string;
   organizationLogo: string | null;
-} | null>(null);
-const fileRef = ref<HTMLInputElement>();
+} | null>(null)
+const fileRef = ref<HTMLInputElement>()
 
 // Verify invitation on mount
 onMounted(async () => {
   if (!identifier.value) {
     toast.add({
-      title: t("auth.acceptInvitation.error"),
-      description: t("auth.acceptInvitation.noIdentifier"),
-      color: "error",
-    });
-    router.push($localePath("signup"));
-    return;
+      title: t('auth.acceptInvitation.error'),
+      description: t('auth.acceptInvitation.noIdentifier'),
+      color: 'error'
+    })
+    router.push($localePath('signup'))
+    return
   }
 
   try {
@@ -49,162 +49,162 @@ onMounted(async () => {
       organizationName: string;
       organizationLogo: string | null;
       userExists: boolean;
-    }>(`/check-invitation/${identifier.value}`);
+    }>(`/check-invitation/${identifier.value}`)
 
     invitationData.value = {
       email: response.email,
       organizationName: response.organizationName,
-      organizationLogo: response.organizationLogo,
-    };
-    userExists.value = response.userExists;
-    isValid.value = true;
+      organizationLogo: response.organizationLogo
+    }
+    userExists.value = response.userExists
+    isValid.value = true
   } catch (error: any) {
     toast.add({
-      title: t("auth.acceptInvitation.error"),
+      title: t('auth.acceptInvitation.error'),
       description:
-        error.data?.message || t("auth.acceptInvitation.invalidInvitation"),
-      color: "error",
-    });
-    router.push($localePath("signup"));
+        error.data?.message || t('auth.acceptInvitation.invalidInvitation'),
+      color: 'error'
+    })
+    router.push($localePath('signup'))
   } finally {
-    isVerifying.value = false;
+    isVerifying.value = false
   }
-});
+})
 
 const schema = z.object({
   firstName: z.preprocess(
-    (val) => val ?? "",
+    val => val ?? '',
     z.string().superRefine((val, ctx) => {
       if (!val || val.length === 0) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.firstNameRequired"),
-        });
+          code: 'custom',
+          message: t('auth.validation.firstNameRequired')
+        })
       } else if (val.length < 2) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.firstNameTooShort"),
-        });
+          code: 'custom',
+          message: t('auth.validation.firstNameTooShort')
+        })
       }
-    }),
+    })
   ),
   lastName: z.preprocess(
-    (val) => val ?? "",
+    val => val ?? '',
     z.string().superRefine((val, ctx) => {
       if (!val || val.length === 0) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.lastNameRequired"),
-        });
+          code: 'custom',
+          message: t('auth.validation.lastNameRequired')
+        })
       } else if (val.length < 2) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.lastNameTooShort"),
-        });
+          code: 'custom',
+          message: t('auth.validation.lastNameTooShort')
+        })
       }
-    }),
+    })
   ),
-  avatar: z.any().optional(),
-});
+  avatar: z.any().optional()
+})
 
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
   firstName: undefined,
   lastName: undefined,
-  avatar: undefined,
-});
+  avatar: undefined
+})
 
 // Avatar management functions
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
+function onFileChange (e: Event) {
+  const input = e.target as HTMLInputElement
 
   if (!input.files?.length) {
-    return;
+    return
   }
 
-  state.avatar = URL.createObjectURL(input.files[0]!);
+  state.avatar = URL.createObjectURL(input.files[0]!)
 }
 
-function onFileClick() {
-  fileRef.value?.click();
+function onFileClick () {
+  fileRef.value?.click()
 }
 
-function onRemoveAvatar() {
-  state.avatar = undefined;
+function onRemoveAvatar () {
+  state.avatar = undefined
   // Clear file input
   if (fileRef.value) {
-    fileRef.value.value = "";
+    fileRef.value.value = ''
   }
 }
 
 // Get avatar URL (for preview)
 const avatarUrl = computed(() => {
-  if (!state.avatar) return undefined;
+  if (!state.avatar) { return undefined }
 
   // If it's a blob URL (local preview), use it directly
-  if (state.avatar.startsWith("blob:")) {
-    return state.avatar;
+  if (state.avatar.startsWith('blob:')) {
+    return state.avatar
   }
 
-  return state.avatar;
-});
+  return state.avatar
+})
 
 // Compute full name for display
 const fullName = computed(() => {
-  return `${state.firstName || ""} ${state.lastName || ""}`.trim();
-});
+  return `${state.firstName || ''} ${state.lastName || ''}`.trim()
+})
 
 // Compute organization logo URL
 const organizationLogoUrl = computed(() => {
-  if (!invitationData.value?.organizationLogo) return null;
-  return `${config.public.apiUrl}/${invitationData.value.organizationLogo}`;
-});
+  if (!invitationData.value?.organizationLogo) { return null }
+  return `${config.public.apiUrl}/${invitationData.value.organizationLogo}`
+})
 
-async function onSubmit(event?: FormSubmitEvent<Schema>) {
+async function onSubmit (event?: FormSubmitEvent<Schema>) {
   try {
     // Prepare FormData
-    const formData = new FormData();
-    formData.append("identifier", identifier.value);
+    const formData = new FormData()
+    formData.append('identifier', identifier.value)
 
     // Add firstName, lastName, and avatar only for new users
     if (!userExists.value && event?.data) {
-      formData.append("firstName", event.data.firstName);
-      formData.append("lastName", event.data.lastName);
+      formData.append('firstName', event.data.firstName)
+      formData.append('lastName', event.data.lastName)
 
       // Add avatar if file was selected
-      const fileInput = fileRef.value;
+      const fileInput = fileRef.value
       if (fileInput?.files && fileInput.files.length > 0) {
-        formData.append("avatar", fileInput.files[0]);
+        formData.append('avatar', fileInput.files[0])
       }
     }
 
     const response = await api<{ token: string; message: string }>(
-      "/accept-invitation",
+      '/accept-invitation',
       {
-        method: "POST",
-        body: formData,
-      },
-    );
+        method: 'POST',
+        body: formData
+      }
+    )
 
     // Store token using auth store
-    await login(response.token);
+    await login(response.token)
 
     toast.add({
-      title: t("auth.acceptInvitation.success"),
-      description: t("auth.acceptInvitation.successDescription"),
-      color: "success",
-    });
+      title: t('auth.acceptInvitation.success'),
+      description: t('auth.acceptInvitation.successDescription'),
+      color: 'success'
+    })
 
     // Redirect to dashboard
-    router.push($localePath("dashboard"));
+    router.push($localePath('dashboard'))
   } catch (error: any) {
     toast.add({
-      title: t("auth.acceptInvitation.error"),
+      title: t('auth.acceptInvitation.error'),
       description:
-        error.data?.message || t("auth.acceptInvitation.errorDescription"),
-      color: "error",
-    });
+        error.data?.message || t('auth.acceptInvitation.errorDescription'),
+      color: 'error'
+    })
   }
 }
 </script>
@@ -257,7 +257,7 @@ async function onSubmit(event?: FormSubmitEvent<Schema>) {
             })
           }}
         </p>
-        <UButton @click="onSubmit()" block size="lg">
+        <UButton block size="lg" @click="onSubmit()">
           {{ $t("auth.acceptInvitation.existingUser.button") }}
         </UButton>
       </div>
@@ -310,7 +310,7 @@ async function onSubmit(event?: FormSubmitEvent<Schema>) {
             class="hidden"
             accept=".jpg, .jpeg, .png, .gif"
             @change="onFileChange"
-          />
+          >
         </div>
       </UFormField>
 

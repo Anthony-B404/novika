@@ -16,18 +16,18 @@ const statusConfig: Record<OrganizationStatus, { color: BadgeColor; icon: string
   active: {
     color: 'success',
     icon: 'i-lucide-check-circle',
-    labelKey: 'reseller.organizations.status.active',
+    labelKey: 'reseller.organizations.status.active'
   },
   suspended: {
     color: 'warning',
     icon: 'i-lucide-pause-circle',
-    labelKey: 'reseller.organizations.status.suspended',
+    labelKey: 'reseller.organizations.status.suspended'
   },
   deleted: {
     color: 'error',
     icon: 'i-lucide-trash-2',
-    labelKey: 'reseller.organizations.status.deleted',
-  },
+    labelKey: 'reseller.organizations.status.deleted'
+  }
 }
 
 const config = computed(() => statusConfig[props.status])

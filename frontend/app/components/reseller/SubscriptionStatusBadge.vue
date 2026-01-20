@@ -13,25 +13,25 @@ const status = computed(() => {
     return {
       color: 'neutral' as const,
       label: t('reseller.subscription.status.inactive'),
-      icon: 'i-lucide-circle-off',
+      icon: 'i-lucide-circle-off'
     }
   }
   if (props.subscription.subscriptionPausedAt) {
     return {
       color: 'warning' as const,
       label: t('reseller.subscription.status.paused'),
-      icon: 'i-lucide-pause-circle',
+      icon: 'i-lucide-pause-circle'
     }
   }
   return {
     color: 'primary' as const,
     label: t('reseller.subscription.status.active'),
-    icon: 'i-lucide-repeat',
+    icon: 'i-lucide-repeat'
   }
 })
 
 const nextRenewalFormatted = computed(() => {
-  if (!props.subscription?.nextRenewalAt) return null
+  if (!props.subscription?.nextRenewalAt) { return null }
   return d(new Date(props.subscription.nextRenewalAt), 'short')
 })
 </script>

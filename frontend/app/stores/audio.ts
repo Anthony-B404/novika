@@ -25,22 +25,22 @@ export const useAudioStore = defineStore('audio', {
       currentPage: 1,
       lastPage: 1,
       total: 0,
-      perPage: 20,
+      perPage: 20
     },
     loading: false,
     error: null,
     activeJobs: new Map(),
-    processingAudioIds: new Set(),
+    processingAudioIds: new Set()
   }),
 
   getters: {
-    getAudios: (state) => state.audios,
-    getCurrentAudio: (state) => state.currentAudio,
-    isLoading: (state) => state.loading,
-    hasError: (state) => !!state.error,
-    getError: (state) => state.error,
-    getPagination: (state) => state.pagination,
-    hasActiveJobs: (state) => state.activeJobs.size > 0,
+    getAudios: state => state.audios,
+    getCurrentAudio: state => state.currentAudio,
+    isLoading: state => state.loading,
+    hasError: state => !!state.error,
+    getError: state => state.error,
+    getPagination: state => state.pagination,
+    hasActiveJobs: state => state.activeJobs.size > 0,
 
     getJobStatus: (state) => {
       return (jobId: string) => state.activeJobs.get(jobId)
@@ -50,19 +50,19 @@ export const useAudioStore = defineStore('audio', {
       return (audioId: number) => state.processingAudioIds.has(audioId)
     },
 
-    pendingAudios: (state) => state.audios.filter((a) => a.status === AudioStatus.Pending),
-    processingAudios: (state) => state.audios.filter((a) => a.status === AudioStatus.Processing),
-    completedAudios: (state) => state.audios.filter((a) => a.status === AudioStatus.Completed),
-    failedAudios: (state) => state.audios.filter((a) => a.status === AudioStatus.Failed),
+    pendingAudios: state => state.audios.filter(a => a.status === AudioStatus.Pending),
+    processingAudios: state => state.audios.filter(a => a.status === AudioStatus.Processing),
+    completedAudios: state => state.audios.filter(a => a.status === AudioStatus.Completed),
+    failedAudios: state => state.audios.filter(a => a.status === AudioStatus.Failed),
 
-    hasMore: (state) => state.pagination.currentPage < state.pagination.lastPage,
+    hasMore: state => state.pagination.currentPage < state.pagination.lastPage
   },
 
   actions: {
     /**
      * Fetch paginated list of audios with optional filters and sorting
      */
-    async fetchAudios(
+    async fetchAudios (
       page: number = 1,
       options?: {
         status?: AudioStatus
@@ -79,10 +79,10 @@ export const useAudioStore = defineStore('audio', {
         const { authenticatedFetch } = useAuth()
         const params = new URLSearchParams({ page: String(page), limit: '20' })
 
-        if (options?.status) params.append('status', options.status)
-        if (options?.search) params.append('search', options.search)
-        if (options?.sort) params.append('sort', options.sort)
-        if (options?.order) params.append('order', options.order)
+        if (options?.status) { params.append('status', options.status) }
+        if (options?.search) { params.append('search', options.search) }
+        if (options?.sort) { params.append('sort', options.sort) }
+        if (options?.order) { params.append('order', options.order) }
 
         const response = await authenticatedFetch<AudioPagination>(`/audios?${params}`)
 
@@ -100,7 +100,7 @@ export const useAudioStore = defineStore('audio', {
           currentPage: response.meta.currentPage,
           lastPage: response.meta.lastPage,
           total: response.meta.total,
-          perPage: response.meta.perPage,
+          perPage: response.meta.perPage
         }
       } catch (error: any) {
         this.error = error?.data?.message || error?.message || 'Failed to load audios'
@@ -113,7 +113,7 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Fetch single audio with transcription
      */
-    async fetchAudio(id: number): Promise<Audio | null> {
+    async fetchAudio (id: number): Promise<Audio | null> {
       // Validate ID before API call
       if (!Number.isInteger(id) || id <= 0) {
         console.warn('fetchAudio called with invalid ID:', id)
@@ -129,7 +129,7 @@ export const useAudioStore = defineStore('audio', {
         this.currentAudio = audio
 
         // Update in list if exists
-        const index = this.audios.findIndex((a) => a.id === id)
+        const index = this.audios.findIndex(a => a.id === id)
         if (index !== -1) {
           this.audios[index] = audio
         }
@@ -147,13 +147,13 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Delete audio and remove from state
      */
-    async deleteAudio(id: number): Promise<boolean> {
+    async deleteAudio (id: number): Promise<boolean> {
       try {
         const { authenticatedFetch } = useAuth()
         await authenticatedFetch(`/audios/${id}`, { method: 'DELETE' })
 
         // Remove from local state
-        this.audios = this.audios.filter((a) => a.id !== id)
+        this.audios = this.audios.filter(a => a.id !== id)
         if (this.currentAudio?.id === id) {
           this.currentAudio = null
         }
@@ -170,16 +170,16 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Delete multiple audios and remove from state
      */
-    async deleteMultiple(ids: number[]): Promise<{ success: boolean; deletedCount: number }> {
+    async deleteMultiple (ids: number[]): Promise<{ success: boolean; deletedCount: number }> {
       try {
         const { authenticatedFetch } = useAuth()
         const response = await authenticatedFetch<{ deletedCount: number }>('/audios/batch', {
           method: 'DELETE',
-          body: { ids },
+          body: { ids }
         })
 
         // Remove from local state
-        this.audios = this.audios.filter((a) => !ids.includes(a.id))
+        this.audios = this.audios.filter(a => !ids.includes(a.id))
         if (this.currentAudio && ids.includes(this.currentAudio.id)) {
           this.currentAudio = null
         }
@@ -196,16 +196,16 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Update audio title
      */
-    async updateAudio(id: number, title: string): Promise<boolean> {
+    async updateAudio (id: number, title: string): Promise<boolean> {
       try {
         const { authenticatedFetch } = useAuth()
         const response = await authenticatedFetch<{ audio: Audio }>(`/audios/${id}`, {
           method: 'PUT',
-          body: { title },
+          body: { title }
         })
 
         // Update in local state
-        const index = this.audios.findIndex((a) => a.id === id)
+        const index = this.audios.findIndex(a => a.id === id)
         if (index !== -1) {
           this.audios[index] = { ...this.audios[index], title: response.audio.title }
         }
@@ -224,11 +224,11 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Add job to tracking
      */
-    trackJob(jobId: string, audioId: number) {
+    trackJob (jobId: string, audioId: number) {
       this.activeJobs.set(jobId, {
         jobId,
         status: AudioStatus.Pending,
-        progress: 0,
+        progress: 0
       })
       this.processingAudioIds.add(audioId)
     },
@@ -236,14 +236,14 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Update job status
      */
-    updateJobStatus(jobId: string, status: JobStatus) {
+    updateJobStatus (jobId: string, status: JobStatus) {
       this.activeJobs.set(jobId, status)
     },
 
     /**
      * Remove job from tracking
      */
-    removeJob(jobId: string, audioId: number) {
+    removeJob (jobId: string, audioId: number) {
       this.activeJobs.delete(jobId)
       this.processingAudioIds.delete(audioId)
     },
@@ -251,20 +251,20 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Update audio status locally
      */
-    updateAudioStatus(audioId: number, status: AudioStatus, errorMessage?: string) {
-      const index = this.audios.findIndex((a) => a.id === audioId)
+    updateAudioStatus (audioId: number, status: AudioStatus, errorMessage?: string) {
+      const index = this.audios.findIndex(a => a.id === audioId)
       if (index !== -1) {
         this.audios[index] = {
           ...this.audios[index],
           status,
-          errorMessage: errorMessage || null,
+          errorMessage: errorMessage || null
         }
       }
       if (this.currentAudio?.id === audioId) {
         this.currentAudio = {
           ...this.currentAudio,
           status,
-          errorMessage: errorMessage || null,
+          errorMessage: errorMessage || null
         }
       }
     },
@@ -272,9 +272,9 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Add new audio to list (prepend)
      */
-    addAudio(audio: Audio) {
+    addAudio (audio: Audio) {
       // Remove if already exists (to avoid duplicates)
-      this.audios = this.audios.filter((a) => a.id !== audio.id)
+      this.audios = this.audios.filter(a => a.id !== audio.id)
       // Add to beginning
       this.audios.unshift(audio)
       this.pagination.total += 1
@@ -283,14 +283,14 @@ export const useAudioStore = defineStore('audio', {
     /**
      * Clear current audio
      */
-    clearCurrentAudio() {
+    clearCurrentAudio () {
       this.currentAudio = null
     },
 
     /**
      * Reset store to initial state
      */
-    reset() {
+    reset () {
       this.audios = []
       this.currentAudio = null
       this.pagination = { currentPage: 1, lastPage: 1, total: 0, perPage: 20 }
@@ -298,6 +298,6 @@ export const useAudioStore = defineStore('audio', {
       this.error = null
       this.activeJobs.clear()
       this.processingAudioIds.clear()
-    },
-  },
+    }
+  }
 })

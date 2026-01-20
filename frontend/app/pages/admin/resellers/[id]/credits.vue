@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Reseller, ResellerTransaction, TransactionsFilters, AddCreditsPayload } from '~/types/admin'
 import { z } from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import type { Reseller, ResellerTransaction, TransactionsFilters, AddCreditsPayload } from '~/types/admin'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'admin'],
+  middleware: ['auth', 'admin']
 })
 
 const { t } = useI18n()
@@ -16,7 +16,7 @@ const toast = useToast()
 const resellerId = computed(() => Number(route.params.id))
 
 useSeoMeta({
-  title: t('admin.resellers.credits.title'),
+  title: t('admin.resellers.credits.title')
 })
 
 const { fetchReseller, fetchTransactions, addCredits, removeCredits, loading } = useResellers()
@@ -42,11 +42,11 @@ watch(resellerId, async (newId) => {
   }
 })
 
-async function loadTransactions(page = 1) {
+async function loadTransactions (page = 1) {
   const response = await fetchTransactions(resellerId.value, {
     page,
     limit: pagination.value.perPage,
-    type: typeFilter.value,
+    type: typeFilter.value
   })
   if (response) {
     transactions.value = response.transactions.data
@@ -54,7 +54,7 @@ async function loadTransactions(page = 1) {
       total: response.transactions.meta.total,
       perPage: response.transactions.meta.perPage,
       currentPage: response.transactions.meta.currentPage,
-      lastPage: response.transactions.meta.lastPage,
+      lastPage: response.transactions.meta.lastPage
     }
     // Update reseller balance
     if (reseller.value) {
@@ -67,28 +67,28 @@ async function loadTransactions(page = 1) {
 watch(typeFilter, () => loadTransactions(1))
 
 // Handle page change
-function handlePageChange(page: number) {
+function handlePageChange (page: number) {
   loadTransactions(page)
 }
 
 // Add credits form
 const addCreditsSchema = z.object({
   amount: z.number().positive(t('admin.resellers.credits.validation.amountPositive')).min(1),
-  description: z.string().max(500).optional(),
+  description: z.string().max(500).optional()
 })
 
 type AddCreditsSchema = z.infer<typeof addCreditsSchema>
 
 const addCreditsState = reactive<Partial<AddCreditsSchema>>({
   amount: undefined,
-  description: '',
+  description: ''
 })
 
-async function onAddCredits(event: FormSubmitEvent<AddCreditsSchema>) {
+async function onAddCredits (event: FormSubmitEvent<AddCreditsSchema>) {
   addingCredits.value = true
   try {
     const payload: AddCreditsPayload = {
-      amount: event.data.amount,
+      amount: event.data.amount
     }
     if (event.data.description) {
       payload.description = event.data.description
@@ -101,7 +101,7 @@ async function onAddCredits(event: FormSubmitEvent<AddCreditsSchema>) {
       }
       toast.add({
         title: t('admin.resellers.credits.addSuccess'),
-        color: 'success',
+        color: 'success'
       })
       // Reset form
       addCreditsState.amount = undefined
@@ -117,7 +117,7 @@ async function onAddCredits(event: FormSubmitEvent<AddCreditsSchema>) {
     toast.add({
       title: t('admin.resellers.credits.addError'),
       description: errorMessage,
-      color: 'error',
+      color: 'error'
     })
   } finally {
     addingCredits.value = false
@@ -127,23 +127,23 @@ async function onAddCredits(event: FormSubmitEvent<AddCreditsSchema>) {
 // Remove credits form
 const removeCreditsSchema = z.object({
   amount: z.number().positive(t('admin.resellers.credits.validation.amountPositive')).min(1),
-  description: z.string().max(500).optional(),
+  description: z.string().max(500).optional()
 })
 
 type RemoveCreditsSchema = z.infer<typeof removeCreditsSchema>
 
 const removeCreditsState = reactive<Partial<RemoveCreditsSchema>>({
   amount: undefined,
-  description: '',
+  description: ''
 })
 
-async function onRemoveCredits(event: FormSubmitEvent<RemoveCreditsSchema>) {
+async function onRemoveCredits (event: FormSubmitEvent<RemoveCreditsSchema>) {
   // Validate amount doesn't exceed balance
   if (reseller.value && event.data.amount > reseller.value.creditBalance) {
     toast.add({
       title: t('common.error'),
       description: t('admin.resellers.credits.removeAmountExceedsBalance'),
-      color: 'error',
+      color: 'error'
     })
     return
   }
@@ -151,7 +151,7 @@ async function onRemoveCredits(event: FormSubmitEvent<RemoveCreditsSchema>) {
   removingCredits.value = true
   try {
     const payload: AddCreditsPayload = {
-      amount: event.data.amount,
+      amount: event.data.amount
     }
     if (event.data.description) {
       payload.description = event.data.description
@@ -164,7 +164,7 @@ async function onRemoveCredits(event: FormSubmitEvent<RemoveCreditsSchema>) {
       }
       toast.add({
         title: t('admin.resellers.credits.removeSuccess'),
-        color: 'success',
+        color: 'success'
       })
       // Reset form
       removeCreditsState.amount = undefined
@@ -180,7 +180,7 @@ async function onRemoveCredits(event: FormSubmitEvent<RemoveCreditsSchema>) {
     toast.add({
       title: t('admin.resellers.credits.removeError'),
       description: errorMessage,
-      color: 'error',
+      color: 'error'
     })
   } finally {
     removingCredits.value = false
@@ -191,7 +191,7 @@ const typeOptions = [
   { label: t('admin.resellers.credits.filters.all'), value: undefined },
   { label: t('admin.transactions.types.purchase'), value: 'purchase' },
   { label: t('admin.transactions.types.distribution'), value: 'distribution' },
-  { label: t('admin.transactions.types.adjustment'), value: 'adjustment' },
+  { label: t('admin.transactions.types.adjustment'), value: 'adjustment' }
 ]
 </script>
 
@@ -229,7 +229,9 @@ const typeOptions = [
           <div class="text-5xl font-bold text-primary-500">
             {{ reseller?.creditBalance?.toLocaleString() || 0 }}
           </div>
-          <div class="text-gray-500 mt-2">{{ t('common.credits') }}</div>
+          <div class="text-gray-500 mt-2">
+            {{ t('common.credits') }}
+          </div>
         </div>
       </UCard>
 
@@ -238,7 +240,9 @@ const typeOptions = [
         <!-- Add Credits -->
         <UCard>
           <template #header>
-            <h2 class="text-lg font-semibold">{{ t('admin.resellers.credits.addCredits') }}</h2>
+            <h2 class="text-lg font-semibold">
+              {{ t('admin.resellers.credits.addCredits') }}
+            </h2>
           </template>
 
           <UForm
@@ -326,7 +330,9 @@ const typeOptions = [
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold">{{ t('admin.resellers.credits.history') }}</h2>
+            <h2 class="text-lg font-semibold">
+              {{ t('admin.resellers.credits.history') }}
+            </h2>
             <USelect
               v-model="typeFilter"
               :items="typeOptions"

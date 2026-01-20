@@ -13,7 +13,7 @@ const showAlert = computed(() => {
 })
 
 const formatDate = (dateStr: string | null) => {
-  if (!dateStr) return '-'
+  if (!dateStr) { return '-' }
   return d(new Date(dateStr), 'short')
 }
 </script>

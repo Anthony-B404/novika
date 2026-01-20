@@ -104,7 +104,7 @@ export default class AudioConverterService {
     const { stdout } = await execFileAsync(ffprobePath, args)
     const data = JSON.parse(stdout)
 
-    return parseFloat(data.format?.duration) || 0
+    return Number.parseFloat(data.format?.duration) || 0
   }
 
   /**

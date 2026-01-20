@@ -1,68 +1,68 @@
 <script setup lang="ts">
-const { t } = useI18n();
-const route = useRoute();
-const router = useRouter();
-const { $localePath } = useNuxtApp();
-const toast = useToast();
-const api = useApi();
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const { $localePath } = useNuxtApp()
+const toast = useToast()
+const api = useApi()
 
 definePageMeta({
-  layout: "auth",
-});
+  layout: 'auth'
+})
 
 useSeoMeta({
-  title: t("seo.verifyLogin.title"),
-  description: t("seo.verifyLogin.description"),
-});
+  title: t('seo.verifyLogin.title'),
+  description: t('seo.verifyLogin.description')
+})
 
-const token = ref(route.query.token as string);
-const isVerifying = ref(true);
+const token = ref(route.query.token as string)
+const isVerifying = ref(true)
 
 // Verify magic link token and auto-login on mount
 onMounted(async () => {
   if (!token.value) {
     toast.add({
-      title: t("auth.verifyLogin.error"),
-      description: t("auth.verifyLogin.noToken"),
-      color: "error",
-    });
-    router.push($localePath("index"));
-    return;
+      title: t('auth.verifyLogin.error'),
+      description: t('auth.verifyLogin.noToken'),
+      color: 'error'
+    })
+    router.push($localePath('index'))
+    return
   }
 
   try {
-    const { login, user } = useAuth();
+    const { login, user } = useAuth()
 
     const response = await api<{ token: string }>(
-      `/verify-magic-link/${token.value}`,
-    );
+      `/verify-magic-link/${token.value}`
+    )
 
     // Store token using auth store
-    await login(response.token);
+    await login(response.token)
 
     toast.add({
-      title: t("auth.verifyLogin.success"),
-      description: t("auth.verifyLogin.successDescription"),
-      color: "success",
-    });
+      title: t('auth.verifyLogin.success'),
+      description: t('auth.verifyLogin.successDescription'),
+      color: 'success'
+    })
 
     // Redirect based on user role
     if (user.value?.isSuperAdmin) {
-      router.push($localePath("/admin"));
+      router.push($localePath('/admin'))
     } else {
-      router.push($localePath("dashboard"));
+      router.push($localePath('dashboard'))
     }
   } catch (error: any) {
     toast.add({
-      title: t("auth.verifyLogin.error"),
-      description: error.data?.message || t("auth.verifyLogin.invalidToken"),
-      color: "error",
-    });
-    router.push($localePath("index"));
+      title: t('auth.verifyLogin.error'),
+      description: error.data?.message || t('auth.verifyLogin.invalidToken'),
+      color: 'error'
+    })
+    router.push($localePath('index'))
   } finally {
-    isVerifying.value = false;
+    isVerifying.value = false
   }
-});
+})
 </script>
 
 <template>

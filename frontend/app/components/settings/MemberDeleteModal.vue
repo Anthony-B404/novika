@@ -1,55 +1,55 @@
 <script setup lang="ts">
-import type { Member } from "~/types";
+import type { Member } from '~/types'
 
 const props = defineProps<{
   member: Member | null;
   open: boolean;
-}>();
+}>()
 
 const emit = defineEmits<{
   close: [];
   deleted: [];
-}>();
+}>()
 
-const { t } = useI18n();
-const toast = useToast();
-const { authenticatedFetch } = useAuth();
+const { t } = useI18n()
+const toast = useToast()
+const { authenticatedFetch } = useAuth()
 
-const loading = ref(false);
+const loading = ref(false)
 
-async function onConfirm() {
-  if (!props.member) return;
+async function onConfirm () {
+  if (!props.member) { return }
 
-  loading.value = true;
+  loading.value = true
 
   try {
     await authenticatedFetch(`/delete-member/${props.member.id}`, {
-      method: "DELETE",
-    });
+      method: 'DELETE'
+    })
 
     toast.add({
-      title: t("components.settings.members.deleteModal.successTitle"),
-      description: t("components.settings.members.deleteModal.successDescription"),
-      color: "success",
-    });
+      title: t('components.settings.members.deleteModal.successTitle'),
+      description: t('components.settings.members.deleteModal.successDescription'),
+      color: 'success'
+    })
 
-    emit("deleted");
-    emit("close");
+    emit('deleted')
+    emit('close')
   } catch (error: any) {
     toast.add({
-      title: t("components.settings.members.deleteModal.errorTitle"),
+      title: t('components.settings.members.deleteModal.errorTitle'),
       description:
         error.data?.message ||
-        t("components.settings.members.deleteModal.errorDescription"),
-      color: "error",
-    });
+        t('components.settings.members.deleteModal.errorDescription'),
+      color: 'error'
+    })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
-function handleClose() {
-  emit("close");
+function handleClose () {
+  emit('close')
 }
 </script>
 

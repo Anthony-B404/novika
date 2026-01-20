@@ -3,7 +3,7 @@ import type { ResellerOrganization, OrganizationUser, AddUserPayload, UsersFilte
 
 definePageMeta({
   layout: 'reseller',
-  middleware: ['auth', 'reseller'],
+  middleware: ['auth', 'reseller']
 })
 
 const { t } = useI18n()
@@ -18,11 +18,11 @@ const breadcrumbItems = computed(() => [
   { label: t('reseller.navigation.dashboard'), icon: 'i-lucide-home', to: localePath('/reseller') },
   { label: t('reseller.navigation.organizations'), icon: 'i-lucide-building-2', to: localePath('/reseller/organizations') },
   { label: organization.value?.name || '...', icon: 'i-lucide-building', to: localePath(`/reseller/organizations/${organizationId.value}`) },
-  { label: t('reseller.users.management.title'), icon: 'i-lucide-users' },
+  { label: t('reseller.users.management.title'), icon: 'i-lucide-users' }
 ])
 
 useSeoMeta({
-  title: t('reseller.users.management.title'),
+  title: t('reseller.users.management.title')
 })
 
 // Composables
@@ -36,7 +36,7 @@ const pagination = ref({
   total: 0,
   perPage: 20,
   currentPage: 1,
-  lastPage: 1,
+  lastPage: 1
 })
 
 // Modal state
@@ -52,10 +52,10 @@ onMounted(async () => {
   await loadData()
 })
 
-async function loadData() {
+async function loadData () {
   const [orgData, usersData] = await Promise.all([
     fetchOrganization(organizationId.value),
-    fetchUsers(organizationId.value),
+    fetchUsers(organizationId.value)
   ])
 
   if (orgData) {
@@ -67,15 +67,15 @@ async function loadData() {
       total: usersData.meta.total,
       perPage: usersData.meta.perPage,
       currentPage: usersData.meta.currentPage,
-      lastPage: usersData.meta.lastPage,
+      lastPage: usersData.meta.lastPage
     }
   }
 }
 
-async function loadUsers(page = 1) {
+async function loadUsers (page = 1) {
   const filters: UsersFilters = {
     page,
-    limit: pagination.value.perPage,
+    limit: pagination.value.perPage
   }
 
   const response = await fetchUsers(organizationId.value, filters)
@@ -85,19 +85,19 @@ async function loadUsers(page = 1) {
       total: response.meta.total,
       perPage: response.meta.perPage,
       currentPage: response.meta.currentPage,
-      lastPage: response.meta.lastPage,
+      lastPage: response.meta.lastPage
     }
   }
 }
 
-async function handleAddUser(data: AddUserPayload) {
+async function handleAddUser (data: AddUserPayload) {
   addingUser.value = true
   try {
     const result = await addUser(organizationId.value, data)
     if (result) {
       toast.add({
         title: t('reseller.users.add.success'),
-        color: 'success',
+        color: 'success'
       })
       showAddModal.value = false
       await loadUsers(pagination.value.currentPage)
@@ -105,20 +105,20 @@ async function handleAddUser(data: AddUserPayload) {
   } catch (e) {
     toast.add({
       title: error.value || t('reseller.users.add.error'),
-      color: 'error',
+      color: 'error'
     })
   } finally {
     addingUser.value = false
   }
 }
 
-function openDeleteModal(user: OrganizationUser) {
+function openDeleteModal (user: OrganizationUser) {
   userToDelete.value = user
   showDeleteModal.value = true
 }
 
-async function confirmDelete() {
-  if (!userToDelete.value) return
+async function confirmDelete () {
+  if (!userToDelete.value) { return }
 
   deletingUser.value = true
   try {
@@ -126,7 +126,7 @@ async function confirmDelete() {
     if (success) {
       toast.add({
         title: t('reseller.users.delete.success'),
-        color: 'success',
+        color: 'success'
       })
       showDeleteModal.value = false
       userToDelete.value = null
@@ -135,25 +135,25 @@ async function confirmDelete() {
   } catch (e) {
     toast.add({
       title: error.value || t('reseller.users.delete.error'),
-      color: 'error',
+      color: 'error'
     })
   } finally {
     deletingUser.value = false
   }
 }
 
-function handlePageChange(page: number) {
+function handlePageChange (page: number) {
   loadUsers(page)
 }
 
-async function handleResendInvitation(user: OrganizationUser) {
+async function handleResendInvitation (user: OrganizationUser) {
   resendingInvitation.value = true
   try {
     const result = await resendInvitation(organizationId.value, user.id)
     if (result) {
       toast.add({
         title: t('reseller.users.resend.success'),
-        color: 'success',
+        color: 'success'
       })
       // Refresh the users list to get updated lastInvitationSentAt
       await loadUsers(pagination.value.currentPage)
@@ -164,12 +164,12 @@ async function handleResendInvitation(user: OrganizationUser) {
     if (errorData?.code === 'INVITATION_RATE_LIMIT') {
       toast.add({
         title: t('reseller.users.resend.rateLimited'),
-        color: 'warning',
+        color: 'warning'
       })
     } else {
       toast.add({
         title: error.value || t('reseller.users.resend.error'),
-        color: 'error',
+        color: 'error'
       })
     }
   } finally {
@@ -254,7 +254,9 @@ async function handleResendInvitation(user: OrganizationUser) {
     <!-- Add User Modal -->
     <UModal v-model:open="showAddModal">
       <template #header>
-        <h2 class="text-lg font-semibold">{{ t('reseller.users.add.title') }}</h2>
+        <h2 class="text-lg font-semibold">
+          {{ t('reseller.users.add.title') }}
+        </h2>
       </template>
       <template #body>
         <p class="mb-4 text-sm text-gray-500">

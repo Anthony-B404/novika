@@ -16,7 +16,7 @@ export const BUSINESS_SECTORS: BusinessSector[] = [
   'finance',
   'legal',
   'sales',
-  'hr',
+  'hr'
 ]
 
 // =============================================================================
@@ -35,7 +35,7 @@ export type OrganizationStatus = 'active' | 'suspended' | 'deleted'
 export const USER_ROLES = {
   OWNER: 1,
   ADMINISTRATOR: 2,
-  MEMBER: 3,
+  MEMBER: 3
 } as const
 
 export type UserRoleValue = (typeof USER_ROLES)[keyof typeof USER_ROLES]

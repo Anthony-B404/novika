@@ -11,7 +11,7 @@ export const useRoles = () => {
     const roleMap: Record<UserRole, string> = {
       [UserRole.Owner]: t('common.roles.owner'),
       [UserRole.Administrator]: t('common.roles.administrator'),
-      [UserRole.Member]: t('common.roles.member'),
+      [UserRole.Member]: t('common.roles.member')
     }
     return roleMap[role]
   }
@@ -22,7 +22,7 @@ export const useRoles = () => {
   const getRoleOptions = () => [
     { label: t('common.roles.owner'), value: UserRole.Owner },
     { label: t('common.roles.administrator'), value: UserRole.Administrator },
-    { label: t('common.roles.member'), value: UserRole.Member },
+    { label: t('common.roles.member'), value: UserRole.Member }
   ]
 
   /**
@@ -52,6 +52,6 @@ export const useRoles = () => {
     isOwner,
     isAdministrator,
     isMember,
-    hasAdminPrivileges,
+    hasAdminPrivileges
   }
 }

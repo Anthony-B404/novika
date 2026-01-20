@@ -2,15 +2,15 @@
 import { AudioStatus } from '~/types/audio'
 
 definePageMeta({
-  middleware: ['auth', 'pending-deletion', 'organization-status'],
+  middleware: ['auth', 'pending-deletion', 'organization-status']
 })
 
 const route = useRoute()
 const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.audioDetail.title"),
-  description: t("seo.audioDetail.description"),
+  title: t('seo.audioDetail.title'),
+  description: t('seo.audioDetail.description')
 })
 const toast = useToast()
 const localePath = useLocalePath()
@@ -29,7 +29,7 @@ const { startPolling, stopAllPolling, polling } = useAudioPolling({
     currentJobId.value = null
     toast.add({
       title: t('pages.dashboard.workshop.detail.processingComplete'),
-      color: 'success',
+      color: 'success'
     })
     // Refresh audio to get transcription
     audioStore.fetchAudio(audioId.value)
@@ -39,9 +39,9 @@ const { startPolling, stopAllPolling, polling } = useAudioPolling({
     toast.add({
       title: t('pages.dashboard.workshop.detail.processingError'),
       description: error.message,
-      color: 'error',
+      color: 'error'
     })
-  },
+  }
 })
 
 const audioId = computed(() => Number(route.params.id))
@@ -113,8 +113,8 @@ watch(
 )
 
 // Fetch audio file with authentication and create blob URL
-async function loadAudioFile() {
-  if (!audio.value || audioFileLoading.value) return
+async function loadAudioFile () {
+  if (!audio.value || audioFileLoading.value) { return }
 
   const { getAuthHeaders } = useAuth()
 
@@ -123,7 +123,7 @@ async function loadAudioFile() {
     const response = await fetch(
       `${runtimeConfig.public.apiUrl}/audios/${audio.value.id}/file`,
       {
-        headers: getAuthHeaders() as HeadersInit,
+        headers: getAuthHeaders() as HeadersInit
       }
     )
 
@@ -141,21 +141,21 @@ async function loadAudioFile() {
 }
 
 // Handle delete
-async function handleDeleteConfirm() {
-  if (!audio.value) return
+async function handleDeleteConfirm () {
+  if (!audio.value) { return }
 
   const success = await audioStore.deleteAudio(audio.value.id)
 
   if (success) {
     toast.add({
       title: t('pages.dashboard.workshop.deleteSuccess'),
-      color: 'success',
+      color: 'success'
     })
     navigateTo(localePath('/dashboard'))
   } else {
     toast.add({
       title: t('pages.dashboard.workshop.deleteError'),
-      color: 'error',
+      color: 'error'
     })
   }
 
@@ -171,27 +171,27 @@ const canCopy = computed(() => {
 })
 
 // Copy active tab content to clipboard
-async function copyContent() {
+async function copyContent () {
   if (activeTab.value === 'transcription') {
-    if (!audio.value?.transcription?.rawText) return
+    if (!audio.value?.transcription?.rawText) { return }
     await navigator.clipboard.writeText(audio.value.transcription.rawText)
     toast.add({
       title: t('pages.dashboard.workshop.detail.transcriptionCopied'),
-      color: 'success',
+      color: 'success'
     })
   } else if (activeTab.value === 'analysis') {
-    if (!audio.value?.transcription?.analysis) return
+    if (!audio.value?.transcription?.analysis) { return }
     await navigator.clipboard.writeText(audio.value.transcription.analysis)
     toast.add({
       title: t('pages.dashboard.workshop.detail.analysisCopied'),
-      color: 'success',
+      color: 'success'
     })
   }
 }
 
 // Title editing functions
-function startEditingTitle() {
-  if (!audio.value) return
+function startEditingTitle () {
+  if (!audio.value) { return }
   editedTitle.value = audio.value.title || audio.value.fileName
   isEditingTitle.value = true
   nextTick(() => {
@@ -200,12 +200,12 @@ function startEditingTitle() {
   })
 }
 
-function cancelEditingTitle() {
+function cancelEditingTitle () {
   isEditingTitle.value = false
   editedTitle.value = ''
 }
 
-async function saveTitle() {
+async function saveTitle () {
   if (!audio.value || !editedTitle.value.trim() || savingTitle.value) {
     cancelEditingTitle()
     return
@@ -223,12 +223,12 @@ async function saveTitle() {
   if (success) {
     toast.add({
       title: t('pages.dashboard.workshop.detail.titleUpdated'),
-      color: 'success',
+      color: 'success'
     })
   } else {
     toast.add({
       title: t('pages.dashboard.workshop.detail.titleUpdateError'),
-      color: 'error',
+      color: 'error'
     })
   }
 
@@ -236,7 +236,7 @@ async function saveTitle() {
   isEditingTitle.value = false
 }
 
-function handleTitleKeydown(event: KeyboardEvent) {
+function handleTitleKeydown (event: KeyboardEvent) {
   if (event.key === 'Enter') {
     event.preventDefault()
     saveTitle()
@@ -245,43 +245,28 @@ function handleTitleKeydown(event: KeyboardEvent) {
   }
 }
 
-// Download transcription as text file
-function downloadTranscription() {
-  if (!audio.value?.transcription?.rawText) return
-
-  const blob = new Blob([audio.value.transcription.rawText], { type: 'text/plain' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${audio.value.title || audio.value.fileName}-transcription.txt`
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
-}
-
 // Handle time update from audio player
-function onTimeUpdate(time: number) {
+function onTimeUpdate (time: number) {
   currentTime.value = time
 }
 
 // Handle seek from transcription segment click
-function handleSegmentSeek(time: number) {
+function handleSegmentSeek (time: number) {
   audioPlayerRef.value?.seekTo(time)
 }
 
 // Format duration
-function formatDuration(seconds: number | null): string {
-  if (!seconds) return '--:--'
+function formatDuration (seconds: number | null): string {
+  if (!seconds) { return '--:--' }
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
 // Format file size
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+function formatFileSize (bytes: number): string {
+  if (bytes < 1024) { return `${bytes} B` }
+  if (bytes < 1024 * 1024) { return `${(bytes / 1024).toFixed(1)} KB` }
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
@@ -299,12 +284,12 @@ onUnmounted(() => {
 const tabItems = computed(() => [
   {
     label: t('pages.dashboard.workshop.detail.tabs.transcription'),
-    value: 'transcription',
+    value: 'transcription'
   },
   {
     label: t('pages.dashboard.workshop.detail.tabs.analysis'),
-    value: 'analysis',
-  },
+    value: 'analysis'
+  }
 ])
 </script>
 
@@ -377,170 +362,170 @@ const tabItems = computed(() => [
 
     <!-- Content (scrollable) -->
     <div class="flex-1 overflow-y-auto p-6">
-        <!-- Loading state -->
-        <div v-if="audioStore.loading && !audio" class="space-y-6">
-          <USkeleton class="h-24 rounded-lg" />
-          <USkeleton class="h-64 rounded-lg" />
-        </div>
+      <!-- Loading state -->
+      <div v-if="audioStore.loading && !audio" class="space-y-6">
+        <USkeleton class="h-24 rounded-lg" />
+        <USkeleton class="h-64 rounded-lg" />
+      </div>
 
-        <!-- Not found -->
-        <WorkshopEmptyState
-          v-else-if="!audio"
-          :title="t('pages.dashboard.workshop.detail.notFound')"
-          :description="t('pages.dashboard.workshop.detail.notFoundDescription')"
-          icon="i-lucide-file-audio"
-        >
-          <UButton
-            :label="t('pages.dashboard.workshop.detail.backToWorkshop')"
-            color="primary"
+      <!-- Not found -->
+      <WorkshopEmptyState
+        v-else-if="!audio"
+        :title="t('pages.dashboard.workshop.detail.notFound')"
+        :description="t('pages.dashboard.workshop.detail.notFoundDescription')"
+        icon="i-lucide-file-audio"
+      >
+        <UButton
+          :label="t('pages.dashboard.workshop.detail.backToWorkshop')"
+          color="primary"
+          class="mt-4"
+          :to="localePath('/dashboard')"
+        />
+      </WorkshopEmptyState>
+
+      <!-- Audio detail -->
+      <div v-else class="space-y-6 max-w-4xl">
+        <!-- Audio info card -->
+        <UPageCard variant="subtle">
+          <div class="flex items-start gap-4 mb-4">
+            <div
+              class="shrink-0 w-16 h-16 rounded-lg flex items-center justify-center"
+              :class="isCompleted ? 'bg-primary/10' : 'bg-elevated'"
+            >
+              <UIcon
+                :name="isProcessing ? 'i-lucide-loader-2' : 'i-lucide-music'"
+                class="w-8 h-8"
+                :class="[
+                  isProcessing ? 'animate-spin text-primary' : '',
+                  isCompleted ? 'text-primary' : 'text-muted',
+                ]"
+              />
+            </div>
+
+            <div class="flex-1">
+              <h2 class="text-xl font-semibold text-highlighted mb-2">
+                {{ audio.title || audio.fileName }}
+              </h2>
+              <div class="flex items-center gap-4 text-sm text-muted">
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-lucide-clock" class="w-4 h-4" />
+                  {{ formatDuration(audio.duration) }}
+                </span>
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-lucide-hard-drive" class="w-4 h-4" />
+                  {{ formatFileSize(audio.fileSize) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audio player -->
+          <WorkshopAudioPlayer
+            v-if="audioFileUrl"
+            ref="audioPlayerRef"
+            :src="audioFileUrl"
+            :duration="audio.duration"
+            @timeupdate="onTimeUpdate"
+          />
+
+          <!-- Processing status with real-time progress -->
+          <WorkshopProcessingStatus
+            v-if="isProcessing"
             class="mt-4"
-            :to="localePath('/dashboard')"
+            :status="{
+              jobId: currentJobId || '',
+              status: currentJobStatus?.status || AudioStatus.Processing,
+              progress: currentJobStatus?.progress || 0,
+              error: currentJobStatus?.error,
+            }"
           />
-        </WorkshopEmptyState>
+        </UPageCard>
 
-        <!-- Audio detail -->
-        <div v-else class="space-y-6 max-w-4xl">
-          <!-- Audio info card -->
-          <UPageCard variant="subtle">
-            <div class="flex items-start gap-4 mb-4">
-              <div
-                class="shrink-0 w-16 h-16 rounded-lg flex items-center justify-center"
-                :class="isCompleted ? 'bg-primary/10' : 'bg-elevated'"
-              >
-                <UIcon
-                  :name="isProcessing ? 'i-lucide-loader-2' : 'i-lucide-music'"
-                  class="w-8 h-8"
-                  :class="[
-                    isProcessing ? 'animate-spin text-primary' : '',
-                    isCompleted ? 'text-primary' : 'text-muted',
-                  ]"
-                />
-              </div>
+        <!-- Transcription/Analysis tabs -->
+        <UPageCard v-if="isCompleted && audio.transcription" variant="subtle">
+          <div class="flex items-center justify-between mb-4">
+            <UTabs v-model="activeTab" :items="tabItems" />
 
-              <div class="flex-1">
-                <h2 class="text-xl font-semibold text-highlighted mb-2">
-                  {{ audio.title || audio.fileName }}
-                </h2>
-                <div class="flex items-center gap-4 text-sm text-muted">
-                  <span class="flex items-center gap-1">
-                    <UIcon name="i-lucide-clock" class="w-4 h-4" />
-                    {{ formatDuration(audio.duration) }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <UIcon name="i-lucide-hard-drive" class="w-4 h-4" />
-                    {{ formatFileSize(audio.fileSize) }}
-                  </span>
-                </div>
-              </div>
+            <div class="flex items-center gap-2">
+              <UButton
+                icon="i-lucide-copy"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :disabled="!canCopy"
+                @click="copyContent"
+              />
+              <WorkshopExportDropdown
+                :audio-id="audio.id"
+                :audio-title="audio.title || audio.fileName"
+                :has-transcription="!!audio.transcription?.rawText"
+                :has-analysis="!!audio.transcription?.analysis"
+              />
             </div>
+          </div>
 
-            <!-- Audio player -->
-            <WorkshopAudioPlayer
-              v-if="audioFileUrl"
-              ref="audioPlayerRef"
-              :src="audioFileUrl"
-              :duration="audio.duration"
-              @timeupdate="onTimeUpdate"
+          <!-- Transcription content -->
+          <div v-show="activeTab === 'transcription'">
+            <!-- Segments with timestamps (clickable) -->
+            <WorkshopTranscriptionSegments
+              v-if="hasTimestamps"
+              :segments="audio.transcription.timestamps!"
+              :current-time="currentTime"
+              @seek="handleSegmentSeek"
             />
 
-            <!-- Processing status with real-time progress -->
-            <WorkshopProcessingStatus
-              v-if="isProcessing"
-              class="mt-4"
-              :status="{
-                jobId: currentJobId || '',
-                status: currentJobStatus?.status || AudioStatus.Processing,
-                progress: currentJobStatus?.progress || 0,
-                error: currentJobStatus?.error,
-              }"
+            <!-- Fallback to markdown for legacy transcriptions -->
+            <div
+              v-else
+              class="markdown-content text-sm"
+              v-html="renderedTranscription"
             />
-          </UPageCard>
 
-          <!-- Transcription/Analysis tabs -->
-          <UPageCard v-if="isCompleted && audio.transcription" variant="subtle">
-            <div class="flex items-center justify-between mb-4">
-              <UTabs v-model="activeTab" :items="tabItems" />
-
-              <div class="flex items-center gap-2">
-                <UButton
-                  icon="i-lucide-copy"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  :disabled="!canCopy"
-                  @click="copyContent"
-                />
-                <WorkshopExportDropdown
-                  :audio-id="audio.id"
-                  :audio-title="audio.title || audio.fileName"
-                  :has-transcription="!!audio.transcription?.rawText"
-                  :has-analysis="!!audio.transcription?.analysis"
-                />
-              </div>
+            <!-- Metadata -->
+            <div
+              class="mt-4 pt-4 border-t border-default flex items-center gap-4 text-sm text-muted"
+            >
+              <span v-if="audio.transcription.language">
+                {{ t('pages.dashboard.workshop.detail.language') }}:
+                {{ audio.transcription.language.toUpperCase() }}
+              </span>
+              <span v-if="audio.transcription.confidence">
+                {{ t('pages.dashboard.workshop.detail.confidence') }}:
+                {{ (audio.transcription.confidence * 100).toFixed(0) }}%
+              </span>
             </div>
+          </div>
 
-            <!-- Transcription content -->
-            <div v-show="activeTab === 'transcription'">
-              <!-- Segments with timestamps (clickable) -->
-              <WorkshopTranscriptionSegments
-                v-if="hasTimestamps"
-                :segments="audio.transcription.timestamps!"
-                :current-time="currentTime"
-                @seek="handleSegmentSeek"
+          <!-- Analysis content -->
+          <div v-show="activeTab === 'analysis'">
+            <!-- Analysis available -->
+            <div
+              v-if="audio.transcription?.analysis"
+              class="markdown-content text-sm"
+              v-html="renderedAnalysis"
+            />
+
+            <!-- No analysis -->
+            <div v-else class="text-center py-8">
+              <WorkshopEmptyState
+                :title="t('pages.dashboard.workshop.detail.noAnalysis')"
+                :description="t('pages.dashboard.workshop.detail.noAnalysisDescription')"
+                icon="i-lucide-sparkles"
               />
-
-              <!-- Fallback to markdown for legacy transcriptions -->
-              <div
-                v-else
-                class="markdown-content text-sm"
-                v-html="renderedTranscription"
-              />
-
-              <!-- Metadata -->
-              <div
-                class="mt-4 pt-4 border-t border-default flex items-center gap-4 text-sm text-muted"
-              >
-                <span v-if="audio.transcription.language">
-                  {{ t('pages.dashboard.workshop.detail.language') }}:
-                  {{ audio.transcription.language.toUpperCase() }}
-                </span>
-                <span v-if="audio.transcription.confidence">
-                  {{ t('pages.dashboard.workshop.detail.confidence') }}:
-                  {{ (audio.transcription.confidence * 100).toFixed(0) }}%
-                </span>
-              </div>
             </div>
+          </div>
+        </UPageCard>
 
-            <!-- Analysis content -->
-            <div v-show="activeTab === 'analysis'">
-              <!-- Analysis available -->
-              <div
-                v-if="audio.transcription?.analysis"
-                class="markdown-content text-sm"
-                v-html="renderedAnalysis"
-              />
-
-              <!-- No analysis -->
-              <div v-else class="text-center py-8">
-                <WorkshopEmptyState
-                  :title="t('pages.dashboard.workshop.detail.noAnalysis')"
-                  :description="t('pages.dashboard.workshop.detail.noAnalysisDescription')"
-                  icon="i-lucide-sparkles"
-                />
-              </div>
-            </div>
-          </UPageCard>
-
-          <!-- Error state -->
-          <UAlert
-            v-if="isFailed"
-            color="error"
-            variant="subtle"
-            :title="t('pages.dashboard.workshop.detail.processingFailed')"
-            :description="audio.errorMessage || undefined"
-            icon="i-lucide-alert-circle"
-          />
-        </div>
+        <!-- Error state -->
+        <UAlert
+          v-if="isFailed"
+          color="error"
+          variant="subtle"
+          :title="t('pages.dashboard.workshop.detail.processingFailed')"
+          :description="audio.errorMessage || undefined"
+          icon="i-lucide-alert-circle"
+        />
+      </div>
     </div>
 
     <!-- Delete modal -->

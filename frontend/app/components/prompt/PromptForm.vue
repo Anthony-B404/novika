@@ -26,20 +26,20 @@ const schema = computed(() => z.object({
     .min(5, t('pages.dashboard.prompts.errors.contentTooShort'))
     .max(5000, t('pages.dashboard.prompts.errors.contentTooLong')),
   categoryId: z.number().nullable(),
-  isFavorite: z.boolean(),
+  isFavorite: z.boolean()
 }))
 
 const form = reactive({
   title: '',
   content: '',
   categoryId: null as number | null,
-  isFavorite: false,
+  isFavorite: false
 })
 
 const loading = ref(false)
 const errors = reactive({
   title: '',
-  content: '',
+  content: ''
 })
 
 // Reset form when modal opens
@@ -63,13 +63,13 @@ watch(() => props.open, (isOpen) => {
 
 const categoryOptions = computed(() => [
   { label: t('pages.dashboard.prompts.form.noCategory'), value: null },
-  ...props.categories.map((c) => ({
+  ...props.categories.map(c => ({
     label: c.name,
-    value: c.id,
-  })),
+    value: c.id
+  }))
 ])
 
-function validate(): boolean {
+function validate (): boolean {
   errors.title = ''
   errors.content = ''
 
@@ -77,7 +77,7 @@ function validate(): boolean {
     title: form.title.trim(),
     content: form.content.trim(),
     categoryId: form.categoryId,
-    isFavorite: form.isFavorite,
+    isFavorite: form.isFavorite
   })
 
   if (!result.success) {
@@ -93,8 +93,8 @@ function validate(): boolean {
   return true
 }
 
-async function handleSubmit() {
-  if (!validate()) return
+async function handleSubmit () {
+  if (!validate()) { return }
 
   loading.value = true
 
@@ -103,7 +103,7 @@ async function handleSubmit() {
       title: form.title.trim(),
       content: form.content.trim(),
       categoryId: form.categoryId,
-      isFavorite: form.isFavorite,
+      isFavorite: form.isFavorite
     }
 
     emit('save', payload)
@@ -113,7 +113,7 @@ async function handleSubmit() {
   }
 }
 
-function handleClose() {
+function handleClose () {
   emit('update:open', false)
 }
 </script>

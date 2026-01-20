@@ -248,7 +248,7 @@ export default class OrganizationsController {
       const fileName = await this.handleLogoUpload(logo)
 
       // Parse businessSectors from FormData if present
-      let businessSectors: Organization['businessSectors'] | undefined = undefined
+      let businessSectors: Organization['businessSectors'] | undefined
       const sectorsInput = request.input('businessSectors')
       if (sectorsInput) {
         try {

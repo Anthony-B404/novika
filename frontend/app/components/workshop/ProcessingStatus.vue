@@ -17,11 +17,11 @@ const progressLabel = computed(() => {
     case AudioStatus.Processing: {
       const progress = props.status.progress
       // Dynamic labels based on progress stage
-      if (progress < 2) return t('components.workshop.processing.starting')
-      if (progress < 12) return t('components.workshop.processing.converting')
-      if (progress < 17) return t('components.workshop.processing.analyzing_metadata')
-      if (progress < 72) return t('components.workshop.processing.transcribing', { progress })
-      if (progress < 92) return t('components.workshop.processing.analyzing')
+      if (progress < 2) { return t('components.workshop.processing.starting') }
+      if (progress < 12) { return t('components.workshop.processing.converting') }
+      if (progress < 17) { return t('components.workshop.processing.analyzing_metadata') }
+      if (progress < 72) { return t('components.workshop.processing.transcribing', { progress }) }
+      if (progress < 92) { return t('components.workshop.processing.analyzing') }
       return t('components.workshop.processing.finalizing')
     }
     case AudioStatus.Completed:
@@ -50,13 +50,10 @@ const progressColor = computed(() => {
   }
 })
 
-// Use indeterminate for uploading state (no real progress tracking)
-const isIndeterminate = computed(() => props.status.status === 'uploading')
-
 const progressValue = computed(() => {
-  if (props.status.status === 'uploading') return undefined // Indeterminate
-  if (props.status.status === AudioStatus.Completed) return 100
-  if (props.status.status === AudioStatus.Failed) return 100
+  if (props.status.status === 'uploading') { return undefined } // Indeterminate
+  if (props.status.status === AudioStatus.Completed) { return 100 }
+  if (props.status.status === AudioStatus.Failed) { return 100 }
   return props.status.progress
 })
 

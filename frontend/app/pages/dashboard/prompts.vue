@@ -6,14 +6,14 @@ import CategoryTabs from '~/components/prompt/CategoryTabs.vue'
 import CategoryManager from '~/components/prompt/CategoryManager.vue'
 
 definePageMeta({
-  middleware: ['auth', 'pending-deletion', 'organization-status'],
+  middleware: ['auth', 'pending-deletion', 'organization-status']
 })
 
 const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.prompts.title"),
-  description: t("seo.prompts.description"),
+  title: t('seo.prompts.title'),
+  description: t('seo.prompts.description')
 })
 const localePath = useLocalePath()
 
@@ -39,7 +39,7 @@ const debouncedSearch = refDebounced(searchQuery, 300)
 onMounted(async () => {
   await Promise.all([
     promptsStore.fetchCategories(),
-    promptsStore.fetchPrompts(),
+    promptsStore.fetchPrompts()
   ])
   initialLoadDone.value = true
 })
@@ -53,44 +53,44 @@ watch(debouncedSearch, () => {
 // Pas de filtrage client nécessaire - évite les états intermédiaires qui cassent l'animation
 const filteredPrompts = computed(() => promptsStore.prompts)
 
-async function fetchPrompts() {
+async function fetchPrompts () {
   isFiltering.value = true
   await promptsStore.fetchPrompts(1, {
     categoryId: showFavorites.value ? undefined : selectedCategoryId.value ?? undefined,
     favorites: showFavorites.value ? true : undefined,
-    search: debouncedSearch.value || undefined,
+    search: debouncedSearch.value || undefined
   })
   isFiltering.value = false
 }
 
-function handleCategorySelect(categoryId: number | null) {
+function handleCategorySelect (categoryId: number | null) {
   showFavorites.value = false
   selectedCategoryId.value = categoryId
   fetchPrompts()
 }
 
-function handleFavoritesSelect() {
+function handleFavoritesSelect () {
   showFavorites.value = true
   selectedCategoryId.value = null
   fetchPrompts()
 }
 
-function handleAddPrompt() {
+function handleAddPrompt () {
   editingPrompt.value = null
   promptFormOpen.value = true
 }
 
-function handleEditPrompt(prompt: Prompt) {
+function handleEditPrompt (prompt: Prompt) {
   editingPrompt.value = prompt
   promptFormOpen.value = true
 }
 
-function handleDeletePrompt(prompt: Prompt) {
+function handleDeletePrompt (prompt: Prompt) {
   promptToDelete.value = prompt
   deleteModalOpen.value = true
 }
 
-async function handleSavePrompt(payload: CreatePromptPayload | UpdatePromptPayload) {
+async function handleSavePrompt (payload: CreatePromptPayload | UpdatePromptPayload) {
   if (editingPrompt.value) {
     const updated = await promptsStore.updatePrompt(editingPrompt.value.id, payload)
     if (updated) {
@@ -108,8 +108,8 @@ async function handleSavePrompt(payload: CreatePromptPayload | UpdatePromptPaylo
   }
 }
 
-async function handleConfirmDelete() {
-  if (!promptToDelete.value) return
+async function handleConfirmDelete () {
+  if (!promptToDelete.value) { return }
 
   const success = await promptsStore.deletePrompt(promptToDelete.value.id)
   if (success) {
@@ -122,21 +122,21 @@ async function handleConfirmDelete() {
   promptToDelete.value = null
 }
 
-async function handleToggleFavorite(prompt: Prompt) {
+async function handleToggleFavorite (prompt: Prompt) {
   const result = await promptsStore.toggleFavorite(prompt.id)
   if (result !== null) {
     toast.add({
       title: result
         ? t('pages.dashboard.prompts.addedToFavorites')
         : t('pages.dashboard.prompts.removedFromFavorites'),
-      color: 'success',
+      color: 'success'
     })
   } else {
     toast.add({ title: t('common.error'), description: promptsStore.error || undefined, color: 'error' })
   }
 }
 
-async function handleCreateCategory(payload: CreateCategoryPayload) {
+async function handleCreateCategory (payload: CreateCategoryPayload) {
   const created = await promptsStore.createCategory(payload)
   if (created) {
     toast.add({ title: t('pages.dashboard.prompts.categoryCreated'), color: 'success' })
@@ -145,7 +145,7 @@ async function handleCreateCategory(payload: CreateCategoryPayload) {
   }
 }
 
-async function handleUpdateCategory(id: number, payload: UpdateCategoryPayload) {
+async function handleUpdateCategory (id: number, payload: UpdateCategoryPayload) {
   const updated = await promptsStore.updateCategory(id, payload)
   if (updated) {
     toast.add({ title: t('pages.dashboard.prompts.categoryUpdated'), color: 'success' })
@@ -154,7 +154,7 @@ async function handleUpdateCategory(id: number, payload: UpdateCategoryPayload) 
   }
 }
 
-async function handleDeleteCategory(id: number) {
+async function handleDeleteCategory (id: number) {
   const success = await promptsStore.deleteCategory(id)
   if (success) {
     toast.add({ title: t('pages.dashboard.prompts.categoryDeleted'), color: 'success' })

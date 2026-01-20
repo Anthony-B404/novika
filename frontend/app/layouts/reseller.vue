@@ -1,104 +1,104 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from "@nuxt/ui";
+import type { NavigationMenuItem } from '@nuxt/ui'
 
-const { t } = useI18n();
-const localePath = useLocalePath();
-const route = useRoute();
-const { user, logout } = useAuth();
-const colorMode = useColorMode();
+const { t } = useI18n()
+const localePath = useLocalePath()
+const route = useRoute()
+const { user, logout } = useAuth()
+const colorMode = useColorMode()
 
 // Sidebar collapsed state (persisted in localStorage)
-const collapsed = useCookie<boolean>("reseller-sidebar-collapsed", {
-  default: () => false,
-});
+const collapsed = useCookie<boolean>('reseller-sidebar-collapsed', {
+  default: () => false
+})
 
 // Navigation items for the sidebar
 const navigationItems = computed<NavigationMenuItem[]>(() => [
   {
-    label: t("reseller.navigation.dashboard"),
-    icon: "i-lucide-layout-dashboard",
-    to: localePath("/reseller"),
-    active: route.path === localePath("/reseller"),
+    label: t('reseller.navigation.dashboard'),
+    icon: 'i-lucide-layout-dashboard',
+    to: localePath('/reseller'),
+    active: route.path === localePath('/reseller')
   },
   {
-    label: t("reseller.navigation.organizations"),
-    icon: "i-lucide-building-2",
-    to: localePath("/reseller/organizations"),
-    active: route.path.startsWith(localePath("/reseller/organizations")),
+    label: t('reseller.navigation.organizations'),
+    icon: 'i-lucide-building-2',
+    to: localePath('/reseller/organizations'),
+    active: route.path.startsWith(localePath('/reseller/organizations'))
   },
   {
-    label: t("reseller.navigation.credits"),
-    icon: "i-lucide-coins",
-    to: localePath("/reseller/credits"),
-    active: route.path === localePath("/reseller/credits"),
+    label: t('reseller.navigation.credits'),
+    icon: 'i-lucide-coins',
+    to: localePath('/reseller/credits'),
+    active: route.path === localePath('/reseller/credits')
   },
   {
-    label: t("reseller.navigation.profile"),
-    icon: "i-lucide-user",
-    to: localePath("/reseller/profile"),
-    active: route.path === localePath("/reseller/profile"),
-  },
-]);
+    label: t('reseller.navigation.profile'),
+    icon: 'i-lucide-user',
+    to: localePath('/reseller/profile'),
+    active: route.path === localePath('/reseller/profile')
+  }
+])
 
 // User menu items for the footer dropdown
 const userMenuItems = computed<NavigationMenuItem[][]>(() => [
   [
     {
-      label: user.value?.email || "",
-      slot: "account",
-      disabled: true,
-    },
+      label: user.value?.email || '',
+      slot: 'account',
+      disabled: true
+    }
   ],
   [
     {
-      label: t("components.user.appearance"),
-      icon: "i-lucide-sun-moon",
+      label: t('components.user.appearance'),
+      icon: 'i-lucide-sun-moon',
       children: [
         {
-          label: t("components.user.light"),
-          icon: "i-lucide-sun",
-          type: "checkbox",
-          checked: colorMode.preference === "light",
-          onSelect(e: Event) {
-            e.preventDefault();
-            colorMode.preference = "light";
-          },
+          label: t('components.user.light'),
+          icon: 'i-lucide-sun',
+          type: 'checkbox',
+          checked: colorMode.preference === 'light',
+          onSelect (e: Event) {
+            e.preventDefault()
+            colorMode.preference = 'light'
+          }
         },
         {
-          label: t("components.user.dark"),
-          icon: "i-lucide-moon",
-          type: "checkbox",
-          checked: colorMode.preference === "dark",
-          onSelect(e: Event) {
-            e.preventDefault();
-            colorMode.preference = "dark";
-          },
+          label: t('components.user.dark'),
+          icon: 'i-lucide-moon',
+          type: 'checkbox',
+          checked: colorMode.preference === 'dark',
+          onSelect (e: Event) {
+            e.preventDefault()
+            colorMode.preference = 'dark'
+          }
         },
         {
-          label: t("components.user.system"),
-          icon: "i-lucide-monitor",
-          type: "checkbox",
-          checked: colorMode.preference === "system",
-          onSelect(e: Event) {
-            e.preventDefault();
-            colorMode.preference = "system";
-          },
-        },
-      ],
-    },
+          label: t('components.user.system'),
+          icon: 'i-lucide-monitor',
+          type: 'checkbox',
+          checked: colorMode.preference === 'system',
+          onSelect (e: Event) {
+            e.preventDefault()
+            colorMode.preference = 'system'
+          }
+        }
+      ]
+    }
   ],
   [
     {
-      label: t("common.buttons.logout"),
-      icon: "i-lucide-log-out",
-      onSelect: handleLogout,
-    },
-  ],
-]);
+      label: t('common.buttons.logout'),
+      icon: 'i-lucide-log-out',
+      onSelect: handleLogout
+    }
+  ]
+])
 
-async function handleLogout() {
-  await logout();
-  navigateTo(localePath("/"));
+async function handleLogout () {
+  await logout()
+  navigateTo(localePath('/'))
 }
 </script>
 
@@ -116,7 +116,7 @@ async function handleLogout() {
           :class="isCollapsed ? 'justify-center' : 'justify-between pr-1 pl-2'"
         >
           <div class="flex items-center gap-2">
-            <img src="/favicon.svg" alt="DH-Echo" class="h-8 w-8 shrink-0" />
+            <img src="/favicon.svg" alt="DH-Echo" class="h-8 w-8 shrink-0">
             <span
               v-if="!isCollapsed"
               class="text-lg font-semibold text-slate-800 dark:text-white"

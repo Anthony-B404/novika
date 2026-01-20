@@ -1,254 +1,253 @@
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from 'zod'
 import type {
   CreateOrganizationPayload,
   AddUserPayload,
   RenewalType,
-  BusinessSector,
-} from "~/types/reseller";
-import type { FormSubmitEvent } from "#ui/types";
+  BusinessSector
+} from '~/types/reseller'
 
 definePageMeta({
-  layout: "reseller",
-  middleware: ["auth", "reseller"],
-});
+  layout: 'reseller',
+  middleware: ['auth', 'reseller']
+})
 
-const { t } = useI18n();
-const localePath = useLocalePath();
-const toast = useToast();
+const { t } = useI18n()
+const localePath = useLocalePath()
+const toast = useToast()
 
 // Breadcrumb
 const breadcrumbItems = computed(() => [
   {
-    label: t("reseller.navigation.dashboard"),
-    icon: "i-lucide-home",
-    to: localePath("/reseller"),
+    label: t('reseller.navigation.dashboard'),
+    icon: 'i-lucide-home',
+    to: localePath('/reseller')
   },
   {
-    label: t("reseller.navigation.organizations"),
-    icon: "i-lucide-building-2",
-    to: localePath("/reseller/organizations"),
+    label: t('reseller.navigation.organizations'),
+    icon: 'i-lucide-building-2',
+    to: localePath('/reseller/organizations')
   },
-  { label: t("reseller.organizations.create.title"), icon: "i-lucide-plus" },
-]);
+  { label: t('reseller.organizations.create.title'), icon: 'i-lucide-plus' }
+])
 
 useSeoMeta({
-  title: t("reseller.organizations.create.title"),
-});
+  title: t('reseller.organizations.create.title')
+})
 
 const { createOrganization, addUser, loading, error } =
-  useResellerOrganizations();
-const { fetchProfile } = useResellerProfile();
-const { sectorOptions, getSectorConfig, getSectorLabel } = useBusinessSectors();
+  useResellerOrganizations()
+const { fetchProfile } = useResellerProfile()
+const { sectorOptions } = useBusinessSectors()
 
 // Available credits from reseller pool
-const availableCredits = ref<number>(0);
+const availableCredits = ref<number>(0)
 
 onMounted(async () => {
-  const profile = await fetchProfile();
+  const profile = await fetchProfile()
   if (profile) {
-    availableCredits.value = profile.creditBalance;
+    availableCredits.value = profile.creditBalance
   }
-});
+})
 
 // Stepper configuration
-const stepper = useTemplateRef("stepper");
-const currentStep = ref("organization");
+const stepper = useTemplateRef('stepper')
+const currentStep = ref('organization')
 
 const steps = computed(() => [
   {
-    value: "organization",
-    title: t("reseller.organizations.steps.organization"),
-    description: t("reseller.organizations.steps.organizationDesc"),
-    icon: "i-lucide-building-2",
+    value: 'organization',
+    title: t('reseller.organizations.steps.organization'),
+    description: t('reseller.organizations.steps.organizationDesc'),
+    icon: 'i-lucide-building-2'
   },
   {
-    value: "credits",
-    title: t("reseller.organizations.steps.credits"),
-    description: t("reseller.organizations.steps.creditsDesc"),
-    icon: "i-lucide-coins",
+    value: 'credits',
+    title: t('reseller.organizations.steps.credits'),
+    description: t('reseller.organizations.steps.creditsDesc'),
+    icon: 'i-lucide-coins'
   },
   {
-    value: "owner",
-    title: t("reseller.organizations.steps.owner"),
-    description: t("reseller.organizations.steps.ownerDesc"),
-    icon: "i-lucide-user-check",
+    value: 'owner',
+    title: t('reseller.organizations.steps.owner'),
+    description: t('reseller.organizations.steps.ownerDesc'),
+    icon: 'i-lucide-user-check'
   },
   {
-    value: "members",
-    title: t("reseller.organizations.steps.members"),
-    description: t("reseller.organizations.steps.membersDesc"),
-    icon: "i-lucide-users",
-  },
-]);
+    value: 'members',
+    title: t('reseller.organizations.steps.members'),
+    description: t('reseller.organizations.steps.membersDesc'),
+    icon: 'i-lucide-users'
+  }
+])
 
 // Form refs for validation
-const orgFormRef = useTemplateRef("orgForm");
-const creditsFormRef = useTemplateRef("creditsForm");
-const ownerFormRef = useTemplateRef("ownerForm");
+const orgFormRef = useTemplateRef('orgForm')
+const creditsFormRef = useTemplateRef('creditsForm')
+const ownerFormRef = useTemplateRef('ownerForm')
 
 // Mapping field names to steps for backend error handling
 const fieldToStep: Record<string, string> = {
-  name: "organization",
-  email: "organization",
-  initialCredits: "credits",
-  subscriptionEnabled: "credits",
-  monthlyCreditsTarget: "credits",
-  renewalType: "credits",
-  renewalDay: "credits",
-  ownerEmail: "owner",
-  ownerFirstName: "owner",
-  ownerLastName: "owner",
-};
+  name: 'organization',
+  email: 'organization',
+  initialCredits: 'credits',
+  subscriptionEnabled: 'credits',
+  monthlyCreditsTarget: 'credits',
+  renewalType: 'credits',
+  renewalDay: 'credits',
+  ownerEmail: 'owner',
+  ownerFirstName: 'owner',
+  ownerLastName: 'owner'
+}
 
 // Handle backend validation errors - navigate to step and show inline error
-function handleBackendErrors(e: unknown): boolean {
-  if (e && typeof e === "object" && "data" in e) {
+function handleBackendErrors (e: unknown): boolean {
+  if (e && typeof e === 'object' && 'data' in e) {
     const data = (
       e as { data?: { errors?: Array<{ field: string; message: string }> } }
-    ).data;
-    const errors = data?.errors;
+    ).data
+    const errors = data?.errors
 
     if (Array.isArray(errors) && errors.length > 0 && errors[0]) {
-      const firstError = errors[0];
-      const targetStep = fieldToStep[firstError.field];
+      const firstError = errors[0]
+      const targetStep = fieldToStep[firstError.field]
 
       if (targetStep) {
         // 1. Navigate to the step containing the errored field
         if (currentStep.value !== targetStep) {
-          currentStep.value = targetStep;
+          currentStep.value = targetStep
         }
 
         // 2. Inject error into the form for inline display
         nextTick(() => {
-          let formRef;
-          if (targetStep === "organization") {
-            formRef = orgFormRef;
-          } else if (targetStep === "credits") {
-            formRef = creditsFormRef;
-          } else if (targetStep === "owner") {
-            formRef = ownerFormRef;
+          let formRef
+          if (targetStep === 'organization') {
+            formRef = orgFormRef
+          } else if (targetStep === 'credits') {
+            formRef = creditsFormRef
+          } else if (targetStep === 'owner') {
+            formRef = ownerFormRef
           }
           formRef?.value?.setErrors([
             {
               name: firstError.field,
-              message: firstError.message,
-            },
-          ]);
-        });
+              message: firstError.message
+            }
+          ])
+        })
 
-        return true; // Error was handled
+        return true // Error was handled
       }
     }
   }
 
-  return false; // No validation error found
+  return false // No validation error found
 }
 
 // Zod schemas for each step
 const organizationSchema = computed(() =>
   z.object({
-    name: z.string().min(2, t("reseller.organizations.validation.nameMin")),
+    name: z.string().min(2, t('reseller.organizations.validation.nameMin')),
     email: z
       .string()
-      .email(t("reseller.organizations.validation.emailInvalid")),
-  }),
-);
+      .email(t('reseller.organizations.validation.emailInvalid'))
+  })
+)
 
 const creditsSchema = computed(() =>
   z
     .object({
-      billingType: z.enum(["one_time", "subscription"]),
+      billingType: z.enum(['one_time', 'subscription']),
       initialCredits: z
         .number()
-        .min(0, t("reseller.organizations.validation.initialCreditsMin"))
+        .min(0, t('reseller.organizations.validation.initialCreditsMin'))
         .max(
           availableCredits.value,
-          t("reseller.organizations.validation.initialCreditsMax"),
+          t('reseller.organizations.validation.initialCreditsMax')
         )
         .optional(),
       monthlyCreditsTarget: z
         .number()
-        .min(1, t("reseller.subscription.validation.targetPositive"))
+        .min(1, t('reseller.subscription.validation.targetPositive'))
         .optional(),
-      renewalType: z.enum(["first_of_month", "anniversary"]).optional(),
-      renewalDay: z.number().min(1).max(28).optional(),
+      renewalType: z.enum(['first_of_month', 'anniversary']).optional(),
+      renewalDay: z.number().min(1).max(28).optional()
     })
     .refine(
       (data) => {
         // If subscription, monthlyCreditsTarget is required
-        if (data.billingType === "subscription") {
+        if (data.billingType === 'subscription') {
           return (
             data.monthlyCreditsTarget !== undefined &&
             data.monthlyCreditsTarget > 0
-          );
+          )
         }
-        return true;
+        return true
       },
       {
-        message: t("reseller.subscription.validation.targetRequired"),
-        path: ["monthlyCreditsTarget"],
-      },
+        message: t('reseller.subscription.validation.targetRequired'),
+        path: ['monthlyCreditsTarget']
+      }
     )
     .refine(
       (data) => {
         // If subscription, renewalType is required
-        if (data.billingType === "subscription") {
-          return data.renewalType !== undefined;
+        if (data.billingType === 'subscription') {
+          return data.renewalType !== undefined
         }
-        return true;
+        return true
       },
       {
-        message: t("reseller.subscription.validation.renewalTypeRequired"),
-        path: ["renewalType"],
-      },
-    ),
-);
+        message: t('reseller.subscription.validation.renewalTypeRequired'),
+        path: ['renewalType']
+      }
+    )
+)
 
 const ownerSchema = computed(() =>
   z.object({
     ownerEmail: z
       .string()
-      .email(t("reseller.organizations.validation.ownerEmailInvalid")),
+      .email(t('reseller.organizations.validation.ownerEmailInvalid')),
     ownerFirstName: z
       .string()
-      .min(2, t("reseller.organizations.validation.ownerFirstNameMin")),
+      .min(2, t('reseller.organizations.validation.ownerFirstNameMin')),
     ownerLastName: z
       .string()
-      .min(2, t("reseller.organizations.validation.ownerLastNameMin")),
-  }),
-);
+      .min(2, t('reseller.organizations.validation.ownerLastNameMin'))
+  })
+)
 
 const memberSchema = computed(() =>
   z.object({
-    email: z.string().email(t("reseller.users.validation.emailInvalid")),
-    firstName: z.string().min(2, t("reseller.users.validation.firstNameMin")),
-    lastName: z.string().min(2, t("reseller.users.validation.lastNameMin")),
-    role: z.number(),
-  }),
-);
+    email: z.string().email(t('reseller.users.validation.emailInvalid')),
+    firstName: z.string().min(2, t('reseller.users.validation.firstNameMin')),
+    lastName: z.string().min(2, t('reseller.users.validation.lastNameMin')),
+    role: z.number()
+  })
+)
 
 // Form states for each step
 const organizationState = reactive({
-  name: "",
-  email: "",
-  businessSectors: [] as BusinessSector[],
-});
+  name: '',
+  email: '',
+  businessSectors: [] as BusinessSector[]
+})
 
 const creditsState = reactive({
-  billingType: "one_time" as "one_time" | "subscription",
+  billingType: 'one_time' as 'one_time' | 'subscription',
   initialCredits: undefined as number | undefined,
   // Subscription fields
   monthlyCreditsTarget: undefined as number | undefined,
-  renewalType: "first_of_month" as RenewalType,
-  renewalDay: 1,
-});
+  renewalType: 'first_of_month' as RenewalType,
+  renewalDay: 1
+})
 
 const ownerState = reactive({
-  ownerEmail: "",
-  ownerFirstName: "",
-  ownerLastName: "",
-});
+  ownerEmail: '',
+  ownerFirstName: '',
+  ownerLastName: ''
+})
 
 const membersState = reactive({
   members: [] as Array<{
@@ -256,186 +255,186 @@ const membersState = reactive({
     firstName: string;
     lastName: string;
     role: 2 | 3;
-  }>,
-});
+  }>
+})
 
 // Helper function to set credits from preset buttons
-function setCredits(amount: number) {
-  creditsState.initialCredits = Math.min(amount, availableCredits.value);
+function setCredits (amount: number) {
+  creditsState.initialCredits = Math.min(amount, availableCredits.value)
 }
 
 // Computed for credit progress bar
 const creditsUsedPercentage = computed(() => {
-  if (availableCredits.value === 0) return 0;
-  const used = creditsState.initialCredits || 0;
-  return Math.round((used / availableCredits.value) * 100);
-});
+  if (availableCredits.value === 0) { return 0 }
+  const used = creditsState.initialCredits || 0
+  return Math.round((used / availableCredits.value) * 100)
+})
 
 // Billing type options
 const billingTypeOptions = computed(() => [
   {
-    value: "one_time",
-    label: t("reseller.organizations.billing.oneTime"),
-    description: t("reseller.organizations.billing.oneTimeDesc"),
-    icon: "i-lucide-credit-card",
+    value: 'one_time',
+    label: t('reseller.organizations.billing.oneTime'),
+    description: t('reseller.organizations.billing.oneTimeDesc'),
+    icon: 'i-lucide-credit-card'
   },
   {
-    value: "subscription",
-    label: t("reseller.organizations.billing.subscription"),
-    description: t("reseller.organizations.billing.subscriptionDesc"),
-    icon: "i-lucide-refresh-cw",
-  },
-]);
+    value: 'subscription',
+    label: t('reseller.organizations.billing.subscription'),
+    description: t('reseller.organizations.billing.subscriptionDesc'),
+    icon: 'i-lucide-refresh-cw'
+  }
+])
 
 // Renewal type options
 const renewalTypeOptions = computed(() => [
   {
-    value: "first_of_month",
-    label: t("reseller.subscription.renewalType.firstOfMonth"),
+    value: 'first_of_month',
+    label: t('reseller.subscription.renewalType.firstOfMonth')
   },
   {
-    value: "anniversary",
-    label: t("reseller.subscription.renewalType.anniversary"),
-  },
-]);
+    value: 'anniversary',
+    label: t('reseller.subscription.renewalType.anniversary')
+  }
+])
 
 // Day options for anniversary renewal (1-28)
 const renewalDayOptions = computed(() =>
   Array.from({ length: 28 }, (_, i) => ({
     value: i + 1,
-    label: String(i + 1),
-  })),
-);
+    label: String(i + 1)
+  }))
+)
 
 // Check if current step is valid (for disabling Next button)
 const isCurrentStepValid = computed(() => {
-  if (currentStep.value === "organization") {
+  if (currentStep.value === 'organization') {
     // Explicitly access properties to trigger Vue reactivity
     const data = {
       name: organizationState.name,
-      email: organizationState.email,
-    };
-    const result = organizationSchema.value.safeParse(data);
-    return result.success;
-  } else if (currentStep.value === "credits") {
+      email: organizationState.email
+    }
+    const result = organizationSchema.value.safeParse(data)
+    return result.success
+  } else if (currentStep.value === 'credits') {
     // Explicitly access properties to trigger Vue reactivity
     const data = {
       billingType: creditsState.billingType,
       initialCredits: creditsState.initialCredits,
       monthlyCreditsTarget: creditsState.monthlyCreditsTarget,
       renewalType: creditsState.renewalType,
-      renewalDay: creditsState.renewalDay,
-    };
-    const result = creditsSchema.value.safeParse(data);
-    return result.success;
-  } else if (currentStep.value === "owner") {
+      renewalDay: creditsState.renewalDay
+    }
+    const result = creditsSchema.value.safeParse(data)
+    return result.success
+  } else if (currentStep.value === 'owner') {
     // Explicitly access properties to trigger Vue reactivity
     const data = {
       ownerEmail: ownerState.ownerEmail,
       ownerFirstName: ownerState.ownerFirstName,
-      ownerLastName: ownerState.ownerLastName,
-    };
-    const result = ownerSchema.value.safeParse(data);
-    return result.success;
+      ownerLastName: ownerState.ownerLastName
+    }
+    const result = ownerSchema.value.safeParse(data)
+    return result.success
   }
 
   // Members step is optional, but validate added members
-  if (currentStep.value === "members" && membersState.members.length > 0) {
+  if (currentStep.value === 'members' && membersState.members.length > 0) {
     return membersState.members.every((m) => {
       const data = {
         email: m.email,
         firstName: m.firstName,
         lastName: m.lastName,
-        role: m.role,
-      };
-      return memberSchema.value.safeParse(data).success;
-    });
+        role: m.role
+      }
+      return memberSchema.value.safeParse(data).success
+    })
   }
 
-  return true;
-});
+  return true
+})
 
 // Navigation
-async function nextStep() {
+async function nextStep () {
   // Validate current step form before proceeding
-  if (currentStep.value === "organization") {
-    const form = orgFormRef.value;
+  if (currentStep.value === 'organization') {
+    const form = orgFormRef.value
     if (form) {
       try {
-        await form.validate({ silent: false });
+        await form.validate({ silent: false })
       } catch {
         // Validation failed, errors will be displayed
-        return;
+        return
       }
     }
-  } else if (currentStep.value === "credits") {
-    const form = creditsFormRef.value;
+  } else if (currentStep.value === 'credits') {
+    const form = creditsFormRef.value
     if (form) {
       try {
-        await form.validate({ silent: false });
+        await form.validate({ silent: false })
       } catch {
         // Validation failed, errors will be displayed
-        return;
+        return
       }
     }
-  } else if (currentStep.value === "owner") {
-    const form = ownerFormRef.value;
+  } else if (currentStep.value === 'owner') {
+    const form = ownerFormRef.value
     if (form) {
       try {
-        await form.validate({ silent: false });
+        await form.validate({ silent: false })
       } catch {
         // Validation failed, errors will be displayed
-        return;
+        return
       }
     }
   }
 
   // Pre-fill owner email from organization email if empty (when moving from credits to owner)
-  if (currentStep.value === "credits" && !ownerState.ownerEmail) {
-    ownerState.ownerEmail = organizationState.email;
+  if (currentStep.value === 'credits' && !ownerState.ownerEmail) {
+    ownerState.ownerEmail = organizationState.email
   }
 
-  if (!isCurrentStepValid.value) return;
+  if (!isCurrentStepValid.value) { return }
 
   if (stepper.value?.hasNext) {
-    stepper.value.next();
+    stepper.value.next()
   }
 }
 
-function prevStep() {
+function prevStep () {
   if (stepper.value?.hasPrev) {
-    stepper.value.prev();
+    stepper.value.prev()
   }
 }
 
 // Members management
-function addMember() {
+function addMember () {
   membersState.members.push({
-    email: "",
-    firstName: "",
-    lastName: "",
-    role: 3,
-  });
+    email: '',
+    firstName: '',
+    lastName: '',
+    role: 3
+  })
 }
 
-function removeMember(index: number) {
-  membersState.members.splice(index, 1);
+function removeMember (index: number) {
+  membersState.members.splice(index, 1)
 }
 
 // Role options for select
 const roleOptions = computed(() => [
-  { value: 2, label: t("reseller.organizations.members.roleAdmin") },
-  { value: 3, label: t("reseller.organizations.members.roleMember") },
-]);
+  { value: 2, label: t('reseller.organizations.members.roleAdmin') },
+  { value: 3, label: t('reseller.organizations.members.roleMember') }
+])
 
 // Submission state
-const isSubmitting = ref(false);
+const isSubmitting = ref(false)
 
 // Submit form
-async function handleSubmit() {
-  if (!isCurrentStepValid.value) return;
+async function handleSubmit () {
+  if (!isCurrentStepValid.value) { return }
 
-  isSubmitting.value = true;
+  isSubmitting.value = true
   try {
     // 1. Create organization with owner
     const payload: CreateOrganizationPayload = {
@@ -448,18 +447,18 @@ async function handleSubmit() {
       // Business sectors
       businessSectors: organizationState.businessSectors,
       // Subscription configuration
-      subscriptionEnabled: creditsState.billingType === "subscription",
-      ...(creditsState.billingType === "subscription" && {
+      subscriptionEnabled: creditsState.billingType === 'subscription',
+      ...(creditsState.billingType === 'subscription' && {
         monthlyCreditsTarget: creditsState.monthlyCreditsTarget,
         renewalType: creditsState.renewalType,
         renewalDay:
-          creditsState.renewalType === "anniversary"
+          creditsState.renewalType === 'anniversary'
             ? creditsState.renewalDay
-            : undefined,
-      }),
-    };
+            : undefined
+      })
+    }
 
-    const result = await createOrganization(payload);
+    const result = await createOrganization(payload)
 
     if (result) {
       // 2. Add members if any
@@ -470,44 +469,44 @@ async function handleSubmit() {
               email: member.email,
               firstName: member.firstName,
               lastName: member.lastName,
-              role: member.role,
-            };
-            await addUser(result.organization.id, memberPayload);
+              role: member.role
+            }
+            await addUser(result.organization.id, memberPayload)
           } catch {
             // Continue with other members even if one fails
             toast.add({
-              title: t("reseller.users.add.error"),
+              title: t('reseller.users.add.error'),
               description: `${member.email}`,
-              color: "warning",
-            });
+              color: 'warning'
+            })
           }
         }
       }
 
       toast.add({
-        title: t("reseller.organizations.create.success"),
-        color: "success",
-      });
+        title: t('reseller.organizations.create.success'),
+        color: 'success'
+      })
       navigateTo(
-        localePath(`/reseller/organizations/${result.organization.id}`),
-      );
+        localePath(`/reseller/organizations/${result.organization.id}`)
+      )
     }
   } catch (e) {
     // Try to handle as backend validation error (show inline on field)
     if (!handleBackendErrors(e)) {
       // Fallback: show generic toast
       toast.add({
-        title: error.value || t("reseller.organizations.create.error"),
-        color: "error",
-      });
+        title: error.value || t('reseller.organizations.create.error'),
+        color: 'error'
+      })
     }
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
 }
 
-function handleCancel() {
-  navigateTo(localePath("/reseller/organizations"));
+function handleCancel () {
+  navigateTo(localePath('/reseller/organizations'))
 }
 </script>
 

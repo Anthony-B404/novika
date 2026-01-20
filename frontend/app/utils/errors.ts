@@ -8,7 +8,7 @@ interface FetchErrorLike {
  * Extract error message from fetch error
  * Prioritizes validation error messages over generic API messages
  */
-export function getErrorMessage(e: unknown, fallback: string): string {
+export function getErrorMessage (e: unknown, fallback: string): string {
   if (e && typeof e === 'object' && 'data' in e) {
     const fetchError = e as FetchErrorLike
 

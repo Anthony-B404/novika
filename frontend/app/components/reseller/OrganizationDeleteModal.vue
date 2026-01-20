@@ -18,17 +18,17 @@ const { t } = useI18n()
 const confirmationName = ref('')
 
 const isConfirmationValid = computed(() => {
-  if (!props.organization) return false
+  if (!props.organization) { return false }
   return confirmationName.value.trim().toLowerCase() === props.organization.name.toLowerCase()
 })
 
-function handleConfirm() {
+function handleConfirm () {
   if (isConfirmationValid.value) {
     emit('confirm')
   }
 }
 
-function handleCancel() {
+function handleCancel () {
   confirmationName.value = ''
   emit('cancel')
 }
@@ -55,7 +55,9 @@ watch(open, (isOpen) => {
         <UAlert color="error" variant="subtle" :title="t('reseller.organizations.delete.warning')">
           <template #description>
             <div class="mt-2">
-              <p class="font-medium">{{ t('reseller.organizations.delete.consequences.title') }}</p>
+              <p class="font-medium">
+                {{ t('reseller.organizations.delete.consequences.title') }}
+              </p>
               <ul class="mt-1 list-disc list-inside text-sm space-y-1">
                 <li>{{ t('reseller.organizations.delete.consequences.access') }}</li>
                 <li>{{ t('reseller.organizations.delete.consequences.purge') }}</li>

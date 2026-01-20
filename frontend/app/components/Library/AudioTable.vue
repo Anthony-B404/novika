@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { AudioStatus } from '~/types/audio'
-import type { Audio } from '~/types/audio'
 import { formatDistanceToNow } from 'date-fns'
 import { fr, enUS } from 'date-fns/locale'
+import { AudioStatus } from '~/types/audio'
+import type { Audio } from '~/types/audio'
 
 const props = defineProps<{
   audios: Audio[]
@@ -26,7 +26,6 @@ const editedTitle = ref('')
 const titleInputRef = ref<HTMLInputElement | null>(null)
 
 const { t, locale } = useI18n()
-const localePath = useLocalePath()
 
 // Table columns definition (Nuxt UI 4 uses TanStack Table format)
 const columns = computed(() => [
@@ -34,47 +33,47 @@ const columns = computed(() => [
     id: 'select',
     accessorKey: 'select',
     header: '',
-    meta: { class: { th: 'w-12', td: 'w-12' } },
+    meta: { class: { th: 'w-12', td: 'w-12' } }
   },
   {
     id: 'title',
     accessorKey: 'title',
     header: t('pages.dashboard.library.columns.title'),
-    enableSorting: true,
+    enableSorting: true
   },
   {
     id: 'duration',
     accessorKey: 'duration',
     header: t('pages.dashboard.library.columns.duration'),
     enableSorting: true,
-    meta: { class: { th: 'w-24', td: 'w-24' } },
+    meta: { class: { th: 'w-24', td: 'w-24' } }
   },
   {
     id: 'status',
     accessorKey: 'status',
     header: t('pages.dashboard.library.columns.status'),
     enableSorting: true,
-    meta: { class: { th: 'w-32', td: 'w-32' } },
+    meta: { class: { th: 'w-32', td: 'w-32' } }
   },
   {
     id: 'createdAt',
     accessorKey: 'createdAt',
     header: t('pages.dashboard.library.columns.date'),
     enableSorting: true,
-    meta: { class: { th: 'w-40', td: 'w-40' } },
+    meta: { class: { th: 'w-40', td: 'w-40' } }
   },
   {
     id: 'actions',
     accessorKey: 'actions',
     header: '',
-    meta: { class: { th: 'w-16', td: 'w-16' } },
-  },
+    meta: { class: { th: 'w-16', td: 'w-16' } }
+  }
 ])
 
 // Check if all items are selected
 const allSelected = computed(() => {
-  if (props.audios.length === 0) return false
-  return props.audios.every((a) => props.selectedIds.includes(a.id))
+  if (props.audios.length === 0) { return false }
+  return props.audios.every(a => props.selectedIds.includes(a.id))
 })
 
 // Check if some items are selected (for indeterminate state)
@@ -83,25 +82,25 @@ const someSelected = computed(() => {
 })
 
 // Toggle all selection
-function toggleAll() {
+function toggleAll () {
   if (allSelected.value) {
     emit('update:selectedIds', [])
   } else {
-    emit('update:selectedIds', props.audios.map((a) => a.id))
+    emit('update:selectedIds', props.audios.map(a => a.id))
   }
 }
 
 // Toggle single item selection
-function toggleItem(audioId: number) {
+function toggleItem (audioId: number) {
   const newSelection = props.selectedIds.includes(audioId)
-    ? props.selectedIds.filter((id) => id !== audioId)
+    ? props.selectedIds.filter(id => id !== audioId)
     : [...props.selectedIds, audioId]
   emit('update:selectedIds', newSelection)
 }
 
 // Handle column sort click
-function handleSort(column: string) {
-  if (!['title', 'duration', 'status', 'createdAt'].includes(column)) return
+function handleSort (column: string) {
+  if (!['title', 'duration', 'status', 'createdAt'].includes(column)) { return }
 
   const newOrder =
     props.sortBy === column && props.sortOrder === 'desc' ? 'asc' : 'desc'
@@ -109,15 +108,15 @@ function handleSort(column: string) {
 }
 
 // Format duration
-function formatDuration(seconds: number | null): string {
-  if (!seconds) return '--:--'
+function formatDuration (seconds: number | null): string {
+  if (!seconds) { return '--:--' }
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
 // Format date
-function formatDate(dateStr: string): string {
+function formatDate (dateStr: string): string {
   const dateLocale = locale.value === 'fr' ? fr : enUS
   return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: dateLocale })
 }
@@ -127,16 +126,16 @@ const statusConfig: Record<AudioStatus, { color: 'neutral' | 'primary' | 'succes
   pending: { color: 'neutral', icon: 'i-lucide-clock' },
   processing: { color: 'primary', icon: 'i-lucide-loader-2' },
   completed: { color: 'success', icon: 'i-lucide-check-circle' },
-  failed: { color: 'error', icon: 'i-lucide-x-circle' },
+  failed: { color: 'error', icon: 'i-lucide-x-circle' }
 }
 
 // Get display title
-function getDisplayTitle(audio: Audio): string {
+function getDisplayTitle (audio: Audio): string {
   return audio.title || audio.fileName
 }
 
 // Title editing functions
-function startEditingTitle(audio: Audio, event: Event) {
+function startEditingTitle (audio: Audio, event: Event) {
   event.stopPropagation()
   editingAudioId.value = audio.id
   editedTitle.value = audio.title || audio.fileName
@@ -146,12 +145,12 @@ function startEditingTitle(audio: Audio, event: Event) {
   })
 }
 
-function cancelEditingTitle() {
+function cancelEditingTitle () {
   editingAudioId.value = null
   editedTitle.value = ''
 }
 
-function saveTitle(audio: Audio) {
+function saveTitle (audio: Audio) {
   const newTitle = editedTitle.value.trim()
   if (!newTitle) {
     cancelEditingTitle()
@@ -168,7 +167,7 @@ function saveTitle(audio: Audio) {
   editedTitle.value = ''
 }
 
-function handleTitleKeydown(event: KeyboardEvent, audio: Audio) {
+function handleTitleKeydown (event: KeyboardEvent, audio: Audio) {
   if (event.key === 'Enter') {
     event.preventDefault()
     saveTitle(audio)

@@ -1,154 +1,154 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion", "organization-status"],
-});
+  middleware: ['auth', 'pending-deletion', 'organization-status']
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.settingsGeneral.title"),
-  description: t("seo.settingsGeneral.description"),
-});
+  title: t('seo.settingsGeneral.title'),
+  description: t('seo.settingsGeneral.description')
+})
 
-const authStore = useAuthStore();
-const toast = useToast();
-const api = useApi();
-const { getAvatarUrl } = useAvatarUrl();
+const authStore = useAuthStore()
+const toast = useToast()
+const api = useApi()
+const { getAvatarUrl } = useAvatarUrl()
 
-const fileRef = ref<HTMLInputElement>();
+const fileRef = ref<HTMLInputElement>()
 
 const profileSchema = z.object({
   firstName: z
     .string()
-    .min(2, t("pages.dashboard.settings.general.validation.firstNameTooShort")),
+    .min(2, t('pages.dashboard.settings.general.validation.firstNameTooShort')),
   lastName: z
     .string()
-    .min(2, t("pages.dashboard.settings.general.validation.lastNameTooShort")),
+    .min(2, t('pages.dashboard.settings.general.validation.lastNameTooShort')),
   email: z
     .string()
-    .email(t("pages.dashboard.settings.general.validation.invalidEmail")),
-  avatar: z.string().optional(),
-});
+    .email(t('pages.dashboard.settings.general.validation.invalidEmail')),
+  avatar: z.string().optional()
+})
 
 type ProfileSchema = z.output<typeof profileSchema>;
 
 // Initialize state with user data from store
 const profile = reactive<ProfileSchema>({
-  firstName: authStore.user?.firstName || "",
-  lastName: authStore.user?.lastName || "",
-  email: authStore.user?.email || "",
-  avatar: authStore.user?.avatar || undefined,
-});
+  firstName: authStore.user?.firstName || '',
+  lastName: authStore.user?.lastName || '',
+  email: authStore.user?.email || '',
+  avatar: authStore.user?.avatar || undefined
+})
 
-const loading = ref(false);
-const avatarRemoved = ref(false);
+const loading = ref(false)
+const avatarRemoved = ref(false)
 
-async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
-  loading.value = true;
+async function onSubmit (event: FormSubmitEvent<ProfileSchema>) {
+  loading.value = true
   try {
-    const formData = new FormData();
+    const formData = new FormData()
 
     // Add text fields if they changed
     if (event.data.firstName !== authStore.user?.firstName) {
-      formData.append("firstName", event.data.firstName);
+      formData.append('firstName', event.data.firstName)
     }
     if (event.data.lastName !== authStore.user?.lastName) {
-      formData.append("lastName", event.data.lastName);
+      formData.append('lastName', event.data.lastName)
     }
     if (event.data.email !== authStore.user?.email) {
-      formData.append("email", event.data.email);
+      formData.append('email', event.data.email)
     }
 
     // Add avatar removal flag
     if (avatarRemoved.value) {
-      formData.append("removeAvatar", "true");
+      formData.append('removeAvatar', 'true')
     }
 
     // Add avatar if file was selected
-    const fileInput = fileRef.value;
+    const fileInput = fileRef.value
     if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append("avatar", fileInput.files[0]);
+      formData.append('avatar', fileInput.files[0])
     }
 
     // Only send request if there are changes
     if (Array.from(formData.keys()).length > 0) {
-      const response = await api<{ message: string; user: any }>("/profile", {
-        method: "PUT",
+      const response = await api<{ message: string; user: any }>('/profile', {
+        method: 'PUT',
         headers: {
-          Authorization: `Bearer ${authStore.token}`,
+          Authorization: `Bearer ${authStore.token}`
         },
-        body: formData,
-      });
+        body: formData
+      })
 
       // Update user in store
-      authStore.setUser(response.user);
+      authStore.setUser(response.user)
 
       // Update local state with new data
-      profile.firstName = response.user.firstName;
-      profile.lastName = response.user.lastName;
-      profile.email = response.user.email;
-      profile.avatar = response.user.avatar;
-      avatarRemoved.value = false;
+      profile.firstName = response.user.firstName
+      profile.lastName = response.user.lastName
+      profile.email = response.user.email
+      profile.avatar = response.user.avatar
+      avatarRemoved.value = false
 
       toast.add({
-        title: t("pages.dashboard.settings.general.successTitle"),
+        title: t('pages.dashboard.settings.general.successTitle'),
         description: response.message,
-        icon: "i-lucide-check",
-        color: "success",
-      });
+        icon: 'i-lucide-check',
+        color: 'success'
+      })
     } else {
       toast.add({
-        title: t("pages.dashboard.settings.general.noChangesTitle"),
-        description: t("pages.dashboard.settings.general.noChangesDescription"),
-        icon: "i-lucide-info",
-        color: "neutral",
-      });
+        title: t('pages.dashboard.settings.general.noChangesTitle'),
+        description: t('pages.dashboard.settings.general.noChangesDescription'),
+        icon: 'i-lucide-info',
+        color: 'neutral'
+      })
     }
   } catch (error: any) {
     toast.add({
-      title: t("pages.dashboard.settings.general.errorTitle"),
+      title: t('pages.dashboard.settings.general.errorTitle'),
       description:
         error.data?.message ||
-        t("pages.dashboard.settings.general.errorDescription"),
-      icon: "i-lucide-x",
-      color: "error",
-    });
+        t('pages.dashboard.settings.general.errorDescription'),
+      icon: 'i-lucide-x',
+      color: 'error'
+    })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
+function onFileChange (e: Event) {
+  const input = e.target as HTMLInputElement
 
   if (!input.files?.length) {
-    return;
+    return
   }
 
-  profile.avatar = URL.createObjectURL(input.files[0]!);
-  avatarRemoved.value = false;
+  profile.avatar = URL.createObjectURL(input.files[0]!)
+  avatarRemoved.value = false
 }
 
-function onFileClick() {
-  fileRef.value?.click();
+function onFileClick () {
+  fileRef.value?.click()
 }
 
-function onRemoveAvatar() {
-  profile.avatar = undefined;
-  avatarRemoved.value = true;
+function onRemoveAvatar () {
+  profile.avatar = undefined
+  avatarRemoved.value = true
   // Clear file input
   if (fileRef.value) {
-    fileRef.value.value = "";
+    fileRef.value.value = ''
   }
 }
 
 // Compute full name for display
 const fullName = computed(() => {
-  return `${profile.firstName} ${profile.lastName}`.trim();
-});
+  return `${profile.firstName} ${profile.lastName}`.trim()
+})
 </script>
 
 <template>
@@ -240,7 +240,7 @@ const fullName = computed(() => {
             class="hidden"
             accept=".jpg, .jpeg, .png, .gif"
             @change="onFileChange"
-          />
+          >
         </div>
       </UFormField>
     </UPageCard>

@@ -3,15 +3,15 @@ import type { AdminStats } from '~/types/admin'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'admin'],
+  middleware: ['auth', 'admin']
 })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const localePath = useLocalePath()
 
 useSeoMeta({
   title: t('admin.dashboard.title'),
-  description: t('admin.dashboard.subtitle'),
+  description: t('admin.dashboard.subtitle')
 })
 
 const { fetchStats, loading, error } = useResellers()
@@ -20,15 +20,6 @@ const stats = ref<AdminStats | null>(null)
 onMounted(async () => {
   stats.value = await fetchStats()
 })
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString(locale.value, {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 </script>
 
 <template>
@@ -96,7 +87,9 @@ function formatDate(dateString: string) {
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold">{{ t('admin.dashboard.topResellers') }}</h2>
+              <h2 class="text-lg font-semibold">
+                {{ t('admin.dashboard.topResellers') }}
+              </h2>
               <UButton
                 :to="localePath('/admin/resellers')"
                 color="neutral"
@@ -120,8 +113,12 @@ function formatDate(dateString: string) {
               class="flex items-center justify-between py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 -mx-4 px-4 transition-colors"
             >
               <div>
-                <p class="font-medium text-gray-900 dark:text-white">{{ reseller.name }}</p>
-                <p class="text-sm text-gray-500">{{ reseller.company }}</p>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  {{ reseller.name }}
+                </p>
+                <p class="text-sm text-gray-500">
+                  {{ reseller.company }}
+                </p>
               </div>
               <UBadge color="success" variant="subtle">
                 {{ reseller.creditBalance.toLocaleString() }} {{ t('common.credits') }}
@@ -136,7 +133,9 @@ function formatDate(dateString: string) {
         <!-- Recent Transactions -->
         <UCard>
           <template #header>
-            <h2 class="text-lg font-semibold">{{ t('admin.dashboard.recentTransactions') }}</h2>
+            <h2 class="text-lg font-semibold">
+              {{ t('admin.dashboard.recentTransactions') }}
+            </h2>
           </template>
 
           <AdminTransactionHistory

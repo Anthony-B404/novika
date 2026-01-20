@@ -3,7 +3,7 @@ import type { Reseller, ResellersFilters } from '~/types/admin'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'admin'],
+  middleware: ['auth', 'admin']
 })
 
 const { t } = useI18n()
@@ -11,7 +11,7 @@ const localePath = useLocalePath()
 const toast = useToast()
 
 useSeoMeta({
-  title: t('admin.resellers.list.title'),
+  title: t('admin.resellers.list.title')
 })
 
 const { fetchResellers, deactivateReseller, loading, error } = useResellers()
@@ -22,7 +22,7 @@ const pagination = ref({
   total: 0,
   perPage: 20,
   currentPage: 1,
-  lastPage: 1,
+  lastPage: 1
 })
 
 // Filters
@@ -34,14 +34,14 @@ const deleteModalOpen = ref(false)
 const resellerToDelete = ref<Reseller | null>(null)
 
 // Load resellers
-async function loadResellers(page = 1) {
+async function loadResellers (page = 1) {
   const filters: ResellersFilters = {
     page,
     limit: pagination.value.perPage,
     search: search.value || undefined,
     isActive: activeFilter.value,
     sortBy: 'createdAt',
-    sortOrder: 'desc',
+    sortOrder: 'desc'
   }
 
   const response = await fetchResellers(filters)
@@ -51,7 +51,7 @@ async function loadResellers(page = 1) {
       total: response.meta.total,
       perPage: response.meta.perPage,
       currentPage: response.meta.currentPage,
-      lastPage: response.meta.lastPage,
+      lastPage: response.meta.lastPage
     }
   }
 }
@@ -71,45 +71,45 @@ watch(search, () => {
 watch(activeFilter, () => loadResellers(1))
 
 // Handle page change
-function handlePageChange(page: number) {
+function handlePageChange (page: number) {
   loadResellers(page)
 }
 
 // Handle view
-function handleView(reseller: Reseller) {
+function handleView (reseller: Reseller) {
   navigateTo(localePath(`/admin/resellers/${reseller.id}`))
 }
 
 // Handle edit
-function handleEdit(reseller: Reseller) {
+function handleEdit (reseller: Reseller) {
   navigateTo(localePath(`/admin/resellers/${reseller.id}`))
 }
 
 // Handle credits
-function handleCredits(reseller: Reseller) {
+function handleCredits (reseller: Reseller) {
   navigateTo(localePath(`/admin/resellers/${reseller.id}/credits`))
 }
 
 // Handle delete
-function openDeleteModal(reseller: Reseller) {
+function openDeleteModal (reseller: Reseller) {
   resellerToDelete.value = reseller
   deleteModalOpen.value = true
 }
 
-async function confirmDelete() {
-  if (!resellerToDelete.value) return
+async function confirmDelete () {
+  if (!resellerToDelete.value) { return }
 
   const success = await deactivateReseller(resellerToDelete.value.id)
   if (success) {
     toast.add({
       title: t('admin.resellers.deactivateSuccess'),
-      color: 'success',
+      color: 'success'
     })
     await loadResellers(pagination.value.currentPage)
   } else {
     toast.add({
       title: t('admin.resellers.deactivateError'),
-      color: 'error',
+      color: 'error'
     })
   }
 
@@ -121,7 +121,7 @@ async function confirmDelete() {
 const statusOptions = [
   { label: t('admin.resellers.filters.all'), value: undefined },
   { label: t('admin.resellers.filters.active'), value: true },
-  { label: t('admin.resellers.filters.inactive'), value: false },
+  { label: t('admin.resellers.filters.inactive'), value: false }
 ]
 </script>
 

@@ -30,9 +30,7 @@ export default class ResellersController {
         sortOrder = 'desc',
       } = await request.validateUsing(listResellersValidator)
 
-      const query = Reseller.query()
-        .withCount('organizations')
-        .withCount('adminUsers')
+      const query = Reseller.query().withCount('organizations').withCount('adminUsers')
 
       // Search filter
       if (search) {

@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from "@nuxt/ui";
-import type { Member } from "~/types";
-import { UserRole } from "~/types/auth";
+import type { DropdownMenuItem } from '@nuxt/ui'
+import type { Member } from '~/types'
+import { UserRole } from '~/types/auth'
 
-const { t } = useI18n();
-const toast = useToast();
-const { getRoleOptions } = useRoles();
-const { authenticatedFetch } = useAuth();
-const { getAvatarUrl } = useAvatarUrl();
+const { t } = useI18n()
+const toast = useToast()
+const { getRoleOptions } = useRoles()
+const { authenticatedFetch } = useAuth()
+const { getAvatarUrl } = useAvatarUrl()
 
 const props = defineProps<{
   members: Member[];
   currentUserRole: UserRole;
-}>();
+}>()
 
 const emit = defineEmits<{
   refresh: [];
-}>();
+}>()
 
 // Modal states
-const editModalOpen = ref(false);
-const deleteModalOpen = ref(false);
-const selectedMember = ref<Member | null>(null);
+const editModalOpen = ref(false)
+const deleteModalOpen = ref(false)
+const selectedMember = ref<Member | null>(null)
 
 // Loading states for role changes
-const roleChanging = ref<number | null>(null);
+const roleChanging = ref<number | null>(null)
 
 /**
  * Check if current user can manage (edit/delete) a member
@@ -34,50 +34,50 @@ const roleChanging = ref<number | null>(null);
 const canManageMember = (member: Member): boolean => {
   // Cannot manage yourself
   if (member.isCurrentUser) {
-    return false;
+    return false
   }
 
   // Owner can manage anyone except themselves
   if (props.currentUserRole === UserRole.Owner) {
-    return member.role !== UserRole.Owner;
+    return member.role !== UserRole.Owner
   }
 
   // Admin can only manage Members
   if (props.currentUserRole === UserRole.Administrator) {
-    return member.role === UserRole.Member;
+    return member.role === UserRole.Member
   }
 
-  return false;
-};
+  return false
+}
 
 /**
  * Check if current user can change a member's role
  * Same rules as canManageMember
  */
 const canChangeRole = (member: Member): boolean => {
-  return canManageMember(member);
-};
+  return canManageMember(member)
+}
 
 /**
  * Get dropdown items for a member based on permissions
  */
 const getMemberItems = (member: Member): DropdownMenuItem[] => {
   if (!canManageMember(member)) {
-    return [];
+    return []
   }
 
   return [
     {
-      label: t("components.settings.members.editMember"),
-      onSelect: () => openEditModal(member),
+      label: t('components.settings.members.editMember'),
+      onSelect: () => openEditModal(member)
     },
     {
-      label: t("components.settings.members.removeMember"),
-      color: "error" as const,
-      onSelect: () => openDeleteModal(member),
-    },
-  ];
-};
+      label: t('components.settings.members.removeMember'),
+      color: 'error' as const,
+      onSelect: () => openDeleteModal(member)
+    }
+  ]
+}
 
 /**
  * Get role options for a member
@@ -87,94 +87,94 @@ const getMemberItems = (member: Member): DropdownMenuItem[] => {
 const getMemberRoleOptions = (member: Member) => {
   // If member is owner, show only owner option (disabled)
   if (member.role === UserRole.Owner) {
-    return getRoleOptions().filter((option) => option.value === UserRole.Owner);
+    return getRoleOptions().filter(option => option.value === UserRole.Owner)
   }
 
   // If current user can't change role, show only current role
   if (!canChangeRole(member)) {
-    return getRoleOptions().filter((option) => option.value === member.role);
+    return getRoleOptions().filter(option => option.value === member.role)
   }
 
   // Otherwise, show Admin and Member options (never Owner)
-  return getRoleOptions().filter((option) => option.value !== UserRole.Owner);
-};
+  return getRoleOptions().filter(option => option.value !== UserRole.Owner)
+}
 
 /**
  * Handle role change - call API
  */
 const handleRoleChange = async (member: Member, newRole: UserRole) => {
-  if (newRole === member.role) return;
+  if (newRole === member.role) { return }
 
-  roleChanging.value = member.id;
+  roleChanging.value = member.id
 
   try {
     await authenticatedFetch(`/update-member-role/${member.id}`, {
-      method: "PUT",
-      body: { role: newRole },
-    });
+      method: 'PUT',
+      body: { role: newRole }
+    })
 
     toast.add({
-      title: t("components.settings.members.roleChangeSuccess"),
-      color: "success",
-    });
+      title: t('components.settings.members.roleChangeSuccess'),
+      color: 'success'
+    })
 
-    emit("refresh");
+    emit('refresh')
   } catch (error: any) {
     toast.add({
-      title: t("components.settings.members.roleChangeError"),
-      description: error.data?.message || "",
-      color: "error",
-    });
+      title: t('components.settings.members.roleChangeError'),
+      description: error.data?.message || '',
+      color: 'error'
+    })
   } finally {
-    roleChanging.value = null;
+    roleChanging.value = null
   }
-};
+}
 
 /**
  * Open edit modal for a member
  */
 const openEditModal = (member: Member) => {
-  selectedMember.value = member;
-  editModalOpen.value = true;
-};
+  selectedMember.value = member
+  editModalOpen.value = true
+}
 
 /**
  * Open delete modal for a member
  */
 const openDeleteModal = (member: Member) => {
-  selectedMember.value = member;
-  deleteModalOpen.value = true;
-};
+  selectedMember.value = member
+  deleteModalOpen.value = true
+}
 
 /**
  * Handle edit modal close
  */
 const handleEditClose = () => {
-  editModalOpen.value = false;
-  selectedMember.value = null;
-};
+  editModalOpen.value = false
+  selectedMember.value = null
+}
 
 /**
  * Handle edit modal success
  */
 const handleEditUpdated = () => {
-  emit("refresh");
-};
+  emit('refresh')
+}
 
 /**
  * Handle delete modal close
  */
 const handleDeleteClose = () => {
-  deleteModalOpen.value = false;
-  selectedMember.value = null;
-};
+  deleteModalOpen.value = false
+  selectedMember.value = null
+}
 
 /**
  * Handle delete modal success
  */
 const handleDeleteDeleted = () => {
-  emit("refresh");
-};
+  emit('refresh')
+}
 </script>
 
 <template>
@@ -207,8 +207,8 @@ const handleDeleteDeleted = () => {
           :items="getMemberRoleOptions(member)"
           :disabled="
             member.role === UserRole.Owner ||
-            !canChangeRole(member) ||
-            roleChanging === member.id
+              !canChangeRole(member) ||
+              roleChanging === member.id
           "
           :loading="roleChanging === member.id"
           color="neutral"

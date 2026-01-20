@@ -22,7 +22,7 @@ const state = reactive({
   enabled: props.subscription?.subscriptionEnabled ?? false,
   monthlyCreditsTarget: props.subscription?.monthlyCreditsTarget ?? undefined,
   renewalType: props.subscription?.renewalType ?? ('first_of_month' as RenewalType),
-  renewalDay: props.subscription?.renewalDay ?? 1,
+  renewalDay: props.subscription?.renewalDay ?? 1
 })
 
 // Watch for subscription prop changes
@@ -43,19 +43,19 @@ watch(
 const renewalTypeOptions = computed(() => [
   {
     value: 'first_of_month',
-    label: t('reseller.subscription.renewalType.firstOfMonth'),
+    label: t('reseller.subscription.renewalType.firstOfMonth')
   },
   {
     value: 'anniversary',
-    label: t('reseller.subscription.renewalType.anniversary'),
-  },
+    label: t('reseller.subscription.renewalType.anniversary')
+  }
 ])
 
 // Day options for anniversary type (1-28)
 const dayOptions = computed(() =>
   Array.from({ length: 28 }, (_, i) => ({
     value: i + 1,
-    label: String(i + 1),
+    label: String(i + 1)
   }))
 )
 
@@ -65,29 +65,29 @@ const schema = computed(() =>
     enabled: z.boolean(),
     monthlyCreditsTarget: state.enabled
       ? z
-          .number({ message: t('reseller.subscription.validation.targetRequired') })
-          .positive(t('reseller.subscription.validation.targetPositive'))
+        .number({ message: t('reseller.subscription.validation.targetRequired') })
+        .positive(t('reseller.subscription.validation.targetPositive'))
       : z.number().optional(),
     renewalType: state.enabled
       ? z.enum(['first_of_month', 'anniversary'], {
-          message: t('reseller.subscription.validation.renewalTypeRequired'),
-        })
+        message: t('reseller.subscription.validation.renewalTypeRequired')
+      })
       : z.enum(['first_of_month', 'anniversary']).optional(),
     renewalDay:
       state.enabled && state.renewalType === 'anniversary'
         ? z.number().min(1).max(28)
-        : z.number().optional(),
+        : z.number().optional()
   })
 )
 
 type Schema = z.infer<typeof schema.value>
 
-function onSubmit(event: FormSubmitEvent<Schema>) {
+function onSubmit (event: FormSubmitEvent<Schema>) {
   const payload: ConfigureSubscriptionPayload = {
     enabled: event.data.enabled,
     monthlyCreditsTarget: event.data.enabled ? event.data.monthlyCreditsTarget : null,
     renewalType: event.data.enabled ? (event.data.renewalType as RenewalType) : null,
-    renewalDay: event.data.enabled && event.data.renewalType === 'anniversary' ? event.data.renewalDay : null,
+    renewalDay: event.data.enabled && event.data.renewalType === 'anniversary' ? event.data.renewalDay : null
   }
   emit('submit', payload)
 }
@@ -118,7 +118,7 @@ const canPauseResume = computed(() => props.subscription?.subscriptionEnabled)
           :placeholder="t('reseller.subscription.placeholders.monthlyCreditsTarget')"
           :min="1"
         />
-        <template #hint v-if="currentCredits !== undefined">
+        <template v-if="currentCredits !== undefined" #hint>
           <span class="text-sm text-gray-500">
             {{ t('reseller.subscription.currentCredits', { count: currentCredits?.toLocaleString() }) }}
           </span>

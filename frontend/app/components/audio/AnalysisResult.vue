@@ -2,38 +2,38 @@
 defineProps<{
   transcription: string;
   analysis: string;
-}>();
+}>()
 
-const { t } = useI18n();
-const toast = useToast();
+const { t } = useI18n()
+const toast = useToast()
 
-const activeTab = ref("analysis");
+const activeTab = ref('analysis')
 
-async function copyToClipboard(text: string) {
+async function copyToClipboard (text: string) {
   try {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(text)
     toast.add({
-      title: t("common.messages.copiedToClipboard"),
-      color: "success",
-    });
+      title: t('common.messages.copiedToClipboard'),
+      color: 'success'
+    })
   } catch {
     toast.add({
-      title: t("common.messages.error"),
-      color: "error",
-    });
+      title: t('common.messages.error'),
+      color: 'error'
+    })
   }
 }
 
-function downloadAsText(content: string, filename: string) {
-  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+function downloadAsText (content: string, filename: string) {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 </script>
 

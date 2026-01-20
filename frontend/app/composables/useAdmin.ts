@@ -19,6 +19,6 @@ export const useAdmin = () => {
 
   return {
     isSuperAdmin,
-    canAccessAdmin,
+    canAccessAdmin
   }
 }

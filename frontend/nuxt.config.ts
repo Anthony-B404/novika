@@ -1,55 +1,55 @@
-import { fileURLToPath } from "node:url";
-import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath } from 'node:url'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   ssr: false,
-  compatibilityDate: "2024-04-03",
+  compatibilityDate: '2024-04-03',
   app: {
     head: {
-      link: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
-    },
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]
+    }
   },
   devtools: { enabled: true },
-  css: ["~/assets/css/main.css"],
+  css: ['~/assets/css/main.css'],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss()]
   },
   runtimeConfig: {
     public: {
-      apiUrl: process.env.API_URL,
-    },
+      apiUrl: process.env.API_URL
+    }
   },
   alias: {
-    "@": fileURLToPath(new URL("./app", import.meta.url)),
+    '@': fileURLToPath(new URL('./app', import.meta.url))
   },
   modules: [
-    "@nuxt/ui",
-    "@nuxtjs/color-mode",
-    "@nuxtjs/i18n",
-    "@pinia/nuxt",
-    "@vueuse/nuxt",
-    "@formkit/auto-animate/nuxt",
+    '@nuxt/ui',
+    '@nuxtjs/color-mode',
+    '@nuxtjs/i18n',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    '@formkit/auto-animate/nuxt'
   ],
   routeRules: {
-    "/": { prerender: true },
+    '/': { prerender: true }
   },
   i18n: {
-    strategy: "prefix_and_default",
-    langDir: "locales",
-    defaultLocale: "fr",
+    strategy: 'prefix_and_default',
+    langDir: 'locales',
+    defaultLocale: 'fr',
     lazy: true,
     locales: [
       {
-        code: "fr",
-        file: "fr.json",
+        code: 'fr',
+        file: 'fr.json'
       },
       {
-        code: "en",
-        file: "en.json",
-      },
-    ],
+        code: 'en',
+        file: 'en.json'
+      }
+    ]
   },
   colorMode: {
-    classSuffix: "",
-  },
-});
+    classSuffix: ''
+  }
+})

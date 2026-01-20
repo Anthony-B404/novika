@@ -12,8 +12,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo({
       path: localePath('/'),
       query: {
-        redirect: to.fullPath,
-      },
+        redirect: to.fullPath
+      }
     })
   }
 

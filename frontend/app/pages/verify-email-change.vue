@@ -1,61 +1,61 @@
 <script setup lang="ts">
-const { t } = useI18n();
-const route = useRoute();
-const router = useRouter();
-const { $localePath } = useNuxtApp();
-const toast = useToast();
-const { fetchUser } = useAuth();
-const api = useApi();
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const { $localePath } = useNuxtApp()
+const toast = useToast()
+const { fetchUser } = useAuth()
+const api = useApi()
 
 definePageMeta({
-  layout: "auth",
-});
+  layout: 'auth'
+})
 
 useSeoMeta({
-  title: t("seo.verifyEmailChange.title"),
-  description: t("seo.verifyEmailChange.description"),
-});
+  title: t('seo.verifyEmailChange.title'),
+  description: t('seo.verifyEmailChange.description')
+})
 
-const token = ref(route.query.token as string);
-const isVerifying = ref(true);
+const token = ref(route.query.token as string)
+const isVerifying = ref(true)
 
 // Verify email change token on mount
 onMounted(async () => {
   if (!token.value) {
     toast.add({
-      title: t("auth.verifyEmailChange.error"),
-      description: t("auth.verifyEmailChange.noToken"),
-      color: "error",
-    });
-    router.push($localePath("index"));
-    return;
+      title: t('auth.verifyEmailChange.error'),
+      description: t('auth.verifyEmailChange.noToken'),
+      color: 'error'
+    })
+    router.push($localePath('index'))
+    return
   }
 
   try {
-    await api(`/verify-email-change/${token.value}`);
+    await api(`/verify-email-change/${token.value}`)
 
     // Refresh user data in Pinia store to get updated email
-    await fetchUser();
+    await fetchUser()
 
     toast.add({
-      title: t("auth.verifyEmailChange.success"),
-      description: t("auth.verifyEmailChange.successDescription"),
-      color: "success",
-    });
+      title: t('auth.verifyEmailChange.success'),
+      description: t('auth.verifyEmailChange.successDescription'),
+      color: 'success'
+    })
 
     // Redirect to dashboard
-    router.push($localePath("dashboard"));
+    router.push($localePath('dashboard'))
   } catch (error: any) {
     toast.add({
-      title: t("auth.verifyEmailChange.error"),
-      description: error.data?.message || t("auth.verifyEmailChange.invalidToken"),
-      color: "error",
-    });
-    router.push($localePath("index"));
+      title: t('auth.verifyEmailChange.error'),
+      description: error.data?.message || t('auth.verifyEmailChange.invalidToken'),
+      color: 'error'
+    })
+    router.push($localePath('index'))
   } finally {
-    isVerifying.value = false;
+    isVerifying.value = false
   }
-});
+})
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Reseller } from '~/types/admin'
 
-const props = defineProps<{
+defineProps<{
   reseller: Reseller | null
 }>()
 

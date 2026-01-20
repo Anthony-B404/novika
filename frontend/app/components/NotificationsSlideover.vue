@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { formatTimeAgo } from "@vueuse/core";
-import type { Notification } from "~/types";
+import { formatTimeAgo } from '@vueuse/core'
+import type { Notification } from '~/types'
 
-const { t } = useI18n();
-const { isNotificationsSlideoverOpen } = useDashboard();
-const localePath = useLocalePath();
+const { t } = useI18n()
+const { isNotificationsSlideoverOpen } = useDashboard()
+const localePath = useLocalePath()
 
 const { data: notifications } =
-  await useFetch<Notification[]>("/api/notifications");
+  await useFetch<Notification[]>('/api/notifications')
 </script>
 
 <template>

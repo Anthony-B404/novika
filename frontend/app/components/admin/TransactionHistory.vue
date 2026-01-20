@@ -19,36 +19,36 @@ const transactionStyles: Record<
   purchase: {
     icon: 'i-lucide-plus-circle',
     bgColor: 'bg-green-100 dark:bg-green-900/30',
-    iconColor: 'text-green-500',
+    iconColor: 'text-green-500'
   },
   distribution: {
     icon: 'i-lucide-send',
     bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-    iconColor: 'text-blue-500',
+    iconColor: 'text-blue-500'
   },
   adjustment: {
     icon: 'i-lucide-settings',
     bgColor: 'bg-orange-100 dark:bg-orange-900/30',
-    iconColor: 'text-orange-500',
+    iconColor: 'text-orange-500'
   },
   default: {
     icon: 'i-lucide-circle',
     bgColor: 'bg-gray-100 dark:bg-gray-800',
-    iconColor: 'text-gray-500',
-  },
+    iconColor: 'text-gray-500'
+  }
 }
 
-function getTransactionStyle(type: string) {
+function getTransactionStyle (type: string) {
   return transactionStyles[type as ResellerTransactionType] || transactionStyles.default
 }
 
-function formatDate(dateString: string) {
+function formatDate (dateString: string) {
   return new Date(dateString).toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit',
+    minute: '2-digit'
   })
 }
 </script>

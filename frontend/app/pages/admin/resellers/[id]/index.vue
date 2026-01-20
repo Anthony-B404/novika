@@ -3,7 +3,7 @@ import type { Reseller, UpdateResellerPayload } from '~/types/admin'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'admin'],
+  middleware: ['auth', 'admin']
 })
 
 const { t, locale } = useI18n()
@@ -14,7 +14,7 @@ const toast = useToast()
 const resellerId = computed(() => Number(route.params.id))
 
 useSeoMeta({
-  title: t('admin.resellers.detail.title'),
+  title: t('admin.resellers.detail.title')
 })
 
 const { fetchReseller, updateReseller, loading, error } = useResellers()
@@ -34,18 +34,18 @@ watch(resellerId, async (newId) => {
   }
 })
 
-async function handleSubmit(data: UpdateResellerPayload) {
+async function handleSubmit (data: UpdateResellerPayload) {
   try {
     // Build payload with only changed fields
     const payload: UpdateResellerPayload = {}
-    if (data.name !== reseller.value?.name) payload.name = data.name
-    if (data.email !== reseller.value?.email) payload.email = data.email
-    if (data.phone !== reseller.value?.phone) payload.phone = data.phone || null
-    if (data.company !== reseller.value?.company) payload.company = data.company
-    if (data.siret !== reseller.value?.siret) payload.siret = data.siret || null
-    if (data.address !== reseller.value?.address) payload.address = data.address || null
-    if (data.notes !== reseller.value?.notes) payload.notes = data.notes || null
-    if (data.isActive !== reseller.value?.isActive) payload.isActive = data.isActive
+    if (data.name !== reseller.value?.name) { payload.name = data.name }
+    if (data.email !== reseller.value?.email) { payload.email = data.email }
+    if (data.phone !== reseller.value?.phone) { payload.phone = data.phone || null }
+    if (data.company !== reseller.value?.company) { payload.company = data.company }
+    if (data.siret !== reseller.value?.siret) { payload.siret = data.siret || null }
+    if (data.address !== reseller.value?.address) { payload.address = data.address || null }
+    if (data.notes !== reseller.value?.notes) { payload.notes = data.notes || null }
+    if (data.isActive !== reseller.value?.isActive) { payload.isActive = data.isActive }
 
     const result = await updateReseller(resellerId.value, payload)
     if (result) {
@@ -53,7 +53,7 @@ async function handleSubmit(data: UpdateResellerPayload) {
       isEditing.value = false
       toast.add({
         title: t('admin.resellers.detail.updateSuccess'),
-        color: 'success',
+        color: 'success'
       })
     }
   } catch (e: unknown) {
@@ -64,20 +64,20 @@ async function handleSubmit(data: UpdateResellerPayload) {
     toast.add({
       title: t('admin.resellers.detail.updateError'),
       description: errorMessage,
-      color: 'error',
+      color: 'error'
     })
   }
 }
 
-function handleCancel() {
+function handleCancel () {
   isEditing.value = false
 }
 
-function formatDate(dateString: string) {
+function formatDate (dateString: string) {
   return new Date(dateString).toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'long',
-    year: 'numeric',
+    year: 'numeric'
   })
 }
 </script>
@@ -150,7 +150,9 @@ function formatDate(dateString: string) {
           <UCard>
             <template #header>
               <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold">{{ t('admin.resellers.detail.info') }}</h2>
+                <h2 class="text-lg font-semibold">
+                  {{ t('admin.resellers.detail.info') }}
+                </h2>
               </div>
             </template>
 
@@ -229,7 +231,9 @@ function formatDate(dateString: string) {
             <template #header>
               <h2 class="text-lg font-semibold">
                 {{ t('admin.resellers.detail.organizations') }}
-                <UBadge color="neutral" class="ml-2">{{ reseller.organizationsCount }}</UBadge>
+                <UBadge color="neutral" class="ml-2">
+                  {{ reseller.organizationsCount }}
+                </UBadge>
               </h2>
             </template>
 
@@ -243,8 +247,12 @@ function formatDate(dateString: string) {
                 class="py-3 flex items-center justify-between"
               >
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">{{ org.name }}</p>
-                  <p class="text-sm text-gray-500">{{ org.email }}</p>
+                  <p class="font-medium text-gray-900 dark:text-white">
+                    {{ org.name }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    {{ org.email }}
+                  </p>
                 </div>
                 <UBadge color="neutral">
                   {{ org.credits.toLocaleString() }} {{ t('common.credits') }}
@@ -262,14 +270,18 @@ function formatDate(dateString: string) {
           <!-- Credits card -->
           <UCard>
             <template #header>
-              <h2 class="text-lg font-semibold">{{ t('admin.resellers.detail.creditBalance') }}</h2>
+              <h2 class="text-lg font-semibold">
+                {{ t('admin.resellers.detail.creditBalance') }}
+              </h2>
             </template>
 
             <div class="text-center py-4">
               <div class="text-4xl font-bold text-primary-500">
                 {{ reseller.creditBalance.toLocaleString() }}
               </div>
-              <div class="text-gray-500">{{ t('common.credits') }}</div>
+              <div class="text-gray-500">
+                {{ t('common.credits') }}
+              </div>
             </div>
 
             <UButton
@@ -287,7 +299,9 @@ function formatDate(dateString: string) {
             <template #header>
               <h2 class="text-lg font-semibold">
                 {{ t('admin.resellers.detail.adminUsers') }}
-                <UBadge color="neutral" class="ml-2">{{ reseller.adminUsersCount }}</UBadge>
+                <UBadge color="neutral" class="ml-2">
+                  {{ reseller.adminUsersCount }}
+                </UBadge>
               </h2>
             </template>
 
@@ -299,7 +313,9 @@ function formatDate(dateString: string) {
                 <p class="font-medium text-gray-900 dark:text-white">
                   {{ user.firstName }} {{ user.lastName }}
                 </p>
-                <p class="text-sm text-gray-500">{{ user.email }}</p>
+                <p class="text-sm text-gray-500">
+                  {{ user.email }}
+                </p>
               </div>
             </div>
             <div v-else class="py-4 text-center text-gray-500">

@@ -2,7 +2,7 @@
  * Composable for transforming avatar URLs
  * Handles different avatar sources: uploaded files, Google OAuth, blob URLs
  */
-export function useAvatarUrl() {
+export function useAvatarUrl () {
   const config = useRuntimeConfig()
 
   /**
@@ -17,12 +17,12 @@ export function useAvatarUrl() {
     }
 
     // If it's already a full URL (Google OAuth), use it directly
-    if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
+    if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
       return avatar
     }
 
     // If it's a blob URL (local preview), use it directly
-    if (avatar.startsWith("blob:")) {
+    if (avatar.startsWith('blob:')) {
       return avatar
     }
 

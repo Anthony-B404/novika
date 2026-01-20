@@ -3,14 +3,14 @@ import { AudioStatus } from '~/types/audio'
 import type { Audio } from '~/types/audio'
 
 definePageMeta({
-  middleware: ['auth', 'pending-deletion', 'organization-status'],
+  middleware: ['auth', 'pending-deletion', 'organization-status']
 })
 
 const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.library.title"),
-  description: t("seo.library.description"),
+  title: t('seo.library.title'),
+  description: t('seo.library.description')
 })
 const toast = useToast()
 const localePath = useLocalePath()
@@ -42,97 +42,97 @@ const statusOptions = computed(() => [
   { label: t('components.workshop.filters.all'), value: null },
   { label: t('components.workshop.filters.completed'), value: AudioStatus.Completed },
   { label: t('components.workshop.filters.processing'), value: AudioStatus.Processing },
-  { label: t('components.workshop.filters.failed'), value: AudioStatus.Failed },
+  { label: t('components.workshop.filters.failed'), value: AudioStatus.Failed }
 ])
 
 // Sort options
 const sortOptions = computed(() => [
   { label: t('pages.dashboard.library.sort.date'), value: 'createdAt' },
   { label: t('pages.dashboard.library.sort.title'), value: 'title' },
-  { label: t('pages.dashboard.library.sort.duration'), value: 'duration' },
+  { label: t('pages.dashboard.library.sort.duration'), value: 'duration' }
 ])
 
 // Load audios with current filters
-async function loadAudios(page = 1, append = false) {
+async function loadAudios (page = 1, append = false) {
   await audioStore.fetchAudios(page, {
     search: searchQuery.value || undefined,
     sort: sortBy.value,
     order: sortOrder.value,
     status: statusFilter.value || undefined,
-    append,
+    append
   })
 }
 
 // Handle sort change from table
-function handleSort({ column, order }: { column: string; order: 'asc' | 'desc' }) {
+function handleSort ({ column, order }: { column: string; order: 'asc' | 'desc' }) {
   sortBy.value = column as typeof sortBy.value
   sortOrder.value = order
   loadAudios()
 }
 
 // Handle status filter change
-function handleStatusChange(status: AudioStatus | null) {
+function handleStatusChange (status: AudioStatus | null) {
   statusFilter.value = status
   loadAudios()
 }
 
 // Handle sort dropdown change
-function handleSortChange(value: string) {
+function handleSortChange (value: string) {
   sortBy.value = value as typeof sortBy.value
   loadAudios()
 }
 
 // Toggle sort order
-function toggleSortOrder() {
+function toggleSortOrder () {
   sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
   loadAudios()
 }
 
 // Handle audio selection (navigate to detail)
-function handleSelectAudio(audio: Audio) {
+function handleSelectAudio (audio: Audio) {
   navigateTo(localePath(`/dashboard/${audio.id}`))
 }
 
 // Handle single delete request
-function handleDeleteRequest(audio: Audio) {
+function handleDeleteRequest (audio: Audio) {
   singleDeleteAudio.value = audio
   singleDeleteModalOpen.value = true
 }
 
 // Handle title update
-async function handleUpdateTitle({ audio, title }: { audio: Audio; title: string }) {
+async function handleUpdateTitle ({ audio, title }: { audio: Audio; title: string }) {
   const success = await audioStore.updateAudio(audio.id, title)
 
   if (success) {
     toast.add({
       title: t('pages.dashboard.library.titleUpdated'),
-      color: 'success',
+      color: 'success'
     })
   } else {
     toast.add({
       title: t('pages.dashboard.library.titleUpdateError'),
-      color: 'error',
+      color: 'error'
     })
   }
 }
 
 // Handle single delete confirm
-async function handleSingleDeleteConfirm() {
-  if (!singleDeleteAudio.value) return
+async function handleSingleDeleteConfirm () {
+  if (!singleDeleteAudio.value) { return }
 
   const success = await audioStore.deleteAudio(singleDeleteAudio.value.id)
 
   if (success) {
     toast.add({
       title: t('pages.dashboard.workshop.deleteSuccess'),
-      color: 'success',
+      color: 'success'
     })
     // Remove from selection if selected
     selectedIds.value = selectedIds.value.filter(id => id !== singleDeleteAudio.value?.id)
   } else {
     toast.add({
       title: t('pages.dashboard.workshop.deleteError'),
-      color: 'error',
+      color: 'error'
     })
   }
 
@@ -141,13 +141,13 @@ async function handleSingleDeleteConfirm() {
 }
 
 // Handle batch delete
-function handleBatchDeleteRequest() {
-  if (selectedIds.value.length === 0) return
+function handleBatchDeleteRequest () {
+  if (selectedIds.value.length === 0) { return }
   deleteModalOpen.value = true
 }
 
 // Handle batch delete confirm
-async function handleBatchDeleteConfirm() {
+async function handleBatchDeleteConfirm () {
   batchDeleteLoading.value = true
 
   const result = await audioStore.deleteMultiple(selectedIds.value)
@@ -155,13 +155,13 @@ async function handleBatchDeleteConfirm() {
   if (result.success) {
     toast.add({
       title: t('pages.dashboard.library.batchDeleteSuccess', { count: result.deletedCount }),
-      color: 'success',
+      color: 'success'
     })
     selectedIds.value = []
   } else {
     toast.add({
       title: t('pages.dashboard.library.batchDeleteError'),
-      color: 'error',
+      color: 'error'
     })
   }
 
@@ -170,7 +170,7 @@ async function handleBatchDeleteConfirm() {
 }
 
 // Load more
-async function handleLoadMore() {
+async function handleLoadMore () {
   await loadAudios(audioStore.pagination.currentPage + 1, true)
 }
 
@@ -268,9 +268,9 @@ onMounted(() => {
     <!-- Audio table -->
     <UCard class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden">
       <LibraryAudioTable
+        v-model:selected-ids="selectedIds"
         :audios="audioStore.audios"
         :loading="audioStore.loading"
-        v-model:selected-ids="selectedIds"
         :sort-by="sortBy"
         :sort-order="sortOrder"
         @sort="handleSort"

@@ -1,13 +1,13 @@
 import type { RecorderState } from '~/types/audio'
 
-export function useAudioRecorder() {
+export function useAudioRecorder () {
   const state = reactive<RecorderState>({
     isRecording: false,
     isPaused: false,
     duration: 0,
     audioBlob: null,
     audioUrl: null,
-    error: null,
+    error: null
   })
 
   // Audio Context & Processor refs
@@ -27,7 +27,7 @@ export function useAudioRecorder() {
    * Check if recording is supported
    */
   const isSupported = computed(() => {
-    if (import.meta.server) return false
+    if (import.meta.server) { return false }
     return (
       typeof navigator !== 'undefined' &&
       'mediaDevices' in navigator &&
@@ -39,7 +39,7 @@ export function useAudioRecorder() {
   /**
    * Start recording
    */
-  async function start(): Promise<boolean> {
+  async function start (): Promise<boolean> {
     if (!isSupported.value) {
       state.error = 'Audio recording is not supported in this browser'
       return false
@@ -51,8 +51,8 @@ export function useAudioRecorder() {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
-        },
+          autoGainControl: true
+        }
       })
 
       // 2. Init Audio Context
@@ -75,7 +75,7 @@ export function useAudioRecorder() {
 
       // 5. Processing logic
       scriptProcessor.onaudioprocess = (e) => {
-        if (!state.isRecording || state.isPaused) return
+        if (!state.isRecording || state.isPaused) { return }
 
         const left = e.inputBuffer.getChannelData(0)
         // Clone buffer to avoid reference issues
@@ -93,7 +93,6 @@ export function useAudioRecorder() {
       startDurationTimer()
 
       return true
-
     } catch (err: any) {
       console.error('Recording error:', err)
       if (err.name === 'NotAllowedError') {
@@ -110,7 +109,7 @@ export function useAudioRecorder() {
   /**
    * Pause recording
    */
-  function pause() {
+  function pause () {
     if (state.isRecording && !state.isPaused) {
       state.isPaused = true
       stopDurationTimer()
@@ -123,7 +122,7 @@ export function useAudioRecorder() {
   /**
    * Resume recording
    */
-  function resume() {
+  function resume () {
     if (state.isRecording && state.isPaused) {
       state.isPaused = false
       startDurationTimer()
@@ -136,8 +135,8 @@ export function useAudioRecorder() {
   /**
    * Stop recording
    */
-  function stop() {
-    if (!state.isRecording) return
+  function stop () {
+    if (!state.isRecording) { return }
 
     stopDurationTimer()
     state.isRecording = false
@@ -156,7 +155,7 @@ export function useAudioRecorder() {
 
     if (audioContext) {
       // We don't necessarily need to close, but good practice if single use
-      // audioContext.close(); 
+      // audioContext.close();
     }
 
     // Encode WAV
@@ -168,7 +167,7 @@ export function useAudioRecorder() {
   /**
    * Manual WAV Encoding
    */
-  function encodeWAV(samples: Float32Array[], totalLength: number, sampleRate: number) {
+  function encodeWAV (samples: Float32Array[], totalLength: number, sampleRate: number) {
     const buffer = new ArrayBuffer(44 + totalLength * 2)
     const view = new DataView(buffer)
 
@@ -204,16 +203,16 @@ export function useAudioRecorder() {
     return new Blob([view], { type: 'audio/wav' })
   }
 
-  function floatTo16BitPCM(output: DataView, offset: number, input: Float32Array) {
+  function floatTo16BitPCM (output: DataView, offset: number, input: Float32Array) {
     for (let i = 0; i < input.length; i++, offset += 2) {
-      let s = Math.max(-1, Math.min(1, input[i]))
+      const s = Math.max(-1, Math.min(1, input[i]))
       // Convert float to 16-bit PCM
       // s < 0 ? s * 0x8000 : s * 0x7FFF
       output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
     }
   }
 
-  function writeString(view: DataView, offset: number, string: string) {
+  function writeString (view: DataView, offset: number, string: string) {
     for (let i = 0; i < string.length; i++) {
       view.setUint8(offset + i, string.charCodeAt(i))
     }
@@ -222,7 +221,7 @@ export function useAudioRecorder() {
   /**
    * Reset
    */
-  function reset() {
+  function reset () {
     stop()
     if (state.audioUrl) {
       URL.revokeObjectURL(state.audioUrl)
@@ -235,14 +234,14 @@ export function useAudioRecorder() {
     recordingLength = 0
   }
 
-  function startDurationTimer() {
+  function startDurationTimer () {
     stopDurationTimer()
     durationInterval = setInterval(() => {
       state.duration += 1
     }, 1000)
   }
 
-  function stopDurationTimer() {
+  function stopDurationTimer () {
     if (durationInterval) {
       clearInterval(durationInterval)
       durationInterval = null
@@ -252,14 +251,14 @@ export function useAudioRecorder() {
   /**
    * Get file
    */
-  function getFile(): File | null {
-    if (!state.audioBlob) return null
+  function getFile (): File | null {
+    if (!state.audioBlob) { return null }
     return new File([state.audioBlob], `recording-${Date.now()}.wav`, {
       type: 'audio/wav'
     })
   }
 
-  function formatDuration(seconds: number): string {
+  function formatDuration (seconds: number): string {
     const hours = Math.floor(seconds / 3600)
     const mins = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
@@ -285,6 +284,6 @@ export function useAudioRecorder() {
     stop,
     reset,
     getFile,
-    formatDuration,
+    formatDuration
   }
 }

@@ -4,8 +4,8 @@
  * based on current i18n locale (reactive to locale changes)
  */
 export const useApi = () => {
-  const { $i18n } = useNuxtApp();
-  const config = useRuntimeConfig();
+  const { $i18n } = useNuxtApp()
+  const config = useRuntimeConfig()
 
   /**
    * Make API request with automatic Accept-Language header
@@ -15,24 +15,24 @@ export const useApi = () => {
    */
   const apiFetch = async <T = any>(
     url: string,
-    options: RequestInit & { baseURL?: string } = {},
+    options: RequestInit & { baseURL?: string } = {}
   ): Promise<T> => {
     // Get current locale (reactive - always up to date)
-    const locale = $i18n?.locale?.value || "fr";
+    const locale = $i18n?.locale?.value || 'fr'
 
     // Construct full URL if needed
-    const fullUrl = url.startsWith("http")
+    const fullUrl = url.startsWith('http')
       ? url
-      : `${options.baseURL || config.public.apiUrl}${url}`;
+      : `${options.baseURL || config.public.apiUrl}${url}`
 
     return await $fetch<T>(fullUrl, {
       ...options,
       headers: {
-        "Accept-Language": locale,
-        ...options.headers,
-      },
-    });
-  };
+        'Accept-Language': locale,
+        ...options.headers
+      }
+    })
+  }
 
-  return apiFetch;
-};
+  return apiFetch
+}

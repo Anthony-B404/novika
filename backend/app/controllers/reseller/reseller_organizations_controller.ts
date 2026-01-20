@@ -32,9 +32,7 @@ export default class ResellerOrganizationsController {
         sectors,
       } = await request.validateUsing(listResellerOrganizationsValidator)
 
-      const query = Organization.query()
-        .where('reseller_id', reseller!.id)
-        .withCount('users')
+      const query = Organization.query().where('reseller_id', reseller!.id).withCount('users')
 
       if (search) {
         query.where((q) => {
@@ -106,9 +104,7 @@ export default class ResellerOrganizationsController {
    */
   async store({ request, response, auth, reseller, i18n }: HttpContext) {
     try {
-      const payload = await request.validateUsing(
-        createResellerOrganizationValidator(reseller!.id)
-      )
+      const payload = await request.validateUsing(createResellerOrganizationValidator(reseller!.id))
       const resellerAdmin = auth.user!
 
       // Check if reseller has enough credits for initial distribution
@@ -167,9 +163,12 @@ export default class ResellerOrganizationsController {
         )
 
         // 3. Create owner relationship
-        await organization.useTransaction(trx).related('users').attach({
-          [ownerUser.id]: { role: UserRole.Owner },
-        })
+        await organization
+          .useTransaction(trx)
+          .related('users')
+          .attach({
+            [ownerUser.id]: { role: UserRole.Owner },
+          })
 
         // 4. Distribute initial credits if provided
         if (payload.initialCredits && payload.initialCredits > 0) {

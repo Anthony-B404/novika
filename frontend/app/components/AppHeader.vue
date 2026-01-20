@@ -1,39 +1,39 @@
 <script setup lang="ts">
-const { t } = useI18n();
-const nuxtApp = useNuxtApp();
-const { activeHeadings, updateHeadings } = useScrollspy();
+const { t } = useI18n()
+const nuxtApp = useNuxtApp()
+const { activeHeadings, updateHeadings } = useScrollspy()
 
 const items = computed(() => [
   {
-    label: t("nav.features"),
-    to: "#features",
+    label: t('nav.features'),
+    to: '#features',
     active:
-      activeHeadings.value.includes("features") &&
-      !activeHeadings.value.includes("pricing"),
+      activeHeadings.value.includes('features') &&
+      !activeHeadings.value.includes('pricing')
   },
   {
-    label: t("nav.pricing"),
-    to: "#pricing",
-    active: activeHeadings.value.includes("pricing"),
+    label: t('nav.pricing'),
+    to: '#pricing',
+    active: activeHeadings.value.includes('pricing')
   },
   {
-    label: t("nav.testimonials"),
-    to: "#testimonials",
+    label: t('nav.testimonials'),
+    to: '#testimonials',
     active:
-      activeHeadings.value.includes("testimonials") &&
-      !activeHeadings.value.includes("pricing"),
-  },
-]);
+      activeHeadings.value.includes('testimonials') &&
+      !activeHeadings.value.includes('pricing')
+  }
+])
 
-nuxtApp.hooks.hookOnce("page:finish", () => {
+nuxtApp.hooks.hookOnce('page:finish', () => {
   updateHeadings(
     [
-      document.querySelector("#features"),
-      document.querySelector("#pricing"),
-      document.querySelector("#testimonials"),
-    ].filter(Boolean) as Element[],
-  );
-});
+      document.querySelector('#features'),
+      document.querySelector('#pricing'),
+      document.querySelector('#testimonials')
+    ].filter(Boolean) as Element[]
+  )
+})
 </script>
 
 <template>

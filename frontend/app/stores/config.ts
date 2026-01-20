@@ -13,7 +13,7 @@ export const useConfigStore = defineStore('config', {
     /** Whether the config has been loaded from API */
     isLoaded: false,
     /** Whether there was an error fetching config */
-    hasError: false,
+    hasError: false
   }),
 
   getters: {
@@ -27,7 +27,7 @@ export const useConfigStore = defineStore('config', {
       }
       // Fallback to static constants if API failed or not yet loaded
       return BUSINESS_SECTORS
-    },
+    }
   },
 
   actions: {
@@ -35,7 +35,7 @@ export const useConfigStore = defineStore('config', {
      * Fetch business sectors from the backend API.
      * Sets fallback flag on error for graceful degradation.
      */
-    async fetchSectors() {
+    async fetchSectors () {
       try {
         const api = useApi()
         const response = await api<{ sectors: string[] }>('/api/config/sectors')
@@ -47,6 +47,6 @@ export const useConfigStore = defineStore('config', {
         this.hasError = true
         // Keep using static fallback via getter
       }
-    },
-  },
+    }
+  }
 })

@@ -1,52 +1,52 @@
 <script setup lang="ts">
-import type { Prompt } from "~/types/prompt";
-import PromptQuickSelect from "~/components/prompt/PromptQuickSelect.vue";
+import type { Prompt } from '~/types/prompt'
+import PromptQuickSelect from '~/components/prompt/PromptQuickSelect.vue'
 
-const model = defineModel<string>({ default: "" });
+const model = defineModel<string>({ default: '' })
 
 defineProps<{
   disabled?: boolean;
-}>();
+}>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-const promptsStore = usePromptsStore();
-const quickSelectOpen = ref(false);
+const promptsStore = usePromptsStore()
+const quickSelectOpen = ref(false)
 
 // Load prompts on mount
 onMounted(async () => {
   if (promptsStore.prompts.length === 0) {
-    await promptsStore.fetchPrompts();
+    await promptsStore.fetchPrompts()
   }
-});
+})
 
 // Get favorite prompts for quick access (limit to 4)
 const favoritePrompts = computed(() => {
-  return promptsStore.favoritePrompts.slice(0, 4);
-});
+  return promptsStore.favoritePrompts.slice(0, 4)
+})
 
 // Get recent prompts as fallback when no favorites (limit to 4)
 const recentPrompts = computed(() => {
-  return promptsStore.prompts.slice(0, 4);
-});
+  return promptsStore.prompts.slice(0, 4)
+})
 
 // Display prompts: favorites first, then recent as fallback
 const displayPrompts = computed(() => {
   if (favoritePrompts.value.length > 0) {
-    return { prompts: favoritePrompts.value, isFavorites: true };
+    return { prompts: favoritePrompts.value, isFavorites: true }
   }
-  return { prompts: recentPrompts.value, isFavorites: false };
-});
+  return { prompts: recentPrompts.value, isFavorites: false }
+})
 
-function usePrompt(prompt: Prompt) {
-  model.value = prompt.content;
+function usePrompt (prompt: Prompt) {
+  model.value = prompt.content
   // Track usage
-  promptsStore.incrementUsage(prompt.id);
+  promptsStore.incrementUsage(prompt.id)
 }
 
-function handleSelectFromLibrary(prompt: Prompt) {
-  model.value = prompt.content;
-  promptsStore.incrementUsage(prompt.id);
+function handleSelectFromLibrary (prompt: Prompt) {
+  model.value = prompt.content
+  promptsStore.incrementUsage(prompt.id)
 }
 </script>
 

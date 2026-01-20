@@ -17,7 +17,7 @@ const { t } = useI18n()
 // Form state
 const state = reactive({
   amount: undefined as number | undefined,
-  description: '',
+  description: ''
 })
 
 // Validation schema
@@ -27,13 +27,13 @@ const schema = computed(() =>
       .number({ message: t('reseller.credits.validation.amountRequired') })
       .positive(t('reseller.credits.validation.amountPositive'))
       .max(props.maxCredits || Infinity, t('reseller.credits.validation.amountMax')),
-    description: z.string().max(500).optional(),
+    description: z.string().max(500).optional()
   })
 )
 
 type Schema = z.infer<typeof schema.value>
 
-function onSubmit(event: FormSubmitEvent<Schema>) {
+function onSubmit (event: FormSubmitEvent<Schema>) {
   emit('submit', event.data)
   // Reset form
   state.amount = undefined

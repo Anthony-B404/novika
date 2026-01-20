@@ -15,13 +15,13 @@ const DEFAULT_CATEGORIES: Array<{
 }> = [
   {
     name: 'Ressources humaines',
-    description: 'Prompts pour l\'analyse RH : recrutement, évaluation et gestion des talents',
+    description: "Prompts pour l'analyse RH : recrutement, évaluation et gestion des talents",
     color: '#6366F1', // indigo
     icon: 'i-heroicons-user-group',
     sector: 'hr',
     prompts: [
       {
-        title: 'Analyse d\'entretien de recrutement',
+        title: "Analyse d'entretien de recrutement",
         content: `Tu es un recruteur senior expérimenté avec 15 ans en recrutement tech et cadres. À partir de la transcription complète de cet entretien d'embauche pour le poste de [intitulé exact du poste], produis un compte-rendu structuré et objectif au format suivant :
 
 1. Synthèse globale (3-4 phrases max) : adéquation générale du candidat avec le poste
@@ -36,7 +36,7 @@ const DEFAULT_CATEGORIES: Array<{
 Soit factuel, cite les passages clés de la transcription entre guillemets quand c'est pertinent, et reste neutre et professionnel.`,
       },
       {
-        title: 'Entretien annuel d\'évaluation',
+        title: "Entretien annuel d'évaluation",
         content: `Tu es un DRH expert en gestion de la performance et entretiens annuels. Analyse cette transcription d'entretien annuel d'évaluation avec [prénom ou "le collaborateur"] en poste de [poste] depuis [X] années.
 
 Structure ton compte-rendu exactement comme ceci :
@@ -54,7 +54,7 @@ Structure ton compte-rendu exactement comme ceci :
 Ton objectif : produire un document clair, actionnable et confidentiel pour le dossier RH et le suivi.`,
       },
       {
-        title: 'Analyse d\'entretien de départ',
+        title: "Analyse d'entretien de départ",
         content: `Tu es un spécialiste RH en rétention et gestion des talents. Voici la transcription complète d'un exit interview avec [prénom ou "le collaborateur"] qui quitte l'entreprise après [X] années en tant que [poste].
 
 Génère un rapport d'analyse structuré et percutant au format suivant :
@@ -74,13 +74,13 @@ Sois direct, factuel, bienveillant mais sans édulcorer. Utilise des verbatims e
   },
   {
     name: 'Vente et Commerce',
-    description: 'Prompts pour l\'analyse commerciale : prospection, démos et négociations',
+    description: "Prompts pour l'analyse commerciale : prospection, démos et négociations",
     color: '#10B981', // green
     icon: 'i-heroicons-currency-euro',
     sector: 'sales',
     prompts: [
       {
-        title: 'Analyse d\'appel de vente',
+        title: "Analyse d'appel de vente",
         content: `Tu es un Head of Sales senior avec 12 ans d'expérience en B2B et solutions complexes. Analyse cette transcription complète d'un appel de vente / discovery call avec un prospect [nom ou "le prospect"] pour [nom du produit/service].
 
 Produis un compte-rendu ultra-actionnable au format suivant :
@@ -137,7 +137,7 @@ Sois incisif, stratégique et orienté cash : l'objectif est de maximiser le win
   },
   {
     name: 'Droit & affaires juridiques',
-    description: 'Prompts pour l\'analyse juridique : consultations, dépositions et négociations',
+    description: "Prompts pour l'analyse juridique : consultations, dépositions et négociations",
     color: '#8B5CF6', // violet
     icon: 'i-heroicons-scale',
     sector: 'legal',
@@ -200,7 +200,7 @@ Sois incisif, stratégique et orienté résultat : maximiser la valeur du deal t
   },
   {
     name: 'Finance & Comptabilité',
-    description: 'Prompts pour l\'analyse financière : patrimoine, budget et investissements',
+    description: "Prompts pour l'analyse financière : patrimoine, budget et investissements",
     color: '#F59E0B', // amber
     icon: 'i-heroicons-banknotes',
     sector: 'finance',
@@ -241,7 +241,7 @@ Génère un rapport d'analyse budgétaire structuré exactement comme suit :
 Objectif : fournir un outil rapide pour le DAF ou le contrôleur de gestion afin de piloter efficacement.`,
       },
       {
-        title: 'Analyse d\'entretien d\'investissement',
+        title: "Analyse d'entretien d'investissement",
         content: `Tu es un conseiller en investissements financiers certifié AMF, expert en allocation d'actifs. Analyse cette transcription d'un entretien / point portefeuille avec [nom du client] concernant son portefeuille [type : actions, obligations, immobilier, crypto...].
 
 Structure ton rapport comme ceci :
@@ -262,7 +262,7 @@ Sois prudent, cite les éléments clés, et adopte un ton professionnel orienté
   },
   {
     name: 'Psychologie et Thérapie',
-    description: 'Prompts pour l\'analyse clinique : séances de thérapie et suivi patient',
+    description: "Prompts pour l'analyse clinique : séances de thérapie et suivi patient",
     color: '#EC4899', // pink
     icon: 'i-heroicons-heart',
     sector: 'psychology',
@@ -327,7 +327,7 @@ Reste prudent, factuel et déontologique : pas de diagnostic ferme en première 
     sector: null,
     prompts: [
       {
-        title: 'Résumé général d\'entretien (avancé)',
+        title: "Résumé général d'entretien (avancé)",
         content: `Tu es un assistant professionnel expert en synthèse de conversations. À partir de cette transcription complète d'un entretien / meeting / appel avec [prénom ou "la personne" ou "les participants"], produis un compte-rendu clair, concis et actionnable au format suivant :
 
 1. Synthèse globale (3-5 phrases max) : objectif de l'entretien, points principaux discutés, ton général et issue/outcome perçu

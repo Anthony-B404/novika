@@ -9,7 +9,7 @@ const colorMode = useColorMode()
 
 // Sidebar collapsed state (persisted in localStorage)
 const collapsed = useCookie<boolean>('admin-sidebar-collapsed', {
-  default: () => false,
+  default: () => false
 })
 
 // Navigation items for the sidebar
@@ -18,14 +18,14 @@ const navigationItems = computed<NavigationMenuItem[]>(() => [
     label: t('admin.navigation.dashboard'),
     icon: 'i-lucide-layout-dashboard',
     to: localePath('/admin'),
-    active: route.path === localePath('/admin'),
+    active: route.path === localePath('/admin')
   },
   {
     label: t('admin.navigation.resellers'),
     icon: 'i-lucide-building-2',
     to: localePath('/admin/resellers'),
-    active: route.path.startsWith(localePath('/admin/resellers')),
-  },
+    active: route.path.startsWith(localePath('/admin/resellers'))
+  }
 ])
 
 // User menu items for the footer dropdown
@@ -34,8 +34,8 @@ const userMenuItems = computed<NavigationMenuItem[][]>(() => [
     {
       label: user.value?.email || '',
       slot: 'account',
-      disabled: true,
-    },
+      disabled: true
+    }
   ],
   [
     {
@@ -47,44 +47,44 @@ const userMenuItems = computed<NavigationMenuItem[][]>(() => [
           icon: 'i-lucide-sun',
           type: 'checkbox',
           checked: colorMode.preference === 'light',
-          onSelect(e: Event) {
+          onSelect (e: Event) {
             e.preventDefault()
             colorMode.preference = 'light'
-          },
+          }
         },
         {
           label: t('components.user.dark'),
           icon: 'i-lucide-moon',
           type: 'checkbox',
           checked: colorMode.preference === 'dark',
-          onSelect(e: Event) {
+          onSelect (e: Event) {
             e.preventDefault()
             colorMode.preference = 'dark'
-          },
+          }
         },
         {
           label: t('components.user.system'),
           icon: 'i-lucide-monitor',
           type: 'checkbox',
           checked: colorMode.preference === 'system',
-          onSelect(e: Event) {
+          onSelect (e: Event) {
             e.preventDefault()
             colorMode.preference = 'system'
-          },
-        },
-      ],
-    },
+          }
+        }
+      ]
+    }
   ],
   [
     {
       label: t('common.buttons.logout'),
       icon: 'i-lucide-log-out',
-      onSelect: handleLogout,
-    },
-  ],
+      onSelect: handleLogout
+    }
+  ]
 ])
 
-async function handleLogout() {
+async function handleLogout () {
   await logout()
   navigateTo(localePath('/'))
 }
@@ -104,7 +104,7 @@ async function handleLogout() {
           :class="isCollapsed ? 'justify-center' : 'justify-between pr-1 pl-2'"
         >
           <div class="flex items-center gap-2">
-            <img src="/favicon.svg" alt="DH-Echo" class="h-8 w-8 shrink-0" />
+            <img src="/favicon.svg" alt="DH-Echo" class="h-8 w-8 shrink-0">
             <span v-if="!isCollapsed" class="text-lg font-semibold text-slate-800 dark:text-white">
               DH-Echo
             </span>

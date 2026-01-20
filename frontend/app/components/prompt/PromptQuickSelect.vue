@@ -37,18 +37,17 @@ const filteredPrompts = computed(() => {
 
   // Filter by favorites
   if (showFavorites.value) {
-    prompts = prompts.filter((p) => p.isFavorite)
-  }
-  // Filter by category
-  else if (selectedCategoryId.value !== null) {
-    prompts = prompts.filter((p) => p.categoryId === selectedCategoryId.value)
+    prompts = prompts.filter(p => p.isFavorite)
+  } else if (selectedCategoryId.value !== null) {
+    // Filter by category
+    prompts = prompts.filter(p => p.categoryId === selectedCategoryId.value)
   }
 
   // Filter by search
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase()
     prompts = prompts.filter(
-      (p) =>
+      p =>
         p.title.toLowerCase().includes(query) ||
         p.content.toLowerCase().includes(query)
     )
@@ -57,22 +56,22 @@ const filteredPrompts = computed(() => {
   return prompts
 })
 
-function handleSelectPrompt(prompt: Prompt) {
+function handleSelectPrompt (prompt: Prompt) {
   emit('select', prompt)
   emit('update:open', false)
 }
 
-function handleCategorySelect(categoryId: number | null) {
+function handleCategorySelect (categoryId: number | null) {
   showFavorites.value = false
   selectedCategoryId.value = categoryId
 }
 
-function handleFavoritesSelect() {
+function handleFavoritesSelect () {
   showFavorites.value = true
   selectedCategoryId.value = null
 }
 
-function handleClose() {
+function handleClose () {
   emit('update:open', false)
 }
 </script>

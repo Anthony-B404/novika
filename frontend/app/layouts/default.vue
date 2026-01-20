@@ -1,147 +1,146 @@
 <script setup lang="ts">
-import type { NavigationMenuItem, DropdownMenuItem } from "@nuxt/ui";
+import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
 
-const { t } = useI18n();
-const localePath = useLocalePath();
-const route = useRoute();
-const toast = useToast();
-const { canAccessOrganization, canManageMembers } = useSettingsPermissions();
-const creditsStore = useCreditsStore();
-const { credits } = storeToRefs(creditsStore);
-const { fetchBalance } = creditsStore;
+const { t } = useI18n()
+const localePath = useLocalePath()
+const toast = useToast()
+const { canAccessOrganization, canManageMembers } = useSettingsPermissions()
+const creditsStore = useCreditsStore()
+const { credits } = storeToRefs(creditsStore)
+const { fetchBalance } = creditsStore
 
-const organizationStore = useOrganizationStore();
-const { organizations } = storeToRefs(organizationStore);
+const organizationStore = useOrganizationStore()
+const { organizations } = storeToRefs(organizationStore)
 
-const hasSingleOrganization = computed(() => organizations.value.length <= 1);
+const hasSingleOrganization = computed(() => organizations.value.length <= 1)
 
-const open = ref(false);
-const contactModalOpen = ref(false);
+const open = ref(false)
+const contactModalOpen = ref(false)
 
 // Fetch credits and organizations on mount
 onMounted(() => {
-  fetchBalance();
+  fetchBalance()
   // Always fetch organizations to ensure role is available for permissions
   if (organizations.value.length === 0) {
-    organizationStore.fetchUserOrganizations();
+    organizationStore.fetchUserOrganizations()
   }
-});
+})
 
 // 1. Navigation principale (Gauche Desktop / Haut Mobile)
 const mainLinks = computed<NavigationMenuItem[][]>(() => {
   return [
     [
       {
-        label: t("layouts.default.navigation.workshop"),
-        icon: "i-lucide-house",
-        to: localePath("/dashboard"),
+        label: t('layouts.default.navigation.workshop'),
+        icon: 'i-lucide-house',
+        to: localePath('/dashboard'),
         onSelect: () => {
-          open.value = false;
-        },
+          open.value = false
+        }
       },
       {
-        label: t("layouts.default.navigation.library"),
-        icon: "i-lucide-library",
-        to: localePath("/dashboard/library"),
+        label: t('layouts.default.navigation.library'),
+        icon: 'i-lucide-library',
+        to: localePath('/dashboard/library'),
         onSelect: () => {
-          open.value = false;
-        },
+          open.value = false
+        }
       },
       {
-        label: t("layouts.default.navigation.prompts"),
-        icon: "i-lucide-bookmark",
-        to: localePath("/dashboard/prompts"),
+        label: t('layouts.default.navigation.prompts'),
+        icon: 'i-lucide-bookmark',
+        to: localePath('/dashboard/prompts'),
         onSelect: () => {
-          open.value = false;
-        },
-      },
-    ],
-  ];
-});
+          open.value = false
+        }
+      }
+    ]
+  ]
+})
 
 // 2. Items des paramètres pour le menu mobile
 const settingsItems = computed(() => {
   const items: DropdownMenuItem[] = [
     {
-      label: t("pages.dashboard.settings.navigation.general"),
-      to: localePath("/dashboard/settings"),
-      icon: "i-lucide-sliders",
+      label: t('pages.dashboard.settings.navigation.general'),
+      to: localePath('/dashboard/settings'),
+      icon: 'i-lucide-sliders',
       onSelect: () => {
-        open.value = false;
-      },
-    },
-  ];
+        open.value = false
+      }
+    }
+  ]
 
   if (canAccessOrganization.value) {
     items.push({
-      label: t("pages.dashboard.settings.navigation.organization"),
-      to: localePath("/dashboard/settings/organization"),
-      icon: "i-lucide-building",
+      label: t('pages.dashboard.settings.navigation.organization'),
+      to: localePath('/dashboard/settings/organization'),
+      icon: 'i-lucide-building',
       onSelect: () => {
-        open.value = false;
-      },
-    });
+        open.value = false
+      }
+    })
   }
 
   if (canManageMembers.value) {
     items.push({
-      label: t("pages.dashboard.settings.navigation.members"),
-      to: localePath("/dashboard/settings/members"),
-      icon: "i-lucide-users",
+      label: t('pages.dashboard.settings.navigation.members'),
+      to: localePath('/dashboard/settings/members'),
+      icon: 'i-lucide-users',
       onSelect: () => {
-        open.value = false;
-      },
-    });
+        open.value = false
+      }
+    })
   }
 
   items.push({
-    label: t("pages.dashboard.settings.navigation.security"),
-    to: localePath("/dashboard/settings/security"),
-    icon: "i-lucide-shield",
+    label: t('pages.dashboard.settings.navigation.security'),
+    to: localePath('/dashboard/settings/security'),
+    icon: 'i-lucide-shield',
     onSelect: () => {
-      open.value = false;
-    },
-  });
+      open.value = false
+    }
+  })
 
-  return [items];
-});
+  return [items]
+})
 
 onMounted(async () => {
-  const cookie = useCookie("cookie-consent");
-  if (cookie.value === "accepted" || cookie.value === "declined") {
-    return;
+  const cookie = useCookie('cookie-consent')
+  if (cookie.value === 'accepted' || cookie.value === 'declined') {
+    return
   }
 
   toast.add({
-    title: t("layouts.default.cookies.title"),
+    title: t('layouts.default.cookies.title'),
     duration: 0,
     close: false,
     actions: [
       {
-        label: t("layouts.default.cookies.accept"),
-        color: "neutral",
-        variant: "outline",
+        label: t('layouts.default.cookies.accept'),
+        color: 'neutral',
+        variant: 'outline',
         onClick: () => {
-          cookie.value = "accepted";
-        },
+          cookie.value = 'accepted'
+        }
       },
       {
-        label: t("layouts.default.cookies.optOut"),
-        color: "neutral",
-        variant: "ghost",
+        label: t('layouts.default.cookies.optOut'),
+        color: 'neutral',
+        variant: 'ghost',
         onClick: () => {
-          cookie.value = "declined";
-        },
+          cookie.value = 'declined'
+        }
       },
       {
-        label: t("layouts.default.cookies.learnMore"),
-        color: "neutral",
-        variant: "link",
-        to: localePath("/cookies-policy"),
-      },
-    ],
-  });
-});
+        label: t('layouts.default.cookies.learnMore'),
+        color: 'neutral',
+        variant: 'link',
+        to: localePath('/cookies-policy')
+      }
+    ]
+  })
+})
 </script>
 
 <template>
@@ -152,12 +151,12 @@ onMounted(async () => {
       <div
         class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full opacity-20 blur-3xl bg-gradient-to-br from-indigo-400 to-blue-500 animate-pulse"
         style="animation-duration: 8s;"
-      ></div>
+      />
       <!-- Bottom Right Blob -->
       <div
         class="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full opacity-15 blur-3xl bg-gradient-to-tl from-indigo-500 to-purple-500 animate-pulse"
         style="animation-duration: 12s;"
-      ></div>
+      />
     </div>
 
     <!-- Top Navigation Bar -->
@@ -167,7 +166,7 @@ onMounted(async () => {
           <!-- Left: Logo -->
           <div class="flex items-center">
             <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2">
-              <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8" />
+              <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8">
               <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 DH-Echo
               </span>
@@ -197,7 +196,7 @@ onMounted(async () => {
 
           <!-- Mobile menu button (Hamburger) -->
           <div class="flex md:hidden justify-end">
-             <UButton icon="i-lucide-menu" color="neutral" variant="ghost" @click="open = true" />
+            <UButton icon="i-lucide-menu" color="neutral" variant="ghost" @click="open = true" />
           </div>
         </div>
       </div>
@@ -218,33 +217,37 @@ onMounted(async () => {
     <USlideover v-model:open="open" title="Menu">
       <template #body>
         <div class="flex flex-col gap-4 h-full">
-           <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2 px-2">
-             <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8" />
-             <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-               DH-Echo
-             </span>
-           </NuxtLink>
-           <TeamsMenu v-else />
+          <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2 px-2">
+            <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8">
+            <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              DH-Echo
+            </span>
+          </NuxtLink>
+          <TeamsMenu v-else />
 
-           <div class="space-y-4">
-             <div class="font-semibold text-sm text-gray-500 px-2">{{ t("layouts.default.navigation.workshop") }}</div>
-             <UNavigationMenu :items="mainLinks[0]" orientation="vertical" />
-           </div>
+          <div class="space-y-4">
+            <div class="font-semibold text-sm text-gray-500 px-2">
+              {{ t("layouts.default.navigation.workshop") }}
+            </div>
+            <UNavigationMenu :items="mainLinks[0]" orientation="vertical" />
+          </div>
 
-           <USeparator />
+          <USeparator />
 
-           <div class="space-y-4">
-             <div class="font-semibold text-sm text-gray-500 px-2">{{ t("layouts.default.navigation.settings") }}</div>
-              <!-- Reusing settingsItems logic for mobile nav -->
-              <UNavigationMenu
-                :items="settingsItems[0] as any"
-                orientation="vertical"
-              />
-           </div>
+          <div class="space-y-4">
+            <div class="font-semibold text-sm text-gray-500 px-2">
+              {{ t("layouts.default.navigation.settings") }}
+            </div>
+            <!-- Reusing settingsItems logic for mobile nav -->
+            <UNavigationMenu
+              :items="settingsItems[0] as any"
+              orientation="vertical"
+            />
+          </div>
 
-           <div class="mt-auto">
-              <UserMenu />
-           </div>
+          <div class="mt-auto">
+            <UserMenu />
+          </div>
         </div>
       </template>
     </USlideover>

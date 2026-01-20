@@ -1,233 +1,232 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
-import type { BusinessSector } from "~/types/reseller";
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import type { BusinessSector } from '~/types/reseller'
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion", "organization-status"],
-});
+  middleware: ['auth', 'pending-deletion', 'organization-status']
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.settingsOrganization.title"),
-  description: t("seo.settingsOrganization.description"),
-});
+  title: t('seo.settingsOrganization.title'),
+  description: t('seo.settingsOrganization.description')
+})
 
-const authStore = useAuthStore();
-const organizationStore = useOrganizationStore();
-const config = useRuntimeConfig();
-const toast = useToast();
-const localePath = useLocalePath();
-const { canAccessOrganization } = useSettingsPermissions();
-const { sectorOptions } = useBusinessSectors();
+const organizationStore = useOrganizationStore()
+const config = useRuntimeConfig()
+const toast = useToast()
+const localePath = useLocalePath()
+const { canAccessOrganization } = useSettingsPermissions()
+const { sectorOptions } = useBusinessSectors()
 
 // Redirect if not authorized (Owner only) - wait for org data to load
-const hasRedirected = ref(false);
+const hasRedirected = ref(false)
 watch(
   () => ({
     canAccess: canAccessOrganization.value,
-    orgLoaded: organizationStore.currentOrganization !== null,
+    orgLoaded: organizationStore.currentOrganization !== null
   }),
   ({ canAccess, orgLoaded }) => {
     if (orgLoaded && canAccess === false && !hasRedirected.value) {
-      hasRedirected.value = true;
+      hasRedirected.value = true
       toast.add({
-        title: t("common.errors.accessDenied"),
-        icon: "i-lucide-shield-x",
-        color: "error",
-      });
-      navigateTo(localePath("/dashboard/settings"), { replace: true });
+        title: t('common.errors.accessDenied'),
+        icon: 'i-lucide-shield-x',
+        color: 'error'
+      })
+      navigateTo(localePath('/dashboard/settings'), { replace: true })
     }
   },
   { immediate: true }
-);
+)
 
-const fileRef = ref<HTMLInputElement>();
+const fileRef = ref<HTMLInputElement>()
 
 const organizationSchema = z.object({
   name: z
     .string()
-    .min(2, t("pages.dashboard.settings.organization.validation.nameTooShort")),
+    .min(2, t('pages.dashboard.settings.organization.validation.nameTooShort')),
   email: z
     .string()
-    .email(t("pages.dashboard.settings.organization.validation.invalidEmail")),
+    .email(t('pages.dashboard.settings.organization.validation.invalidEmail')),
   logo: z.string().optional(),
   // Sectors are validated dynamically from API - backend performs final validation
-  businessSectors: z.array(z.string()).optional(),
-});
+  businessSectors: z.array(z.string()).optional()
+})
 
 type OrganizationSchema = z.output<typeof organizationSchema>;
 
 // Initialize state with organization data from store
 const organization = reactive<OrganizationSchema>({
-  name: organizationStore.organization?.name || "",
-  email: organizationStore.organization?.email || "",
+  name: organizationStore.organization?.name || '',
+  email: organizationStore.organization?.email || '',
   logo: organizationStore.organization?.logo || undefined,
-  businessSectors: (organizationStore.organization?.businessSectors || []) as BusinessSector[],
-});
+  businessSectors: (organizationStore.organization?.businessSectors || []) as BusinessSector[]
+})
 
-const loading = ref(false);
-const logoRemoved = ref(false);
+const loading = ref(false)
+const logoRemoved = ref(false)
 
 // Watch for organization changes (when switching organizations)
 watch(
   () => organizationStore.organization,
   (newOrg) => {
     if (newOrg) {
-      organization.name = newOrg.name || "";
-      organization.email = newOrg.email || "";
-      organization.logo = newOrg.logo || undefined;
-      organization.businessSectors = (newOrg.businessSectors || []) as BusinessSector[];
-      logoRemoved.value = false;
+      organization.name = newOrg.name || ''
+      organization.email = newOrg.email || ''
+      organization.logo = newOrg.logo || undefined
+      organization.businessSectors = (newOrg.businessSectors || []) as BusinessSector[]
+      logoRemoved.value = false
     }
   },
   { deep: true }
-);
+)
 
 // Ensure organization data is loaded on mount
 onMounted(async () => {
   if (!organizationStore.organization) {
-    await organizationStore.fetchOrganization();
+    await organizationStore.fetchOrganization()
   }
-});
+})
 
-async function onSubmit(event: FormSubmitEvent<OrganizationSchema>) {
-  loading.value = true;
+async function onSubmit (event: FormSubmitEvent<OrganizationSchema>) {
+  loading.value = true
   try {
-    const formData = new FormData();
+    const formData = new FormData()
 
     // Add text fields if they changed
     if (event.data.name !== organizationStore.organization?.name) {
-      formData.append("name", event.data.name);
+      formData.append('name', event.data.name)
     }
     if (event.data.email !== organizationStore.organization?.email) {
-      formData.append("email", event.data.email);
+      formData.append('email', event.data.email)
     }
 
     // Add business sectors if they changed
-    const currentSectors = organizationStore.organization?.businessSectors || [];
-    const newSectors = event.data.businessSectors || [];
+    const currentSectors = organizationStore.organization?.businessSectors || []
+    const newSectors = event.data.businessSectors || []
     if (JSON.stringify(currentSectors) !== JSON.stringify(newSectors)) {
-      formData.append("businessSectors", JSON.stringify(newSectors));
+      formData.append('businessSectors', JSON.stringify(newSectors))
     }
 
     // Add logo removal flag
     if (logoRemoved.value) {
-      formData.append("removeLogo", "true");
+      formData.append('removeLogo', 'true')
     }
 
     // Add logo if file was selected
-    const fileInput = fileRef.value;
+    const fileInput = fileRef.value
     if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append("logo", fileInput.files[0]);
+      formData.append('logo', fileInput.files[0])
     }
 
     // Only send request if there are changes
     if (Array.from(formData.keys()).length > 0) {
-      const { authenticatedFetch } = useAuth();
+      const { authenticatedFetch } = useAuth()
       const response = await authenticatedFetch<{
         name: string;
         email: string;
         logo: string | null;
-      }>("/organization/update", {
-        method: "PUT",
-        body: formData,
-      });
+      }>('/organization/update', {
+        method: 'PUT',
+        body: formData
+      })
 
       // Update organization in store
       await Promise.all([
         organizationStore.fetchOrganization(),
         organizationStore.fetchUserOrganizations()
-      ]);
+      ])
 
       // Update local state with new data
-      organization.name = response.name;
-      organization.email = response.email;
-      organization.logo = response.logo || undefined;
-      logoRemoved.value = false;
+      organization.name = response.name
+      organization.email = response.email
+      organization.logo = response.logo || undefined
+      logoRemoved.value = false
 
       toast.add({
-        title: t("pages.dashboard.settings.organization.successTitle"),
+        title: t('pages.dashboard.settings.organization.successTitle'),
         description: t(
-          "pages.dashboard.settings.organization.successDescription"
+          'pages.dashboard.settings.organization.successDescription'
         ),
-        icon: "i-lucide-check",
-        color: "success",
-      });
+        icon: 'i-lucide-check',
+        color: 'success'
+      })
     } else {
       toast.add({
-        title: t("pages.dashboard.settings.organization.noChangesTitle"),
+        title: t('pages.dashboard.settings.organization.noChangesTitle'),
         description: t(
-          "pages.dashboard.settings.organization.noChangesDescription"
+          'pages.dashboard.settings.organization.noChangesDescription'
         ),
-        icon: "i-lucide-info",
-        color: "neutral",
-      });
+        icon: 'i-lucide-info',
+        color: 'neutral'
+      })
     }
   } catch (error: any) {
     toast.add({
-      title: t("pages.dashboard.settings.organization.errorTitle"),
+      title: t('pages.dashboard.settings.organization.errorTitle'),
       description:
         error.data?.message ||
-        t("pages.dashboard.settings.organization.errorDescription"),
-      icon: "i-lucide-x",
-      color: "error",
-    });
+        t('pages.dashboard.settings.organization.errorDescription'),
+      icon: 'i-lucide-x',
+      color: 'error'
+    })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
+function onFileChange (e: Event) {
+  const input = e.target as HTMLInputElement
 
   if (!input.files?.length) {
-    return;
+    return
   }
 
-  organization.logo = URL.createObjectURL(input.files[0]!);
-  logoRemoved.value = false;
+  organization.logo = URL.createObjectURL(input.files[0]!)
+  logoRemoved.value = false
 }
 
-function onFileClick() {
-  fileRef.value?.click();
+function onFileClick () {
+  fileRef.value?.click()
 }
 
-function onRemoveLogo() {
-  organization.logo = undefined;
-  logoRemoved.value = true;
+function onRemoveLogo () {
+  organization.logo = undefined
+  logoRemoved.value = true
   // Clear file input
   if (fileRef.value) {
-    fileRef.value.value = "";
+    fileRef.value.value = ''
   }
 }
 
 // Get logo URL with smart detection
 const logoUrl = computed(() => {
-  if (!organization.logo) return undefined;
+  if (!organization.logo) { return undefined }
 
   // If it's already a full URL (unlikely for organization logo), use it directly
   if (
-    organization.logo.startsWith("http://") ||
-    organization.logo.startsWith("https://")
+    organization.logo.startsWith('http://') ||
+    organization.logo.startsWith('https://')
   ) {
-    return organization.logo;
+    return organization.logo
   }
 
   // If it's a blob URL (local preview), use it directly
-  if (organization.logo.startsWith("blob:")) {
-    return organization.logo;
+  if (organization.logo.startsWith('blob:')) {
+    return organization.logo
   }
 
   // Otherwise, it's an uploaded file - construct backend URL
-  return `${config.public.apiUrl}/${organization.logo}`;
-});
+  return `${config.public.apiUrl}/${organization.logo}`
+})
 
 // Compute organization name for display
 const organizationName = computed(() => {
-  return organization.name.trim();
-});
+  return organization.name.trim()
+})
 </script>
 
 <template>
@@ -313,7 +312,7 @@ const organizationName = computed(() => {
             class="hidden"
             accept=".jpg, .jpeg, .png, .gif"
             @change="onFileChange"
-          />
+          >
         </div>
       </UFormField>
       <USeparator />

@@ -1,209 +1,209 @@
 <script setup lang="ts">
-import { AudioStatus } from "~/types/audio";
-import type { Audio } from "~/types/audio";
-import { getAudioDuration } from "~/utils/audio";
+import { AudioStatus } from '~/types/audio'
+import type { Audio } from '~/types/audio'
+import { getAudioDuration } from '~/utils/audio'
 
 definePageMeta({
-  middleware: ["auth", "pending-deletion", "organization-status"],
-});
+  middleware: ['auth', 'pending-deletion', 'organization-status']
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.dashboard.title"),
-  description: t("seo.dashboard.description"),
-});
-const toast = useToast();
-const localePath = useLocalePath();
+  title: t('seo.dashboard.title'),
+  description: t('seo.dashboard.description')
+})
+const toast = useToast()
+const localePath = useLocalePath()
 
-const audioStore = useAudioStore();
-const creditsStore = useCreditsStore();
+const audioStore = useAudioStore()
+const creditsStore = useCreditsStore()
 
 const {
   uploading,
   upload,
   reset: resetUpload,
-  formatFileSize,
+  formatFileSize
 } = useAudioUpload({
   onSuccess: async (response) => {
     // Fetch the newly created audio and add it to the list immediately
-    await audioStore.fetchAudio(response.audioId);
+    await audioStore.fetchAudio(response.audioId)
     if (audioStore.currentAudio) {
-      audioStore.addAudio(audioStore.currentAudio);
+      audioStore.addAudio(audioStore.currentAudio)
     }
 
     // Start polling for this job (multiple jobs can be polled simultaneously)
-    startPolling(response.jobId, response.audioId);
+    startPolling(response.jobId, response.audioId)
 
     toast.add({
-      title: t("pages.dashboard.workshop.uploadSuccess"),
-      description: t("pages.dashboard.workshop.processingStarted"),
-      color: "success",
-    });
+      title: t('pages.dashboard.workshop.uploadSuccess'),
+      description: t('pages.dashboard.workshop.processingStarted'),
+      color: 'success'
+    })
   },
   onError: (error) => {
     toast.add({
-      title: t("pages.dashboard.workshop.uploadError"),
+      title: t('pages.dashboard.workshop.uploadError'),
       description: error.message,
-      color: "error",
-    });
-  },
-});
+      color: 'error'
+    })
+  }
+})
 
 const { startPolling, stopAllPolling } = useAudioPolling({
   onComplete: () => {
     toast.add({
-      title: t("pages.dashboard.workshop.processingComplete"),
-      color: "success",
-    });
+      title: t('pages.dashboard.workshop.processingComplete'),
+      color: 'success'
+    })
     // Refresh the list and credits
-    audioStore.fetchAudios(1);
-    creditsStore.refresh();
+    audioStore.fetchAudios(1)
+    creditsStore.refresh()
   },
   onError: (error) => {
     toast.add({
-      title: t("pages.dashboard.workshop.processingError"),
+      title: t('pages.dashboard.workshop.processingError'),
       description: error.message,
-      color: "error",
-    });
-  },
-});
+      color: 'error'
+    })
+  }
+})
 
 // State
-const selectedFile = ref<File | null>(null);
-const prompt = ref("");
-const activeTab = ref<"upload" | "record">("upload");
-const deleteModalOpen = ref(false);
-const audioToDelete = ref<Audio | null>(null);
-const initialLoadDone = ref(false);
+const selectedFile = ref<File | null>(null)
+const prompt = ref('')
+const activeTab = ref<'upload' | 'record'>('upload')
+const deleteModalOpen = ref(false)
+const audioToDelete = ref<Audio | null>(null)
+const initialLoadDone = ref(false)
 
 // Computed: Only show 5 most recent audios on dashboard
-const recentAudios = computed(() => audioStore.audios.slice(0, 5));
-const hasMoreAudios = computed(() => audioStore.pagination.total > 5);
+const recentAudios = computed(() => audioStore.audios.slice(0, 5))
+const hasMoreAudios = computed(() => audioStore.pagination.total > 5)
 
 // Load audios on mount
 onMounted(async () => {
-  await audioStore.fetchAudios();
-  initialLoadDone.value = true;
+  await audioStore.fetchAudios()
+  initialLoadDone.value = true
 
   // Resume polling for ALL processing audios with currentJobId (after page refresh)
   const processingAudios = audioStore.audios.filter(
-    (a) => (a.status === AudioStatus.Pending || a.status === AudioStatus.Processing) && a.currentJobId
-  );
+    a => (a.status === AudioStatus.Pending || a.status === AudioStatus.Processing) && a.currentJobId
+  )
   processingAudios.forEach((audio) => {
     if (audio.currentJobId) {
-      startPolling(audio.currentJobId, audio.id);
+      startPolling(audio.currentJobId, audio.id)
     }
-  });
-});
+  })
+})
 
 // Handle file selection
-function handleFileSelected(file: File) {
-  selectedFile.value = file;
+function handleFileSelected (file: File) {
+  selectedFile.value = file
 }
 
-function handleRecordingComplete(file: File) {
-  selectedFile.value = file;
-  activeTab.value = "upload";
+function handleRecordingComplete (file: File) {
+  selectedFile.value = file
+  activeTab.value = 'upload'
 }
 
-function removeFile() {
-  selectedFile.value = null;
-  prompt.value = "";
+function removeFile () {
+  selectedFile.value = null
+  prompt.value = ''
 }
 
 // Handle upload
-async function handleUpload() {
+async function handleUpload () {
   if (!selectedFile.value || !prompt.value.trim()) {
     toast.add({
-      title: t("pages.dashboard.workshop.validationError"),
-      description: t("pages.dashboard.workshop.fileAndPromptRequired"),
-      color: "error",
-    });
-    return;
+      title: t('pages.dashboard.workshop.validationError'),
+      description: t('pages.dashboard.workshop.fileAndPromptRequired'),
+      color: 'error'
+    })
+    return
   }
 
   // Check credits
   try {
-    const duration = await getAudioDuration(selectedFile.value);
-    const creditsNeeded = Math.max(1, Math.ceil(duration / 60));
+    const duration = await getAudioDuration(selectedFile.value)
+    const creditsNeeded = Math.max(1, Math.ceil(duration / 60))
 
     if (creditsStore.credits < creditsNeeded) {
       toast.add({
-        title: t("pages.dashboard.credits.insufficientCredits"),
-        description: t("pages.dashboard.credits.insufficientCreditsMessage", { 
-          required: creditsNeeded, 
-          available: creditsStore.credits 
+        title: t('pages.dashboard.credits.insufficientCredits'),
+        description: t('pages.dashboard.credits.insufficientCreditsMessage', {
+          required: creditsNeeded,
+          available: creditsStore.credits
         }),
-        color: "error",
-      });
-      return;
+        color: 'error'
+      })
+      return
     }
   } catch (error) {
-    console.error("Failed to check audio duration:", error);
+    console.error('Failed to check audio duration:', error)
     // Continue with upload if check fails (backend will handle it)
   }
 
-  const response = await upload(selectedFile.value, prompt.value);
+  const response = await upload(selectedFile.value, prompt.value)
 
   if (response) {
     // Reset form on success - immediately ready for next upload
-    selectedFile.value = null;
-    prompt.value = "";
-    resetUpload();
+    selectedFile.value = null
+    prompt.value = ''
+    resetUpload()
   }
 }
 
 // Handle audio selection - navigate to detail page
-function handleSelectAudio(audio: Audio) {
-  navigateTo(localePath(`/dashboard/${audio.id}`));
+function handleSelectAudio (audio: Audio) {
+  navigateTo(localePath(`/dashboard/${audio.id}`))
 }
 
 // Handle delete
-function handleDeleteRequest(audio: Audio) {
-  audioToDelete.value = audio;
-  deleteModalOpen.value = true;
+function handleDeleteRequest (audio: Audio) {
+  audioToDelete.value = audio
+  deleteModalOpen.value = true
 }
 
-async function handleDeleteConfirm() {
-  if (!audioToDelete.value) return;
+async function handleDeleteConfirm () {
+  if (!audioToDelete.value) { return }
 
-  const success = await audioStore.deleteAudio(audioToDelete.value.id);
+  const success = await audioStore.deleteAudio(audioToDelete.value.id)
 
   if (success) {
     toast.add({
-      title: t("pages.dashboard.workshop.deleteSuccess"),
-      color: "success",
-    });
+      title: t('pages.dashboard.workshop.deleteSuccess'),
+      color: 'success'
+    })
   } else {
     toast.add({
-      title: t("pages.dashboard.workshop.deleteError"),
-      color: "error",
-    });
+      title: t('pages.dashboard.workshop.deleteError'),
+      color: 'error'
+    })
   }
 
-  deleteModalOpen.value = false;
-  audioToDelete.value = null;
+  deleteModalOpen.value = false
+  audioToDelete.value = null
 }
 
 // Cleanup
 onUnmounted(() => {
-  stopAllPolling();
-});
+  stopAllPolling()
+})
 
 // Tab items for upload/record
 const tabItems = computed(() => [
   {
-    label: t("pages.dashboard.workshop.tabs.upload"),
-    value: "upload",
-    icon: "i-lucide-upload",
+    label: t('pages.dashboard.workshop.tabs.upload'),
+    value: 'upload',
+    icon: 'i-lucide-upload'
   },
   {
-    label: t("pages.dashboard.workshop.tabs.record"),
-    value: "record",
-    icon: "i-lucide-mic",
-  },
-]);
+    label: t('pages.dashboard.workshop.tabs.record'),
+    value: 'record',
+    icon: 'i-lucide-mic'
+  }
+])
 </script>
 
 <template>
@@ -211,8 +211,12 @@ const tabItems = computed(() => [
     <!-- Header Section - toujours visible -->
     <div class="w-full flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ t('pages.dashboard.workshop.title') }}</h1>
-        <p class="mt-2 text-gray-500 dark:text-gray-400">{{ t('pages.dashboard.workshop.subtitle') }}</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+          {{ t('pages.dashboard.workshop.title') }}
+        </h1>
+        <p class="mt-2 text-gray-500 dark:text-gray-400">
+          {{ t('pages.dashboard.workshop.subtitle') }}
+        </p>
       </div>
     </div>
 
@@ -223,10 +227,10 @@ const tabItems = computed(() => [
           class="transition-all duration-300 hover:-translate-y-1 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm ring-1 ring-gray-200 dark:ring-gray-800 hover:ring-2 hover:ring-primary-500/50 dark:hover:ring-primary-400/50 shadow-lg hover:shadow-xl dark:shadow-none"
         >
           <template #header>
-             <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-               <UIcon name="i-lucide-sparkles" class="text-primary-500" />
-               {{ t('pages.dashboard.workshop.newAudio') }}
-             </h3>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <UIcon name="i-lucide-sparkles" class="text-primary-500" />
+              {{ t('pages.dashboard.workshop.newAudio') }}
+            </h3>
           </template>
 
           <!-- Tabs for Upload/Record -->
@@ -238,8 +242,8 @@ const tabItems = computed(() => [
               <WorkshopAudioUploadZone
                 :disabled="uploading"
                 :loading="uploading"
-                @file-selected="handleFileSelected"
                 class="border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-400 transition-colors duration-300 rounded-xl bg-gray-50/50 dark:bg-gray-800/20"
+                @file-selected="handleFileSelected"
               />
             </div>
 

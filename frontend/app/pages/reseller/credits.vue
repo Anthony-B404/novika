@@ -3,7 +3,7 @@ import type { ResellerTransaction, TransactionsFilters, ResellerTransactionType 
 
 definePageMeta({
   layout: 'reseller',
-  middleware: ['auth', 'reseller'],
+  middleware: ['auth', 'reseller']
 })
 
 const { t } = useI18n()
@@ -12,11 +12,11 @@ const localePath = useLocalePath()
 // Breadcrumb
 const breadcrumbItems = computed(() => [
   { label: t('reseller.navigation.dashboard'), icon: 'i-lucide-home', to: localePath('/reseller') },
-  { label: t('reseller.navigation.credits'), icon: 'i-lucide-coins' },
+  { label: t('reseller.navigation.credits'), icon: 'i-lucide-coins' }
 ])
 
 useSeoMeta({
-  title: t('reseller.credits.title'),
+  title: t('reseller.credits.title')
 })
 
 // Composables
@@ -29,7 +29,7 @@ const pagination = ref({
   total: 0,
   perPage: 20,
   currentPage: 1,
-  lastPage: 1,
+  lastPage: 1
 })
 
 // Filters
@@ -40,11 +40,11 @@ onMounted(async () => {
   await loadCredits()
 })
 
-async function loadCredits(page = 1) {
+async function loadCredits (page = 1) {
   const filters: TransactionsFilters = {
     page,
     limit: pagination.value.perPage,
-    type: typeFilter.value,
+    type: typeFilter.value
   }
 
   const response = await fetchCredits(filters)
@@ -55,7 +55,7 @@ async function loadCredits(page = 1) {
       total: response.transactions.meta.total,
       perPage: response.transactions.meta.perPage,
       currentPage: response.transactions.meta.currentPage,
-      lastPage: response.transactions.meta.lastPage,
+      lastPage: response.transactions.meta.lastPage
     }
   }
 }
@@ -63,7 +63,7 @@ async function loadCredits(page = 1) {
 // Watch filters
 watch(typeFilter, () => loadCredits(1))
 
-function handlePageChange(page: number) {
+function handlePageChange (page: number) {
   loadCredits(page)
 }
 
@@ -72,7 +72,7 @@ const typeOptions = [
   { label: t('reseller.credits.filters.all'), value: undefined },
   { label: t('reseller.transactions.types.purchase'), value: 'purchase' },
   { label: t('reseller.transactions.types.distribution'), value: 'distribution' },
-  { label: t('reseller.transactions.types.adjustment'), value: 'adjustment' },
+  { label: t('reseller.transactions.types.adjustment'), value: 'adjustment' }
 ]
 </script>
 
@@ -109,7 +109,9 @@ const typeOptions = [
           <div class="text-5xl font-bold text-primary-500 mb-2">
             {{ creditBalance.toLocaleString() }}
           </div>
-          <div class="text-lg text-gray-500">{{ t('reseller.credits.availableCredits') }}</div>
+          <div class="text-lg text-gray-500">
+            {{ t('reseller.credits.availableCredits') }}
+          </div>
           <p class="mt-4 text-sm text-gray-400">
             {{ t('reseller.credits.purchaseInfo') }}
           </p>
@@ -120,7 +122,9 @@ const typeOptions = [
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold">{{ t('reseller.credits.transactionHistory') }}</h2>
+            <h2 class="text-lg font-semibold">
+              {{ t('reseller.credits.transactionHistory') }}
+            </h2>
             <USelect
               v-model="typeFilter"
               :items="typeOptions"

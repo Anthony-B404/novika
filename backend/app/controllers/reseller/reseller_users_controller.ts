@@ -38,7 +38,16 @@ export default class ResellerUsersController {
 
       await organization.load('users', (query) => {
         query
-          .select(['id', 'email', 'first_name', 'last_name', 'full_name', 'created_at', 'onboarding_completed', 'last_invitation_sent_at'])
+          .select([
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'full_name',
+            'created_at',
+            'onboarding_completed',
+            'last_invitation_sent_at',
+          ])
           .orderBy('created_at', 'desc')
       })
 
@@ -185,9 +194,12 @@ export default class ResellerUsersController {
           { client: trx }
         )
 
-        await organization.useTransaction(trx).related('users').attach({
-          [user.id]: { role: payload.role },
-        })
+        await organization
+          .useTransaction(trx)
+          .related('users')
+          .attach({
+            [user.id]: { role: payload.role },
+          })
 
         return user
       })

@@ -1,50 +1,50 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
-import type { BusinessSector } from "~/types/reseller";
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import type { BusinessSector } from '~/types/reseller'
 
-const { t } = useI18n();
-const route = useRoute();
-const router = useRouter();
-const { $localePath } = useNuxtApp();
-const toast = useToast();
-const { login } = useAuth();
-const api = useApi();
-const { sectorOptions } = useBusinessSectors();
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const { $localePath } = useNuxtApp()
+const toast = useToast()
+const { login } = useAuth()
+const api = useApi()
+const { sectorOptions } = useBusinessSectors()
 
 definePageMeta({
-  layout: "auth",
-});
+  layout: 'auth'
+})
 
 useSeoMeta({
-  title: t("seo.setup.title"),
-  description: t("seo.setup.description"),
-});
+  title: t('seo.setup.title'),
+  description: t('seo.setup.description')
+})
 
-const token = ref(route.params.token as string);
-const isVerifying = ref(true);
-const isValid = ref(false);
-const isExpired = ref(false);
-const isSubmitting = ref(false);
+const token = ref(route.params.token as string)
+const isVerifying = ref(true)
+const isValid = ref(false)
+const isExpired = ref(false)
+const isSubmitting = ref(false)
 const userData = ref<{
   email: string;
   firstName: string | null;
   lastName: string | null;
   organizationName: string | null;
   businessSectors: BusinessSector[];
-} | null>(null);
-const fileRef = ref<HTMLInputElement>();
+} | null>(null)
+const fileRef = ref<HTMLInputElement>()
 
 // Verify magic link token on mount
 onMounted(async () => {
   if (!token.value) {
     toast.add({
-      title: t("auth.setup.error"),
-      description: t("auth.setup.noToken"),
-      color: "error",
-    });
-    router.push($localePath("index"));
-    return;
+      title: t('auth.setup.error'),
+      description: t('auth.setup.noToken'),
+      color: 'error'
+    })
+    router.push($localePath('index'))
+    return
   }
 
   try {
@@ -56,19 +56,19 @@ onMounted(async () => {
       businessSectors: BusinessSector[];
       token: string;
       isDisabled: boolean;
-    }>(`/verify-magic-link/${token.value}`);
+    }>(`/verify-magic-link/${token.value}`)
 
     // Check if the response contains a token (means user is already onboarded - login flow)
     // In that case, the user should use the verify-login page instead
     if (response.token && !response.firstName && !response.lastName) {
       // This shouldn't happen for setup flow, redirect to index
       toast.add({
-        title: t("auth.setup.alreadyCompleted"),
-        description: t("auth.setup.alreadyCompletedDescription"),
-        color: "warning",
-      });
-      router.push($localePath("index"));
-      return;
+        title: t('auth.setup.alreadyCompleted'),
+        description: t('auth.setup.alreadyCompletedDescription'),
+        color: 'warning'
+      })
+      router.push($localePath('index'))
+      return
     }
 
     userData.value = {
@@ -76,92 +76,92 @@ onMounted(async () => {
       firstName: response.firstName,
       lastName: response.lastName,
       organizationName: response.organizationName,
-      businessSectors: response.businessSectors || [],
-    };
-    isValid.value = true;
+      businessSectors: response.businessSectors || []
+    }
+    isValid.value = true
 
     // Pre-fill form with existing data
     if (response.firstName) {
-      state.firstName = response.firstName;
+      state.firstName = response.firstName
     }
     if (response.lastName) {
-      state.lastName = response.lastName;
+      state.lastName = response.lastName
     }
     if (response.organizationName) {
-      state.organizationName = response.organizationName;
+      state.organizationName = response.organizationName
     }
     if (response.businessSectors && response.businessSectors.length > 0) {
-      state.businessSectors = response.businessSectors;
+      state.businessSectors = response.businessSectors
     }
   } catch (error: any) {
     if (error.status === 401) {
-      isExpired.value = true;
+      isExpired.value = true
     } else {
       toast.add({
-        title: t("auth.setup.error"),
-        description: error.data?.message || t("auth.setup.tokenInvalid"),
-        color: "error",
-      });
+        title: t('auth.setup.error'),
+        description: error.data?.message || t('auth.setup.tokenInvalid'),
+        color: 'error'
+      })
     }
-    isValid.value = false;
+    isValid.value = false
   } finally {
-    isVerifying.value = false;
+    isVerifying.value = false
   }
-});
+})
 
 const schema = z.object({
   firstName: z.preprocess(
-    (val) => val ?? "",
+    val => val ?? '',
     z.string().superRefine((val, ctx) => {
       if (!val || val.length === 0) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.firstNameRequired"),
-        });
+          code: 'custom',
+          message: t('auth.validation.firstNameRequired')
+        })
       } else if (val.length < 2) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.firstNameTooShort"),
-        });
+          code: 'custom',
+          message: t('auth.validation.firstNameTooShort')
+        })
       }
-    }),
+    })
   ),
   lastName: z.preprocess(
-    (val) => val ?? "",
+    val => val ?? '',
     z.string().superRefine((val, ctx) => {
       if (!val || val.length === 0) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.lastNameRequired"),
-        });
+          code: 'custom',
+          message: t('auth.validation.lastNameRequired')
+        })
       } else if (val.length < 2) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.lastNameTooShort"),
-        });
+          code: 'custom',
+          message: t('auth.validation.lastNameTooShort')
+        })
       }
-    }),
+    })
   ),
   organizationName: z.preprocess(
-    (val) => val ?? "",
+    val => val ?? '',
     z.string().superRefine((val, ctx) => {
       if (!val || val.length === 0) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.organizationNameRequired"),
-        });
+          code: 'custom',
+          message: t('auth.validation.organizationNameRequired')
+        })
       } else if (val.length < 2) {
         ctx.addIssue({
-          code: "custom",
-          message: t("auth.validation.organizationNameTooShort"),
-        });
+          code: 'custom',
+          message: t('auth.validation.organizationNameTooShort')
+        })
       }
-    }),
+    })
   ),
   logo: z.any().optional(),
   // Sectors are validated dynamically from API - backend performs final validation
-  businessSectors: z.array(z.string()).optional(),
-});
+  businessSectors: z.array(z.string()).optional()
+})
 
 type Schema = z.output<typeof schema>;
 
@@ -170,92 +170,92 @@ const state = reactive<Partial<Schema>>({
   lastName: undefined,
   organizationName: undefined,
   logo: undefined,
-  businessSectors: [] as BusinessSector[],
-});
+  businessSectors: [] as BusinessSector[]
+})
 
 // Logo management functions
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
+function onFileChange (e: Event) {
+  const input = e.target as HTMLInputElement
 
   if (!input.files?.length) {
-    return;
+    return
   }
 
-  state.logo = URL.createObjectURL(input.files[0]!);
+  state.logo = URL.createObjectURL(input.files[0]!)
 }
 
-function onFileClick() {
-  fileRef.value?.click();
+function onFileClick () {
+  fileRef.value?.click()
 }
 
-function onRemoveLogo() {
-  state.logo = undefined;
+function onRemoveLogo () {
+  state.logo = undefined
   // Clear file input
   if (fileRef.value) {
-    fileRef.value.value = "";
+    fileRef.value.value = ''
   }
 }
 
 // Get logo URL (for preview)
 const logoUrl = computed(() => {
-  if (!state.logo) return undefined;
+  if (!state.logo) { return undefined }
 
   // If it's a blob URL (local preview), use it directly
-  if (state.logo.startsWith("blob:")) {
-    return state.logo;
+  if (state.logo.startsWith('blob:')) {
+    return state.logo
   }
 
-  return state.logo;
-});
+  return state.logo
+})
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  isSubmitting.value = true;
+async function onSubmit (event: FormSubmitEvent<Schema>) {
+  isSubmitting.value = true
   try {
     // Prepare FormData
-    const formData = new FormData();
-    formData.append("magicLinkToken", token.value);
-    formData.append("firstName", event.data.firstName);
-    formData.append("lastName", event.data.lastName);
-    formData.append("organizationName", event.data.organizationName);
+    const formData = new FormData()
+    formData.append('magicLinkToken', token.value)
+    formData.append('firstName', event.data.firstName)
+    formData.append('lastName', event.data.lastName)
+    formData.append('organizationName', event.data.organizationName)
 
     // Add business sectors if selected
     if (state.businessSectors && state.businessSectors.length > 0) {
-      formData.append("businessSectors", JSON.stringify(state.businessSectors));
+      formData.append('businessSectors', JSON.stringify(state.businessSectors))
     }
 
     // Add logo if file was selected
-    const fileInput = fileRef.value;
+    const fileInput = fileRef.value
     if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append("logo", fileInput.files[0]);
+      formData.append('logo', fileInput.files[0])
     }
 
     const response = await api<{ token: string; message: string }>(
-      "/complete-registration",
+      '/complete-registration',
       {
-        method: "POST",
-        body: formData,
-      },
-    );
+        method: 'POST',
+        body: formData
+      }
+    )
 
     // Store token using auth store
-    await login(response.token);
+    await login(response.token)
 
     toast.add({
-      title: t("auth.setup.success"),
-      description: t("auth.setup.successDescription"),
-      color: "success",
-    });
+      title: t('auth.setup.success'),
+      description: t('auth.setup.successDescription'),
+      color: 'success'
+    })
 
     // Redirect to dashboard
-    router.push($localePath("dashboard"));
+    router.push($localePath('dashboard'))
   } catch (error: any) {
     toast.add({
-      title: t("auth.setup.error"),
-      description: error.data?.message || t("auth.setup.errorDescription"),
-      color: "error",
-    });
+      title: t('auth.setup.error'),
+      description: error.data?.message || t('auth.setup.errorDescription'),
+      color: 'error'
+    })
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
 }
 </script>
@@ -412,7 +412,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             class="hidden"
             accept=".jpg, .jpeg, .png, .gif"
             @change="onFileChange"
-          />
+          >
         </div>
         <p class="text-muted-foreground mt-1 text-sm">
           {{ $t("auth.setup.logoHint") }}

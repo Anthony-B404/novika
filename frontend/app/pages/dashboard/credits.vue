@@ -1,13 +1,13 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['auth', 'pending-deletion', 'organization-status'],
+  middleware: ['auth', 'pending-deletion', 'organization-status']
 })
 
 const { t, locale } = useI18n()
 
 useSeoMeta({
-  title: t("seo.credits.title"),
-  description: t("seo.credits.description"),
+  title: t('seo.credits.title'),
+  description: t('seo.credits.description')
 })
 const localePath = useLocalePath()
 const creditsStore = useCreditsStore()
@@ -18,7 +18,7 @@ onMounted(async () => {
   await Promise.all([fetchBalance(), fetchHistory()])
 })
 
-function getTransactionIcon(type: string) {
+function getTransactionIcon (type: string) {
   switch (type) {
     case 'usage':
       return 'i-lucide-activity'
@@ -33,7 +33,7 @@ function getTransactionIcon(type: string) {
   }
 }
 
-function getTransactionColor(type: string) {
+function getTransactionColor (type: string) {
   switch (type) {
     case 'usage':
       return 'text-slate-500 dark:text-slate-400'
@@ -44,7 +44,7 @@ function getTransactionColor(type: string) {
     default:
       return 'text-gray-500'
   }
-}function getTransactionBg(type: string) {
+} function getTransactionBg (type: string) {
   switch (type) {
     case 'usage':
       return 'bg-slate-100 dark:bg-slate-800'
@@ -57,13 +57,13 @@ function getTransactionColor(type: string) {
   }
 }
 
-function formatDate(dateString: string) {
+function formatDate (dateString: string) {
   return new Date(dateString).toLocaleDateString(locale.value, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit',
+    minute: '2-digit'
   })
 }
 </script>

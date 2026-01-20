@@ -1,80 +1,80 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: "auth",
-  middleware: "auth",
-});
+  layout: 'auth',
+  middleware: 'auth'
+})
 
-const { t, d } = useI18n();
-const { $localePath } = useNuxtApp();
-const { logout } = useAuth();
-const organizationStore = useOrganizationStore();
+const { t, d } = useI18n()
+const { $localePath } = useNuxtApp()
+const { logout } = useAuth()
+const organizationStore = useOrganizationStore()
 
 useSeoMeta({
-  title: t("seo.organizationUnavailable.title"),
-  description: t("seo.organizationUnavailable.description"),
-});
+  title: t('seo.organizationUnavailable.title'),
+  description: t('seo.organizationUnavailable.description')
+})
 
 // Load organization on mount
 onMounted(async () => {
-  await organizationStore.fetchOrganization();
+  await organizationStore.fetchOrganization()
 
   // If organization is available, redirect to dashboard
   if (!organizationStore.isOrganizationUnavailable) {
-    navigateTo($localePath("/dashboard"));
+    navigateTo($localePath('/dashboard'))
   }
-});
+})
 
 // Computed: page title based on status
 const pageTitle = computed(() => {
   if (organizationStore.isOrganizationDeleted) {
-    return t("pages.organizationUnavailable.deletedTitle");
+    return t('pages.organizationUnavailable.deletedTitle')
   }
   if (organizationStore.isOrganizationSuspended) {
-    return t("pages.organizationUnavailable.suspendedTitle");
+    return t('pages.organizationUnavailable.suspendedTitle')
   }
-  return t("pages.organizationUnavailable.title");
-});
+  return t('pages.organizationUnavailable.title')
+})
 
 // Computed: description based on status
 const pageDescription = computed(() => {
   if (organizationStore.isOrganizationDeleted) {
-    return t("pages.organizationUnavailable.deletedDescription");
+    return t('pages.organizationUnavailable.deletedDescription')
   }
   if (organizationStore.isOrganizationSuspended) {
-    return t("pages.organizationUnavailable.suspendedDescription");
+    return t('pages.organizationUnavailable.suspendedDescription')
   }
-  return "";
-});
+  return ''
+})
 
 // Computed: formatted date for suspended/deleted
 const statusDate = computed(() => {
   if (organizationStore.isOrganizationDeleted && organizationStore.deletedAt) {
-    return d(new Date(organizationStore.deletedAt), "long");
+    return d(new Date(organizationStore.deletedAt), 'long')
   }
   if (organizationStore.isOrganizationSuspended && organizationStore.suspendedAt) {
-    return d(new Date(organizationStore.suspendedAt), "long");
+    return d(new Date(organizationStore.suspendedAt), 'long')
   }
-  return null;
-});
+  return null
+})
 
 // Computed: days until purge for deleted organizations
 const daysUntilPurge = computed(() => {
   if (!organizationStore.isOrganizationDeleted || !organizationStore.deletedAt) {
-    return null;
+    return null
   }
-  const deletedDate = new Date(organizationStore.deletedAt);
-  const purgeDate = new Date(deletedDate);
-  purgeDate.setDate(purgeDate.getDate() + 30);
-  const now = new Date();
-  const diffTime = purgeDate.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return Math.max(0, diffDays);
-});
+  const deletedDate = new Date(organizationStore.deletedAt)
+  const purgeDate = new Date(deletedDate)
+  purgeDate.setDate(purgeDate.getDate() + 30)
+  const now = new Date()
+  const diffTime = purgeDate.getTime() - now.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  return Math.max(0, diffDays)
+})
 
 // Handle logout
-async function handleLogout() {
-  await logout();
-  navigateTo($localePath("/"));
+async function handleLogout () {
+  await logout()
+  navigateTo($localePath('/'))
 }
 </script>
 
@@ -82,11 +82,14 @@ async function handleLogout() {
   <div class="space-y-6 w-full">
     <!-- Header -->
     <div class="text-center">
-      <div class="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4" :class="[
-        organizationStore.isOrganizationDeleted
-          ? 'bg-error-100 dark:bg-error-900/30'
-          : 'bg-warning-100 dark:bg-warning-900/30'
-      ]">
+      <div
+        class="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4"
+        :class="[
+          organizationStore.isOrganizationDeleted
+            ? 'bg-error-100 dark:bg-error-900/30'
+            : 'bg-warning-100 dark:bg-warning-900/30'
+        ]"
+      >
         <UIcon
           :name="organizationStore.isOrganizationDeleted ? 'i-lucide-trash-2' : 'i-lucide-pause-circle'"
           class="w-8 h-8"

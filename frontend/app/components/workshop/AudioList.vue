@@ -20,8 +20,8 @@ const audioStore = useAudioStore()
 const statusFilter = ref<AudioStatus | 'all'>('all')
 
 const filteredAudios = computed(() => {
-  if (statusFilter.value === 'all') return props.audios
-  return props.audios.filter((a) => a.status === statusFilter.value)
+  if (statusFilter.value === 'all') { return props.audios }
+  return props.audios.filter(a => a.status === statusFilter.value)
 })
 
 const hasMore = computed(() => audioStore.hasMore)
@@ -30,17 +30,17 @@ const statusOptions = computed(() => [
   { label: t('components.workshop.filters.all'), value: 'all' },
   { label: t('components.workshop.filters.completed'), value: AudioStatus.Completed },
   { label: t('components.workshop.filters.processing'), value: AudioStatus.Processing },
-  { label: t('components.workshop.filters.failed'), value: AudioStatus.Failed },
+  { label: t('components.workshop.filters.failed'), value: AudioStatus.Failed }
 ])
 
 /**
  * Get progress for a specific audio from the store
  * Returns undefined if the audio is not currently being processed
  */
-function getProgressForAudio(audio: Audio): number | undefined {
+function getProgressForAudio (audio: Audio): number | undefined {
   // Only show progress for pending or processing audios with a job
-  if (!audio.currentJobId) return undefined
-  if (audio.status !== AudioStatus.Pending && audio.status !== AudioStatus.Processing) return undefined
+  if (!audio.currentJobId) { return undefined }
+  if (audio.status !== AudioStatus.Pending && audio.status !== AudioStatus.Processing) { return undefined }
 
   const jobStatus = audioStore.getJobStatus(audio.currentJobId)
   return jobStatus?.progress

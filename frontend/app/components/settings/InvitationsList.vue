@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import type { Invitation } from "~/types";
-import { UserRole } from "~/types/auth";
+import type { Invitation } from '~/types'
+import { UserRole } from '~/types/auth'
 
-const { t } = useI18n();
-const { getRoleOptions } = useRoles();
+const { t } = useI18n()
+const { getRoleOptions } = useRoles()
 
-const props = defineProps<{
+defineProps<{
   invitations: Invitation[];
-}>();
+}>()
 
 const emit = defineEmits<{
   resend: [id: number];
   delete: [id: number];
-}>();
+}>()
 
 /**
  * Get role label for invitation
  */
 const getRoleLabel = (role: UserRole) => {
-  const roleOption = getRoleOptions().find((option) => option.value === role);
-  return roleOption?.label || "";
-};
+  const roleOption = getRoleOptions().find(option => option.value === role)
+  return roleOption?.label || ''
+}
 
 /**
  * Format date to readable string
  */
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-};
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
 
 const handleResend = (id: number) => {
-  emit("resend", id);
-};
+  emit('resend', id)
+}
 
 const handleDelete = (id: number) => {
-  emit("delete", id);
-};
+  emit('delete', id)
+}
 </script>
 
 <template>

@@ -23,26 +23,26 @@ const formatOptions = computed(() => [
     label: t('components.workshop.export.format.pdf'),
     value: 'pdf' as ExportFormat,
     icon: 'i-lucide-file-text',
-    extension: '.pdf',
+    extension: '.pdf'
   },
   {
     label: t('components.workshop.export.format.docx'),
     value: 'docx' as ExportFormat,
     icon: 'i-lucide-file-type',
-    extension: '.docx',
+    extension: '.docx'
   },
   {
     label: t('components.workshop.export.format.txt'),
     value: 'txt' as ExportFormat,
     icon: 'i-lucide-file',
-    extension: '.txt',
+    extension: '.txt'
   },
   {
     label: t('components.workshop.export.format.md'),
     value: 'md' as ExportFormat,
     icon: 'i-lucide-file-code',
-    extension: '.md',
-  },
+    extension: '.md'
+  }
 ])
 
 // Content options
@@ -52,21 +52,21 @@ const contentOptions = computed(() => {
   if (props.hasTranscription && props.hasAnalysis) {
     options.push({
       label: t('components.workshop.export.content.both'),
-      value: 'both' as ExportContent,
+      value: 'both' as ExportContent
     })
   }
 
   if (props.hasTranscription) {
     options.push({
       label: t('components.workshop.export.content.transcription'),
-      value: 'transcription' as ExportContent,
+      value: 'transcription' as ExportContent
     })
   }
 
   if (props.hasAnalysis) {
     options.push({
       label: t('components.workshop.export.content.analysis'),
-      value: 'analysis' as ExportContent,
+      value: 'analysis' as ExportContent
     })
   }
 
@@ -88,8 +88,8 @@ watch(
   { immediate: true }
 )
 
-async function exportDocument(format: ExportFormat) {
-  if (loading.value) return
+async function exportDocument (format: ExportFormat) {
+  if (loading.value) { return }
 
   loading.value = true
   open.value = false
@@ -105,8 +105,8 @@ async function exportDocument(format: ExportFormat) {
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
-        'Accept-Language': locale.value,
-      },
+        'Accept-Language': locale.value
+      }
     })
 
     if (!response.ok) {
@@ -137,13 +137,13 @@ async function exportDocument(format: ExportFormat) {
 
     toast.add({
       title: t('components.workshop.export.success'),
-      color: 'success',
+      color: 'success'
     })
   } catch (error) {
     console.error('Export error:', error)
     toast.add({
       title: t('components.workshop.export.error'),
-      color: 'error',
+      color: 'error'
     })
   } finally {
     loading.value = false

@@ -1,27 +1,27 @@
 <script setup lang="ts">
-const { t } = useI18n();
-const localePath = useLocalePath();
+const { t } = useI18n()
+const localePath = useLocalePath()
 
-const currentYear = new Date().getFullYear();
+const currentYear = new Date().getFullYear()
 
 const legalLinks = computed(() => [
   {
-    label: t("layouts.default.footer.terms"),
-    to: localePath("/terms"),
+    label: t('layouts.default.footer.terms'),
+    to: localePath('/terms')
   },
   {
-    label: t("layouts.default.footer.privacy"),
-    to: localePath("/privacy-policy"),
+    label: t('layouts.default.footer.privacy'),
+    to: localePath('/privacy-policy')
   },
   {
-    label: t("layouts.default.footer.cookies"),
-    to: localePath("/cookies-policy"),
+    label: t('layouts.default.footer.cookies'),
+    to: localePath('/cookies-policy')
   },
   {
-    label: t("layouts.default.footer.legalNotice"),
-    to: localePath("/legal-notice"),
-  },
-]);
+    label: t('layouts.default.footer.legalNotice'),
+    to: localePath('/legal-notice')
+  }
+])
 </script>
 
 <template>

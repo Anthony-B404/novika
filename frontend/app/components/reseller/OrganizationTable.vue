@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ResellerOrganization } from '~/types/reseller'
 import type { TableColumn, TableRow } from '@nuxt/ui'
+import type { ResellerOrganization } from '~/types/reseller'
 
 defineProps<{
   organizations: ResellerOrganization[]
@@ -23,50 +23,50 @@ const { getSectorConfig, getSectorLabel } = useBusinessSectors()
 const columns: TableColumn<ResellerOrganization>[] = [
   {
     accessorKey: 'name',
-    header: t('reseller.organizations.table.name'),
+    header: t('reseller.organizations.table.name')
   },
   {
     accessorKey: 'email',
-    header: t('reseller.organizations.table.email'),
+    header: t('reseller.organizations.table.email')
   },
   {
     accessorKey: 'businessSectors',
-    header: t('reseller.organizations.table.sectors'),
+    header: t('reseller.organizations.table.sectors')
   },
   {
     accessorKey: 'credits',
-    header: t('reseller.organizations.table.credits'),
+    header: t('reseller.organizations.table.credits')
   },
   {
     accessorKey: 'subscription',
-    header: t('reseller.organizations.table.subscription'),
+    header: t('reseller.organizations.table.subscription')
   },
   {
     accessorKey: 'status',
-    header: t('reseller.organizations.table.status'),
+    header: t('reseller.organizations.table.status')
   },
   {
     accessorKey: 'usersCount',
-    header: t('reseller.organizations.table.users'),
+    header: t('reseller.organizations.table.users')
   },
   {
     accessorKey: 'createdAt',
-    header: t('reseller.organizations.table.createdAt'),
+    header: t('reseller.organizations.table.createdAt')
   },
   {
     accessorKey: 'actions',
-    header: '',
-  },
+    header: ''
+  }
 ]
 
-function getRowActions(organization: ResellerOrganization) {
+function getRowActions (organization: ResellerOrganization) {
   const actions = []
 
   // View action is always available
   actions.push({
     label: t('common.buttons.view'),
     icon: 'i-lucide-eye',
-    onSelect: () => emit('view', organization),
+    onSelect: () => emit('view', organization)
   })
 
   // Actions depend on status
@@ -75,34 +75,34 @@ function getRowActions(organization: ResellerOrganization) {
     actions.push({
       label: t('reseller.organizations.actions.distributeCredits'),
       icon: 'i-lucide-coins',
-      onSelect: () => emit('credits', organization),
+      onSelect: () => emit('credits', organization)
     })
     actions.push({
       label: t('reseller.organizations.actions.manageUsers'),
       icon: 'i-lucide-users',
-      onSelect: () => emit('users', organization),
+      onSelect: () => emit('users', organization)
     })
     actions.push({
       label: t('reseller.organizations.actions.suspend'),
       icon: 'i-lucide-pause-circle',
-      onSelect: () => emit('suspend', organization),
+      onSelect: () => emit('suspend', organization)
     })
     actions.push({
       label: t('reseller.organizations.actions.delete'),
       icon: 'i-lucide-trash-2',
-      onSelect: () => emit('delete', organization),
+      onSelect: () => emit('delete', organization)
     })
   } else if (organization.status === 'suspended') {
     // Suspended: View, Restore, Delete
     actions.push({
       label: t('reseller.organizations.actions.restore'),
       icon: 'i-lucide-rotate-ccw',
-      onSelect: () => emit('restore', organization),
+      onSelect: () => emit('restore', organization)
     })
     actions.push({
       label: t('reseller.organizations.actions.delete'),
       icon: 'i-lucide-trash-2',
-      onSelect: () => emit('delete', organization),
+      onSelect: () => emit('delete', organization)
     })
   }
   // Deleted: View only (already added above)
@@ -121,7 +121,9 @@ function getRowActions(organization: ResellerOrganization) {
   >
     <template #name-cell="{ row }">
       <div>
-        <p class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</p>
+        <p class="font-medium text-gray-900 dark:text-white">
+          {{ row.original.name }}
+        </p>
       </div>
     </template>
 

@@ -14,7 +14,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const deleting = ref(false)
 
-async function handleConfirm() {
+async function handleConfirm () {
   deleting.value = true
   emit('confirm')
 }

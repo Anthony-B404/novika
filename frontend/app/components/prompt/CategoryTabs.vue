@@ -14,15 +14,15 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-function selectCategory(categoryId: number | null) {
+function selectCategory (categoryId: number | null) {
   emit('update:selectedCategoryId', categoryId)
 }
 
-function selectFavorites() {
+function selectFavorites () {
   emit('selectFavorites')
 }
 
-function isSelected(categoryId: number | null) {
+function isSelected (categoryId: number | null) {
   return !props.showFavorites && props.selectedCategoryId === categoryId
 }
 </script>

@@ -90,9 +90,11 @@ export default class ResellerSubscriptionsController {
 
       // Update subscription configuration
       organization.subscriptionEnabled = payload.enabled
-      organization.monthlyCreditsTarget = payload.enabled ? payload.monthlyCreditsTarget ?? null : null
-      organization.renewalType = payload.enabled ? payload.renewalType ?? null : null
-      organization.renewalDay = payload.enabled ? payload.renewalDay ?? null : null
+      organization.monthlyCreditsTarget = payload.enabled
+        ? (payload.monthlyCreditsTarget ?? null)
+        : null
+      organization.renewalType = payload.enabled ? (payload.renewalType ?? null) : null
+      organization.renewalDay = payload.enabled ? (payload.renewalDay ?? null) : null
 
       // Handle subscription state changes
       if (!wasEnabled && isNowEnabled) {

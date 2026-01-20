@@ -32,23 +32,23 @@ const statusConfig = computed(() => {
     [AudioStatus.Pending]: {
       color: 'neutral',
       icon: 'i-lucide-clock',
-      label: t('components.workshop.status.pending'),
+      label: t('components.workshop.status.pending')
     },
     [AudioStatus.Processing]: {
       color: 'primary',
       icon: 'i-lucide-loader-2',
-      label: t('components.workshop.status.processing'),
+      label: t('components.workshop.status.processing')
     },
     [AudioStatus.Completed]: {
       color: 'success',
       icon: 'i-lucide-check-circle',
-      label: t('components.workshop.status.completed'),
+      label: t('components.workshop.status.completed')
     },
     [AudioStatus.Failed]: {
       color: 'error',
       icon: 'i-lucide-x-circle',
-      label: t('components.workshop.status.failed'),
-    },
+      label: t('components.workshop.status.failed')
+    }
   }
   return configs[props.audio.status]
 })
@@ -58,14 +58,14 @@ const isCompleted = computed(() => props.audio.status === AudioStatus.Completed)
 const isFailed = computed(() => props.audio.status === AudioStatus.Failed)
 const isProcessingStatus = computed(() => props.audio.status === AudioStatus.Processing)
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+function formatFileSize (bytes: number): string {
+  if (bytes < 1024) { return `${bytes} B` }
+  if (bytes < 1024 * 1024) { return `${(bytes / 1024).toFixed(1)} KB` }
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function formatDuration(seconds: number | null): string {
-  if (!seconds) return '--:--'
+function formatDuration (seconds: number | null): string {
+  if (!seconds) { return '--:--' }
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`

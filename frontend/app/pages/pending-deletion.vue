@@ -1,71 +1,71 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: "auth",
-  middleware: "auth",
-});
+  layout: 'auth',
+  middleware: 'auth'
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("seo.pendingDeletion.title"),
-  description: t("seo.pendingDeletion.description"),
-});
+  title: t('seo.pendingDeletion.title'),
+  description: t('seo.pendingDeletion.description')
+})
 
-const { $localePath } = useNuxtApp();
-const toast = useToast();
-const gdprStore = useGdprStore();
-const { logout } = useAuth();
+const { $localePath } = useNuxtApp()
+const toast = useToast()
+const gdprStore = useGdprStore()
+const { logout } = useAuth()
 
 // Load deletion status on mount
 onMounted(async () => {
-  await gdprStore.fetchDeletionStatus();
+  await gdprStore.fetchDeletionStatus()
 
   // If no pending deletion, redirect to dashboard
   if (!gdprStore.hasPendingDeletion) {
-    navigateTo($localePath("/dashboard"));
+    navigateTo($localePath('/dashboard'))
   }
-});
+})
 
 // Export data
-async function handleExport() {
+async function handleExport () {
   try {
-    await gdprStore.downloadExport();
+    await gdprStore.downloadExport()
     toast.add({
-      title: t("pages.dashboard.settings.privacy.export.success"),
-      color: "success",
-    });
+      title: t('pages.dashboard.settings.privacy.export.success'),
+      color: 'success'
+    })
   } catch {
     toast.add({
-      title: t("pages.dashboard.settings.privacy.export.error"),
-      color: "error",
-    });
+      title: t('pages.dashboard.settings.privacy.export.error'),
+      color: 'error'
+    })
   }
 }
 
 // Cancel deletion
-async function handleCancelDeletion() {
-  if (!gdprStore.pendingDeletionRequest?.token) return;
+async function handleCancelDeletion () {
+  if (!gdprStore.pendingDeletionRequest?.token) { return }
 
   try {
-    await gdprStore.cancelDeletion(gdprStore.pendingDeletionRequest.token);
+    await gdprStore.cancelDeletion(gdprStore.pendingDeletionRequest.token)
     toast.add({
-      title: t("pages.dashboard.settings.privacy.deletion.cancelSuccess"),
-      color: "success",
-    });
+      title: t('pages.dashboard.settings.privacy.deletion.cancelSuccess'),
+      color: 'success'
+    })
     // Redirect to dashboard after cancellation
-    navigateTo($localePath("/dashboard"));
+    navigateTo($localePath('/dashboard'))
   } catch {
     toast.add({
-      title: t("pages.dashboard.settings.privacy.deletion.cancelError"),
-      color: "error",
-    });
+      title: t('pages.dashboard.settings.privacy.deletion.cancelError'),
+      color: 'error'
+    })
   }
 }
 
 // Handle logout
-async function handleLogout() {
-  await logout();
-  navigateTo($localePath("/"));
+async function handleLogout () {
+  await logout()
+  navigateTo($localePath('/'))
 }
 </script>
 

@@ -1,6 +1,5 @@
 import type {
   ResellerOrganization,
-  OrganizationUser,
   OrganizationsListResponse,
   UsersListResponse,
   CreateOrganizationPayload,
@@ -14,7 +13,7 @@ import type {
   OrganizationsFilters,
   UsersFilters,
   SuspendOrganizationPayload,
-  OrganizationStatusResponse,
+  OrganizationStatusResponse
 } from '~/types/reseller'
 import { getErrorMessage } from '~/utils/errors'
 
@@ -22,7 +21,7 @@ import { getErrorMessage } from '~/utils/errors'
  * Reseller Organizations composable
  * Provides CRUD operations for managing organizations (Reseller Admin only)
  */
-export function useResellerOrganizations() {
+export function useResellerOrganizations () {
   const { authenticatedFetch } = useAuth()
 
   const loading = ref(false)
@@ -35,20 +34,20 @@ export function useResellerOrganizations() {
   /**
    * Fetch organizations list with pagination and filters
    */
-  async function fetchOrganizations(
+  async function fetchOrganizations (
     filters: OrganizationsFilters = {}
   ): Promise<OrganizationsListResponse | null> {
     loading.value = true
     error.value = null
     try {
       const params = new URLSearchParams()
-      if (filters.page) params.set('page', String(filters.page))
-      if (filters.limit) params.set('limit', String(filters.limit))
-      if (filters.search) params.set('search', filters.search)
-      if (filters.sortBy) params.set('sortBy', filters.sortBy)
-      if (filters.sortOrder) params.set('sortOrder', filters.sortOrder)
+      if (filters.page) { params.set('page', String(filters.page)) }
+      if (filters.limit) { params.set('limit', String(filters.limit)) }
+      if (filters.search) { params.set('search', filters.search) }
+      if (filters.sortBy) { params.set('sortBy', filters.sortBy) }
+      if (filters.sortOrder) { params.set('sortOrder', filters.sortOrder) }
       if (filters.sectors && filters.sectors.length > 0) {
-        filters.sectors.forEach((sector) => params.append('sectors[]', sector))
+        filters.sectors.forEach(sector => params.append('sectors[]', sector))
       }
 
       const query = params.toString()
@@ -66,7 +65,7 @@ export function useResellerOrganizations() {
   /**
    * Fetch single organization by ID with users
    */
-  async function fetchOrganization(id: number): Promise<ResellerOrganization | null> {
+  async function fetchOrganization (id: number): Promise<ResellerOrganization | null> {
     loading.value = true
     error.value = null
     try {
@@ -82,7 +81,7 @@ export function useResellerOrganizations() {
   /**
    * Create a new organization with owner user
    */
-  async function createOrganization(
+  async function createOrganization (
     payload: CreateOrganizationPayload
   ): Promise<CreateOrganizationResponse | null> {
     loading.value = true
@@ -93,7 +92,7 @@ export function useResellerOrganizations() {
         {
           method: 'POST',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     } catch (e: unknown) {
@@ -107,7 +106,7 @@ export function useResellerOrganizations() {
   /**
    * Update an existing organization
    */
-  async function updateOrganization(
+  async function updateOrganization (
     id: number,
     payload: UpdateOrganizationPayload
   ): Promise<UpdateOrganizationResponse | null> {
@@ -119,7 +118,7 @@ export function useResellerOrganizations() {
         {
           method: 'PUT',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     } catch (e: unknown) {
@@ -137,7 +136,7 @@ export function useResellerOrganizations() {
   /**
    * Distribute credits from reseller pool to an organization
    */
-  async function distributeCredits(
+  async function distributeCredits (
     organizationId: number,
     payload: DistributeCreditsPayload
   ): Promise<DistributeCreditsResponse | null> {
@@ -149,7 +148,7 @@ export function useResellerOrganizations() {
         {
           method: 'POST',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     } catch (e: unknown) {
@@ -167,7 +166,7 @@ export function useResellerOrganizations() {
   /**
    * Fetch users list for an organization
    */
-  async function fetchUsers(
+  async function fetchUsers (
     organizationId: number,
     filters: UsersFilters = {}
   ): Promise<UsersListResponse | null> {
@@ -175,8 +174,8 @@ export function useResellerOrganizations() {
     error.value = null
     try {
       const params = new URLSearchParams()
-      if (filters.page) params.set('page', String(filters.page))
-      if (filters.limit) params.set('limit', String(filters.limit))
+      if (filters.page) { params.set('page', String(filters.page)) }
+      if (filters.limit) { params.set('limit', String(filters.limit)) }
 
       const query = params.toString()
       return await authenticatedFetch<UsersListResponse>(
@@ -193,7 +192,7 @@ export function useResellerOrganizations() {
   /**
    * Add a user to an organization (create new or link existing)
    */
-  async function addUser(
+  async function addUser (
     organizationId: number,
     payload: AddUserPayload
   ): Promise<AddUserResponse | null> {
@@ -205,7 +204,7 @@ export function useResellerOrganizations() {
         {
           method: 'POST',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     } catch (e: unknown) {
@@ -219,12 +218,12 @@ export function useResellerOrganizations() {
   /**
    * Remove a user from an organization
    */
-  async function removeUser(organizationId: number, userId: number): Promise<boolean> {
+  async function removeUser (organizationId: number, userId: number): Promise<boolean> {
     loading.value = true
     error.value = null
     try {
       await authenticatedFetch(`/reseller/organizations/${organizationId}/users/${userId}`, {
-        method: 'DELETE',
+        method: 'DELETE'
       })
       return true
     } catch (e: unknown) {
@@ -238,7 +237,7 @@ export function useResellerOrganizations() {
   /**
    * Resend invitation to a pending user
    */
-  async function resendInvitation(
+  async function resendInvitation (
     organizationId: number,
     userId: number
   ): Promise<{ message: string; lastInvitationSentAt: string } | null> {
@@ -248,7 +247,7 @@ export function useResellerOrganizations() {
       return await authenticatedFetch<{ message: string; lastInvitationSentAt: string }>(
         `/reseller/organizations/${organizationId}/users/${userId}/resend-invitation`,
         {
-          method: 'POST',
+          method: 'POST'
         }
       )
     } catch (e: unknown) {
@@ -266,7 +265,7 @@ export function useResellerOrganizations() {
   /**
    * Suspend an organization
    */
-  async function suspendOrganization(
+  async function suspendOrganization (
     organizationId: number,
     payload?: SuspendOrganizationPayload
   ): Promise<OrganizationStatusResponse | null> {
@@ -278,7 +277,7 @@ export function useResellerOrganizations() {
         {
           method: 'POST',
           body: payload ? JSON.stringify(payload) : undefined,
-          headers: payload ? { 'Content-Type': 'application/json' } : undefined,
+          headers: payload ? { 'Content-Type': 'application/json' } : undefined
         }
       )
     } catch (e: unknown) {
@@ -292,7 +291,7 @@ export function useResellerOrganizations() {
   /**
    * Restore a suspended organization
    */
-  async function restoreOrganization(
+  async function restoreOrganization (
     organizationId: number
   ): Promise<OrganizationStatusResponse | null> {
     loading.value = true
@@ -301,7 +300,7 @@ export function useResellerOrganizations() {
       return await authenticatedFetch<OrganizationStatusResponse>(
         `/reseller/organizations/${organizationId}/restore`,
         {
-          method: 'POST',
+          method: 'POST'
         }
       )
     } catch (e: unknown) {
@@ -315,7 +314,7 @@ export function useResellerOrganizations() {
   /**
    * Delete an organization (soft delete with 30-day purge)
    */
-  async function deleteOrganization(
+  async function deleteOrganization (
     organizationId: number
   ): Promise<OrganizationStatusResponse | null> {
     loading.value = true
@@ -324,7 +323,7 @@ export function useResellerOrganizations() {
       return await authenticatedFetch<OrganizationStatusResponse>(
         `/reseller/organizations/${organizationId}`,
         {
-          method: 'DELETE',
+          method: 'DELETE'
         }
       )
     } catch (e: unknown) {
@@ -358,6 +357,6 @@ export function useResellerOrganizations() {
     fetchUsers,
     addUser,
     removeUser,
-    resendInvitation,
+    resendInvitation
   }
 }

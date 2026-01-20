@@ -31,8 +31,9 @@ export default class PromptCategoriesController {
     }
 
     // Validate query parameters
-    const { includePromptCount, prioritizeSectors } =
-      await request.validateUsing(promptCategoryIndexValidator)
+    const { includePromptCount, prioritizeSectors } = await request.validateUsing(
+      promptCategoryIndexValidator
+    )
 
     // Build query with tenant isolation
     const query = PromptCategory.query().where('organizationId', user.currentOrganizationId!)

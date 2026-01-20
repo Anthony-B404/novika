@@ -7,7 +7,7 @@ import type {
   UpdatePromptPayload,
   CreateCategoryPayload,
   UpdateCategoryPayload,
-  PromptsStoreState,
+  PromptsStoreState
 } from '~/types/prompt'
 
 export const usePromptsStore = defineStore('prompts', {
@@ -19,35 +19,35 @@ export const usePromptsStore = defineStore('prompts', {
       currentPage: 1,
       lastPage: 1,
       total: 0,
-      perPage: 50,
+      perPage: 50
     },
     loading: false,
     categoriesLoading: false,
-    error: null,
+    error: null
   }),
 
   getters: {
-    getPrompts: (state) => state.prompts,
-    getCategories: (state) => state.categories,
-    getCurrentPrompt: (state) => state.currentPrompt,
-    isLoading: (state) => state.loading,
-    isCategoriesLoading: (state) => state.categoriesLoading,
-    hasError: (state) => !!state.error,
-    getError: (state) => state.error,
-    getPagination: (state) => state.pagination,
+    getPrompts: state => state.prompts,
+    getCategories: state => state.categories,
+    getCurrentPrompt: state => state.currentPrompt,
+    isLoading: state => state.loading,
+    isCategoriesLoading: state => state.categoriesLoading,
+    hasError: state => !!state.error,
+    getError: state => state.error,
+    getPagination: state => state.pagination,
 
-    favoritePrompts: (state) => state.prompts.filter((p) => p.isFavorite),
+    favoritePrompts: state => state.prompts.filter(p => p.isFavorite),
 
     promptsByCategory: (state) => {
       return (categoryId: number | null) =>
-        state.prompts.filter((p) => p.categoryId === categoryId)
+        state.prompts.filter(p => p.categoryId === categoryId)
     },
 
     getCategory: (state) => {
-      return (categoryId: number) => state.categories.find((c) => c.id === categoryId)
+      return (categoryId: number) => state.categories.find(c => c.id === categoryId)
     },
 
-    hasMore: (state) => state.pagination.currentPage < state.pagination.lastPage,
+    hasMore: state => state.pagination.currentPage < state.pagination.lastPage
   },
 
   actions: {
@@ -56,15 +56,15 @@ export const usePromptsStore = defineStore('prompts', {
      * @param includePromptCount - Include count of prompts per category
      * @param prioritizeSectors - Sort categories by organization's business sectors first (default: true)
      */
-    async fetchCategories(includePromptCount: boolean = true, prioritizeSectors: boolean = true) {
+    async fetchCategories (includePromptCount: boolean = true, prioritizeSectors: boolean = true) {
       this.categoriesLoading = true
       this.error = null
 
       try {
         const { authenticatedFetch } = useAuth()
         const params = new URLSearchParams()
-        if (includePromptCount) params.append('includePromptCount', 'true')
-        if (prioritizeSectors) params.append('prioritizeSectors', 'true')
+        if (includePromptCount) { params.append('includePromptCount', 'true') }
+        if (prioritizeSectors) { params.append('prioritizeSectors', 'true') }
 
         const categories = await authenticatedFetch<PromptCategory[]>(
           `/prompt-categories?${params}`
@@ -81,7 +81,7 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Fetch paginated list of prompts with optional filters
      */
-    async fetchPrompts(
+    async fetchPrompts (
       page: number = 1,
       options?: {
         categoryId?: number
@@ -100,13 +100,13 @@ export const usePromptsStore = defineStore('prompts', {
         const { authenticatedFetch } = useAuth()
         const params = new URLSearchParams({ page: String(page), limit: '50' })
 
-        if (options?.categoryId) params.append('categoryId', String(options.categoryId))
-        if (options?.favorites) params.append('favorites', 'true')
-        if (options?.search) params.append('search', options.search)
-        if (options?.sort) params.append('sort', options.sort)
-        if (options?.order) params.append('order', options.order)
+        if (options?.categoryId) { params.append('categoryId', String(options.categoryId)) }
+        if (options?.favorites) { params.append('favorites', 'true') }
+        if (options?.search) { params.append('search', options.search) }
+        if (options?.sort) { params.append('sort', options.sort) }
+        if (options?.order) { params.append('order', options.order) }
         // Default to true for sector-based sorting unless explicitly disabled
-        if (options?.prioritizeSectors !== false) params.append('prioritizeSectors', 'true')
+        if (options?.prioritizeSectors !== false) { params.append('prioritizeSectors', 'true') }
 
         const response = await authenticatedFetch<PromptPagination>(`/prompts?${params}`)
 
@@ -122,7 +122,7 @@ export const usePromptsStore = defineStore('prompts', {
           currentPage: response.meta.currentPage,
           lastPage: response.meta.lastPage,
           total: response.meta.total,
-          perPage: response.meta.perPage,
+          perPage: response.meta.perPage
         }
       } catch (error: any) {
         this.error = error?.data?.message || error?.message || 'Failed to load prompts'
@@ -135,7 +135,7 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Create a new prompt
      */
-    async createPrompt(payload: CreatePromptPayload): Promise<Prompt | null> {
+    async createPrompt (payload: CreatePromptPayload): Promise<Prompt | null> {
       this.loading = true
       this.error = null
 
@@ -145,7 +145,7 @@ export const usePromptsStore = defineStore('prompts', {
           '/prompts',
           {
             method: 'POST',
-            body: payload,
+            body: payload
           }
         )
 
@@ -165,7 +165,7 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Update a prompt
      */
-    async updatePrompt(id: number, payload: UpdatePromptPayload): Promise<Prompt | null> {
+    async updatePrompt (id: number, payload: UpdatePromptPayload): Promise<Prompt | null> {
       this.loading = true
       this.error = null
 
@@ -175,12 +175,12 @@ export const usePromptsStore = defineStore('prompts', {
           `/prompts/${id}`,
           {
             method: 'PUT',
-            body: payload,
+            body: payload
           }
         )
 
         // Update in local state
-        const index = this.prompts.findIndex((p) => p.id === id)
+        const index = this.prompts.findIndex(p => p.id === id)
         if (index !== -1) {
           this.prompts[index] = response.prompt
         }
@@ -202,13 +202,13 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Delete a prompt
      */
-    async deletePrompt(id: number): Promise<boolean> {
+    async deletePrompt (id: number): Promise<boolean> {
       try {
         const { authenticatedFetch } = useAuth()
         await authenticatedFetch(`/prompts/${id}`, { method: 'DELETE' })
 
         // Remove from local state
-        this.prompts = this.prompts.filter((p) => p.id !== id)
+        this.prompts = this.prompts.filter(p => p.id !== id)
 
         if (this.currentPrompt?.id === id) {
           this.currentPrompt = null
@@ -225,7 +225,7 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Toggle favorite status
      */
-    async toggleFavorite(id: number): Promise<boolean | null> {
+    async toggleFavorite (id: number): Promise<boolean | null> {
       try {
         const { authenticatedFetch } = useAuth()
         const response = await authenticatedFetch<{ isFavorite: boolean }>(
@@ -234,7 +234,7 @@ export const usePromptsStore = defineStore('prompts', {
         )
 
         // Update in local state
-        const index = this.prompts.findIndex((p) => p.id === id)
+        const index = this.prompts.findIndex(p => p.id === id)
         if (index !== -1) {
           this.prompts[index].isFavorite = response.isFavorite
         }
@@ -254,7 +254,7 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Increment usage count (when prompt is used)
      */
-    async incrementUsage(id: number): Promise<void> {
+    async incrementUsage (id: number): Promise<void> {
       try {
         const { authenticatedFetch } = useAuth()
         const response = await authenticatedFetch<{ usageCount: number }>(
@@ -263,7 +263,7 @@ export const usePromptsStore = defineStore('prompts', {
         )
 
         // Update in local state
-        const index = this.prompts.findIndex((p) => p.id === id)
+        const index = this.prompts.findIndex(p => p.id === id)
         if (index !== -1) {
           this.prompts[index].usageCount = response.usageCount
         }
@@ -275,7 +275,7 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Create a new category
      */
-    async createCategory(payload: CreateCategoryPayload): Promise<PromptCategory | null> {
+    async createCategory (payload: CreateCategoryPayload): Promise<PromptCategory | null> {
       this.categoriesLoading = true
       this.error = null
 
@@ -285,7 +285,7 @@ export const usePromptsStore = defineStore('prompts', {
           '/prompt-categories',
           {
             method: 'POST',
-            body: payload,
+            body: payload
           }
         )
 
@@ -305,7 +305,7 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Update a category
      */
-    async updateCategory(
+    async updateCategory (
       id: number,
       payload: UpdateCategoryPayload
     ): Promise<PromptCategory | null> {
@@ -318,12 +318,12 @@ export const usePromptsStore = defineStore('prompts', {
           `/prompt-categories/${id}`,
           {
             method: 'PUT',
-            body: payload,
+            body: payload
           }
         )
 
         // Update in local state
-        const index = this.categories.findIndex((c) => c.id === id)
+        const index = this.categories.findIndex(c => c.id === id)
         if (index !== -1) {
           this.categories[index] = response.category
         }
@@ -341,13 +341,13 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Delete a category
      */
-    async deleteCategory(id: number): Promise<boolean> {
+    async deleteCategory (id: number): Promise<boolean> {
       try {
         const { authenticatedFetch } = useAuth()
         await authenticatedFetch(`/prompt-categories/${id}`, { method: 'DELETE' })
 
         // Remove from local state
-        this.categories = this.categories.filter((c) => c.id !== id)
+        this.categories = this.categories.filter(c => c.id !== id)
 
         return true
       } catch (error: any) {
@@ -360,14 +360,14 @@ export const usePromptsStore = defineStore('prompts', {
     /**
      * Clear error
      */
-    clearError() {
+    clearError () {
       this.error = null
     },
 
     /**
      * Reset store
      */
-    reset() {
+    reset () {
       this.prompts = []
       this.categories = []
       this.currentPrompt = null
@@ -375,11 +375,11 @@ export const usePromptsStore = defineStore('prompts', {
         currentPage: 1,
         lastPage: 1,
         total: 0,
-        perPage: 50,
+        perPage: 50
       }
       this.loading = false
       this.categoriesLoading = false
       this.error = null
-    },
-  },
+    }
+  }
 })

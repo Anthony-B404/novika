@@ -293,12 +293,7 @@ For questions about your data, please contact: support@dh-echo.app
     ]
 
     if (audio.transcription?.analysis) {
-      parts.push(
-        ``,
-        `--- ANALYSIS ---`,
-        ``,
-        audio.transcription.analysis
-      )
+      parts.push(``, `--- ANALYSIS ---`, ``, audio.transcription.analysis)
     }
 
     return parts.join('\n')

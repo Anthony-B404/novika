@@ -17,9 +17,7 @@ export default class extends BaseSchema {
 
       table.integer('amount').notNullable()
 
-      table
-        .enum('type', ['purchase', 'distribution', 'adjustment'])
-        .notNullable()
+      table.enum('type', ['purchase', 'distribution', 'adjustment']).notNullable()
 
       table
         .integer('target_organization_id')

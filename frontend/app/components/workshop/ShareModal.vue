@@ -18,7 +18,7 @@ const loading = ref(false)
 const emailSchema = z.string().email()
 
 const isEmailValid = computed(() => {
-  if (!email.value) return false
+  if (!email.value) { return false }
   try {
     emailSchema.parse(email.value)
     return true
@@ -27,11 +27,11 @@ const isEmailValid = computed(() => {
   }
 })
 
-async function handleShare() {
+async function handleShare () {
   if (!isEmailValid.value) {
     toast.add({
       title: t('components.workshop.shareModal.validation.invalidEmail'),
-      color: 'error',
+      color: 'error'
     })
     return
   }
@@ -40,12 +40,12 @@ async function handleShare() {
   try {
     await authenticatedFetch(`/audios/${props.audioId}/share`, {
       method: 'POST',
-      body: { email: email.value },
+      body: { email: email.value }
     })
 
     toast.add({
       title: t('components.workshop.shareModal.success'),
-      color: 'success',
+      color: 'success'
     })
 
     email.value = ''
@@ -54,7 +54,7 @@ async function handleShare() {
     toast.add({
       title: t('components.workshop.shareModal.error'),
       description: error?.data?.message || error?.message,
-      color: 'error',
+      color: 'error'
     })
   } finally {
     loading.value = false

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   disabled?: boolean
 }>()
 
@@ -11,15 +11,15 @@ const { t } = useI18n()
 const { state, isSupported, start, pause, resume, stop, reset, getFile, formatDuration } =
   useAudioRecorder()
 
-async function handleStart() {
+async function handleStart () {
   await start()
 }
 
-function handleStop() {
+function handleStop () {
   stop()
 }
 
-function handleUseRecording() {
+function handleUseRecording () {
   const file = getFile()
   if (file) {
     emit('recording-complete', file)
@@ -27,7 +27,7 @@ function handleUseRecording() {
   }
 }
 
-function handleDiscard() {
+function handleDiscard () {
   reset()
 }
 </script>

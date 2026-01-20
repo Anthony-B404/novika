@@ -1,130 +1,130 @@
 <script setup lang="ts">
-import type { OrphanOrganization, OrphanDecision } from "~/stores/gdpr";
+import type { OrphanOrganization, OrphanDecision } from '~/stores/gdpr'
 
 const props = defineProps<{
   open: boolean;
   organizations: OrphanOrganization[];
   loading: boolean;
-}>();
+}>()
 
 const emit = defineEmits<{
-  "update:open": [value: boolean];
+  'update:open': [value: boolean];
   confirm: [decisions: OrphanDecision[]];
-}>();
+}>()
 
-const { t } = useI18n();
-const toast = useToast();
+const { t } = useI18n()
+const toast = useToast()
 
 // Separate organizations into two groups
 const soloOrgs = computed(() =>
-  props.organizations.filter((org) => getTransferableMembers(org).length === 0)
-);
+  props.organizations.filter(org => getTransferableMembers(org).length === 0)
+)
 
 const orgsWithMembers = computed(() =>
-  props.organizations.filter((org) => getTransferableMembers(org).length > 0)
-);
+  props.organizations.filter(org => getTransferableMembers(org).length > 0)
+)
 
 // Track decisions using simple reactive objects (not Map)
-const decisions = ref<Record<number, "transfer" | "delete">>({});
-const selectedOwners = ref<Record<number, number | undefined>>({});
+const decisions = ref<Record<number, 'transfer' | 'delete'>>({})
+const selectedOwners = ref<Record<number, number | undefined>>({})
 
 // Initialize decisions when organizations change
 watch(
   () => props.organizations,
   (orgs) => {
-    decisions.value = {};
-    selectedOwners.value = {};
+    decisions.value = {}
+    selectedOwners.value = {}
 
     orgs.forEach((org) => {
-      const otherMembers = getTransferableMembers(org);
+      const otherMembers = getTransferableMembers(org)
       if (otherMembers.length > 0) {
         // Default to transfer for orgs with members
-        decisions.value[org.id] = "transfer";
-        selectedOwners.value[org.id] = otherMembers[0].id;
+        decisions.value[org.id] = 'transfer'
+        selectedOwners.value[org.id] = otherMembers[0].id
       }
-    });
+    })
   },
   { immediate: true }
-);
+)
 
 // Get non-owner members for an organization
-function getTransferableMembers(org: OrphanOrganization) {
-  return org.members.filter((m) => m.role !== 1);
+function getTransferableMembers (org: OrphanOrganization) {
+  return org.members.filter(m => m.role !== 1)
 }
 
 // Get radio items for an organization
-function getActionItems(org: OrphanOrganization) {
+function getActionItems (_org: OrphanOrganization) {
   return [
     {
-      label: t("pages.dashboard.settings.privacy.orphanOrgs.transferOption"),
-      value: "transfer" as const,
-      description: t("pages.dashboard.settings.privacy.orphanOrgs.selectNewOwner"),
+      label: t('pages.dashboard.settings.privacy.orphanOrgs.transferOption'),
+      value: 'transfer' as const,
+      description: t('pages.dashboard.settings.privacy.orphanOrgs.selectNewOwner')
     },
     {
-      label: t("pages.dashboard.settings.privacy.orphanOrgs.deleteOption"),
-      value: "delete" as const,
-      description: t("pages.dashboard.settings.privacy.orphanOrgs.deleteAllMembersWarning"),
-    },
-  ];
+      label: t('pages.dashboard.settings.privacy.orphanOrgs.deleteOption'),
+      value: 'delete' as const,
+      description: t('pages.dashboard.settings.privacy.orphanOrgs.deleteAllMembersWarning')
+    }
+  ]
 }
 
 // Get member items for SelectMenu
-function getMemberItems(org: OrphanOrganization) {
-  return getTransferableMembers(org).map((m) => ({
+function getMemberItems (org: OrphanOrganization) {
+  return getTransferableMembers(org).map(m => ({
     id: m.id,
     label: m.fullName || m.email,
-    email: m.email,
-  }));
+    email: m.email
+  }))
 }
 
 // Validate and submit
-function handleConfirm() {
+function handleConfirm () {
   // Validate decisions for orgs with members
   for (const org of orgsWithMembers.value) {
-    const decision = decisions.value[org.id];
+    const decision = decisions.value[org.id]
     if (!decision) {
       toast.add({
-        title: t("pages.dashboard.settings.privacy.errors.missingDecisions"),
-        color: "error",
-      });
-      return;
+        title: t('pages.dashboard.settings.privacy.errors.missingDecisions'),
+        color: 'error'
+      })
+      return
     }
 
-    if (decision === "transfer" && !selectedOwners.value[org.id]) {
+    if (decision === 'transfer' && !selectedOwners.value[org.id]) {
       toast.add({
-        title: t("pages.dashboard.settings.privacy.errors.missingDecisions"),
-        color: "error",
-      });
-      return;
+        title: t('pages.dashboard.settings.privacy.errors.missingDecisions'),
+        color: 'error'
+      })
+      return
     }
   }
 
   // Build decisions array
-  const decisionsArray: OrphanDecision[] = [];
+  const decisionsArray: OrphanDecision[] = []
 
   // Add auto-delete decisions for solo orgs
   soloOrgs.value.forEach((org) => {
     decisionsArray.push({
       organizationId: org.id,
-      action: "delete",
-    });
-  });
+      action: 'delete'
+    })
+  })
 
   // Add user decisions for orgs with members
   orgsWithMembers.value.forEach((org) => {
-    const decision = decisions.value[org.id];
+    const decision = decisions.value[org.id]
     decisionsArray.push({
       organizationId: org.id,
       action: decision,
-      newOwnerId: decision === "transfer" ? selectedOwners.value[org.id] : undefined,
-    });
-  });
+      newOwnerId: decision === 'transfer' ? selectedOwners.value[org.id] : undefined
+    })
+  })
 
-  emit("confirm", decisionsArray);
+  emit('confirm', decisionsArray)
 }
 
-function handleClose() {
-  emit("update:open", false);
+function handleClose () {
+  emit('update:open', false)
 }
 </script>
 
@@ -186,7 +186,9 @@ function handleClose() {
             >
               <!-- Organization Header -->
               <div class="mb-4">
-                <h4 class="font-semibold">{{ org.name }}</h4>
+                <h4 class="font-semibold">
+                  {{ org.name }}
+                </h4>
                 <p class="text-muted text-sm">
                   {{ t("pages.dashboard.settings.privacy.orphanOrgs.membersCount", org.membersCount) }}
                 </p>

@@ -97,10 +97,10 @@ export default class AudioChunkingService {
     const audioStream = data.streams?.find((s: any) => s.codec_type === 'audio') || {}
 
     return {
-      duration: parseFloat(format.duration) || 0,
+      duration: Number.parseFloat(format.duration) || 0,
       format: format.format_name?.split(',')[0] || 'unknown',
-      bitrate: parseInt(format.bit_rate) || 0,
-      sampleRate: parseInt(audioStream.sample_rate) || 0,
+      bitrate: Number.parseInt(format.bit_rate) || 0,
+      sampleRate: Number.parseInt(audioStream.sample_rate) || 0,
       channels: audioStream.channels || 0,
     }
   }
@@ -237,6 +237,5 @@ export default class AudioChunkingService {
         }
       }
     }
-
   }
 }

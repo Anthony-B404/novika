@@ -29,14 +29,13 @@ const IMPORTER = (filePath: string) => {
 }
 
 async function startWorker() {
-  const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER })
-    .tap((app) => {
-      app.booting(async () => {
-        await import('#start/env')
-      })
-      app.listen('SIGTERM', () => app.terminate())
-      app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
+  const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER }).tap((app) => {
+    app.booting(async () => {
+      await import('#start/env')
     })
+    app.listen('SIGTERM', () => app.terminate())
+    app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
+  })
 
   // Create and boot the application without starting HTTP server
   const app = await ignitor.createApp('console')

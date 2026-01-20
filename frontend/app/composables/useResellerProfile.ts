@@ -2,7 +2,7 @@ import type {
   ResellerProfile,
   ResellerStats,
   CreditsResponse,
-  TransactionsFilters,
+  TransactionsFilters
 } from '~/types/reseller'
 import { getErrorMessage } from '~/utils/errors'
 
@@ -10,7 +10,7 @@ import { getErrorMessage } from '~/utils/errors'
  * Reseller Profile composable
  * Provides access to current reseller's profile and credits (Reseller Admin only)
  */
-export function useResellerProfile() {
+export function useResellerProfile () {
   const { authenticatedFetch } = useAuth()
 
   const loading = ref(false)
@@ -19,7 +19,7 @@ export function useResellerProfile() {
   /**
    * Fetch the current reseller's profile
    */
-  async function fetchProfile(): Promise<ResellerProfile | null> {
+  async function fetchProfile (): Promise<ResellerProfile | null> {
     loading.value = true
     error.value = null
     try {
@@ -35,16 +35,16 @@ export function useResellerProfile() {
   /**
    * Fetch credits and transaction history for the current reseller
    */
-  async function fetchCredits(
+  async function fetchCredits (
     filters: TransactionsFilters = {}
   ): Promise<CreditsResponse | null> {
     loading.value = true
     error.value = null
     try {
       const params = new URLSearchParams()
-      if (filters.page) params.set('page', String(filters.page))
-      if (filters.limit) params.set('limit', String(filters.limit))
-      if (filters.type) params.set('type', filters.type)
+      if (filters.page) { params.set('page', String(filters.page)) }
+      if (filters.limit) { params.set('limit', String(filters.limit)) }
+      if (filters.type) { params.set('type', filters.type) }
 
       const query = params.toString()
       return await authenticatedFetch<CreditsResponse>(
@@ -62,14 +62,14 @@ export function useResellerProfile() {
    * Fetch dashboard stats for the reseller
    * This is a computed view combining profile data with organization stats
    */
-  async function fetchStats(): Promise<ResellerStats | null> {
+  async function fetchStats (): Promise<ResellerStats | null> {
     loading.value = true
     error.value = null
     try {
       // Fetch profile and credits in parallel
       const [profile, creditsData] = await Promise.all([
         authenticatedFetch<ResellerProfile>('/reseller/profile'),
-        authenticatedFetch<CreditsResponse>('/reseller/credits?limit=5'),
+        authenticatedFetch<CreditsResponse>('/reseller/credits?limit=5')
       ])
 
       // Calculate stats from the data
@@ -79,7 +79,7 @@ export function useResellerProfile() {
 
       // Calculate distributed credits (negative amounts = distributions)
       const totalDistributed = recentTransactions
-        .filter((t) => t.type === 'distribution')
+        .filter(t => t.type === 'distribution')
         .reduce((sum, t) => sum + Math.abs(t.amount), 0)
 
       return {
@@ -88,7 +88,7 @@ export function useResellerProfile() {
         totalDistributedCredits: totalDistributed,
         totalConsumedCredits: 0, // Would need organization-level data
         recentOrganizations: [],
-        recentTransactions,
+        recentTransactions
       }
     } catch (e: unknown) {
       error.value = getErrorMessage(e, 'Failed to fetch stats')
@@ -106,6 +106,6 @@ export function useResellerProfile() {
     // Methods
     fetchProfile,
     fetchCredits,
-    fetchStats,
+    fetchStats
   }
 }

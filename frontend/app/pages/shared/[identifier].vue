@@ -1,127 +1,127 @@
 <script setup lang="ts">
-import { AudioStatus } from "~/types/audio";
+import { AudioStatus } from '~/types/audio'
 
 definePageMeta({
-  layout: false,
-});
+  layout: false
+})
 
-const route = useRoute();
-const { t } = useI18n();
-const toast = useToast();
-const runtimeConfig = useRuntimeConfig();
+const route = useRoute()
+const { t } = useI18n()
+const toast = useToast()
+const runtimeConfig = useRuntimeConfig()
 
-const identifier = computed(() => route.params.identifier as string);
+const identifier = computed(() => route.params.identifier as string)
 
 // Fetch shared data
 const { data, pending, error } = await useFetch(
   () => `${runtimeConfig.public.apiUrl}/shared/${identifier.value}`,
   {
-    key: `shared-${identifier.value}`,
-  },
-);
+    key: `shared-${identifier.value}`
+  }
+)
 
-const share = computed(() => data.value?.share);
-const audio = computed(() => data.value?.audio);
+const share = computed(() => data.value?.share)
+const audio = computed(() => data.value?.audio)
 
-const activeTab = ref<"transcription" | "analysis">("transcription");
+const activeTab = ref<'transcription' | 'analysis'>('transcription')
 
 // Audio player ref and current time for segment sync
-const audioPlayerRef = ref<InstanceType<typeof WorkshopAudioPlayer> | null>(null);
-const currentTime = ref(0);
+const audioPlayerRef = ref<InstanceType<typeof WorkshopAudioPlayer> | null>(null)
+const currentTime = ref(0)
 
 // Audio URL (public endpoint)
 const audioUrl = computed(
   () => `${runtimeConfig.public.apiUrl}/shared/${identifier.value}/audio`
-);
+)
 
 // Check if timestamps are available
 const hasTimestamps = computed(
   () => (audio.value?.transcription?.timestamps?.length ?? 0) > 0
-);
+)
 
 // Markdown rendering
-const { renderMarkdown } = useMarkdown();
+const { renderMarkdown } = useMarkdown()
 const renderedTranscription = computed(() =>
-  renderMarkdown(audio.value?.transcription?.rawText || ""),
-);
+  renderMarkdown(audio.value?.transcription?.rawText || '')
+)
 const renderedAnalysis = computed(() =>
-  renderMarkdown(audio.value?.transcription?.analysis || ""),
-);
+  renderMarkdown(audio.value?.transcription?.analysis || '')
+)
 
 // Tab items
 const tabItems = computed(() => [
   {
-    label: t("pages.shared.tabs.transcription"),
-    value: "transcription",
+    label: t('pages.shared.tabs.transcription'),
+    value: 'transcription'
   },
   {
-    label: t("pages.shared.tabs.analysis"),
-    value: "analysis",
-  },
-]);
+    label: t('pages.shared.tabs.analysis'),
+    value: 'analysis'
+  }
+])
 
 // Format duration
-function formatDuration(seconds: number | null): string {
-  if (!seconds) return "--:--";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+function formatDuration (seconds: number | null): string {
+  if (!seconds) { return '--:--' }
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
 // Format file size
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+function formatFileSize (bytes: number): string {
+  if (bytes < 1024) { return `${bytes} B` }
+  if (bytes < 1024 * 1024) { return `${(bytes / 1024).toFixed(1)} KB` }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 // Get sender name
 const senderName = computed(() => {
-  if (!share.value?.sharedBy) return "";
-  return share.value.sharedBy.fullName || share.value.sharedBy.firstName || "";
-});
+  if (!share.value?.sharedBy) { return '' }
+  return share.value.sharedBy.fullName || share.value.sharedBy.firstName || ''
+})
 
 // Check if current tab content can be copied
 const canCopy = computed(() => {
-  if (activeTab.value === "transcription") {
-    return !!audio.value?.transcription?.rawText;
+  if (activeTab.value === 'transcription') {
+    return !!audio.value?.transcription?.rawText
   }
-  return !!audio.value?.transcription?.analysis;
-});
+  return !!audio.value?.transcription?.analysis
+})
 
 // Copy active tab content to clipboard
-async function copyContent() {
-  if (activeTab.value === "transcription") {
-    if (!audio.value?.transcription?.rawText) return;
-    await navigator.clipboard.writeText(audio.value.transcription.rawText);
+async function copyContent () {
+  if (activeTab.value === 'transcription') {
+    if (!audio.value?.transcription?.rawText) { return }
+    await navigator.clipboard.writeText(audio.value.transcription.rawText)
     toast.add({
-      title: t("pages.shared.transcriptionCopied"),
-      color: "success",
-    });
-  } else if (activeTab.value === "analysis") {
-    if (!audio.value?.transcription?.analysis) return;
-    await navigator.clipboard.writeText(audio.value.transcription.analysis);
+      title: t('pages.shared.transcriptionCopied'),
+      color: 'success'
+    })
+  } else if (activeTab.value === 'analysis') {
+    if (!audio.value?.transcription?.analysis) { return }
+    await navigator.clipboard.writeText(audio.value.transcription.analysis)
     toast.add({
-      title: t("pages.shared.analysisCopied"),
-      color: "success",
-    });
+      title: t('pages.shared.analysisCopied'),
+      color: 'success'
+    })
   }
 }
 
 // Handle time update from audio player
-function onTimeUpdate(time: number) {
-  currentTime.value = time;
+function onTimeUpdate (time: number) {
+  currentTime.value = time
 }
 
 // Handle seek from transcription segment click
-function handleSegmentSeek(time: number) {
-  audioPlayerRef.value?.seekTo(time);
+function handleSegmentSeek (time: number) {
+  audioPlayerRef.value?.seekTo(time)
 }
 
 useSeoMeta({
-  title: () => audio.value?.title || t("pages.shared.seoTitle"),
-  description: t("pages.shared.seoDescription"),
-});
+  title: () => audio.value?.title || t('pages.shared.seoTitle'),
+  description: t('pages.shared.seoDescription')
+})
 </script>
 
 <template>

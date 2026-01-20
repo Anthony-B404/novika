@@ -1,101 +1,101 @@
 <script setup lang="ts">
 import type {
   ResellerOrganization,
-  OrganizationsFilters,
-} from "~/types/reseller";
+  OrganizationsFilters
+} from '~/types/reseller'
 
 definePageMeta({
-  layout: "reseller",
-  middleware: ["auth", "reseller"],
-});
+  layout: 'reseller',
+  middleware: ['auth', 'reseller']
+})
 
-const { t } = useI18n();
-const localePath = useLocalePath();
+const { t } = useI18n()
+const localePath = useLocalePath()
 
 // Breadcrumb
 const breadcrumbItems = computed(() => [
   {
-    label: t("reseller.navigation.dashboard"),
-    icon: "i-lucide-home",
-    to: localePath("/reseller"),
+    label: t('reseller.navigation.dashboard'),
+    icon: 'i-lucide-home',
+    to: localePath('/reseller')
   },
   {
-    label: t("reseller.navigation.organizations"),
-    icon: "i-lucide-building-2",
-  },
-]);
+    label: t('reseller.navigation.organizations'),
+    icon: 'i-lucide-building-2'
+  }
+])
 
 useSeoMeta({
-  title: t("reseller.organizations.list.title"),
-});
+  title: t('reseller.organizations.list.title')
+})
 
-const { fetchOrganizations, loading, error } = useResellerOrganizations();
+const { fetchOrganizations, loading, error } = useResellerOrganizations()
 
 // State
-const organizations = ref<ResellerOrganization[]>([]);
+const organizations = ref<ResellerOrganization[]>([])
 const pagination = ref({
   total: 0,
   perPage: 20,
   currentPage: 1,
-  lastPage: 1,
-});
+  lastPage: 1
+})
 
 // Filters
-const search = ref("");
+const search = ref('')
 
 // Load organizations
-async function loadOrganizations(page = 1) {
+async function loadOrganizations (page = 1) {
   const filters: OrganizationsFilters = {
     page,
     limit: pagination.value.perPage,
     search: search.value || undefined,
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  };
+    sortBy: 'createdAt',
+    sortOrder: 'desc'
+  }
 
-  const response = await fetchOrganizations(filters);
+  const response = await fetchOrganizations(filters)
   if (response) {
-    organizations.value = response.data;
+    organizations.value = response.data
     pagination.value = {
       total: response.meta.total,
       perPage: response.meta.perPage,
       currentPage: response.meta.currentPage,
-      lastPage: response.meta.lastPage,
-    };
+      lastPage: response.meta.lastPage
+    }
   }
 }
 
 // Initial load
-onMounted(() => loadOrganizations());
+onMounted(() => loadOrganizations())
 
 // Debounced search
 const debouncedSearch = useDebounceFn(() => {
-  loadOrganizations(1);
-}, 300);
+  loadOrganizations(1)
+}, 300)
 
 // Watch filters
 watch(search, () => {
-  debouncedSearch();
-});
+  debouncedSearch()
+})
 
 // Handle page change
-function handlePageChange(page: number) {
-  loadOrganizations(page);
+function handlePageChange (page: number) {
+  loadOrganizations(page)
 }
 
 // Handle view
-function handleView(organization: ResellerOrganization) {
-  navigateTo(localePath(`/reseller/organizations/${organization.id}`));
+function handleView (organization: ResellerOrganization) {
+  navigateTo(localePath(`/reseller/organizations/${organization.id}`))
 }
 
 // Handle credits
-function handleCredits(organization: ResellerOrganization) {
-  navigateTo(localePath(`/reseller/organizations/${organization.id}/credits`));
+function handleCredits (organization: ResellerOrganization) {
+  navigateTo(localePath(`/reseller/organizations/${organization.id}/credits`))
 }
 
 // Handle users
-function handleUsers(organization: ResellerOrganization) {
-  navigateTo(localePath(`/reseller/organizations/${organization.id}/users`));
+function handleUsers (organization: ResellerOrganization) {
+  navigateTo(localePath(`/reseller/organizations/${organization.id}/users`))
 }
 </script>
 

@@ -1,15 +1,15 @@
-export function randomInt(min: number, max: number): number {
+export function randomInt (min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export function randomFrom<T>(array: T[]): T {
+export function randomFrom<T> (array: T[]): T {
   return array[Math.floor(Math.random() * array.length)]!
 }
 
 /**
  * Format a date string to localized format
  */
-export function formatDate(
+export function formatDate (
   dateString: string,
   locale: string,
   options?: Intl.DateTimeFormatOptions
@@ -17,7 +17,7 @@ export function formatDate(
   const defaultOptions: Intl.DateTimeFormatOptions = {
     day: 'numeric',
     month: 'short',
-    year: 'numeric',
+    year: 'numeric'
   }
   return new Date(dateString).toLocaleDateString(locale, options || defaultOptions)
 }
@@ -25,7 +25,7 @@ export function formatDate(
 /**
  * Format a date string to localized format with time
  */
-export function formatDateTime(
+export function formatDateTime (
   dateString: string,
   locale: string,
   options?: Intl.DateTimeFormatOptions
@@ -35,7 +35,7 @@ export function formatDateTime(
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit',
+    minute: '2-digit'
   }
   return new Date(dateString).toLocaleDateString(locale, options || defaultOptions)
 }
@@ -43,7 +43,7 @@ export function formatDateTime(
 /**
  * Build URL search params from object
  */
-export function buildQueryString(params: Record<string, unknown>): string {
+export function buildQueryString (params: Record<string, unknown>): string {
   const urlParams = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -56,7 +56,7 @@ export function buildQueryString(params: Record<string, unknown>): string {
 /**
  * Extract error message from unknown error
  */
-export function getErrorMessage(e: unknown, fallback: string): string {
+export function getErrorMessage (e: unknown, fallback: string): string {
   if (e && typeof e === 'object' && 'data' in e) {
     const fetchError = e as { data?: { message?: string } }
     return fetchError.data?.message || fallback

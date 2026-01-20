@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ResellerOrganization } from '~/types/reseller'
 
-const props = defineProps<{
+defineProps<{
   organization: ResellerOrganization | null
   loading?: boolean
 }>()
@@ -17,11 +17,11 @@ const { t } = useI18n()
 
 const reason = ref('')
 
-function handleConfirm() {
+function handleConfirm () {
   emit('confirm', reason.value.trim() || undefined)
 }
 
-function handleCancel() {
+function handleCancel () {
   reason.value = ''
   emit('cancel')
 }
@@ -48,7 +48,9 @@ watch(open, (isOpen) => {
         <UAlert color="warning" variant="subtle" :title="t('reseller.organizations.suspend.warning')">
           <template #description>
             <div class="mt-2">
-              <p class="font-medium">{{ t('reseller.organizations.suspend.consequences.title') }}</p>
+              <p class="font-medium">
+                {{ t('reseller.organizations.suspend.consequences.title') }}
+              </p>
               <ul class="mt-1 list-disc list-inside text-sm space-y-1">
                 <li>{{ t('reseller.organizations.suspend.consequences.users') }}</li>
                 <li>{{ t('reseller.organizations.suspend.consequences.credits') }}</li>

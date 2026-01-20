@@ -40,7 +40,7 @@ const state = reactive({
   address: props.initialData?.address || '',
   notes: props.initialData?.notes || '',
   initialCredits: undefined as number | undefined,
-  isActive: props.initialData?.isActive ?? true,
+  isActive: props.initialData?.isActive ?? true
 })
 
 // Watch for initialData changes (when editing)
@@ -81,12 +81,12 @@ const schema = z.object({
   address: z.string().max(500).optional(),
   notes: z.string().max(2000).optional(),
   initialCredits: z.number().positive().optional(),
-  isActive: z.boolean().optional(),
+  isActive: z.boolean().optional()
 })
 
 type Schema = z.infer<typeof schema>
 
-function onSubmit(event: FormSubmitEvent<Schema>) {
+function onSubmit (event: FormSubmitEvent<Schema>) {
   emit('submit', event.data)
 }
 </script>

@@ -4,7 +4,7 @@ import { getErrorMessage } from '~/utils/errors'
 
 definePageMeta({
   layout: 'admin',
-  middleware: ['auth', 'admin'],
+  middleware: ['auth', 'admin']
 })
 
 const { t } = useI18n()
@@ -12,31 +12,31 @@ const localePath = useLocalePath()
 const toast = useToast()
 
 useSeoMeta({
-  title: t('admin.resellers.create.title'),
+  title: t('admin.resellers.create.title')
 })
 
 const { createReseller, loading } = useResellers()
 
-async function handleSubmit(data: CreateResellerPayload) {
+async function handleSubmit (data: CreateResellerPayload) {
   try {
     // Build payload, excluding empty optional fields
     const payload: CreateResellerPayload = {
       name: data.name,
       email: data.email,
-      company: data.company,
+      company: data.company
     }
-    if (data.phone) payload.phone = data.phone
-    if (data.siret) payload.siret = data.siret
-    if (data.address) payload.address = data.address
-    if (data.notes) payload.notes = data.notes
-    if (data.initialCredits) payload.initialCredits = data.initialCredits
+    if (data.phone) { payload.phone = data.phone }
+    if (data.siret) { payload.siret = data.siret }
+    if (data.address) { payload.address = data.address }
+    if (data.notes) { payload.notes = data.notes }
+    if (data.initialCredits) { payload.initialCredits = data.initialCredits }
 
     const result = await createReseller(payload)
     if (result) {
       toast.add({
         title: t('admin.resellers.create.success'),
         description: t('admin.resellers.create.successDescription'),
-        color: 'success',
+        color: 'success'
       })
       navigateTo(localePath(`/admin/resellers/${result.reseller.id}`))
     }
@@ -44,12 +44,12 @@ async function handleSubmit(data: CreateResellerPayload) {
     toast.add({
       title: t('admin.resellers.create.error'),
       description: getErrorMessage(e, t('admin.resellers.create.errorDescription')),
-      color: 'error',
+      color: 'error'
     })
   }
 }
 
-function handleCancel() {
+function handleCancel () {
   navigateTo(localePath('/admin/resellers'))
 }
 </script>

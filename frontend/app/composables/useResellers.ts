@@ -10,7 +10,7 @@ import type {
   AddCreditsPayload,
   AddCreditsResponse,
   ResellersFilters,
-  TransactionsFilters,
+  TransactionsFilters
 } from '~/types/admin'
 import { getErrorMessage } from '~/utils/errors'
 
@@ -18,7 +18,7 @@ import { getErrorMessage } from '~/utils/errors'
  * Resellers composable
  * Provides CRUD operations for managing resellers (Super Admin only)
  */
-export function useResellers() {
+export function useResellers () {
   const { authenticatedFetch } = useAuth()
 
   const loading = ref(false)
@@ -27,7 +27,7 @@ export function useResellers() {
   /**
    * Fetch admin dashboard stats
    */
-  async function fetchStats(): Promise<AdminStats | null> {
+  async function fetchStats (): Promise<AdminStats | null> {
     loading.value = true
     error.value = null
     try {
@@ -43,19 +43,19 @@ export function useResellers() {
   /**
    * Fetch resellers list with pagination and filters
    */
-  async function fetchResellers(
+  async function fetchResellers (
     filters: ResellersFilters = {}
   ): Promise<ResellersListResponse | null> {
     loading.value = true
     error.value = null
     try {
       const params = new URLSearchParams()
-      if (filters.page) params.set('page', String(filters.page))
-      if (filters.limit) params.set('limit', String(filters.limit))
-      if (filters.search) params.set('search', filters.search)
-      if (filters.isActive !== undefined) params.set('isActive', String(filters.isActive))
-      if (filters.sortBy) params.set('sortBy', filters.sortBy)
-      if (filters.sortOrder) params.set('sortOrder', filters.sortOrder)
+      if (filters.page) { params.set('page', String(filters.page)) }
+      if (filters.limit) { params.set('limit', String(filters.limit)) }
+      if (filters.search) { params.set('search', filters.search) }
+      if (filters.isActive !== undefined) { params.set('isActive', String(filters.isActive)) }
+      if (filters.sortBy) { params.set('sortBy', filters.sortBy) }
+      if (filters.sortOrder) { params.set('sortOrder', filters.sortOrder) }
 
       const query = params.toString()
       return await authenticatedFetch<ResellersListResponse>(
@@ -72,7 +72,7 @@ export function useResellers() {
   /**
    * Fetch single reseller by ID
    */
-  async function fetchReseller(id: number): Promise<Reseller | null> {
+  async function fetchReseller (id: number): Promise<Reseller | null> {
     loading.value = true
     error.value = null
     try {
@@ -88,7 +88,7 @@ export function useResellers() {
   /**
    * Create a new reseller
    */
-  async function createReseller(
+  async function createReseller (
     payload: CreateResellerPayload
   ): Promise<CreateResellerResponse | null> {
     loading.value = true
@@ -97,7 +97,7 @@ export function useResellers() {
       return await authenticatedFetch<CreateResellerResponse>('/admin/resellers', {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' }
       })
     } catch (e: unknown) {
       error.value = getErrorMessage(e, 'Failed to create reseller')
@@ -110,7 +110,7 @@ export function useResellers() {
   /**
    * Update an existing reseller
    */
-  async function updateReseller(
+  async function updateReseller (
     id: number,
     payload: UpdateResellerPayload
   ): Promise<UpdateResellerResponse | null> {
@@ -120,7 +120,7 @@ export function useResellers() {
       return await authenticatedFetch<UpdateResellerResponse>(`/admin/resellers/${id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' }
       })
     } catch (e: unknown) {
       error.value = getErrorMessage(e, 'Failed to update reseller')
@@ -133,7 +133,7 @@ export function useResellers() {
   /**
    * Deactivate a reseller (soft delete)
    */
-  async function deactivateReseller(id: number): Promise<boolean> {
+  async function deactivateReseller (id: number): Promise<boolean> {
     loading.value = true
     error.value = null
     try {
@@ -150,7 +150,7 @@ export function useResellers() {
   /**
    * Add credits to a reseller's pool
    */
-  async function addCredits(
+  async function addCredits (
     resellerId: number,
     payload: AddCreditsPayload
   ): Promise<AddCreditsResponse | null> {
@@ -162,7 +162,7 @@ export function useResellers() {
         {
           method: 'POST',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     } catch (e: unknown) {
@@ -176,7 +176,7 @@ export function useResellers() {
   /**
    * Remove credits from a reseller's pool
    */
-  async function removeCredits(
+  async function removeCredits (
     resellerId: number,
     payload: AddCreditsPayload
   ): Promise<AddCreditsResponse | null> {
@@ -188,7 +188,7 @@ export function useResellers() {
         {
           method: 'POST',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     } catch (e: unknown) {
@@ -202,7 +202,7 @@ export function useResellers() {
   /**
    * Fetch transaction history for a reseller
    */
-  async function fetchTransactions(
+  async function fetchTransactions (
     resellerId: number,
     filters: TransactionsFilters = {}
   ): Promise<TransactionsListResponse | null> {
@@ -210,9 +210,9 @@ export function useResellers() {
     error.value = null
     try {
       const params = new URLSearchParams()
-      if (filters.page) params.set('page', String(filters.page))
-      if (filters.limit) params.set('limit', String(filters.limit))
-      if (filters.type) params.set('type', filters.type)
+      if (filters.page) { params.set('page', String(filters.page)) }
+      if (filters.limit) { params.set('limit', String(filters.limit)) }
+      if (filters.type) { params.set('type', filters.type) }
 
       const query = params.toString()
       return await authenticatedFetch<TransactionsListResponse>(
@@ -240,6 +240,6 @@ export function useResellers() {
     deactivateReseller,
     addCredits,
     removeCredits,
-    fetchTransactions,
+    fetchTransactions
   }
 }

@@ -15,8 +15,8 @@ const isDragging = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 const validationError = ref<string | null>(null)
 
-function handleFiles(files: FileList | null) {
-  if (!files || files.length === 0 || props.disabled) return
+function handleFiles (files: FileList | null) {
+  if (!files || files.length === 0 || props.disabled) { return }
 
   const file = files[0]
   const validation = validateFile(file)
@@ -30,30 +30,30 @@ function handleFiles(files: FileList | null) {
   emit('file-selected', file)
 }
 
-function handleDrop(event: DragEvent) {
+function handleDrop (event: DragEvent) {
   isDragging.value = false
-  if (props.disabled) return
+  if (props.disabled) { return }
   handleFiles(event.dataTransfer?.files || null)
 }
 
-function handleDragOver(event: DragEvent) {
+function handleDragOver (event: DragEvent) {
   event.preventDefault()
   if (!props.disabled) {
     isDragging.value = true
   }
 }
 
-function handleDragLeave() {
+function handleDragLeave () {
   isDragging.value = false
 }
 
-function openFilePicker() {
+function openFilePicker () {
   if (!props.disabled) {
     fileInput.value?.click()
   }
 }
 
-function handleInputChange(event: Event) {
+function handleInputChange (event: Event) {
   const target = event.target as HTMLInputElement
   handleFiles(target.files)
   target.value = ''
@@ -82,7 +82,7 @@ function handleInputChange(event: Event) {
         class="hidden"
         :disabled="disabled || loading"
         @change="handleInputChange"
-      />
+      >
 
       <div v-if="loading" class="flex flex-col items-center gap-3">
         <UIcon name="i-lucide-loader-2" class="w-12 h-12 text-primary animate-spin" />

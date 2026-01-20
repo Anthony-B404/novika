@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import type { NuxtError } from "#app";
+import type { NuxtError } from '#app'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 defineProps<{
   error: NuxtError;
-}>();
+}>()
 
 useSeoMeta({
   title: t('seo.error.title'),
-  description: t('seo.error.description'),
-});
+  description: t('seo.error.description')
+})
 
 useHead({
   htmlAttrs: {
-    lang: "en",
-  },
-});
+    lang: 'en'
+  }
+})
 </script>
 
 <template>

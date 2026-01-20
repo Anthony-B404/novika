@@ -1,67 +1,67 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-const { t } = useI18n();
-const { authenticatedFetch } = useAuth();
+const { t } = useI18n()
+const { authenticatedFetch } = useAuth()
 
-const open = defineModel<boolean>("open", { default: false });
-const loading = ref(false);
+const open = defineModel<boolean>('open', { default: false })
+const loading = ref(false)
 
 const schema = z.object({
   subject: z
     .string()
-    .min(5, t("components.contactSupport.validation.subjectTooShort"))
-    .max(200, t("components.contactSupport.validation.subjectTooLong")),
+    .min(5, t('components.contactSupport.validation.subjectTooShort'))
+    .max(200, t('components.contactSupport.validation.subjectTooLong')),
   message: z
     .string()
-    .min(20, t("components.contactSupport.validation.messageTooShort"))
-    .max(5000, t("components.contactSupport.validation.messageTooLong")),
-});
+    .min(20, t('components.contactSupport.validation.messageTooShort'))
+    .max(5000, t('components.contactSupport.validation.messageTooLong'))
+})
 
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
   subject: undefined,
-  message: undefined,
-});
+  message: undefined
+})
 
-const toast = useToast();
+const toast = useToast()
 
-function resetForm() {
-  state.subject = undefined;
-  state.message = undefined;
+function resetForm () {
+  state.subject = undefined
+  state.message = undefined
 }
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  loading.value = true;
+async function onSubmit (event: FormSubmitEvent<Schema>) {
+  loading.value = true
   try {
-    await authenticatedFetch("/contact", {
-      method: "POST",
+    await authenticatedFetch('/contact', {
+      method: 'POST',
       body: {
         subject: event.data.subject,
-        message: event.data.message,
-      },
-    });
+        message: event.data.message
+      }
+    })
 
     toast.add({
-      title: t("components.contactSupport.successTitle"),
-      description: t("components.contactSupport.successDescription"),
-      color: "success",
-    });
+      title: t('components.contactSupport.successTitle'),
+      description: t('components.contactSupport.successDescription'),
+      color: 'success'
+    })
 
-    resetForm();
-    open.value = false;
+    resetForm()
+    open.value = false
   } catch (error: unknown) {
-    const err = error as { data?: { message?: string } };
+    const err = error as { data?: { message?: string } }
     toast.add({
-      title: t("components.contactSupport.errorTitle"),
+      title: t('components.contactSupport.errorTitle'),
       description:
-        err.data?.message || t("components.contactSupport.errorDescription"),
-      color: "error",
-    });
+        err.data?.message || t('components.contactSupport.errorDescription'),
+      color: 'error'
+    })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

@@ -3,7 +3,7 @@ import type { ResellerProfile } from '~/types/reseller'
 
 definePageMeta({
   layout: 'reseller',
-  middleware: ['auth', 'reseller'],
+  middleware: ['auth', 'reseller']
 })
 
 const { t } = useI18n()
@@ -13,11 +13,11 @@ const { formatDate, formatCredits } = useFormatters()
 // Breadcrumb
 const breadcrumbItems = computed(() => [
   { label: t('reseller.navigation.dashboard'), icon: 'i-lucide-home', to: localePath('/reseller') },
-  { label: t('reseller.navigation.profile'), icon: 'i-lucide-user' },
+  { label: t('reseller.navigation.profile'), icon: 'i-lucide-user' }
 ])
 
 useSeoMeta({
-  title: t('reseller.profile.title'),
+  title: t('reseller.profile.title')
 })
 
 // Composables
@@ -64,7 +64,9 @@ onMounted(async () => {
         <div class="lg:col-span-2">
           <UCard>
             <template #header>
-              <h2 class="text-lg font-semibold">{{ t('reseller.profile.info') }}</h2>
+              <h2 class="text-lg font-semibold">
+                {{ t('reseller.profile.info') }}
+              </h2>
             </template>
 
             <dl class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -133,7 +135,9 @@ onMounted(async () => {
           <!-- Status card -->
           <UCard>
             <template #header>
-              <h2 class="text-lg font-semibold">{{ t('reseller.profile.status') }}</h2>
+              <h2 class="text-lg font-semibold">
+                {{ t('reseller.profile.status') }}
+              </h2>
             </template>
 
             <div class="text-center py-4">
@@ -150,14 +154,18 @@ onMounted(async () => {
           <!-- Credits card -->
           <UCard>
             <template #header>
-              <h2 class="text-lg font-semibold">{{ t('reseller.profile.creditBalance') }}</h2>
+              <h2 class="text-lg font-semibold">
+                {{ t('reseller.profile.creditBalance') }}
+              </h2>
             </template>
 
             <div class="text-center py-4">
               <div class="text-4xl font-bold text-primary-500">
                 {{ formatCredits(profile.creditBalance) }}
               </div>
-              <div class="text-gray-500">{{ t('common.credits') }}</div>
+              <div class="text-gray-500">
+                {{ t('common.credits') }}
+              </div>
             </div>
           </UCard>
 

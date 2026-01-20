@@ -17,14 +17,14 @@ const ALLOWED_TYPES = [
   'audio/mp4',
   'audio/ogg',
   'audio/flac',
-  'audio/x-flac',
+  'audio/x-flac'
 ]
 
 const ALLOWED_EXTENSIONS = /\.(mp3|wav|m4a|ogg|flac)$/i
 
 const MAX_SIZE = 512 * 1024 * 1024 // 512MB
 
-export function useAudioUpload(options: UseAudioUploadOptions = {}) {
+export function useAudioUpload (options: UseAudioUploadOptions = {}) {
   const { authenticatedFetch } = useAuth()
 
   const uploading = ref(false)
@@ -34,27 +34,27 @@ export function useAudioUpload(options: UseAudioUploadOptions = {}) {
   /**
    * Validate file type and size
    */
-  function validateFile(file: File): { valid: boolean; error?: string } {
+  function validateFile (file: File): { valid: boolean; error?: string } {
     const isValidType = ALLOWED_TYPES.includes(file.type) || ALLOWED_EXTENSIONS.test(file.name)
 
     if (!isValidType) {
       return {
         valid: false,
-        error: 'Invalid file type. Supported formats: MP3, WAV, M4A, OGG, FLAC',
+        error: 'Invalid file type. Supported formats: MP3, WAV, M4A, OGG, FLAC'
       }
     }
 
     if (file.size > MAX_SIZE) {
       return {
         valid: false,
-        error: 'File too large. Maximum size is 512MB',
+        error: 'File too large. Maximum size is 512MB'
       }
     }
 
     if (file.size === 0) {
       return {
         valid: false,
-        error: 'File is empty',
+        error: 'File is empty'
       }
     }
 
@@ -64,7 +64,7 @@ export function useAudioUpload(options: UseAudioUploadOptions = {}) {
   /**
    * Upload audio file with prompt
    */
-  async function upload(file: File, prompt: string): Promise<ProcessJobResponse | null> {
+  async function upload (file: File, prompt: string): Promise<ProcessJobResponse | null> {
     // Validate file
     const validation = validateFile(file)
     if (!validation.valid) {
@@ -97,7 +97,7 @@ export function useAudioUpload(options: UseAudioUploadOptions = {}) {
 
       const response = await authenticatedFetch<ProcessJobResponse>('/audio/process', {
         method: 'POST',
-        body: formData,
+        body: formData
       })
 
       progress.value = { loaded: file.size, total: file.size, percentage: 100 }
@@ -116,7 +116,7 @@ export function useAudioUpload(options: UseAudioUploadOptions = {}) {
   /**
    * Reset state
    */
-  function reset() {
+  function reset () {
     uploading.value = false
     progress.value = { loaded: 0, total: 0, percentage: 0 }
     error.value = null
@@ -125,16 +125,16 @@ export function useAudioUpload(options: UseAudioUploadOptions = {}) {
   /**
    * Format file size for display
    */
-  function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  function formatFileSize (bytes: number): string {
+    if (bytes < 1024) { return `${bytes} B` }
+    if (bytes < 1024 * 1024) { return `${(bytes / 1024).toFixed(1)} KB` }
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
   /**
    * Format max size for display
    */
-  function formatMaxSize(): string {
+  function formatMaxSize (): string {
     return formatFileSize(MAX_SIZE)
   }
 
@@ -153,6 +153,6 @@ export function useAudioUpload(options: UseAudioUploadOptions = {}) {
 
     // Constants
     ALLOWED_TYPES,
-    MAX_SIZE,
+    MAX_SIZE
   }
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
 import type { OrganizationUser } from '~/types/reseller'
 import { USER_ROLES } from '~/types/reseller'
-import type { TableColumn } from '@nuxt/ui'
 
 defineProps<{
   users: OrganizationUser[]
@@ -19,24 +19,24 @@ const { formatDate } = useFormatters()
 const columns: TableColumn<OrganizationUser>[] = [
   {
     accessorKey: 'fullName',
-    header: t('reseller.users.table.name'),
+    header: t('reseller.users.table.name')
   },
   {
     accessorKey: 'email',
-    header: t('reseller.users.table.email'),
+    header: t('reseller.users.table.email')
   },
   {
     accessorKey: 'role',
-    header: t('reseller.users.table.role'),
+    header: t('reseller.users.table.role')
   },
   {
     accessorKey: 'createdAt',
-    header: t('reseller.users.table.createdAt'),
+    header: t('reseller.users.table.createdAt')
   },
   {
     accessorKey: 'actions',
-    header: '',
-  },
+    header: ''
+  }
 ]
 
 // Badge color type for Nuxt UI
@@ -46,32 +46,32 @@ type BadgeColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'i
 const roleConfig: Record<number, { label: string; color: BadgeColor }> = {
   [USER_ROLES.OWNER]: {
     label: t('reseller.users.roles.owner'),
-    color: 'primary',
+    color: 'primary'
   },
   [USER_ROLES.ADMINISTRATOR]: {
     label: t('reseller.users.roles.administrator'),
-    color: 'info',
+    color: 'info'
   },
   [USER_ROLES.MEMBER]: {
     label: t('reseller.users.roles.member'),
-    color: 'neutral',
-  },
+    color: 'neutral'
+  }
 }
 
-function getRoleLabel(role: number) {
+function getRoleLabel (role: number) {
   return roleConfig[role]?.label || '-'
 }
 
-function getRoleColor(role: number): BadgeColor {
+function getRoleColor (role: number): BadgeColor {
   return roleConfig[role]?.color || 'neutral'
 }
 
 /**
  * Check if a pending user can receive a new invitation (5 minute cooldown)
  */
-function canResendInvitation(user: OrganizationUser): boolean {
-  if (user.onboardingCompleted) return false
-  if (!user.lastInvitationSentAt) return true
+function canResendInvitation (user: OrganizationUser): boolean {
+  if (user.onboardingCompleted) { return false }
+  if (!user.lastInvitationSentAt) { return true }
 
   const cooldownMs = 5 * 60 * 1000 // 5 minutes
   const lastSent = new Date(user.lastInvitationSentAt).getTime()
@@ -81,8 +81,8 @@ function canResendInvitation(user: OrganizationUser): boolean {
 /**
  * Get remaining cooldown seconds for resend
  */
-function getResendCooldownSeconds(user: OrganizationUser): number {
-  if (!user.lastInvitationSentAt) return 0
+function getResendCooldownSeconds (user: OrganizationUser): number {
+  if (!user.lastInvitationSentAt) { return 0 }
 
   const cooldownMs = 5 * 60 * 1000 // 5 minutes
   const lastSent = new Date(user.lastInvitationSentAt).getTime()
@@ -93,7 +93,7 @@ function getResendCooldownSeconds(user: OrganizationUser): number {
 /**
  * Format cooldown seconds to readable string
  */
-function formatCooldown(seconds: number): string {
+function formatCooldown (seconds: number): string {
   const minutes = Math.floor(seconds / 60)
   const secs = seconds % 60
   if (minutes > 0) {
@@ -102,7 +102,7 @@ function formatCooldown(seconds: number): string {
   return `${secs}s`
 }
 
-function getRowActions(user: OrganizationUser) {
+function getRowActions (user: OrganizationUser) {
   const actions = []
 
   // Add resend invitation action for pending users (including owners)
@@ -116,7 +116,7 @@ function getRowActions(user: OrganizationUser) {
         : t('reseller.users.actions.resendCooldown', { time: formatCooldown(cooldownSeconds) }),
       icon: 'i-lucide-mail',
       disabled: !canResend,
-      onSelect: () => emit('resend', user),
+      onSelect: () => emit('resend', user)
     })
   }
 
@@ -127,7 +127,7 @@ function getRowActions(user: OrganizationUser) {
       actions.push({
         label: t('reseller.users.actions.cannotDeleteOwner'),
         icon: 'i-lucide-info',
-        disabled: true,
+        disabled: true
       })
     }
     return actions
@@ -138,7 +138,7 @@ function getRowActions(user: OrganizationUser) {
     label: t('common.buttons.delete'),
     icon: 'i-lucide-trash-2',
     color: 'error' as const,
-    onSelect: () => emit('delete', user),
+    onSelect: () => emit('delete', user)
   })
 
   return actions

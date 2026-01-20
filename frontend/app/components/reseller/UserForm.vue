@@ -19,13 +19,13 @@ const state = reactive({
   email: '',
   firstName: '',
   lastName: '',
-  role: 3 as 2 | 3,
+  role: 3 as 2 | 3
 })
 
 // Role options
 const roleOptions = [
   { label: t('reseller.users.roles.administrator'), value: 2 },
-  { label: t('reseller.users.roles.member'), value: 3 },
+  { label: t('reseller.users.roles.member'), value: 3 }
 ]
 
 // Validation schema
@@ -34,13 +34,13 @@ const schema = z.object({
   firstName: z.string().min(2, t('reseller.users.validation.firstNameMin')),
   lastName: z.string().min(2, t('reseller.users.validation.lastNameMin')),
   role: z.union([z.literal(2), z.literal(3)], {
-    message: t('reseller.users.validation.roleInvalid'),
-  }),
+    message: t('reseller.users.validation.roleInvalid')
+  })
 })
 
 type Schema = z.infer<typeof schema>
 
-function onSubmit(event: FormSubmitEvent<Schema>) {
+function onSubmit (event: FormSubmitEvent<Schema>) {
   emit('submit', event.data as AddUserPayload)
 }
 </script>
@@ -73,7 +73,9 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
         :placeholder="t('reseller.users.placeholders.role')"
       />
       <template #hint>
-        <p class="text-sm text-gray-500">{{ t('reseller.users.form.roleHint') }}</p>
+        <p class="text-sm text-gray-500">
+          {{ t('reseller.users.form.roleHint') }}
+        </p>
       </template>
     </UFormField>
 

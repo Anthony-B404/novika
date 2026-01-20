@@ -1,50 +1,50 @@
 <script setup lang="ts">
-import type { Prompt } from "~/types/prompt";
+import type { Prompt } from '~/types/prompt'
 
 const props = defineProps<{
   prompt: Prompt;
   selected?: boolean;
   showCategory?: boolean;
-}>();
+}>()
 
 const emit = defineEmits<{
   select: [prompt: Prompt];
   edit: [prompt: Prompt];
   delete: [prompt: Prompt];
   toggleFavorite: [prompt: Prompt];
-}>();
+}>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-const promptsStore = usePromptsStore();
+const promptsStore = usePromptsStore()
 
 const category = computed(() => {
-  if (!props.prompt.categoryId) return null;
-  return promptsStore.getCategory(props.prompt.categoryId);
-});
+  if (!props.prompt.categoryId) { return null }
+  return promptsStore.getCategory(props.prompt.categoryId)
+})
 
-function handleSelect() {
-  emit("select", props.prompt);
+function handleSelect () {
+  emit('select', props.prompt)
 }
 
-function handleEdit(e: Event) {
-  e.stopPropagation();
-  emit("edit", props.prompt);
+function handleEdit (e: Event) {
+  e.stopPropagation()
+  emit('edit', props.prompt)
 }
 
-function handleDelete(e: Event) {
-  e.stopPropagation();
-  emit("delete", props.prompt);
+function handleDelete (e: Event) {
+  e.stopPropagation()
+  emit('delete', props.prompt)
 }
 
-function handleToggleFavorite(e: Event) {
-  e.stopPropagation();
-  emit("toggleFavorite", props.prompt);
+function handleToggleFavorite (e: Event) {
+  e.stopPropagation()
+  emit('toggleFavorite', props.prompt)
 }
 
-function getContentPreview(content: string, maxLength: number = 100): string {
-  if (content.length <= maxLength) return content;
-  return content.substring(0, maxLength).trim() + "...";
+function getContentPreview (content: string, maxLength: number = 100): string {
+  if (content.length <= maxLength) { return content }
+  return content.substring(0, maxLength).trim() + '...'
 }
 </script>
 

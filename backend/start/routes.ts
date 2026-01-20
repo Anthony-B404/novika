@@ -203,8 +203,7 @@ router
   .use([middleware.auth({ guards: ['api'] }), middleware.superAdmin()])
 
 // Reseller API controllers (lazy import)
-const ResellerProfileController = () =>
-  import('#controllers/reseller/reseller_profile_controller')
+const ResellerProfileController = () => import('#controllers/reseller/reseller_profile_controller')
 const ResellerApiCreditsController = () =>
   import('#controllers/reseller/reseller_credits_controller')
 const ResellerOrganizationsController = () =>
@@ -234,12 +233,18 @@ router
     router.post('/organizations/:id/restore', [ResellerOrganizationsController, 'restore'])
 
     // Credit distribution
-    router.post('/organizations/:id/credits', [ResellerOrganizationsController, 'distributeCredits'])
+    router.post('/organizations/:id/credits', [
+      ResellerOrganizationsController,
+      'distributeCredits',
+    ])
 
     // User management
     router.get('/organizations/:id/users', [ResellerUsersController, 'index'])
     router.post('/organizations/:id/users', [ResellerUsersController, 'store'])
-    router.post('/organizations/:id/users/:userId/resend-invitation', [ResellerUsersController, 'resendInvitation'])
+    router.post('/organizations/:id/users/:userId/resend-invitation', [
+      ResellerUsersController,
+      'resendInvitation',
+    ])
     router.delete('/organizations/:id/users/:userId', [ResellerUsersController, 'destroy'])
 
     // Subscription management
@@ -247,7 +252,10 @@ router
     router.get('/organizations/:id/subscription', [ResellerSubscriptionsController, 'show'])
     router.put('/organizations/:id/subscription', [ResellerSubscriptionsController, 'update'])
     router.post('/organizations/:id/subscription/pause', [ResellerSubscriptionsController, 'pause'])
-    router.post('/organizations/:id/subscription/resume', [ResellerSubscriptionsController, 'resume'])
+    router.post('/organizations/:id/subscription/resume', [
+      ResellerSubscriptionsController,
+      'resume',
+    ])
   })
   .prefix('/reseller')
   .use([middleware.auth({ guards: ['api'] }), middleware.reseller()])

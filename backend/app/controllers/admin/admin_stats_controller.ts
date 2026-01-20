@@ -16,7 +16,9 @@ export default class AdminStatsController {
     const totalResellersResult = await Reseller.query().count('* as total')
     const totalResellers = Number(totalResellersResult[0].$extras.total) || 0
 
-    const activeResellersResult = await Reseller.query().where('is_active', true).count('* as total')
+    const activeResellersResult = await Reseller.query()
+      .where('is_active', true)
+      .count('* as total')
     const activeResellers = Number(activeResellersResult[0].$extras.total) || 0
 
     // Total organizations managed by resellers
