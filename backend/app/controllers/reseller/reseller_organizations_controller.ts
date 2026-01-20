@@ -29,6 +29,7 @@ export default class ResellerOrganizationsController {
         search,
         sortBy = 'createdAt',
         sortOrder = 'desc',
+        sectors,
       } = await request.validateUsing(listResellerOrganizationsValidator)
 
       const query = Organization.query()
@@ -39,6 +40,11 @@ export default class ResellerOrganizationsController {
         query.where((q) => {
           q.whereILike('name', `%${search}%`).orWhereILike('email', `%${search}%`)
         })
+      }
+
+      // Filter by business sectors using PostgreSQL JSONB operator
+      if (sectors && sectors.length > 0) {
+        query.whereRaw('business_sectors ?| array[?]', [sectors])
       }
 
       // Convert camelCase sortBy to snake_case
@@ -122,6 +128,7 @@ export default class ResellerOrganizationsController {
           email: payload.email,
           resellerId: reseller!.id,
           credits: 0,
+          businessSectors: payload.businessSectors || [],
         }
 
         // Configure subscription if enabled

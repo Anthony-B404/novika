@@ -394,10 +394,10 @@ Modification des endpoints existants :
 
 ### 6.7 Critères d'acceptation
 
-- [ ] Le reseller peut sélectionner 0, 1 ou plusieurs secteurs à la création
-- [ ] Les secteurs sont modifiables après création
-- [ ] Les secteurs s'affichent sur la liste et le détail
-- [ ] Le filtre par secteur fonctionne sur la liste
+- [x] Le reseller peut sélectionner 0, 1 ou plusieurs secteurs à la création
+- [x] Les secteurs sont modifiables après création
+- [x] Les secteurs s'affichent sur la liste et le détail
+- [x] Le filtre par secteur fonctionne sur la liste
 
 ---
 

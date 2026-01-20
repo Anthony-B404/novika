@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import Organization from '#models/organization'
+import Organization, { BUSINESS_SECTORS } from '#models/organization'
 import User, { UserRole } from '#models/user'
 
 /**
@@ -46,6 +46,8 @@ export const createResellerOrganizationValidator = (resellerId: number) =>
       monthlyCreditsTarget: vine.number().positive().optional(),
       renewalType: vine.enum(['first_of_month', 'anniversary']).optional(),
       renewalDay: vine.number().min(1).max(28).optional(),
+      // Business sectors
+      businessSectors: vine.array(vine.enum(BUSINESS_SECTORS)).optional(),
     })
   )
 
@@ -82,6 +84,8 @@ export const updateResellerOrganizationValidator = (resellerId: number, organiza
           return !existing
         })
         .optional(),
+      // Business sectors
+      businessSectors: vine.array(vine.enum(BUSINESS_SECTORS)).optional(),
     })
   )
 
@@ -120,6 +124,7 @@ export const listResellerOrganizationsValidator = vine.compile(
     search: vine.string().maxLength(255).optional(),
     sortBy: vine.enum(['name', 'credits', 'createdAt']).optional(),
     sortOrder: vine.enum(['asc', 'desc']).optional(),
+    sectors: vine.array(vine.enum(BUSINESS_SECTORS)).optional(),
   })
 )
 

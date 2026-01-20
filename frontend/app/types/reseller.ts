@@ -6,6 +6,20 @@ import type { PaginationMeta } from './admin'
  */
 
 // =============================================================================
+// BUSINESS SECTORS
+// =============================================================================
+
+export type BusinessSector = 'psychology' | 'finance' | 'legal' | 'sales' | 'hr'
+
+export const BUSINESS_SECTORS: BusinessSector[] = [
+  'psychology',
+  'finance',
+  'legal',
+  'sales',
+  'hr',
+]
+
+// =============================================================================
 // ORGANIZATION STATUS
 // =============================================================================
 
@@ -48,6 +62,8 @@ export interface ResellerOrganization {
   suspendedAt: string | null
   suspensionReason: string | null
   deletedAt: string | null
+  // Business sectors
+  businessSectors: BusinessSector[]
   // Subscription fields
   subscriptionEnabled?: boolean
   monthlyCreditsTarget?: number | null
@@ -126,6 +142,8 @@ export interface CreateOrganizationPayload {
   ownerFirstName: string
   ownerLastName: string
   initialCredits?: number
+  // Business sectors (optional)
+  businessSectors?: BusinessSector[]
   // Subscription configuration (optional)
   subscriptionEnabled?: boolean
   monthlyCreditsTarget?: number
@@ -136,6 +154,7 @@ export interface CreateOrganizationPayload {
 export interface UpdateOrganizationPayload {
   name?: string
   email?: string
+  businessSectors?: BusinessSector[]
 }
 
 export interface DistributeCreditsPayload {
@@ -170,6 +189,7 @@ export interface OrganizationsFilters {
   search?: string
   sortBy?: 'name' | 'credits' | 'createdAt'
   sortOrder?: 'asc' | 'desc'
+  sectors?: BusinessSector[]
 }
 
 export interface UsersFilters {

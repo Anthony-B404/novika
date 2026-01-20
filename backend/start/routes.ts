@@ -18,6 +18,7 @@ const InvitationsController = () => import('#controllers/invitations_controller'
 const MembersController = () => import('#controllers/members_controller')
 const ContactController = () => import('#controllers/contact_controller')
 const AudioController = () => import('#controllers/audio_controller')
+const ConfigController = () => import('#controllers/config_controller')
 const AudiosController = () => import('#controllers/audios_controller')
 const PromptsController = () => import('#controllers/prompts_controller')
 const PromptCategoriesController = () => import('#controllers/prompt_categories_controller')
@@ -59,6 +60,9 @@ router.get('/bimi-logo.svg', async ({ response }) => {
   response.header('Content-Type', 'image/svg+xml')
   return response.download(app.publicPath('bimi-logo.svg'))
 })
+
+// Public config endpoints (for frontend dynamic configuration)
+router.get('/api/config/sectors', [ConfigController, 'sectors'])
 
 router.get('/check-invitation/:identifier', [InvitationsController, 'checkInvitation'])
 router.post('/accept-invitation', [InvitationsController, 'acceptInvitation'])

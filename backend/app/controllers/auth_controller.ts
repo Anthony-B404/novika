@@ -195,12 +195,14 @@ export default class AuthController {
 
     // Otherwise, this is a registration flow - return user data for complete registration
     // Include existing user info for pre-filling forms (especially for disabled users re-registering)
-    // Load organization name for pre-filling (if user was created by reseller)
+    // Load organization data for pre-filling (if user was created by reseller)
     let organizationName: string | null = null
+    let businessSectors: Organization['businessSectors'] = []
     if (user.currentOrganizationId) {
       const organization = await Organization.find(user.currentOrganizationId)
       if (organization && organization.name !== 'Temporary Organization') {
         organizationName = organization.name
+        businessSectors = organization.businessSectors || []
       }
     }
 
@@ -209,6 +211,7 @@ export default class AuthController {
       firstName: user.firstName,
       lastName: user.lastName,
       organizationName,
+      businessSectors,
       token: token,
       isDisabled: user.disabled,
     })
@@ -238,6 +241,17 @@ export default class AuthController {
       // Handle logo upload
       const fileName = await this.handleLogoUpload(logo)
 
+      // Parse businessSectors from FormData if present
+      let businessSectors: Organization['businessSectors'] = []
+      const sectorsInput = request.input('businessSectors')
+      if (sectorsInput) {
+        try {
+          businessSectors = JSON.parse(sectorsInput)
+        } catch {
+          businessSectors = []
+        }
+      }
+
       // Calculate full name from first and last name
       const fullName = `${data.firstName} ${data.lastName}`
 
@@ -258,6 +272,7 @@ export default class AuthController {
           name: data.organizationName,
           email: user.email,
           logo: fileName,
+          businessSectors,
         })
 
         // Attach user as Owner of the new organization
@@ -274,6 +289,7 @@ export default class AuthController {
         organization.name = data.organizationName
         organization.email = user.email
         organization.logo = fileName
+        organization.businessSectors = businessSectors
         await organization.save()
       }
 

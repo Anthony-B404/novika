@@ -8,6 +8,10 @@ import type { ManyToMany, HasMany, BelongsTo } from '@adonisjs/lucid/types/relat
 
 export type RenewalType = 'first_of_month' | 'anniversary'
 
+export type BusinessSector = 'psychology' | 'finance' | 'legal' | 'sales' | 'hr'
+
+export const BUSINESS_SECTORS: BusinessSector[] = ['psychology', 'finance', 'legal', 'sales', 'hr']
+
 export enum OrganizationStatus {
   Active = 'active',
   Suspended = 'suspended',
@@ -75,6 +79,12 @@ export default class Organization extends BaseModel {
 
   @column()
   declare suspensionReason: string | null
+
+  @column({
+    prepare: (value: BusinessSector[]) => JSON.stringify(value),
+    consume: (value: string) => (typeof value === 'string' ? JSON.parse(value) : value || []),
+  })
+  declare businessSectors: BusinessSector[]
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

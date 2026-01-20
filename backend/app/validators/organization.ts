@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { BUSINESS_SECTORS } from '#models/organization'
 
 export const createOrganizationValidator = (userId: number) =>
   vine.compile(
@@ -58,5 +59,6 @@ export const updateOrganizationValidator = (userId: number, organizationId: numb
             .first()
           return !existingOrg
         }),
+      businessSectors: vine.array(vine.enum(BUSINESS_SECTORS)).optional(),
     })
   )

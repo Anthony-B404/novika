@@ -95,6 +95,9 @@
       "lastNamePlaceholder": "Entrez votre nom",
       "organizationName": "Nom de l'organisation",
       "organizationNamePlaceholder": "Nom de votre organisation",
+      "businessSectors": "Secteurs d'activité",
+      "businessSectorsPlaceholder": "Sélectionnez vos secteurs...",
+      "businessSectorsHint": "Sélectionnez les secteurs qui correspondent à votre activité. Les prompts pertinents seront mis en avant.",
       "logo": "Logo (optionnel)",
       "logoHint": "JPG, PNG ou GIF. 1Mo max.",
       "submit": "Activer mon compte",
@@ -819,6 +822,9 @@
           "logoLabel": "Logo",
           "logoDescription": "JPG, GIF ou PNG. 1Mo Max.",
           "removeLogo": "Supprimer",
+          "businessSectorsLabel": "Secteurs d'activité",
+          "businessSectorsDescription": "Les prompts correspondant à vos secteurs seront affichés en priorité",
+          "businessSectorsPlaceholder": "Sélectionnez vos secteurs...",
           "successTitle": "Succès",
           "successDescription": "Les paramètres de l'organisation ont été mis à jour.",
           "noChangesTitle": "Aucune modification",
@@ -1100,6 +1106,13 @@
   },
   "reseller": {
     "title": "Espace Revendeur",
+    "sectors": {
+      "psychology": "Psychologie et Thérapie",
+      "finance": "Finance et Comptabilité",
+      "legal": "Droit et Affaires juridiques",
+      "sales": "Vente et Commerce",
+      "hr": "Ressources humaines"
+    },
     "navigation": {
       "dashboard": "Tableau de bord",
       "organizations": "Organisations",
@@ -1150,6 +1163,7 @@
         "usersCount": "{count} utilisateur | {count} utilisateurs",
         "members": "Membres",
         "noMembers": "Aucun membre",
+        "noSectors": "Aucun secteur défini",
         "quickActions": "Actions rapides",
         "updateSuccess": "Organisation mise à jour",
         "updateError": "Erreur lors de la mise à jour"
@@ -1157,6 +1171,7 @@
       "table": {
         "name": "Nom",
         "email": "Email",
+        "sectors": "Secteurs",
         "credits": "Crédits",
         "subscription": "Abonnement",
         "status": "Statut",
@@ -1225,6 +1240,9 @@
       },
       "filters": {
         "searchPlaceholder": "Rechercher une organisation...",
+        "sectors": "Secteurs d'activité",
+        "sectorsSelected": "{count} secteur sélectionné | {count} secteurs sélectionnés",
+        "clear": "Effacer les filtres",
         "sortBy": "Trier par",
         "sortName": "Nom",
         "sortCredits": "Crédits",
@@ -1242,6 +1260,7 @@
       "fields": {
         "name": "Nom de l'organisation",
         "email": "Email de l'organisation",
+        "businessSectors": "Secteurs d'activité",
         "ownerEmail": "Email du propriétaire",
         "ownerFirstName": "Prénom du propriétaire",
         "ownerLastName": "Nom du propriétaire",
@@ -1251,6 +1270,7 @@
       "placeholders": {
         "name": "Mon entreprise",
         "email": "contact{'@'}entreprise.com",
+        "businessSectors": "Sélectionnez un ou plusieurs secteurs",
         "ownerEmail": "proprietaire{'@'}entreprise.com",
         "ownerFirstName": "Jean",
         "ownerLastName": "Dupont",
@@ -1259,6 +1279,7 @@
       "hints": {
         "name": "Le nom sera visible par les utilisateurs de l'organisation",
         "email": "Email principal pour les communications",
+        "businessSectors": "Sélectionnez les secteurs d'activité de l'organisation",
         "ownerEmail": "Un email d'invitation sera envoyé à cette adresse"
       },
       "credits": {

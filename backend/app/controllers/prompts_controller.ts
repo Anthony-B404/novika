@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Prompt from '#models/prompt'
 import PromptCategory from '#models/prompt_category'
+import Organization from '#models/organization'
 import PromptPolicy from '#policies/prompt_policy'
+import BusinessSectorService from '#services/business_sector_service'
 import {
   promptIndexValidator,
   createPromptValidator,
@@ -16,6 +18,16 @@ export default class PromptsController {
    * Supports pagination, category filtering, favorites, search, and sorting.
    *
    * GET /api/prompts
+   *
+   * Query params:
+   * - page: number - Page number for pagination
+   * - limit: number - Items per page
+   * - categoryId: number - Filter by category
+   * - favorites: boolean - Filter by favorites
+   * - search: string - Search in title and content
+   * - sort: string - Sort field (createdAt, title, usageCount, sortOrder)
+   * - order: string - Sort order (asc, desc)
+   * - prioritizeSectors: boolean - Sort prompts by organization's business sectors first
    */
   async index({ request, response, auth, bouncer, i18n }: HttpContext) {
     const user = auth.user!
@@ -36,32 +48,53 @@ export default class PromptsController {
       search,
       sort = 'sortOrder',
       order = 'asc',
+      prioritizeSectors,
     } = await request.validateUsing(promptIndexValidator)
 
     // Build query with tenant isolation
-    const query = Prompt.query()
-      .where('organizationId', user.currentOrganizationId!)
-      .preload('category')
+    // Note: Use snake_case column names when using table prefix
+    const query = Prompt.query().where('prompts.organization_id', user.currentOrganizationId!)
 
     // Apply category filter if provided
     if (categoryId) {
-      query.where('categoryId', categoryId)
+      query.where('prompts.category_id', categoryId)
     }
 
     // Apply favorites filter if provided
     if (favorites === true) {
-      query.where('isFavorite', true)
+      query.where('prompts.is_favorite', true)
     }
 
     // Apply search filter if provided (search in title and content)
     if (search) {
       query.where((subQuery) => {
-        subQuery.whereILike('title', `%${search}%`).orWhereILike('content', `%${search}%`)
+        subQuery
+          .whereILike('prompts.title', `%${search}%`)
+          .orWhereILike('prompts.content', `%${search}%`)
       })
     }
 
-    // Apply sorting
-    query.orderBy(sort, order)
+    // Apply sector-based sorting if requested
+    if (prioritizeSectors) {
+      // Get organization's business sectors and apply sorting via service
+      const organization = await Organization.find(user.currentOrganizationId!)
+      const sectors = organization?.businessSectors || []
+      BusinessSectorService.applyPromptSorting(query, sectors)
+    } else {
+      // Apply default sorting
+      // Convert camelCase sort field to snake_case for raw SQL
+      const sortFieldMap: Record<string, string> = {
+        createdAt: 'created_at',
+        title: 'title',
+        usageCount: 'usage_count',
+        sortOrder: 'sort_order',
+      }
+      const snakeCaseSort = sortFieldMap[sort] || 'sort_order'
+      query.orderBy(`prompts.${snakeCaseSort}`, order)
+    }
+
+    // Preload category after sorting is applied
+    query.preload('category')
 
     // Execute with pagination
     const prompts = await query.paginate(page, limit)

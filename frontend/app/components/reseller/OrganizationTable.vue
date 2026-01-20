@@ -18,6 +18,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const { formatDate, formatCredits } = useFormatters()
+const { getSectorConfig, getSectorLabel } = useBusinessSectors()
 
 const columns: TableColumn<ResellerOrganization>[] = [
   {
@@ -27,6 +28,10 @@ const columns: TableColumn<ResellerOrganization>[] = [
   {
     accessorKey: 'email',
     header: t('reseller.organizations.table.email'),
+  },
+  {
+    accessorKey: 'businessSectors',
+    header: t('reseller.organizations.table.sectors'),
   },
   {
     accessorKey: 'credits',
@@ -118,6 +123,24 @@ function getRowActions(organization: ResellerOrganization) {
       <div>
         <p class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</p>
       </div>
+    </template>
+
+    <template #businessSectors-cell="{ row }">
+      <div v-if="row.original.businessSectors?.length > 0" class="flex flex-wrap gap-1">
+        <span
+          v-for="sector in row.original.businessSectors"
+          :key="sector"
+          class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+          :class="[
+            getSectorConfig(sector).bgClass,
+            getSectorConfig(sector).textClass,
+          ]"
+        >
+          <UIcon :name="getSectorConfig(sector).icon" class="h-3 w-3" />
+          {{ getSectorLabel(sector) }}
+        </span>
+      </div>
+      <span v-else class="text-gray-400">—</span>
     </template>
 
     <template #credits-cell="{ row }">

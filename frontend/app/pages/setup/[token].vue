@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import type { BusinessSector } from "~/types/reseller";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -9,6 +10,7 @@ const { $localePath } = useNuxtApp();
 const toast = useToast();
 const { login } = useAuth();
 const api = useApi();
+const { sectorOptions } = useBusinessSectors();
 
 definePageMeta({
   layout: "auth",
@@ -29,6 +31,7 @@ const userData = ref<{
   firstName: string | null;
   lastName: string | null;
   organizationName: string | null;
+  businessSectors: BusinessSector[];
 } | null>(null);
 const fileRef = ref<HTMLInputElement>();
 
@@ -50,6 +53,7 @@ onMounted(async () => {
       firstName: string | null;
       lastName: string | null;
       organizationName: string | null;
+      businessSectors: BusinessSector[];
       token: string;
       isDisabled: boolean;
     }>(`/verify-magic-link/${token.value}`);
@@ -72,6 +76,7 @@ onMounted(async () => {
       firstName: response.firstName,
       lastName: response.lastName,
       organizationName: response.organizationName,
+      businessSectors: response.businessSectors || [],
     };
     isValid.value = true;
 
@@ -84,6 +89,9 @@ onMounted(async () => {
     }
     if (response.organizationName) {
       state.organizationName = response.organizationName;
+    }
+    if (response.businessSectors && response.businessSectors.length > 0) {
+      state.businessSectors = response.businessSectors;
     }
   } catch (error: any) {
     if (error.status === 401) {
@@ -151,6 +159,8 @@ const schema = z.object({
     }),
   ),
   logo: z.any().optional(),
+  // Sectors are validated dynamically from API - backend performs final validation
+  businessSectors: z.array(z.string()).optional(),
 });
 
 type Schema = z.output<typeof schema>;
@@ -160,6 +170,7 @@ const state = reactive<Partial<Schema>>({
   lastName: undefined,
   organizationName: undefined,
   logo: undefined,
+  businessSectors: [] as BusinessSector[],
 });
 
 // Logo management functions
@@ -206,6 +217,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     formData.append("firstName", event.data.firstName);
     formData.append("lastName", event.data.lastName);
     formData.append("organizationName", event.data.organizationName);
+
+    // Add business sectors if selected
+    if (state.businessSectors && state.businessSectors.length > 0) {
+      formData.append("businessSectors", JSON.stringify(state.businessSectors));
+    }
 
     // Add logo if file was selected
     const fileInput = fileRef.value;
@@ -358,6 +374,21 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           class="w-full"
           size="lg"
         />
+      </UFormField>
+
+      <UFormField :label="$t('auth.setup.businessSectors')" name="businessSectors">
+        <UInputMenu
+          v-model="state.businessSectors"
+          :items="sectorOptions"
+          multiple
+          value-key="value"
+          :placeholder="$t('auth.setup.businessSectorsPlaceholder')"
+          class="w-full"
+          size="lg"
+        />
+        <p class="text-muted-foreground mt-1 text-sm">
+          {{ $t("auth.setup.businessSectorsHint") }}
+        </p>
       </UFormField>
 
       <UFormField :label="$t('auth.setup.logo')" name="logo">

@@ -1,3 +1,5 @@
+import type { BusinessSector } from './reseller'
+
 /**
  * Prompt Category
  * Represents a category for organizing prompts
@@ -11,6 +13,7 @@ export interface PromptCategory {
   icon: string | null
   sortOrder: number
   isDefault: boolean
+  businessSector: BusinessSector | null
   createdAt: string
   updatedAt: string
   promptsCount?: number

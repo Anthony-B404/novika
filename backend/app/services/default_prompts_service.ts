@@ -1,15 +1,24 @@
 import PromptCategory from '#models/prompt_category'
 import Prompt from '#models/prompt'
+import type { BusinessSector } from '#models/organization'
 
 /**
  * Default prompt categories with their prompts
  */
-const DEFAULT_CATEGORIES = [
+const DEFAULT_CATEGORIES: Array<{
+  name: string
+  description: string
+  color: string
+  icon: string
+  sector: BusinessSector | null
+  prompts: Array<{ title: string; content: string }>
+}> = [
   {
     name: 'Ressources humaines',
     description: 'Prompts pour l\'analyse RH : recrutement, évaluation et gestion des talents',
     color: '#6366F1', // indigo
     icon: 'i-heroicons-user-group',
+    sector: 'hr',
     prompts: [
       {
         title: 'Analyse d\'entretien de recrutement',
@@ -68,6 +77,7 @@ Sois direct, factuel, bienveillant mais sans édulcorer. Utilise des verbatims e
     description: 'Prompts pour l\'analyse commerciale : prospection, démos et négociations',
     color: '#10B981', // green
     icon: 'i-heroicons-currency-euro',
+    sector: 'sales',
     prompts: [
       {
         title: 'Analyse d\'appel de vente',
@@ -130,6 +140,7 @@ Sois incisif, stratégique et orienté cash : l'objectif est de maximiser le win
     description: 'Prompts pour l\'analyse juridique : consultations, dépositions et négociations',
     color: '#8B5CF6', // violet
     icon: 'i-heroicons-scale',
+    sector: 'legal',
     prompts: [
       {
         title: 'Analyse de consultation client',
@@ -192,6 +203,7 @@ Sois incisif, stratégique et orienté résultat : maximiser la valeur du deal t
     description: 'Prompts pour l\'analyse financière : patrimoine, budget et investissements',
     color: '#F59E0B', // amber
     icon: 'i-heroicons-banknotes',
+    sector: 'finance',
     prompts: [
       {
         title: 'Analyse de consultation patrimoniale',
@@ -253,6 +265,7 @@ Sois prudent, cite les éléments clés, et adopte un ton professionnel orienté
     description: 'Prompts pour l\'analyse clinique : séances de thérapie et suivi patient',
     color: '#EC4899', // pink
     icon: 'i-heroicons-heart',
+    sector: 'psychology',
     prompts: [
       {
         title: 'Note de session standard',
@@ -311,6 +324,7 @@ Reste prudent, factuel et déontologique : pas de diagnostic ferme en première 
     description: 'Prompts polyvalents pour tout type de conversation ou réunion',
     color: '#3B82F6', // blue
     icon: 'i-heroicons-document-text',
+    sector: null,
     prompts: [
       {
         title: 'Résumé général d\'entretien (avancé)',
@@ -355,6 +369,7 @@ class DefaultPromptsService {
         icon: categoryData.icon,
         isDefault: true,
         sortOrder: sortOrder++,
+        businessSector: categoryData.sector,
       })
 
       // Create prompts for this category

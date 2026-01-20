@@ -108,6 +108,9 @@
       "lastNamePlaceholder": "Enter your last name",
       "organizationName": "Organization name",
       "organizationNamePlaceholder": "Your organization name",
+      "businessSectors": "Business sectors",
+      "businessSectorsPlaceholder": "Select your sectors...",
+      "businessSectorsHint": "Select sectors that match your business. Relevant prompts will be prioritized.",
       "logo": "Logo (optional)",
       "logoHint": "JPG, PNG or GIF. 1MB max.",
       "submit": "Activate my account",
@@ -817,6 +820,9 @@
           "logoLabel": "Logo",
           "logoDescription": "JPG, GIF or PNG. 1MB Max.",
           "removeLogo": "Remove",
+          "businessSectorsLabel": "Business sectors",
+          "businessSectorsDescription": "Prompts matching your sectors will be displayed first",
+          "businessSectorsPlaceholder": "Select your sectors...",
           "successTitle": "Success",
           "successDescription": "Your organization settings have been updated.",
           "noChangesTitle": "No changes",
@@ -1098,6 +1104,13 @@
   },
   "reseller": {
     "title": "Reseller Portal",
+    "sectors": {
+      "psychology": "Psychology & Therapy",
+      "finance": "Finance & Accounting",
+      "legal": "Law & Legal Affairs",
+      "sales": "Sales & Commerce",
+      "hr": "Human Resources"
+    },
     "navigation": {
       "dashboard": "Dashboard",
       "organizations": "Organizations",
@@ -1148,6 +1161,7 @@
         "usersCount": "{count} user | {count} users",
         "members": "Members",
         "noMembers": "No members",
+        "noSectors": "No sectors defined",
         "quickActions": "Quick Actions",
         "updateSuccess": "Organization updated",
         "updateError": "Error updating organization"
@@ -1155,6 +1169,7 @@
       "table": {
         "name": "Name",
         "email": "Email",
+        "sectors": "Sectors",
         "credits": "Credits",
         "subscription": "Subscription",
         "status": "Status",
@@ -1223,6 +1238,9 @@
       },
       "filters": {
         "searchPlaceholder": "Search organizations...",
+        "sectors": "Business sectors",
+        "sectorsSelected": "{count} sector selected | {count} sectors selected",
+        "clear": "Clear filters",
         "sortBy": "Sort by",
         "sortName": "Name",
         "sortCredits": "Credits",
@@ -1240,6 +1258,7 @@
       "fields": {
         "name": "Organization name",
         "email": "Organization email",
+        "businessSectors": "Business sectors",
         "ownerEmail": "Owner email",
         "ownerFirstName": "Owner first name",
         "ownerLastName": "Owner last name",
@@ -1249,6 +1268,7 @@
       "placeholders": {
         "name": "My company",
         "email": "contact{'@'}company.com",
+        "businessSectors": "Select one or more sectors",
         "ownerEmail": "owner{'@'}company.com",
         "ownerFirstName": "John",
         "ownerLastName": "Doe",
@@ -1257,6 +1277,7 @@
       "hints": {
         "name": "The name will be visible to organization users",
         "email": "Main email for communications",
+        "businessSectors": "Select the organization's business sectors",
         "ownerEmail": "An invitation email will be sent to this address"
       },
       "credits": {

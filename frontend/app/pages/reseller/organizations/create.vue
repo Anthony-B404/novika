@@ -4,6 +4,7 @@ import type {
   CreateOrganizationPayload,
   AddUserPayload,
   RenewalType,
+  BusinessSector,
 } from "~/types/reseller";
 import type { FormSubmitEvent } from "#ui/types";
 
@@ -38,6 +39,7 @@ useSeoMeta({
 const { createOrganization, addUser, loading, error } =
   useResellerOrganizations();
 const { fetchProfile } = useResellerProfile();
+const { sectorOptions, getSectorConfig, getSectorLabel } = useBusinessSectors();
 
 // Available credits from reseller pool
 const availableCredits = ref<number>(0);
@@ -230,6 +232,7 @@ const memberSchema = computed(() =>
 const organizationState = reactive({
   name: "",
   email: "",
+  businessSectors: [] as BusinessSector[],
 });
 
 const creditsState = reactive({
@@ -442,6 +445,8 @@ async function handleSubmit() {
       ownerFirstName: ownerState.ownerFirstName,
       ownerLastName: ownerState.ownerLastName,
       initialCredits: creditsState.initialCredits,
+      // Business sectors
+      businessSectors: organizationState.businessSectors,
       // Subscription configuration
       subscriptionEnabled: creditsState.billingType === "subscription",
       ...(creditsState.billingType === "subscription" && {
@@ -600,6 +605,35 @@ function handleCancel() {
                     </span>
                   </template>
                 </UFormField>
+
+                <!-- Business Sectors (optional) -->
+                <UFormField name="businessSectors">
+                  <template #label>
+                    <span class="flex items-center gap-1.5">
+                      <UIcon
+                        name="i-lucide-briefcase"
+                        class="h-4 w-4 text-gray-500"
+                      />
+                      {{ t("reseller.organizations.fields.businessSectors") }}
+                    </span>
+                  </template>
+                  <UInputMenu
+                    v-model="organizationState.businessSectors"
+                    :items="sectorOptions"
+                    multiple
+                    value-key="value"
+                    class="w-full"
+                    :placeholder="
+                      t('reseller.organizations.placeholders.businessSectors')
+                    "
+                  />
+
+                  <template #hint>
+                    <span class="text-xs text-gray-500">
+                      {{ t("reseller.organizations.hints.businessSectors") }}
+                    </span>
+                  </template>
+                </UFormField>
               </UForm>
             </div>
 
@@ -637,7 +671,11 @@ function handleCancel() {
                           ? 'border-primary-500 bg-primary-50 dark:border-primary-400 dark:bg-primary-900/20'
                           : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600',
                       ]"
-                      @click="creditsState.billingType = option.value as 'one_time' | 'subscription'"
+                      @click="
+                        creditsState.billingType = option.value as
+                          | 'one_time'
+                          | 'subscription'
+                      "
                     >
                       <div class="flex items-center gap-3">
                         <div
@@ -1129,7 +1167,7 @@ function handleCancel() {
                     <UFormField>
                       <template #label>
                         <span class="flex items-center gap-1.5">
-                          {{ t('reseller.organizations.members.fields.email') }}
+                          {{ t("reseller.organizations.members.fields.email") }}
                           <span class="text-error-500">*</span>
                         </span>
                       </template>
@@ -1149,7 +1187,9 @@ function handleCancel() {
                         <template #label>
                           <span class="flex items-center gap-1.5">
                             {{
-                              t('reseller.organizations.members.fields.firstName')
+                              t(
+                                "reseller.organizations.members.fields.firstName",
+                              )
                             }}
                             <span class="text-error-500">*</span>
                           </span>
@@ -1169,7 +1209,9 @@ function handleCancel() {
                         <template #label>
                           <span class="flex items-center gap-1.5">
                             {{
-                              t('reseller.organizations.members.fields.lastName')
+                              t(
+                                "reseller.organizations.members.fields.lastName",
+                              )
                             }}
                             <span class="text-error-500">*</span>
                           </span>
@@ -1190,7 +1232,7 @@ function handleCancel() {
                     <UFormField>
                       <template #label>
                         <span class="flex items-center gap-1.5">
-                          {{ t('reseller.organizations.members.fields.role') }}
+                          {{ t("reseller.organizations.members.fields.role") }}
                           <span class="text-error-500">*</span>
                         </span>
                       </template>

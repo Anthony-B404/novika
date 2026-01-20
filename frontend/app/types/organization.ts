@@ -1,4 +1,5 @@
 import type { UserRole } from './auth'
+import type { BusinessSector } from './reseller'
 
 export type OrganizationStatus = 'active' | 'suspended' | 'deleted'
 
@@ -24,6 +25,7 @@ export interface Organization {
   suspendedAt: string | null
   suspensionReason: string | null
   deletedAt: string | null
+  businessSectors: BusinessSector[]
   users?: User[]
   invitations?: Invitation[]
 }

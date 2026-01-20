@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Organization from './organization.js'
+import type { BusinessSector } from './organization.js'
 import Prompt from './prompt.js'
 
 export default class PromptCategory extends BaseModel {
@@ -30,6 +31,9 @@ export default class PromptCategory extends BaseModel {
 
   @column()
   declare isDefault: boolean
+
+  @column()
+  declare businessSector: BusinessSector | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

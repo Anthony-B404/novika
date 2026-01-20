@@ -47,6 +47,9 @@ export function useResellerOrganizations() {
       if (filters.search) params.set('search', filters.search)
       if (filters.sortBy) params.set('sortBy', filters.sortBy)
       if (filters.sortOrder) params.set('sortOrder', filters.sortOrder)
+      if (filters.sectors && filters.sectors.length > 0) {
+        filters.sectors.forEach((sector) => params.append('sectors[]', sector))
+      }
 
       const query = params.toString()
       return await authenticatedFetch<OrganizationsListResponse>(

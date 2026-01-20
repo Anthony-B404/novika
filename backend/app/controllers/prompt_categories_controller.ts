@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import PromptCategory from '#models/prompt_category'
+import Organization from '#models/organization'
 import PromptCategoryPolicy from '#policies/prompt_category_policy'
+import BusinessSectorService from '#services/business_sector_service'
 import {
   promptCategoryIndexValidator,
   createPromptCategoryValidator,
@@ -13,6 +15,10 @@ export default class PromptCategoriesController {
    * List all prompt categories for the current organization.
    *
    * GET /api/prompt-categories
+   *
+   * Query params:
+   * - includePromptCount: boolean - Include count of prompts per category
+   * - prioritizeSectors: boolean - Sort categories by organization's business sectors first
    */
   async index({ request, response, auth, bouncer, i18n }: HttpContext) {
     const user = auth.user!
@@ -25,12 +31,22 @@ export default class PromptCategoriesController {
     }
 
     // Validate query parameters
-    const { includePromptCount } = await request.validateUsing(promptCategoryIndexValidator)
+    const { includePromptCount, prioritizeSectors } =
+      await request.validateUsing(promptCategoryIndexValidator)
 
     // Build query with tenant isolation
-    const query = PromptCategory.query()
-      .where('organizationId', user.currentOrganizationId!)
-      .orderBy('sortOrder', 'asc')
+    const query = PromptCategory.query().where('organizationId', user.currentOrganizationId!)
+
+    // Apply sector-based sorting if requested
+    if (prioritizeSectors) {
+      // Get organization's business sectors and apply sorting via service
+      const organization = await Organization.find(user.currentOrganizationId!)
+      const sectors = organization?.businessSectors || []
+      BusinessSectorService.applyCategorySorting(query, sectors)
+    } else {
+      // Default sorting by sortOrder
+      query.orderBy('sortOrder', 'asc')
+    }
 
     // Optionally include prompts count
     if (includePromptCount) {

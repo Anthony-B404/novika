@@ -209,6 +209,13 @@
     "no_content": "Aucun contenu à partager",
     "revoked": "Partage révoqué avec succès"
   },
+  "business_sectors": {
+    "psychology": "Psychologie et Thérapie",
+    "finance": "Finance et Comptabilité",
+    "legal": "Droit et Affaires juridiques",
+    "sales": "Vente et Commerce",
+    "hr": "Ressources humaines"
+  },
   "gdpr": {
     "account_pending_deletion": "Votre compte est en cours de suppression. L'accès à l'application est restreint. Vous pouvez annuler la suppression ou exporter vos données.",
     "export": {

@@ -247,10 +247,22 @@ export default class OrganizationsController {
       const logo = request.file('logo')
       const fileName = await this.handleLogoUpload(logo)
 
+      // Parse businessSectors from FormData if present
+      let businessSectors: Organization['businessSectors'] | undefined = undefined
+      const sectorsInput = request.input('businessSectors')
+      if (sectorsInput) {
+        try {
+          businessSectors = JSON.parse(sectorsInput)
+        } catch {
+          businessSectors = organization.businessSectors
+        }
+      }
+
       const inputData = {
         name: request.input('name', organization.name),
         email: request.input('email', organization.email),
         logo: fileName || oldLogo,
+        businessSectors: businessSectors ?? organization.businessSectors,
       }
 
       // Valider les données avec le validator d'update

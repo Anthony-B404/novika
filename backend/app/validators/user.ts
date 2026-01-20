@@ -16,6 +16,7 @@ export const registrationRequestValidator = vine.compile(
 )
 
 // Validator for complete registration (step 2 with organization details)
+// Note: businessSectors is parsed manually from FormData JSON string in the controller
 export const completeRegistrationValidator = vine.compile(
   vine.object({
     magicLinkToken: vine.string().uuid(),
@@ -26,6 +27,7 @@ export const completeRegistrationValidator = vine.compile(
 )
 
 // Validator for OAuth complete registration (without magicLinkToken)
+// Note: businessSectors is parsed manually from FormData JSON string in the controller
 export const completeOAuthRegistrationValidator = vine.compile(
   vine.object({
     firstName: vine.string().minLength(2),

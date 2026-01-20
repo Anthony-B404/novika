@@ -53,8 +53,10 @@ export const usePromptsStore = defineStore('prompts', {
   actions: {
     /**
      * Fetch all categories
+     * @param includePromptCount - Include count of prompts per category
+     * @param prioritizeSectors - Sort categories by organization's business sectors first (default: true)
      */
-    async fetchCategories(includePromptCount: boolean = true) {
+    async fetchCategories(includePromptCount: boolean = true, prioritizeSectors: boolean = true) {
       this.categoriesLoading = true
       this.error = null
 
@@ -62,6 +64,7 @@ export const usePromptsStore = defineStore('prompts', {
         const { authenticatedFetch } = useAuth()
         const params = new URLSearchParams()
         if (includePromptCount) params.append('includePromptCount', 'true')
+        if (prioritizeSectors) params.append('prioritizeSectors', 'true')
 
         const categories = await authenticatedFetch<PromptCategory[]>(
           `/prompt-categories?${params}`
@@ -87,6 +90,7 @@ export const usePromptsStore = defineStore('prompts', {
         sort?: 'createdAt' | 'title' | 'usageCount' | 'sortOrder'
         order?: 'asc' | 'desc'
         append?: boolean
+        prioritizeSectors?: boolean
       }
     ) {
       this.loading = true
@@ -101,6 +105,8 @@ export const usePromptsStore = defineStore('prompts', {
         if (options?.search) params.append('search', options.search)
         if (options?.sort) params.append('sort', options.sort)
         if (options?.order) params.append('order', options.order)
+        // Default to true for sector-based sorting unless explicitly disabled
+        if (options?.prioritizeSectors !== false) params.append('prioritizeSectors', 'true')
 
         const response = await authenticatedFetch<PromptPagination>(`/prompts?${params}`)
 

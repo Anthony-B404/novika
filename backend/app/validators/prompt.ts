@@ -37,6 +37,7 @@ export const promptIndexValidator = vine.compile(
     search: vine.string().maxLength(255).optional(),
     sort: vine.enum(['createdAt', 'title', 'usageCount', 'sortOrder']).optional(),
     order: vine.enum(['asc', 'desc']).optional(),
+    prioritizeSectors: vine.boolean().optional(),
   })
 )
 

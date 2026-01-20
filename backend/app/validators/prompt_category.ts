@@ -31,6 +31,7 @@ export const updatePromptCategoryValidator = vine.compile(
 export const promptCategoryIndexValidator = vine.compile(
   vine.object({
     includePromptCount: vine.boolean().optional(),
+    prioritizeSectors: vine.boolean().optional(),
   })
 )
 

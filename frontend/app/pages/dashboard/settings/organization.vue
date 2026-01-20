@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import type { BusinessSector } from "~/types/reseller";
 
 definePageMeta({
   middleware: ["auth", "pending-deletion", "organization-status"],
@@ -19,6 +20,7 @@ const config = useRuntimeConfig();
 const toast = useToast();
 const localePath = useLocalePath();
 const { canAccessOrganization } = useSettingsPermissions();
+const { sectorOptions } = useBusinessSectors();
 
 // Redirect if not authorized (Owner only) - wait for org data to load
 const hasRedirected = ref(false);
@@ -51,6 +53,8 @@ const organizationSchema = z.object({
     .string()
     .email(t("pages.dashboard.settings.organization.validation.invalidEmail")),
   logo: z.string().optional(),
+  // Sectors are validated dynamically from API - backend performs final validation
+  businessSectors: z.array(z.string()).optional(),
 });
 
 type OrganizationSchema = z.output<typeof organizationSchema>;
@@ -60,6 +64,7 @@ const organization = reactive<OrganizationSchema>({
   name: organizationStore.organization?.name || "",
   email: organizationStore.organization?.email || "",
   logo: organizationStore.organization?.logo || undefined,
+  businessSectors: (organizationStore.organization?.businessSectors || []) as BusinessSector[],
 });
 
 const loading = ref(false);
@@ -73,6 +78,7 @@ watch(
       organization.name = newOrg.name || "";
       organization.email = newOrg.email || "";
       organization.logo = newOrg.logo || undefined;
+      organization.businessSectors = (newOrg.businessSectors || []) as BusinessSector[];
       logoRemoved.value = false;
     }
   },
@@ -97,6 +103,13 @@ async function onSubmit(event: FormSubmitEvent<OrganizationSchema>) {
     }
     if (event.data.email !== organizationStore.organization?.email) {
       formData.append("email", event.data.email);
+    }
+
+    // Add business sectors if they changed
+    const currentSectors = organizationStore.organization?.businessSectors || [];
+    const newSectors = event.data.businessSectors || [];
+    if (JSON.stringify(currentSectors) !== JSON.stringify(newSectors)) {
+      formData.append("businessSectors", JSON.stringify(newSectors));
     }
 
     // Add logo removal flag
@@ -302,6 +315,22 @@ const organizationName = computed(() => {
             @change="onFileChange"
           />
         </div>
+      </UFormField>
+      <USeparator />
+      <UFormField
+        name="businessSectors"
+        :label="t('pages.dashboard.settings.organization.businessSectorsLabel')"
+        :description="t('pages.dashboard.settings.organization.businessSectorsDescription')"
+        class="flex justify-between gap-4 max-sm:flex-col sm:items-start"
+      >
+        <UInputMenu
+          v-model="organization.businessSectors"
+          :items="sectorOptions"
+          multiple
+          value-key="value"
+          :placeholder="t('pages.dashboard.settings.organization.businessSectorsPlaceholder')"
+          class="w-full max-w-md"
+        />
       </UFormField>
     </UPageCard>
   </UForm>
