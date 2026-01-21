@@ -46,40 +46,64 @@ Permettre aux Owners de distribuer des crédits du pool organisation vers les me
 
 | ID | En tant que | Je veux | Afin de |
 |----|-------------|---------|---------|
-| US-1.1 | Owner | Distribuer des crédits ponctuels à un membre | Lui permettre de traiter des audios |
-| US-1.2 | Owner | Configurer une recharge mensuelle automatique pour un membre | Simplifier la gestion récurrente |
+| US-1.0 | Owner | Choisir le mode de gestion des crédits (pool commun ou distribution individuelle) | Adapter la gestion à la taille et culture de mon équipe |
+| US-1.1 | Owner | Distribuer des crédits ponctuels à un membre (mode individuel) | Lui permettre de traiter des audios |
+| US-1.2 | Owner | Configurer une recharge mensuelle automatique pour un membre (mode individuel) | Simplifier la gestion récurrente |
 | US-1.3 | Owner | Voir le solde de crédits de chaque membre | Suivre l'utilisation individuelle |
-| US-1.4 | Owner | Récupérer les crédits non utilisés d'un membre | Redistribuer les ressources |
-| US-1.5 | Owner | Définir un plafond de crédits par membre | Contrôler les dépenses |
+| US-1.4 | Owner | Récupérer les crédits non utilisés d'un membre (mode individuel) | Redistribuer les ressources |
+| US-1.5 | Owner | Définir un plafond de crédits par membre (mode individuel) | Contrôler les dépenses |
 | US-1.6 | Member | Voir mon solde de crédits personnel | Savoir combien je peux utiliser |
+| US-1.7 | Owner | Basculer d'un mode à l'autre | Adapter la gestion selon l'évolution de l'équipe |
 
 ### 2.3 Règles métier
 
-1. **Hiérarchie des crédits** : Organisation pool → User allocation
-   - Les crédits sont d'abord dans le pool organisation (`organization.credits`)
-   - L'Owner distribue vers les comptes utilisateurs (`user_credits.balance`)
-   - La consommation se fait sur le solde utilisateur
+1. **Mode de gestion des crédits (choix Owner)** :
 
-2. **Distribution ponctuelle** :
+   L'Owner configure le mode de gestion des crédits pour son organisation. Ce choix est modifiable à tout moment.
+
+   | Mode | Description | Cas d'usage |
+   |------|-------------|-------------|
+   | **Pool commun** | Tous les membres puisent dans le pool organisation | Petites équipes, confiance élevée, simplicité |
+   | **Distribution individuelle** | Crédits alloués par membre avec contrôle | Grandes équipes, contrôle budgétaire, suivi individuel |
+
+   **Mode Pool commun** (`credit_mode = 'shared'`) :
+   - Les crédits restent dans `organization.credits`
+   - Tous les membres consomment directement depuis le pool
+   - Pas de notion de solde individuel
+   - L'Owner voit la consommation par membre dans l'historique
+   - ⚠️ Risque : un membre peut consommer tous les crédits
+
+   **Mode Distribution individuelle** (`credit_mode = 'individual'`) :
+   - Les crédits sont distribués du pool vers les comptes utilisateurs (`user_credits.balance`)
+   - Chaque membre a son propre solde
+   - L'Owner contrôle combien chaque membre peut utiliser
+   - Possibilité de plafonds et recharges automatiques
+
+2. **Distribution ponctuelle** (mode individuel uniquement) :
    - L'Owner sélectionne un membre et un montant
    - Les crédits sont déduits du pool organisation
    - Les crédits sont ajoutés au solde du membre
    - Transaction enregistrée avec type `distribution`
 
-3. **Recharge automatique (top-up)** :
+3. **Recharge automatique (top-up)** (mode individuel uniquement) :
    - Configuration : montant plafond + date de recharge (1er du mois ou anniversaire)
    - Le système ramène le solde utilisateur au plafond configuré
    - Seule la différence est déduite du pool organisation
    - **Exemple** : Membre a 20 crédits, plafond = 100 → recharge de 80 crédits
 
-4. **Récupération de crédits** :
+4. **Récupération de crédits** (mode individuel uniquement) :
    - L'Owner peut récupérer tout ou partie des crédits non utilisés
    - Les crédits retournent dans le pool organisation
    - Transaction enregistrée avec type `recovery`
 
-5. **Contraintes** :
+5. **Changement de mode** :
+   - L'Owner peut basculer entre les deux modes à tout moment
+   - **Pool → Individuel** : Les crédits restent dans le pool, l'Owner doit ensuite distribuer
+   - **Individuel → Pool** : Les crédits des membres sont automatiquement récupérés vers le pool (avec confirmation)
+
+6. **Contraintes** :
    - Distribution impossible si pool organisation insuffisant
-   - Un membre ne peut pas avoir plus de crédits que son plafond
+   - Un membre ne peut pas avoir plus de crédits que son plafond (mode individuel)
    - ⚠️ **Pas de découvert** : Un membre avec 0 crédits ne peut pas traiter d'audio (décision produit)
    - Historique complet des mouvements pour audit
 
@@ -88,7 +112,11 @@ Permettre aux Owners de distribuer des crédits du pool organisation vers les me
 #### Base de données
 
 ```sql
--- Nouvelle table pour crédits utilisateur
+-- Modification table organizations pour le mode de gestion
+ALTER TABLE organizations
+  ADD COLUMN credit_mode VARCHAR(20) NOT NULL DEFAULT 'shared'; -- 'shared' (pool commun) ou 'individual' (distribution)
+
+-- Nouvelle table pour crédits utilisateur (mode individual uniquement)
 CREATE TABLE user_credits (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -126,11 +154,13 @@ CREATE INDEX idx_user_credit_transactions_user ON user_credit_transactions(user_
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| `GET` | `/api/credits/members` | Liste des membres avec leurs soldes |
-| `POST` | `/api/credits/distribute` | Distribution ponctuelle |
-| `POST` | `/api/credits/recover` | Récupération de crédits |
-| `PUT` | `/api/credits/members/:userId/auto-refill` | Configurer recharge auto |
-| `DELETE` | `/api/credits/members/:userId/auto-refill` | Désactiver recharge auto |
+| `GET` | `/api/credits/mode` | Mode actuel de l'organisation (`shared` ou `individual`) |
+| `PUT` | `/api/credits/mode` | Changer le mode (Owner only) |
+| `GET` | `/api/credits/members` | Liste des membres avec leurs soldes/consommation |
+| `POST` | `/api/credits/distribute` | Distribution ponctuelle (mode individual) |
+| `POST` | `/api/credits/recover` | Récupération de crédits (mode individual) |
+| `PUT` | `/api/credits/members/:userId/auto-refill` | Configurer recharge auto (mode individual) |
+| `DELETE` | `/api/credits/members/:userId/auto-refill` | Désactiver recharge auto (mode individual) |
 | `GET` | `/api/credits/my-balance` | Solde personnel du membre |
 | `GET` | `/api/credits/my-transactions` | Historique personnel |
 
@@ -178,19 +208,33 @@ export default class UserCredit extends BaseModel {
 
 ### 2.5 Interface utilisateur
 
+**Sélecteur de mode** (`/dashboard/settings/credits`) - Owner only
+
+- Card en haut de page avec toggle ou radio buttons
+- **Mode Pool commun** : Icône équipe + description "Tous les membres partagent le même pool de crédits"
+- **Mode Distribution** : Icône utilisateur + description "Chaque membre a son propre solde de crédits"
+- Confirmation requise lors du changement de mode (surtout Individual → Shared)
+
 **Page gestion crédits membres** (`/dashboard/settings/credits`)
 
-- Tableau des membres avec colonnes : Nom, Email, Solde, Plafond, Auto-refill, Actions
-- Badge indicateur : 🟢 Normal | 🟡 Bas (<20%) | 🔴 Vide (0)
-- Actions par membre :
-  - Bouton "Distribuer" → Modal avec montant
-  - Bouton "Récupérer" → Modal avec montant max = solde actuel
-  - Toggle "Auto-refill" → Expansion avec config (montant, jour)
+- **Mode Pool commun** :
+  - Affichage du pool organisation en évidence
+  - Tableau des membres avec colonnes : Nom, Email, Consommation totale, Dernière utilisation
+  - Pas d'actions de distribution (les membres puisent directement)
+
+- **Mode Distribution individuelle** :
+  - Tableau des membres avec colonnes : Nom, Email, Solde, Plafond, Auto-refill, Actions
+  - Badge indicateur : 🟢 Normal | 🟡 Bas (<20%) | 🔴 Vide (0)
+  - Actions par membre :
+    - Bouton "Distribuer" → Modal avec montant
+    - Bouton "Récupérer" → Modal avec montant max = solde actuel
+    - Toggle "Auto-refill" → Expansion avec config (montant, jour)
 
 **Widget solde personnel** (Header dashboard)
 
-- Affichage du solde utilisateur avec icône crédits
-- Tooltip avec détail : "X crédits disponibles sur Y plafond"
+- **Mode Pool commun** : Affiche le solde du pool organisation pour tous
+- **Mode Distribution** : Affiche le solde individuel de l'utilisateur
+- Tooltip avec détail selon le mode
 - Lien vers historique personnel
 
 **Page mon historique** (`/dashboard/credits`)
@@ -198,17 +242,44 @@ export default class UserCredit extends BaseModel {
 - Vue actuelle enrichie avec transactions utilisateur
 - Filtres : Tous | Reçus | Utilisés | Récupérés
 - Export CSV optionnel
+- **⚠️ Adaptation selon le rôle** :
+  - **Owner** : Voit les consommations globales de l'organisation (tous les membres)
+    - Affiche toutes les transactions de l'organisation
+    - Colonne "Utilisé par" visible avec le nom du membre
+    - Solde affiché = pool organisation
+  - **Administrator** : Voit les consommations globales (si permission `credits.view_all`)
+    - Même vue que l'Owner si permission accordée
+    - Sinon, vue limitée à ses propres transactions
+  - **Member** : Voit uniquement ses propres utilisations de crédits
+    - Affiche seulement ses transactions personnelles
+    - Colonne "Utilisé par" masquée (toujours soi-même)
+    - Solde affiché = son solde personnel (`user_credits.balance`)
 
 ### 2.6 Critères d'acceptation
 
+**Mode de gestion :**
+- [ ] L'Owner peut choisir le mode de gestion des crédits (pool commun ou distribution individuelle)
+- [ ] Le mode par défaut est "pool commun" pour les nouvelles organisations
+- [ ] L'Owner peut basculer d'un mode à l'autre avec confirmation
+- [ ] Le changement Individual → Shared récupère automatiquement les crédits des membres vers le pool
+
+**Mode Pool commun :**
+- [ ] Tous les membres consomment directement depuis le pool organisation
+- [ ] L'Owner voit la consommation par membre dans l'historique
+
+**Mode Distribution individuelle :**
 - [ ] L'Owner peut distribuer des crédits ponctuels à un membre
 - [ ] Les crédits sont correctement déduits du pool organisation
 - [ ] L'Owner peut configurer une recharge automatique pour un membre
 - [ ] Le job CRON de recharge automatique fonctionne correctement
 - [ ] L'Owner peut récupérer des crédits non utilisés
-- [ ] Chaque membre voit son solde personnel dans le header
+
+**Affichage :**
+- [ ] Chaque membre voit le bon solde dans le header (pool ou perso selon le mode)
 - [ ] L'historique des transactions utilisateur est visible
 - [ ] Les transactions sont auditables avec qui/quand/combien
+- [ ] La page `/dashboard/credits` affiche les consommations globales pour l'Owner
+- [ ] La page `/dashboard/credits` affiche uniquement les transactions personnelles pour un Member
 
 ---
 
