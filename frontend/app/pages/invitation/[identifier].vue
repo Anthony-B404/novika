@@ -58,11 +58,12 @@ onMounted(async () => {
     }
     userExists.value = response.userExists
     isValid.value = true
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('auth.acceptInvitation.error'),
       description:
-        error.data?.message || t('auth.acceptInvitation.invalidInvitation'),
+        apiError.data?.message || t('auth.acceptInvitation.invalidInvitation'),
       color: 'error'
     })
     router.push($localePath('signup'))
@@ -173,9 +174,9 @@ async function onSubmit (event?: FormSubmitEvent<Schema>) {
       formData.append('lastName', event.data.lastName)
 
       // Add avatar if file was selected
-      const fileInput = fileRef.value
-      if (fileInput?.files && fileInput.files.length > 0) {
-        formData.append('avatar', fileInput.files[0])
+      const avatarFile = fileRef.value?.files?.[0]
+      if (avatarFile) {
+        formData.append('avatar', avatarFile)
       }
     }
 
@@ -198,11 +199,12 @@ async function onSubmit (event?: FormSubmitEvent<Schema>) {
 
     // Redirect to dashboard
     router.push($localePath('dashboard'))
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('auth.acceptInvitation.error'),
       description:
-        error.data?.message || t('auth.acceptInvitation.errorDescription'),
+        apiError.data?.message || t('auth.acceptInvitation.errorDescription'),
       color: 'error'
     })
   }

@@ -19,6 +19,8 @@ function handleFiles (files: FileList | null) {
   if (!files || files.length === 0 || props.disabled) { return }
 
   const file = files[0]
+  if (!file) { return }
+
   const validation = validateFile(file)
 
   if (!validation.valid) {

@@ -1,5 +1,6 @@
 import { AudioStatus } from '~/types/audio'
 import type { JobStatus } from '~/types/audio'
+import type { ApiError } from '~/types'
 
 export interface UseAudioPollingOptions {
   /** Initial polling interval in ms (default: 2000) */
@@ -59,9 +60,10 @@ export function useAudioPolling (options: UseAudioPollingOptions = {}) {
     try {
       const status = await authenticatedFetch<JobStatus>(`/audio/status/${jobId}`)
       return status
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const apiError = err as ApiError
       // Handle 404 - job may have completed and currentJobId was cleared
-      if (err?.response?.status === 404 || err?.statusCode === 404 || err?.data?.status === 404) {
+      if (apiError?.statusCode === 404 || apiError?.data?.code === '404') {
         // Fetch the audio directly to check its current status
         try {
           await audioStore.fetchAudio(poll.audioId)
@@ -79,6 +81,7 @@ export function useAudioPolling (options: UseAudioPollingOptions = {}) {
           // If audio fetch also fails, treat as real error
         }
       }
+      // eslint-disable-next-line no-console -- Debug logging for polling errors
       console.error('Polling error:', err)
       return null
     }

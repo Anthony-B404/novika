@@ -9,6 +9,7 @@ import type {
   UpdateCategoryPayload,
   PromptsStoreState
 } from '~/types/prompt'
+import type { ApiError } from '~/types'
 
 export const usePromptsStore = defineStore('prompts', {
   state: (): PromptsStoreState => ({
@@ -70,8 +71,10 @@ export const usePromptsStore = defineStore('prompts', {
           `/prompt-categories?${params}`
         )
         this.categories = categories
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to load categories'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to load categories'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to fetch categories:', error)
       } finally {
         this.categoriesLoading = false
@@ -124,8 +127,10 @@ export const usePromptsStore = defineStore('prompts', {
           total: response.meta.total,
           perPage: response.meta.perPage
         }
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to load prompts'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to load prompts'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to fetch prompts:', error)
       } finally {
         this.loading = false
@@ -153,8 +158,10 @@ export const usePromptsStore = defineStore('prompts', {
         this.prompts.unshift(response.prompt)
 
         return response.prompt
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to create prompt'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to create prompt'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to create prompt:', error)
         return null
       } finally {
@@ -190,8 +197,10 @@ export const usePromptsStore = defineStore('prompts', {
         }
 
         return response.prompt
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to update prompt'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to update prompt'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to update prompt:', error)
         return null
       } finally {
@@ -215,8 +224,10 @@ export const usePromptsStore = defineStore('prompts', {
         }
 
         return true
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to delete prompt'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to delete prompt'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to delete prompt:', error)
         return false
       }
@@ -234,9 +245,9 @@ export const usePromptsStore = defineStore('prompts', {
         )
 
         // Update in local state
-        const index = this.prompts.findIndex(p => p.id === id)
-        if (index !== -1) {
-          this.prompts[index].isFavorite = response.isFavorite
+        const prompt = this.prompts.find(p => p.id === id)
+        if (prompt) {
+          prompt.isFavorite = response.isFavorite
         }
 
         if (this.currentPrompt?.id === id) {
@@ -244,8 +255,10 @@ export const usePromptsStore = defineStore('prompts', {
         }
 
         return response.isFavorite
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to toggle favorite'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to toggle favorite'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to toggle favorite:', error)
         return null
       }
@@ -263,12 +276,13 @@ export const usePromptsStore = defineStore('prompts', {
         )
 
         // Update in local state
-        const index = this.prompts.findIndex(p => p.id === id)
-        if (index !== -1) {
-          this.prompts[index].usageCount = response.usageCount
+        const prompt = this.prompts.find(p => p.id === id)
+        if (prompt) {
+          prompt.usageCount = response.usageCount
         }
-      } catch (error: any) {
-        console.error('Failed to increment usage:', error)
+      } catch (_error: unknown) {
+        // eslint-disable-next-line no-console -- Debug logging
+        console.error('Failed to increment usage:', _error)
       }
     },
 
@@ -293,8 +307,10 @@ export const usePromptsStore = defineStore('prompts', {
         this.categories.push(response.category)
 
         return response.category
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to create category'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to create category'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to create category:', error)
         return null
       } finally {
@@ -329,8 +345,10 @@ export const usePromptsStore = defineStore('prompts', {
         }
 
         return response.category
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to update category'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to update category'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to update category:', error)
         return null
       } finally {
@@ -350,8 +368,10 @@ export const usePromptsStore = defineStore('prompts', {
         this.categories = this.categories.filter(c => c.id !== id)
 
         return true
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to delete category'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to delete category'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to delete category:', error)
         return false
       }

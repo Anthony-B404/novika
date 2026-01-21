@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import type { Member } from '~/types'
+import type { Member, ApiError } from '~/types'
 
 const props = defineProps<{
   member: Member | null;
@@ -103,8 +103,9 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
 
     // Add avatar if file was selected
     const fileInput = fileRef.value
-    if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append('avatar', fileInput.files[0])
+    const avatarFile = fileInput?.files?.[0]
+    if (avatarFile) {
+      formData.append('avatar', avatarFile)
     }
 
     await authenticatedFetch(`/update-member/${props.member.id}`, {
@@ -120,11 +121,12 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
 
     emit('updated')
     emit('close')
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as ApiError
     toast.add({
       title: t('components.settings.members.editModal.errorTitle'),
       description:
-        error.data?.message ||
+        apiError.data?.message ||
         t('components.settings.members.editModal.errorDescription'),
       color: 'error'
     })

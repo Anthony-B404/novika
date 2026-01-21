@@ -117,7 +117,7 @@ async function exportDocument (format: ExportFormat) {
 
     if (contentDisposition) {
       const match = contentDisposition.match(/filename="?([^"]+)"?/)
-      if (match) {
+      if (match?.[1]) {
         filename = match[1]
       }
     }
@@ -138,6 +138,7 @@ async function exportDocument (format: ExportFormat) {
       color: 'success'
     })
   } catch (error) {
+    // eslint-disable-next-line no-console -- Debug logging
     console.error('Export error:', error)
     toast.add({
       title: t('components.workshop.export.error'),

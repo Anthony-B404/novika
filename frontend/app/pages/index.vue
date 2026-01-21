@@ -54,20 +54,18 @@ const schema = z.object({
   )
 })
 
-type Schema = z.output<typeof schema>;
-
-async function onSubmit (payload: FormSubmitEvent<Schema>) {
+async function onSubmit (event?: FormSubmitEvent<{ email: unknown }>) {
+  if (!event) return
+  const email = event.data.email as string
   try {
     await api('/login/request-magic-link', {
       method: 'POST',
-      body: { email: payload.data.email }
+      body: { email }
     })
 
     toast.add({
       title: t('auth.login.success'),
-      description: t('auth.login.successDescription', {
-        email: payload.data.email
-      }),
+      description: t('auth.login.successDescription', { email }),
       color: 'success'
     })
   } catch (error: unknown) {

@@ -102,7 +102,7 @@ async function handleAddUser (data: AddUserPayload) {
       showAddModal.value = false
       await loadUsers(pagination.value.currentPage)
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: error.value || t('reseller.users.add.error'),
       color: 'error'
@@ -132,7 +132,7 @@ async function confirmDelete () {
       userToDelete.value = null
       await loadUsers(pagination.value.currentPage)
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: error.value || t('reseller.users.delete.error'),
       color: 'error'

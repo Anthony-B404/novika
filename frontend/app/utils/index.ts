@@ -53,16 +53,4 @@ export function buildQueryString (params: Record<string, unknown>): string {
   return urlParams.toString()
 }
 
-/**
- * Extract error message from unknown error
- */
-export function getErrorMessage (e: unknown, fallback: string): string {
-  if (e && typeof e === 'object' && 'data' in e) {
-    const fetchError = e as { data?: { message?: string } }
-    return fetchError.data?.message || fallback
-  }
-  if (e instanceof Error) {
-    return e.message
-  }
-  return fallback
-}
+// getErrorMessage is exported from errors.ts (more complete implementation with validation error handling)

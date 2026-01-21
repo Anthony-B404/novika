@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Member } from '~/types'
+import type { Member, ApiError } from '~/types'
 
 const props = defineProps<{
   member: Member | null;
@@ -35,11 +35,12 @@ async function onConfirm () {
 
     emit('deleted')
     emit('close')
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as ApiError
     toast.add({
       title: t('components.settings.members.deleteModal.errorTitle'),
       description:
-        error.data?.message ||
+        apiError.data?.message ||
         t('components.settings.members.deleteModal.errorDescription'),
       color: 'error'
     })

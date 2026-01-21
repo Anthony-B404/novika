@@ -93,13 +93,14 @@ onMounted(async () => {
     if (response.businessSectors && response.businessSectors.length > 0) {
       state.businessSectors = response.businessSectors
     }
-  } catch (error: any) {
-    if (error.status === 401) {
+  } catch (error: unknown) {
+    const apiError = error as { status?: number; data?: { message?: string } }
+    if (apiError.status === 401) {
       isExpired.value = true
     } else {
       toast.add({
         title: t('auth.setup.error'),
-        description: error.data?.message || t('auth.setup.tokenInvalid'),
+        description: apiError.data?.message || t('auth.setup.tokenInvalid'),
         color: 'error'
       })
     }
@@ -224,9 +225,9 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
     }
 
     // Add logo if file was selected
-    const fileInput = fileRef.value
-    if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append('logo', fileInput.files[0])
+    const logoFile = fileRef.value?.files?.[0]
+    if (logoFile) {
+      formData.append('logo', logoFile)
     }
 
     const response = await api<{ token: string; message: string }>(
@@ -248,10 +249,11 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
 
     // Redirect to dashboard
     router.push($localePath('dashboard'))
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('auth.setup.error'),
-      description: error.data?.message || t('auth.setup.errorDescription'),
+      description: apiError.data?.message || t('auth.setup.errorDescription'),
       color: 'error'
     })
   } finally {

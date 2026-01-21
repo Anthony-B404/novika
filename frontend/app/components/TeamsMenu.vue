@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
+import type { ApiError } from '~/types'
 import { storeToRefs } from 'pinia'
 import { useOrganizationStore } from '~/stores/organization'
 
@@ -68,11 +69,12 @@ async function switchOrganization (orgId: number) {
       description: t('components.teams.organizationSwitched'),
       color: 'success'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as ApiError
     toast.add({
       title: t('common.messages.error'),
       description:
-        error.data?.message || t('components.teams.organizationSwitchError'),
+        apiError.data?.message || t('components.teams.organizationSwitchError'),
       color: 'error'
     })
   }

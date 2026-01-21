@@ -118,8 +118,9 @@ async function onSubmit (event: FormSubmitEvent<OrganizationSchema>) {
 
     // Add logo if file was selected
     const fileInput = fileRef.value
-    if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append('logo', fileInput.files[0])
+    const logoFile = fileInput?.files?.[0]
+    if (logoFile) {
+      formData.append('logo', logoFile)
     }
 
     // Only send request if there are changes
@@ -164,11 +165,12 @@ async function onSubmit (event: FormSubmitEvent<OrganizationSchema>) {
         color: 'neutral'
       })
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('pages.dashboard.settings.organization.errorTitle'),
       description:
-        error.data?.message ||
+        apiError.data?.message ||
         t('pages.dashboard.settings.organization.errorDescription'),
       icon: 'i-lucide-x',
       color: 'error'
@@ -180,12 +182,13 @@ async function onSubmit (event: FormSubmitEvent<OrganizationSchema>) {
 
 function onFileChange (e: Event) {
   const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
 
-  if (!input.files?.length) {
+  if (!file) {
     return
   }
 
-  organization.logo = URL.createObjectURL(input.files[0]!)
+  organization.logo = URL.createObjectURL(file)
   logoRemoved.value = false
 }
 

@@ -1,4 +1,5 @@
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 export function useMarkdown () {
   // Configure marked pour le rendu
@@ -9,7 +10,8 @@ export function useMarkdown () {
 
   function renderMarkdown (content: string): string {
     if (!content) { return '' }
-    return marked.parse(content) as string
+    const rawHtml = marked.parse(content) as string
+    return DOMPurify.sanitize(rawHtml)
   }
 
   return {

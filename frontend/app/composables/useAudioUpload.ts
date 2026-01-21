@@ -1,4 +1,5 @@
 import type { ProcessJobResponse, AudioUploadProgress } from '~/types/audio'
+import type { ApiError } from '~/types'
 
 export interface UseAudioUploadOptions {
   onProgress?: (progress: AudioUploadProgress) => void
@@ -104,9 +105,10 @@ export function useAudioUpload (options: UseAudioUploadOptions = {}) {
       options.onSuccess?.(response)
 
       return response
-    } catch (err: any) {
-      error.value = err?.data?.message || err?.message || 'Upload failed'
-      options.onError?.(new Error(error.value))
+    } catch (err: unknown) {
+      const apiError = err as ApiError
+      error.value = apiError?.data?.message || apiError?.message || 'Upload failed'
+      options.onError?.(new Error(error.value ?? undefined))
       return null
     } finally {
       uploading.value = false

@@ -68,14 +68,14 @@ async function onSubmit (event: FormSubmitEvent<ProfileSchema>) {
     }
 
     // Add avatar if file was selected
-    const fileInput = fileRef.value
-    if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append('avatar', fileInput.files[0])
+    const avatarFile = fileRef.value?.files?.[0]
+    if (avatarFile) {
+      formData.append('avatar', avatarFile)
     }
 
     // Only send request if there are changes
     if (Array.from(formData.keys()).length > 0) {
-      const response = await api<{ message: string; user: any }>('/profile', {
+      const response = await api<{ message: string; user: { firstName: string; lastName: string; email: string; avatar?: string } }>('/profile', {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${authStore.token}`
@@ -83,8 +83,13 @@ async function onSubmit (event: FormSubmitEvent<ProfileSchema>) {
         body: formData
       })
 
-      // Update user in store
-      authStore.setUser(response.user)
+      // Update user in store - merge updated fields into existing user
+      if (authStore.user) {
+        authStore.user.firstName = response.user.firstName
+        authStore.user.lastName = response.user.lastName
+        authStore.user.email = response.user.email
+        authStore.user.avatar = response.user.avatar ?? null
+      }
 
       // Update local state with new data
       profile.firstName = response.user.firstName
@@ -107,11 +112,12 @@ async function onSubmit (event: FormSubmitEvent<ProfileSchema>) {
         color: 'neutral'
       })
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('pages.dashboard.settings.general.errorTitle'),
       description:
-        error.data?.message ||
+        apiError.data?.message ||
         t('pages.dashboard.settings.general.errorDescription'),
       icon: 'i-lucide-x',
       color: 'error'

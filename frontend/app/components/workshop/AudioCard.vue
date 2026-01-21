@@ -27,8 +27,10 @@ const isProcessing = computed(
     props.audio.status === AudioStatus.Processing
 )
 
+type BadgeColor = 'error' | 'info' | 'primary' | 'secondary' | 'success' | 'warning' | 'neutral'
+
 const statusConfig = computed(() => {
-  const configs: Record<AudioStatus, { color: string; icon: string; label: string }> = {
+  const configs: Record<AudioStatus, { color: BadgeColor; icon: string; label: string }> = {
     [AudioStatus.Pending]: {
       color: 'neutral',
       icon: 'i-lucide-clock',

@@ -26,7 +26,7 @@ const loadMembers = async () => {
   try {
     const data = await authenticatedFetch<Member[]>('/members')
     members.value = data || []
-  } catch (error) {
+  } catch (_error) {
     toast.add({
       title: t('components.settings.members.errorLoadingTitle'),
       description: t('components.settings.members.errorLoadingDescription'),
@@ -39,7 +39,7 @@ const loadInvitations = async () => {
   try {
     const data = await authenticatedFetch<Invitation[]>('/invitations')
     invitations.value = data || []
-  } catch (error) {
+  } catch (_error) {
     toast.add({
       title: t('components.settings.invitations.errorLoadingTitle'),
       description: t('components.settings.invitations.errorLoadingDescription'),
@@ -192,11 +192,12 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
     // Refresh members list and invitations list
     await refreshMembers()
     await refreshInvitations()
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('components.settings.members.inviteModal.errorTitle'),
       description:
-        error.data?.message ||
+        apiError.data?.message ||
         t('components.settings.members.inviteModal.errorDescription'),
       color: 'error'
     })
@@ -223,11 +224,12 @@ async function resendInvitation (id: number) {
 
     // Refresh invitations list
     await refreshInvitations()
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('components.settings.invitations.resendError'),
       description:
-        error.data?.message || t('components.settings.invitations.resendError'),
+        apiError.data?.message || t('components.settings.invitations.resendError'),
       color: 'error'
     })
   } finally {
@@ -253,11 +255,12 @@ async function deleteInvitation (id: number) {
 
     // Refresh invitations list
     await refreshInvitations()
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('components.settings.invitations.deleteError'),
       description:
-        error.data?.message || t('components.settings.invitations.deleteError'),
+        apiError.data?.message || t('components.settings.invitations.deleteError'),
       color: 'error'
     })
   } finally {

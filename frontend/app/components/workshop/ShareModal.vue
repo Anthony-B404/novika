@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { z } from 'zod'
+import type { ApiError } from '~/types'
 
 const props = defineProps<{
   audioId: number
@@ -50,10 +51,11 @@ async function handleShare () {
 
     email.value = ''
     open.value = false
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as ApiError
     toast.add({
       title: t('components.workshop.shareModal.error'),
-      description: error?.data?.message || error?.message,
+      description: apiError?.data?.message || apiError?.message,
       color: 'error'
     })
   } finally {

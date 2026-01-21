@@ -56,15 +56,15 @@ function handleLoadedMetadata () {
   }
 }
 
-function handleSeek (value: number) {
-  if (audioRef.value) {
+function handleSeek (value: number | undefined) {
+  if (audioRef.value && value !== undefined) {
     audioRef.value.currentTime = value
     currentTime.value = value
   }
 }
 
-function handleVolumeChange (value: number) {
-  if (audioRef.value) {
+function handleVolumeChange (value: number | undefined) {
+  if (audioRef.value && value !== undefined) {
     volume.value = value
     audioRef.value.volume = value
     isMuted.value = value === 0

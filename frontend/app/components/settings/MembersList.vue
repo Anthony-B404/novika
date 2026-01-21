@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-import type { Member } from '~/types'
+import type { Member, ApiError } from '~/types'
 import { UserRole } from '~/types/auth'
 
 const { t } = useI18n()
@@ -119,10 +119,11 @@ const handleRoleChange = async (member: Member, newRole: UserRole) => {
     })
 
     emit('refresh')
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as ApiError
     toast.add({
       title: t('components.settings.members.roleChangeError'),
-      description: error.data?.message || '',
+      description: apiError.data?.message || '',
       color: 'error'
     })
   } finally {

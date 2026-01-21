@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import type { ApiError } from '~/types'
 
 export interface DataSummary {
   profile: {
@@ -99,8 +100,9 @@ export const useGdprStore = defineStore('gdpr', {
       try {
         const response = await authenticatedFetch('/gdpr/data-summary')
         this.dataSummary = response as DataSummary
-      } catch (err: any) {
-        this.error = err.data?.message || 'Failed to fetch data summary'
+      } catch (err: unknown) {
+        const apiError = err as ApiError
+        this.error = apiError.data?.message || 'Failed to fetch data summary'
         throw err
       } finally {
         this.loading.summary = false
@@ -115,8 +117,9 @@ export const useGdprStore = defineStore('gdpr', {
       try {
         const response = await authenticatedFetch('/gdpr/orphan-organizations')
         this.orphanOrganizations = response as OrphanOrganization[]
-      } catch (err: any) {
-        this.error = err.data?.message || 'Failed to fetch orphan organizations'
+      } catch (err: unknown) {
+        const apiError = err as ApiError
+        this.error = apiError.data?.message || 'Failed to fetch orphan organizations'
         throw err
       } finally {
         this.loading.orphans = false
@@ -131,8 +134,9 @@ export const useGdprStore = defineStore('gdpr', {
       try {
         const response = await authenticatedFetch('/gdpr/deletion-status')
         this.deletionStatus = response as DeletionStatus
-      } catch (err: any) {
-        this.error = err.data?.message || 'Failed to fetch deletion status'
+      } catch (err: unknown) {
+        const apiError = err as ApiError
+        this.error = apiError.data?.message || 'Failed to fetch deletion status'
         throw err
       } finally {
         this.loading.deletion = false
@@ -145,9 +149,7 @@ export const useGdprStore = defineStore('gdpr', {
       this.error = null
 
       try {
-        const response = await authenticatedFetch('/gdpr/export', {
-          responseType: 'blob'
-        })
+        const response = await authenticatedFetch<Blob>('/gdpr/export')
 
         // Create download link
         const blob = new Blob([response as BlobPart], { type: 'application/zip' })
@@ -159,8 +161,9 @@ export const useGdprStore = defineStore('gdpr', {
         link.click()
         document.body.removeChild(link)
         window.URL.revokeObjectURL(url)
-      } catch (err: any) {
-        this.error = err.data?.message || 'Failed to download export'
+      } catch (err: unknown) {
+        const apiError = err as ApiError
+        this.error = apiError.data?.message || 'Failed to download export'
         throw err
       } finally {
         this.loading.export = false
@@ -185,8 +188,9 @@ export const useGdprStore = defineStore('gdpr', {
         await this.fetchDeletionStatus()
 
         return response
-      } catch (err: any) {
-        this.error = err.data?.message || 'Failed to request deletion'
+      } catch (err: unknown) {
+        const apiError = err as ApiError
+        this.error = apiError.data?.message || 'Failed to request deletion'
         throw err
       } finally {
         this.loading.deletion = false
@@ -206,8 +210,9 @@ export const useGdprStore = defineStore('gdpr', {
 
         // Refresh deletion status
         await this.fetchDeletionStatus()
-      } catch (err: any) {
-        this.error = err.data?.message || 'Failed to cancel deletion'
+      } catch (err: unknown) {
+        const apiError = err as ApiError
+        this.error = apiError.data?.message || 'Failed to cancel deletion'
         throw err
       } finally {
         this.loading.cancel = false

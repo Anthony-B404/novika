@@ -67,7 +67,7 @@ const savingTitle = ref(false)
 const titleInputRef = ref<HTMLInputElement | null>(null)
 
 // Audio player ref and current time for segment sync
-const audioPlayerRef = ref<InstanceType<typeof WorkshopAudioPlayer> | null>(null)
+const audioPlayerRef = ref<{ seekTo?: (time: number) => void } | null>(null)
 const currentTime = ref(0)
 
 // Check if timestamps are available
@@ -134,6 +134,7 @@ async function loadAudioFile () {
     const blob = await response.blob()
     audioFileUrl.value = URL.createObjectURL(blob)
   } catch (error) {
+    // eslint-disable-next-line no-console -- Debug logging for audio file loading errors
     console.error('Failed to load audio file:', error)
   } finally {
     audioFileLoading.value = false
@@ -252,7 +253,7 @@ function onTimeUpdate (time: number) {
 
 // Handle seek from transcription segment click
 function handleSegmentSeek (time: number) {
-  audioPlayerRef.value?.seekTo(time)
+  audioPlayerRef.value?.seekTo?.(time)
 }
 
 // Format duration

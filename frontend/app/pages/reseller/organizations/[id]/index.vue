@@ -129,7 +129,7 @@ async function handleSubmit (data: UpdateOrganizationPayload) {
         color: 'success'
       })
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: error.value || t('reseller.organizations.detail.updateError'),
       color: 'error'
@@ -152,7 +152,7 @@ async function handleSubscriptionSubmit (data: ConfigureSubscriptionPayload) {
         color: 'success'
       })
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: t('reseller.subscription.configureError'),
       color: 'error'
@@ -170,7 +170,7 @@ async function handlePauseSubscription () {
         color: 'success'
       })
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: t('reseller.subscription.pauseError'),
       color: 'error'
@@ -188,7 +188,7 @@ async function handleResumeSubscription () {
         color: 'success'
       })
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: t('reseller.subscription.resumeError'),
       color: 'error'
@@ -212,7 +212,7 @@ async function handleSuspend (reason?: string) {
         color: 'success'
       })
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: error.value || t('reseller.organizations.suspend.error'),
       color: 'error'
@@ -234,7 +234,7 @@ async function handleRestore () {
         color: 'success'
       })
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: error.value || t('reseller.organizations.restore.error'),
       color: 'error'
@@ -257,7 +257,7 @@ async function handleDelete () {
       // Redirect to organizations list after deletion
       router.push(localePath('/reseller/organizations'))
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: error.value || t('reseller.organizations.delete.error'),
       color: 'error'

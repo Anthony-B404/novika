@@ -1,6 +1,16 @@
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '~/stores/auth'
 
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS' | 'CONNECT' | 'TRACE'
+
+interface AuthFetchOptions {
+  method?: HttpMethod
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body?: BodyInit | Record<string, any> | null
+  headers?: Record<string, string>
+  baseURL?: string
+}
+
 /**
  * Authentication composable
  * Provides easy access to auth state and methods
@@ -12,7 +22,7 @@ export const useAuth = () => {
   /**
    * Get authorization headers for API requests
    */
-  const getAuthHeaders = () => {
+  const getAuthHeaders = (): Record<string, string> => {
     if (!token.value) {
       return {}
     }
@@ -27,7 +37,7 @@ export const useAuth = () => {
    */
   const authenticatedFetch = async <T>(
     url: string,
-    options: RequestInit = {}
+    options: AuthFetchOptions = {}
   ): Promise<T> => {
     const api = useApi()
 

@@ -1,6 +1,34 @@
 <script setup lang="ts">
 import { AudioStatus } from '~/types/audio'
 
+interface SharedAudioResponse {
+  share: {
+    id: number
+    identifier: string
+    expiresAt: string | null
+    organizationName?: string
+    sharedBy?: {
+      fullName?: string
+      firstName?: string
+    }
+  }
+  audio: {
+    id: number
+    title: string
+    duration: number | null
+    status: AudioStatus
+    fileName?: string
+    fileSize?: number
+    transcription?: {
+      rawText: string
+      analysis: string
+      language?: string
+      confidence?: number
+      timestamps?: Array<{ start: number; end: number; text: string }>
+    }
+  }
+}
+
 definePageMeta({
   layout: false
 })
@@ -13,7 +41,7 @@ const runtimeConfig = useRuntimeConfig()
 const identifier = computed(() => route.params.identifier as string)
 
 // Fetch shared data
-const { data, pending, error } = await useFetch(
+const { data, pending, error } = await useFetch<SharedAudioResponse>(
   () => `${runtimeConfig.public.apiUrl}/shared/${identifier.value}`,
   {
     key: `shared-${identifier.value}`
@@ -26,7 +54,7 @@ const audio = computed(() => data.value?.audio)
 const activeTab = ref<'transcription' | 'analysis'>('transcription')
 
 // Audio player ref and current time for segment sync
-const audioPlayerRef = ref<InstanceType<typeof WorkshopAudioPlayer> | null>(null)
+const audioPlayerRef = ref<{ seekTo?: (time: number) => void } | null>(null)
 const currentTime = ref(0)
 
 // Audio URL (public endpoint)
@@ -69,7 +97,8 @@ function formatDuration (seconds: number | null): string {
 }
 
 // Format file size
-function formatFileSize (bytes: number): string {
+function formatFileSize (bytes: number | undefined): string {
+  if (!bytes) { return '--' }
   if (bytes < 1024) { return `${bytes} B` }
   if (bytes < 1024 * 1024) { return `${(bytes / 1024).toFixed(1)} KB` }
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
@@ -115,7 +144,7 @@ function onTimeUpdate (time: number) {
 
 // Handle seek from transcription segment click
 function handleSegmentSeek (time: number) {
-  audioPlayerRef.value?.seekTo(time)
+  audioPlayerRef.value?.seekTo?.(time)
 }
 
 useSeoMeta({
@@ -151,7 +180,7 @@ useSeoMeta({
       </div>
 
       <!-- Content -->
-      <div v-else class="space-y-6">
+      <div v-else-if="audio" class="space-y-6">
         <!-- Header -->
         <div class="mb-8 text-center">
           <h1 class="text-highlighted mb-2 text-2xl font-bold">

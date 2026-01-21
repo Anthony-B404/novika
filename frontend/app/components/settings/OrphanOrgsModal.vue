@@ -37,10 +37,11 @@ watch(
 
     orgs.forEach((org) => {
       const otherMembers = getTransferableMembers(org)
-      if (otherMembers.length > 0) {
+      const firstMember = otherMembers[0]
+      if (firstMember) {
         // Default to transfer for orgs with members
         decisions.value[org.id] = 'transfer'
-        selectedOwners.value[org.id] = otherMembers[0].id
+        selectedOwners.value[org.id] = firstMember.id
       }
     })
   },
@@ -113,11 +114,13 @@ function handleConfirm () {
   // Add user decisions for orgs with members
   orgsWithMembers.value.forEach((org) => {
     const decision = decisions.value[org.id]
-    decisionsArray.push({
-      organizationId: org.id,
-      action: decision,
-      newOwnerId: decision === 'transfer' ? selectedOwners.value[org.id] : undefined
-    })
+    if (decision) {
+      decisionsArray.push({
+        organizationId: org.id,
+        action: decision,
+        newOwnerId: decision === 'transfer' ? selectedOwners.value[org.id] : undefined
+      })
+    }
   })
 
   emit('confirm', decisionsArray)
@@ -132,7 +135,8 @@ function handleClose () {
   <UModal
     :open="open"
     :title="t('pages.dashboard.settings.privacy.orphanOrgs.title')"
-    :ui="{ footer: 'justify-end', width: 'sm:max-w-2xl' }"
+    :ui="{ footer: 'justify-end' }"
+    class="sm:max-w-2xl"
     @update:open="(val) => emit('update:open', val)"
   >
     <template #body>

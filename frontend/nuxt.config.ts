@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -24,6 +25,7 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxt/ui',
+    '@nuxt/eslint',
     '@nuxtjs/color-mode',
     '@nuxtjs/i18n',
     '@pinia/nuxt',
@@ -37,7 +39,6 @@ export default defineNuxtConfig({
     strategy: 'prefix_and_default',
     langDir: 'locales',
     defaultLocale: 'fr',
-    lazy: true,
     locales: [
       {
         code: 'fr',

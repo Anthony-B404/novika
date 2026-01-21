@@ -11,7 +11,7 @@ export default defineNuxtPlugin(async () => {
 
   try {
     await configStore.fetchSectors()
-  } catch (error) {
+  } catch (_error) {
     // Error already logged in store, silent here
     // App continues with static fallback values
   }

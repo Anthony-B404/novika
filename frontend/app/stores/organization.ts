@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import type { Organization, OrganizationState, UserOrganization } from '~/types/organization'
+import type { ApiError } from '~/types'
 
 export const useOrganizationStore = defineStore('organization', {
   state: (): OrganizationState => ({
@@ -65,9 +66,11 @@ export const useOrganizationStore = defineStore('organization', {
         const { authenticatedFetch } = useAuth()
         const response = await authenticatedFetch<Organization>('/organization')
         this.setOrganization(response)
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to fetch organization:', error)
-        this.setError(error?.message || 'Failed to load organization')
+        this.setError(apiError?.message || 'Failed to load organization')
         this.setOrganization(null)
       } finally {
         this.loading = false
@@ -92,9 +95,11 @@ export const useOrganizationStore = defineStore('organization', {
           // Fetch full organization details for the current one
           await this.fetchOrganization()
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to fetch user organizations:', error)
-        this.setError(error?.message || 'Failed to load organizations')
+        this.setError(apiError?.message || 'Failed to load organizations')
         this.setOrganizations([])
       } finally {
         this.loading = false

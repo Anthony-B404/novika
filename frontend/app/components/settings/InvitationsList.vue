@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Invitation } from '~/types'
-import { UserRole } from '~/types/auth'
+import type { UserRole } from '~/types/auth'
 
 const { t } = useI18n()
 const { getRoleOptions } = useRoles()

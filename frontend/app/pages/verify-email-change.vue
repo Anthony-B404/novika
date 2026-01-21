@@ -45,10 +45,11 @@ onMounted(async () => {
 
     // Redirect to dashboard
     router.push($localePath('dashboard'))
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('auth.verifyEmailChange.error'),
-      description: error.data?.message || t('auth.verifyEmailChange.invalidToken'),
+      description: apiError.data?.message || t('auth.verifyEmailChange.invalidToken'),
       color: 'error'
     })
     router.push($localePath('index'))

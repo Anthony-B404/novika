@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateResellerPayload } from '~/types/admin'
+import type { CreateResellerPayload, UpdateResellerPayload } from '~/types/admin'
 import { getErrorMessage } from '~/utils/errors'
 
 definePageMeta({
@@ -17,19 +17,19 @@ useSeoMeta({
 
 const { createReseller, loading } = useResellers()
 
-async function handleSubmit (data: CreateResellerPayload) {
+async function handleSubmit (data: CreateResellerPayload | UpdateResellerPayload) {
   try {
     // Build payload, excluding empty optional fields
     const payload: CreateResellerPayload = {
-      name: data.name,
-      email: data.email,
-      company: data.company
+      name: data.name || '',
+      email: data.email || '',
+      company: data.company || ''
     }
     if (data.phone) { payload.phone = data.phone }
     if (data.siret) { payload.siret = data.siret }
     if (data.address) { payload.address = data.address }
     if (data.notes) { payload.notes = data.notes }
-    if (data.initialCredits) { payload.initialCredits = data.initialCredits }
+    if ('initialCredits' in data && data.initialCredits) { payload.initialCredits = data.initialCredits }
 
     const result = await createReseller(payload)
     if (result) {

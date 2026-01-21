@@ -78,6 +78,7 @@ export const useAuthStore = defineStore('auth', {
           await organizationStore.fetchOrganization()
         }
       } catch (error) {
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to fetch user:', error)
         // Token might be invalid, clear auth state
         this.logout()
@@ -103,6 +104,7 @@ export const useAuthStore = defineStore('auth', {
         })
         return true
       } catch (error) {
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Token validation failed:', error)
         this.logout()
         return false
@@ -131,7 +133,8 @@ export const useAuthStore = defineStore('auth', {
             }
           })
         } catch (error) {
-          console.error('Logout failed:', error)
+          // eslint-disable-next-line no-console -- Debug logging
+        console.error('Logout failed:', error)
         }
       }
 

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { AudioStatus } from '~/types/audio'
 import type { Audio, AudioPagination, JobStatus } from '~/types/audio'
+import type { ApiError } from '~/types'
 
 interface AudioState {
   audios: Audio[]
@@ -102,8 +103,10 @@ export const useAudioStore = defineStore('audio', {
           total: response.meta.total,
           perPage: response.meta.perPage
         }
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to load audios'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to load audios'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to fetch audios:', error)
       } finally {
         this.loading = false
@@ -116,6 +119,7 @@ export const useAudioStore = defineStore('audio', {
     async fetchAudio (id: number): Promise<Audio | null> {
       // Validate ID before API call
       if (!Number.isInteger(id) || id <= 0) {
+        // eslint-disable-next-line no-console -- Debug logging
         console.warn('fetchAudio called with invalid ID:', id)
         return null
       }
@@ -135,8 +139,10 @@ export const useAudioStore = defineStore('audio', {
         }
 
         return audio
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to load audio'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to load audio'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to fetch audio:', error)
         return null
       } finally {
@@ -160,8 +166,10 @@ export const useAudioStore = defineStore('audio', {
         this.pagination.total = Math.max(0, this.pagination.total - 1)
 
         return true
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to delete audio'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to delete audio'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to delete audio:', error)
         return false
       }
@@ -186,8 +194,10 @@ export const useAudioStore = defineStore('audio', {
         this.pagination.total = Math.max(0, this.pagination.total - response.deletedCount)
 
         return { success: true, deletedCount: response.deletedCount }
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to delete audios'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to delete audios'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to delete multiple audios:', error)
         return { success: false, deletedCount: 0 }
       }
@@ -205,17 +215,19 @@ export const useAudioStore = defineStore('audio', {
         })
 
         // Update in local state
-        const index = this.audios.findIndex(a => a.id === id)
-        if (index !== -1) {
-          this.audios[index] = { ...this.audios[index], title: response.audio.title }
+        const existingAudio = this.audios.find(a => a.id === id)
+        if (existingAudio) {
+          Object.assign(existingAudio, { title: response.audio.title })
         }
         if (this.currentAudio?.id === id) {
           this.currentAudio = { ...this.currentAudio, title: response.audio.title }
         }
 
         return true
-      } catch (error: any) {
-        this.error = error?.data?.message || error?.message || 'Failed to update audio'
+      } catch (error: unknown) {
+        const apiError = error as ApiError
+        this.error = apiError?.data?.message || apiError?.message || 'Failed to update audio'
+        // eslint-disable-next-line no-console -- Debug logging
         console.error('Failed to update audio:', error)
         return false
       }
@@ -252,13 +264,12 @@ export const useAudioStore = defineStore('audio', {
      * Update audio status locally
      */
     updateAudioStatus (audioId: number, status: AudioStatus, errorMessage?: string) {
-      const index = this.audios.findIndex(a => a.id === audioId)
-      if (index !== -1) {
-        this.audios[index] = {
-          ...this.audios[index],
+      const existingAudio = this.audios.find(a => a.id === audioId)
+      if (existingAudio) {
+        Object.assign(existingAudio, {
           status,
           errorMessage: errorMessage || null
-        }
+        })
       }
       if (this.currentAudio?.id === audioId) {
         this.currentAudio = {

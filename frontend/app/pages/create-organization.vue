@@ -52,9 +52,9 @@ async function onSubmit (event: FormSubmitEvent<OrganizationSchema>) {
     formData.append('organization', JSON.stringify(organizationData))
 
     // Add logo if file was selected
-    const fileInput = fileRef.value
-    if (fileInput?.files && fileInput.files.length > 0) {
-      formData.append('logo', fileInput.files[0])
+    const logoFile = fileRef.value?.files?.[0]
+    if (logoFile) {
+      formData.append('logo', logoFile)
     }
 
     const response = await authenticatedFetch<{
@@ -86,11 +86,12 @@ async function onSubmit (event: FormSubmitEvent<OrganizationSchema>) {
       // User has active trial - redirect to dashboard
       navigateTo($localePath('/dashboard'))
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('pages.createOrganization.errorTitle'),
       description:
-        error.data?.message || t('pages.createOrganization.errorDescription'),
+        apiError.data?.message || t('pages.createOrganization.errorDescription'),
       icon: 'i-lucide-x',
       color: 'error'
     })

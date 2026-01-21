@@ -1,5 +1,10 @@
 import type { RecorderState } from '~/types/audio'
 
+// Extend Window interface for webkit AudioContext
+interface WindowWithWebkit extends Window {
+  webkitAudioContext?: typeof AudioContext
+}
+
 export function useAudioRecorder () {
   const state = reactive<RecorderState>({
     isRecording: false,
@@ -32,7 +37,7 @@ export function useAudioRecorder () {
       typeof navigator !== 'undefined' &&
       'mediaDevices' in navigator &&
       'getUserMedia' in navigator.mediaDevices &&
-      (typeof AudioContext !== 'undefined' || typeof (window as any).webkitAudioContext !== 'undefined')
+      (typeof AudioContext !== 'undefined' || typeof (window as WindowWithWebkit).webkitAudioContext !== 'undefined')
     )
   })
 
@@ -56,8 +61,8 @@ export function useAudioRecorder () {
       })
 
       // 2. Init Audio Context
-      const AudioCtor = (window.AudioContext || (window as any).webkitAudioContext)
-      audioContext = new AudioCtor()
+      const AudioCtor = (window.AudioContext || (window as WindowWithWebkit).webkitAudioContext)
+      audioContext = new AudioCtor!()
       sampleRate = audioContext.sampleRate
 
       // 3. Create Source & Processor
@@ -93,14 +98,16 @@ export function useAudioRecorder () {
       startDurationTimer()
 
       return true
-    } catch (err: any) {
+    } catch (err: unknown) {
+      // eslint-disable-next-line no-console -- Debug logging for recording errors
       console.error('Recording error:', err)
-      if (err.name === 'NotAllowedError') {
+      const mediaError = err as { name?: string; message?: string }
+      if (mediaError.name === 'NotAllowedError') {
         state.error = 'Microphone access denied. Please allow microphone access.'
-      } else if (err.name === 'NotFoundError') {
+      } else if (mediaError.name === 'NotFoundError') {
         state.error = 'No microphone found. Please connect a microphone.'
       } else {
-        state.error = err.message || 'Failed to start recording'
+        state.error = mediaError.message || 'Failed to start recording'
       }
       return false
     }
@@ -175,8 +182,11 @@ export function useAudioRecorder () {
     const result = new Float32Array(totalLength)
     let offset = 0
     for (let i = 0; i < samples.length; i++) {
-      result.set(samples[i], offset)
-      offset += samples[i].length
+      const sample = samples[i]
+      if (sample) {
+        result.set(sample, offset)
+        offset += sample.length
+      }
     }
 
     // Write WAV Header
@@ -205,7 +215,8 @@ export function useAudioRecorder () {
 
   function floatTo16BitPCM (output: DataView, offset: number, input: Float32Array) {
     for (let i = 0; i < input.length; i++, offset += 2) {
-      const s = Math.max(-1, Math.min(1, input[i]))
+      const sample = input[i] ?? 0
+      const s = Math.max(-1, Math.min(1, sample))
       // Convert float to 16-bit PCM
       // s < 0 ? s * 0x8000 : s * 0x7FFF
       output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true)

@@ -1,3 +1,11 @@
+import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack'
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS' | 'CONNECT' | 'TRACE'
+type FetchOptions = Omit<NitroFetchOptions<NitroFetchRequest>, 'method'> & {
+  method?: HttpMethod
+  baseURL?: string
+}
+
 /**
  * API Composable
  * Provides $fetch wrapper with automatic Accept-Language header
@@ -13,9 +21,9 @@ export const useApi = () => {
    * @param options - Fetch options
    * @returns Promise with typed response
    */
-  const apiFetch = async <T = any>(
+  const apiFetch = async <T>(
     url: string,
-    options: RequestInit & { baseURL?: string } = {}
+    options: FetchOptions = {}
   ): Promise<T> => {
     // Get current locale (reactive - always up to date)
     const locale = $i18n?.locale?.value || 'fr'
@@ -25,13 +33,15 @@ export const useApi = () => {
       ? url
       : `${options.baseURL || config.public.apiUrl}${url}`
 
-    return await $fetch<T>(fullUrl, {
+    const result = await $fetch(fullUrl, {
       ...options,
       headers: {
         'Accept-Language': locale,
         ...options.headers
       }
-    })
+    } as NitroFetchOptions<NitroFetchRequest>)
+
+    return result as T
   }
 
   return apiFetch

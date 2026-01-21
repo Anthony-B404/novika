@@ -158,7 +158,7 @@ function handleClose () {
                 color="error"
                 variant="ghost"
                 size="xs"
-                :disabled="category.promptsCount && category.promptsCount > 0"
+                :disabled="(category.promptsCount ?? 0) > 0"
                 @click="handleDelete(category)"
               />
             </div>

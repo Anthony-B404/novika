@@ -52,10 +52,11 @@ onMounted(async () => {
     } else {
       router.push($localePath('dashboard'))
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('auth.verifyLogin.error'),
-      description: error.data?.message || t('auth.verifyLogin.invalidToken'),
+      description: apiError.data?.message || t('auth.verifyLogin.invalidToken'),
       color: 'error'
     })
     router.push($localePath('index'))

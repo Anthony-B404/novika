@@ -171,7 +171,7 @@ const statusOptions = [
     </UAlert>
 
     <!-- Table -->
-    <UCard :ui="{ body: { padding: 'p-0' } }">
+    <UCard :ui="{ body: 'p-0' }">
       <AdminResellerTable
         :resellers="resellers"
         :loading="loading"

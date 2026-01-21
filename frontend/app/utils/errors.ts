@@ -14,8 +14,9 @@ export function getErrorMessage (e: unknown, fallback: string): string {
 
     // Priority 1: First validation error message (already translated by VineJS)
     const validationErrors = fetchError.data?.errors
-    if (Array.isArray(validationErrors) && validationErrors.length > 0) {
-      return validationErrors[0].message
+    const firstError = Array.isArray(validationErrors) ? validationErrors[0] : undefined
+    if (firstError?.message) {
+      return firstError.message
     }
 
     // Priority 2: Generic API message

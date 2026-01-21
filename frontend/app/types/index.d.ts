@@ -1,7 +1,19 @@
 import type { AvatarProps } from "@nuxt/ui";
+import type { UserRole } from './auth'
 
 export type UserStatus = "subscribed" | "unsubscribed" | "bounced";
 export type SaleStatus = "paid" | "failed" | "refunded";
+
+// API error response type for catch blocks
+export interface ApiError {
+  data?: {
+    message?: string;
+    code?: string;
+    errors?: Record<string, string[]>;
+  };
+  message?: string;
+  statusCode?: number;
+}
 
 export interface User {
   id: number;
@@ -20,8 +32,6 @@ export interface Mail {
   body: string;
   date: string;
 }
-
-import type { UserRole } from './auth'
 
 export interface Member {
   id: number;

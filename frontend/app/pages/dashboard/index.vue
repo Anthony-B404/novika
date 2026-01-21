@@ -140,6 +140,7 @@ async function handleUpload () {
       return
     }
   } catch (error) {
+    // eslint-disable-next-line no-console -- Debug logging for duration check errors
     console.error('Failed to check audio duration:', error)
     // Continue with upload if check fails (backend will handle it)
   }

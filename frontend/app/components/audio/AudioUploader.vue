@@ -37,7 +37,7 @@ function handleFiles (files: FileList | null) {
   if (!files || files.length === 0 || props.disabled) { return }
 
   const file = files[0]
-  if (validateFile(file)) {
+  if (file && validateFile(file)) {
     emit('file-selected', file)
   }
 }

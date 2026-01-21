@@ -43,6 +43,7 @@ export const useConfigStore = defineStore('config', {
         this.isLoaded = true
         this.hasError = false
       } catch (error) {
+        // eslint-disable-next-line no-console -- Debug logging
         console.warn('[config] Failed to fetch sectors from API, using static fallback:', error)
         this.hasError = true
         // Keep using static fallback via getter

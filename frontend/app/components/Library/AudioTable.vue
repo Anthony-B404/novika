@@ -206,9 +206,7 @@ function handleTitleKeydown (event: KeyboardEvent, audio: Audio) {
       :loading="loading"
       class="w-full"
       :ui="{
-        tr: {
-          base: 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
-        },
+        tr: 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
       }"
       @select="(_e, row) => emit('select', row.original)"
     >

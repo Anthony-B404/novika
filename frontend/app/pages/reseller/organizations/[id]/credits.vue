@@ -79,7 +79,7 @@ async function handleDistribute (data: DistributeCreditsPayload) {
       // Reload transactions
       await loadData()
     }
-  } catch (e) {
+  } catch (_e) {
     toast.add({
       title: error.value || t('reseller.credits.distribution.error'),
       color: 'error'

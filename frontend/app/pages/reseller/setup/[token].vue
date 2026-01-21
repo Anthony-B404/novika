@@ -85,13 +85,14 @@ onMounted(async () => {
     if (response.organizationName) {
       state.organizationName = response.organizationName
     }
-  } catch (error: any) {
-    if (error.status === 401) {
+  } catch (error: unknown) {
+    const apiError = error as { status?: number; data?: { message?: string } }
+    if (apiError.status === 401) {
       isExpired.value = true
     } else {
       toast.add({
         title: t('auth.resellerSetup.error'),
-        description: error.data?.message || t('auth.resellerSetup.tokenInvalid'),
+        description: apiError.data?.message || t('auth.resellerSetup.tokenInvalid'),
         color: 'error'
       })
     }
@@ -235,10 +236,11 @@ async function onSubmit (event: FormSubmitEvent<Schema>) {
 
     // Redirect to dashboard
     router.push($localePath('dashboard'))
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const apiError = error as { data?: { message?: string } }
     toast.add({
       title: t('auth.resellerSetup.error'),
-      description: error.data?.message || t('auth.resellerSetup.errorDescription'),
+      description: apiError.data?.message || t('auth.resellerSetup.errorDescription'),
       color: 'error'
     })
   } finally {

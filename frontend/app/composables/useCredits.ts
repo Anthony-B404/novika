@@ -1,4 +1,5 @@
 import type { CreditTransaction, CreditsBalanceResponse, CreditsHistoryResponse } from '~/types/credit'
+import type { ApiError } from '~/types'
 
 export function useCredits () {
   const { authenticatedFetch } = useAuth()
@@ -18,8 +19,10 @@ export function useCredits () {
     try {
       const response = await authenticatedFetch('/credits') as CreditsBalanceResponse
       credits.value = response.credits
-    } catch (e: any) {
-      error.value = e.message || 'Failed to fetch credits'
+    } catch (e: unknown) {
+      const apiError = e as ApiError
+      error.value = apiError.message || 'Failed to fetch credits'
+      // eslint-disable-next-line no-console -- Debug logging for credit errors
       console.error('Error fetching credit balance:', e)
     } finally {
       loading.value = false
@@ -43,8 +46,10 @@ export function useCredits () {
       const response = await authenticatedFetch(`/credits/history?${params}`) as CreditsHistoryResponse
       transactions.value = response.data
       return response
-    } catch (e: any) {
-      error.value = e.message || 'Failed to fetch credit history'
+    } catch (e: unknown) {
+      const apiError = e as ApiError
+      error.value = apiError.message || 'Failed to fetch credit history'
+      // eslint-disable-next-line no-console -- Debug logging for credit errors
       console.error('Error fetching credit history:', e)
       return null
     } finally {

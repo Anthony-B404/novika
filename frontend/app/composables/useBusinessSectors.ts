@@ -80,6 +80,7 @@ export const useBusinessSectors = () => {
    */
   const getSectorLabel = (sector: BusinessSector | string): string => {
     if (!isKnownSector(sector)) {
+      // eslint-disable-next-line no-console -- Warning for unknown sector configuration
       console.warn(`[useBusinessSectors] Unknown sector: "${sector}". Using raw value as label.`)
       return sector
     }
@@ -92,6 +93,7 @@ export const useBusinessSectors = () => {
    */
   const getSectorConfig = (sector: BusinessSector | string): SectorConfig => {
     if (!isKnownSector(sector)) {
+      // eslint-disable-next-line no-console -- Warning for unknown sector configuration
       console.warn(`[useBusinessSectors] Unknown sector: "${sector}". Using default configuration.`)
       return {
         ...DEFAULT_SECTOR_CONFIG,
