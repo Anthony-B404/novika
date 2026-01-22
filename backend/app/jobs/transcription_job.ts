@@ -4,6 +4,7 @@ import MistralService, { type TranscriptionResult } from '#services/mistral_serv
 import AudioChunkingService, { type ChunkingResult } from '#services/audio_chunking_service'
 import AudioConverterService from '#services/audio_converter_service'
 import storageService from '#services/storage_service'
+import creditService from '#services/credit_service'
 import Audio, { AudioStatus } from '#models/audio'
 import User from '#models/user'
 import Organization from '#models/organization'
@@ -229,12 +230,20 @@ async function processTranscriptionJob(
       throw new Error('Organization not found')
     }
 
-    if (!organization.hasEnoughCredits(creditsNeeded)) {
+    // Check credits based on organization's credit mode (shared vs individual)
+    const hasCredits = await creditService.hasEnoughCreditsForProcessing(
+      user,
+      organization,
+      creditsNeeded
+    )
+
+    if (!hasCredits) {
       // Set audio status to failed with specific error
+      const effectiveBalance = await creditService.getEffectiveBalance(user, organization)
       const i18n = i18nManager.locale('fr')
       const errorMessage = i18n.t('messages.audio.insufficient_credits_details', {
         creditsNeeded,
-        creditsAvailable: organization.credits,
+        creditsAvailable: effectiveBalance,
       })
 
       if (audio) {
@@ -246,12 +255,13 @@ async function processTranscriptionJob(
       throw new Error(errorMessage)
     }
 
-    // Deduct credits from organization
+    // Deduct credits based on organization's credit mode (shared vs individual)
     const fileNameWithoutExt = audioFileName.replace(/\.[^/.]+$/, '')
-    await organization.deductCredits(
+    await creditService.deductForAudioProcessing(
+      user,
+      organization,
       creditsNeeded,
       `Analyse audio: ${fileNameWithoutExt} (${Math.round(chunkingResult.metadata.duration)}s)`,
-      user.id,
       audioId
     )
 

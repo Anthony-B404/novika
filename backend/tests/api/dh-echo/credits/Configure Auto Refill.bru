@@ -1,0 +1,50 @@
+meta {
+  name: Configure Auto Refill
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/credits/members/{{targetUserId}}/auto-refill
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "enabled": true,
+    "amount": 100,
+    "day": 1
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should configure auto-refill", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('userCredit');
+    expect(data.userCredit.autoRefillEnabled).to.equal(true);
+    expect(data.userCredit.autoRefillAmount).to.equal(100);
+    expect(data.userCredit.autoRefillDay).to.equal(1);
+  });
+
+  test("should return user credit details", function() {
+    const data = res.getBody();
+    expect(data.userCredit).to.have.property('userId');
+    expect(data.userCredit).to.have.property('balance');
+    expect(data.userCredit).to.have.property('creditCap');
+  });
+}

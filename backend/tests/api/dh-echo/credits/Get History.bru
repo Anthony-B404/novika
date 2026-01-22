@@ -1,0 +1,57 @@
+meta {
+  name: Get History
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/credits/history?page=1&limit=20
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return transaction history", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('data');
+    expect(data).to.have.property('meta');
+    expect(data.data).to.be.an('array');
+  });
+
+  test("should return pagination meta", function() {
+    const data = res.getBody();
+    expect(data.meta).to.have.property('total');
+    expect(data.meta).to.have.property('perPage');
+    expect(data.meta).to.have.property('currentPage');
+  });
+
+  test("should return current credit mode", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('mode');
+    expect(['shared', 'individual']).to.include(data.mode);
+  });
+
+  test("each transaction should have required fields if present", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      const transaction = data.data[0];
+      expect(transaction).to.have.property('id');
+      expect(transaction).to.have.property('amount');
+      expect(transaction).to.have.property('type');
+      expect(transaction).to.have.property('createdAt');
+    }
+  });
+}

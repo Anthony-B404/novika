@@ -764,7 +764,14 @@
         "subtitle": "Manage your audio analysis credits",
         "balance": "Current Balance",
         "creditsUnit": "credits",
+        "organization_pool": "Organization Pool",
+        "my_balance": "My Balance",
         "history": "Transaction History",
+        "tabs": {
+          "history": "History",
+          "configuration": "Configuration",
+          "members": "Members"
+        },
         "noTransactions": "No transactions",
         "noTransactionsDescription": "Your credit history will appear here",
         "buyCredits": "Buy Credits",
@@ -772,13 +779,100 @@
           "usage": "Usage",
           "purchase": "Purchase",
           "bonus": "Bonus",
-          "refund": "Refund"
+          "refund": "Refund",
+          "distribution": "Distribution",
+          "recovery": "Recovery",
+          "refill": "Auto Refill"
         },
         "usedBy": "by {name}",
+        "performedBy": "by {name}",
         "systemAction": "System action",
         "insufficientCredits": "Insufficient Credits",
         "insufficientCreditsMessage": "Insufficient credits. Required: {required}, available: {available}. Please purchase more credits to continue.",
-        "creditInfo": "1 credit = 1 minute of audio"
+        "creditInfo": "1 credit = 1 minute of audio",
+        "mode": {
+          "title": "Credit Management Mode",
+          "shared": "Shared Pool",
+          "shared_description": "All members share the same credit pool",
+          "individual": "Individual Distribution",
+          "individual_description": "Each member has their own credit balance"
+        },
+        "mode_change": {
+          "confirm_title": "Confirm Mode Change",
+          "confirm_to_shared": "Switching to shared pool mode will recover all member credits back to the organization pool. Continue?",
+          "success": "Credit mode changed successfully",
+          "error": "Error changing credit mode"
+        },
+        "members": {
+          "title": "Member Management",
+          "name": "Member",
+          "balance": "Balance",
+          "cap": "Cap",
+          "auto_refill": "Auto Refill",
+          "actions": "Actions"
+        },
+        "distribute": {
+          "title": "Distribute Credits",
+          "amount": "Amount",
+          "amount_placeholder": "Number of credits",
+          "max_available": "Maximum available: {max}",
+          "description": "Description (optional)",
+          "description_placeholder": "Reason for distribution...",
+          "submit": "Distribute",
+          "success": "{amount} credits distributed to {name}",
+          "error": "Error distributing credits"
+        },
+        "recover": {
+          "title": "Recover Credits",
+          "amount": "Amount",
+          "amount_placeholder": "Number of credits",
+          "max_available": "Maximum available: {max}",
+          "description": "Description (optional)",
+          "description_placeholder": "Reason for recovery...",
+          "submit": "Recover",
+          "warning": "This action will remove credits from this member's balance and return them to the organization pool.",
+          "success": "{amount} credits recovered from {name}",
+          "error": "Error recovering credits"
+        },
+        "auto_refill": {
+          "title": "Auto Refill Configuration",
+          "enabled": "Enable automatic refill",
+          "enabled_description": "Member's balance will be automatically refilled each month",
+          "disabled": "Disabled",
+          "target": "Target Balance",
+          "target_placeholder": "e.g. 100",
+          "target_hint": "Balance will be topped up to this target each month",
+          "day": "Day of Month",
+          "day_placeholder": "Select a day",
+          "day_hint": "Refill day (1-28)",
+          "day_label": "day {day}",
+          "success": "Auto refill configuration updated",
+          "error": "Error configuring auto refill"
+        },
+        "global_auto_refill": {
+          "title": "Global Auto Refill",
+          "description": "Default automatic refill settings for all members who don't have individual settings",
+          "enabled": "Enable global auto refill",
+          "enabled_description": "All members without individual settings will be automatically refilled",
+          "disabled": "Disabled",
+          "active": "Active",
+          "target": "Default Target Balance",
+          "target_placeholder": "e.g. 100",
+          "target_hint": "Default target balance for all members",
+          "day": "Default Day of Month",
+          "day_placeholder": "Select a day",
+          "day_hint": "Default refill day (1-28)",
+          "day_label": "day {day}",
+          "success": "Global auto refill configuration updated",
+          "error": "Error configuring global auto refill",
+          "configure": "Configure",
+          "individual_override": "Members with individual settings are not affected"
+        },
+        "status": {
+          "normal": "Normal",
+          "low": "Low",
+          "empty": "Empty"
+        }
       },
       "settings": {
         "title": "Settings",

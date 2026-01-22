@@ -12,6 +12,7 @@ import { join } from 'node:path'
 import fs from 'node:fs/promises'
 import { errors } from '@vinejs/vine'
 import db from '@adonisjs/lucid/services/db'
+import creditService from '#services/credit_service'
 
 export default class MembersController {
   private readonly AVATAR_DIRECTORY = app.makePath('storage/users/avatars')
@@ -248,6 +249,15 @@ export default class MembersController {
 
     try {
       const organization = await Organization.findOrFail(authUser.currentOrganizationId)
+
+      // Clean up member credits before removal:
+      // - Recover any remaining credits back to the organization pool
+      // - Delete the UserCredit record (including auto-refill configuration)
+      await creditService.cleanupMemberCredits(
+        targetUser.id,
+        organization.id,
+        authUser.id
+      )
 
       // Remove user from the organization (detach from pivot)
       await organization.related('users').detach([targetUser.id])

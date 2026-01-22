@@ -1,0 +1,39 @@
+meta {
+  name: Disable Auto Refill
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/credits/members/{{targetUserId}}/auto-refill
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should disable auto-refill", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('userCredit');
+    expect(data.userCredit.autoRefillEnabled).to.equal(false);
+  });
+
+  test("auto-refill settings should be null", function() {
+    const data = res.getBody();
+    expect(data.userCredit.autoRefillAmount).to.be.null;
+    expect(data.userCredit.autoRefillDay).to.be.null;
+  });
+}

@@ -1,0 +1,69 @@
+meta {
+  name: Get Member History
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/credits/members/{{targetUserId}}/history
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 20
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return member transaction history", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('meta');
+    expect(data).to.have.property('data');
+    expect(data.data).to.be.an('array');
+  });
+
+  test("should have pagination meta", function() {
+    const data = res.getBody();
+    expect(data.meta).to.have.property('total');
+    expect(data.meta).to.have.property('perPage');
+    expect(data.meta).to.have.property('currentPage');
+    expect(data.meta).to.have.property('lastPage');
+  });
+
+  test("transactions should have required fields", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      const transaction = data.data[0];
+      expect(transaction).to.have.property('id');
+      expect(transaction).to.have.property('userId');
+      expect(transaction).to.have.property('organizationId');
+      expect(transaction).to.have.property('amount');
+      expect(transaction).to.have.property('balanceAfter');
+      expect(transaction).to.have.property('type');
+      expect(transaction).to.have.property('createdAt');
+    }
+  });
+
+  test("transactions should have performedBy info", function() {
+    const data = res.getBody();
+    if (data.data.length > 0 && data.data[0].performedBy) {
+      const transaction = data.data[0];
+      expect(transaction.performedBy).to.have.property('id');
+      expect(transaction.performedBy).to.have.property('email');
+    }
+  });
+}

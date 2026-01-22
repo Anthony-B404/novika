@@ -766,7 +766,14 @@
         "subtitle": "Gérez vos crédits d'analyse audio",
         "balance": "Solde actuel",
         "creditsUnit": "crédits",
+        "organization_pool": "Pool organisation",
+        "my_balance": "Mon solde",
         "history": "Historique des transactions",
+        "tabs": {
+          "history": "Historique",
+          "configuration": "Configuration",
+          "members": "Membres"
+        },
         "noTransactions": "Aucune transaction",
         "noTransactionsDescription": "Votre historique de crédits apparaîtra ici",
         "buyCredits": "Acheter des crédits",
@@ -774,13 +781,100 @@
           "usage": "Utilisation",
           "purchase": "Achat",
           "bonus": "Bonus",
-          "refund": "Remboursement"
+          "refund": "Remboursement",
+          "distribution": "Distribution",
+          "recovery": "Récupération",
+          "refill": "Recharge auto"
         },
         "usedBy": "par {name}",
+        "performedBy": "par {name}",
         "systemAction": "Action système",
         "insufficientCredits": "Crédits insuffisants",
         "insufficientCreditsMessage": "Crédits insuffisants. Requis : {required}, disponibles : {available}. Veuillez recharger votre compte pour continuer.",
-        "creditInfo": "1 crédit = 1 minute d'audio"
+        "creditInfo": "1 crédit = 1 minute d'audio",
+        "mode": {
+          "title": "Mode de gestion des crédits",
+          "shared": "Pool commun",
+          "shared_description": "Tous les membres partagent le même pool de crédits",
+          "individual": "Distribution individuelle",
+          "individual_description": "Chaque membre a son propre solde de crédits"
+        },
+        "mode_change": {
+          "confirm_title": "Confirmer le changement de mode",
+          "confirm_to_shared": "Passer en mode pool commun récupérera tous les crédits des membres vers le pool de l'organisation. Continuer ?",
+          "success": "Mode de crédits modifié avec succès",
+          "error": "Erreur lors du changement de mode"
+        },
+        "members": {
+          "title": "Gestion des membres",
+          "name": "Membre",
+          "balance": "Solde",
+          "cap": "Plafond",
+          "auto_refill": "Recharge auto",
+          "actions": "Actions"
+        },
+        "distribute": {
+          "title": "Distribuer des crédits",
+          "amount": "Montant",
+          "amount_placeholder": "Nombre de crédits",
+          "max_available": "Maximum disponible : {max}",
+          "description": "Description (optionnel)",
+          "description_placeholder": "Raison de la distribution...",
+          "submit": "Distribuer",
+          "success": "{amount} crédits distribués à {name}",
+          "error": "Erreur lors de la distribution des crédits"
+        },
+        "recover": {
+          "title": "Récupérer des crédits",
+          "amount": "Montant",
+          "amount_placeholder": "Nombre de crédits",
+          "max_available": "Maximum disponible : {max}",
+          "description": "Description (optionnel)",
+          "description_placeholder": "Raison de la récupération...",
+          "submit": "Récupérer",
+          "warning": "Cette action retirera des crédits du solde de ce membre et les remettra dans le pool de l'organisation.",
+          "success": "{amount} crédits récupérés de {name}",
+          "error": "Erreur lors de la récupération des crédits"
+        },
+        "auto_refill": {
+          "title": "Configuration de la recharge automatique",
+          "enabled": "Activer la recharge automatique",
+          "enabled_description": "Le solde du membre sera automatiquement rechargé chaque mois",
+          "disabled": "Désactivée",
+          "target": "Cible de balance",
+          "target_placeholder": "ex: 100",
+          "target_hint": "Le solde sera ramené à cette cible chaque mois",
+          "day": "Jour du mois",
+          "day_placeholder": "Sélectionnez un jour",
+          "day_hint": "Jour de recharge (1-28)",
+          "day_label": "jour {day}",
+          "success": "Configuration de recharge automatique mise à jour",
+          "error": "Erreur lors de la configuration de la recharge automatique"
+        },
+        "global_auto_refill": {
+          "title": "Recharge automatique globale",
+          "description": "Paramètres de recharge automatique par défaut pour tous les membres sans configuration individuelle",
+          "enabled": "Activer la recharge globale",
+          "enabled_description": "Tous les membres sans paramètres individuels seront automatiquement rechargés",
+          "disabled": "Désactivée",
+          "active": "Active",
+          "target": "Cible de balance par défaut",
+          "target_placeholder": "ex: 100",
+          "target_hint": "Cible de balance par défaut pour tous les membres",
+          "day": "Jour du mois par défaut",
+          "day_placeholder": "Sélectionnez un jour",
+          "day_hint": "Jour de recharge par défaut (1-28)",
+          "day_label": "jour {day}",
+          "success": "Configuration de recharge globale mise à jour",
+          "error": "Erreur lors de la configuration de la recharge globale",
+          "configure": "Configurer",
+          "individual_override": "Les membres avec des paramètres individuels ne sont pas affectés"
+        },
+        "status": {
+          "normal": "Normal",
+          "low": "Bas",
+          "empty": "Vide"
+        }
       },
       "settings": {
         "title": "Paramètres",

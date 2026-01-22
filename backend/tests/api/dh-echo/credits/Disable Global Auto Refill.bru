@@ -1,0 +1,51 @@
+meta {
+  name: Disable Global Auto Refill
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/credits/auto-refill
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should disable global auto-refill", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('enabled');
+    expect(data).to.have.property('defaultAmount');
+    expect(data).to.have.property('defaultDay');
+  });
+
+  test("should return enabled=false when disabling", function() {
+    const data = res.getBody();
+    expect(data.enabled).to.equal(false);
+  });
+
+  test("should return null values when disabled", function() {
+    const data = res.getBody();
+    expect(data.defaultAmount).to.be.null;
+    expect(data.defaultDay).to.be.null;
+  });
+
+  test("message should confirm disabling", function() {
+    const data = res.getBody();
+    expect(data.message).to.be.a('string');
+    expect(data.message.length).to.be.greaterThan(0);
+  });
+}

@@ -1,0 +1,44 @@
+meta {
+  name: Get Balance
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/credits
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return balance based on mode", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('credits');
+    expect(data).to.have.property('mode');
+    expect(data.credits).to.be.a('number');
+  });
+
+  test("should return valid credit mode", function() {
+    const data = res.getBody();
+    expect(['shared', 'individual']).to.include(data.mode);
+  });
+
+  test("should return organization credits", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('organizationCredits');
+    expect(data.organizationCredits).to.be.a('number');
+  });
+}

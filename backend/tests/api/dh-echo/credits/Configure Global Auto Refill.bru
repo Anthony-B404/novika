@@ -1,0 +1,59 @@
+meta {
+  name: Configure Global Auto Refill
+  type: http
+  seq: 13
+}
+
+put {
+  url: {{baseUrl}}/credits/auto-refill
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "enabled": true,
+    "defaultAmount": 100,
+    "defaultDay": 1
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should configure global auto-refill", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('enabled');
+    expect(data).to.have.property('defaultAmount');
+    expect(data).to.have.property('defaultDay');
+  });
+
+  test("should return enabled=true when enabling", function() {
+    const data = res.getBody();
+    expect(data.enabled).to.equal(true);
+  });
+
+  test("should return the configured values", function() {
+    const data = res.getBody();
+    expect(data.defaultAmount).to.equal(100);
+    expect(data.defaultDay).to.equal(1);
+  });
+
+  test("message should confirm success", function() {
+    const data = res.getBody();
+    expect(data.message).to.be.a('string');
+    expect(data.message.length).to.be.greaterThan(0);
+  });
+}

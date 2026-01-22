@@ -1,0 +1,51 @@
+meta {
+  name: Update Credit Mode
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/credits/mode
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "mode": "individual"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update credit mode", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('mode');
+    expect(data.mode).to.equal('individual');
+  });
+  
+  test("should return organization credits", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('organizationCredits');
+    expect(data.organizationCredits).to.be.a('number');
+  });
+  
+  test("should return previous mode info", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('previousMode');
+    expect(data).to.have.property('recoveredCredits');
+  });
+}

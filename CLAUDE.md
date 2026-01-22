@@ -128,17 +128,35 @@ User (End user)                → Access: /dashboard/*
 
 ### Credits System (Updated)
 
-**Credit Flow**: Super Admin → Reseller pool → Organization pool → Usage
+**Credit Flow**: Super Admin → Reseller pool → Organization pool → User pool (individual mode) or Usage (shared mode)
 
-- **Organization-Level Credits**: Credits are now stored at the Organization level, not User level
-- **Credit Check**: Verification happens only at audio transcription time in `transcription_job.ts`
-- **No Access Control**: Users always have access to the application; credits are deducted on usage
-- **Three-Tier Structure**:
-  - `reseller.creditBalance` - Reseller's pool (topped up by Super Admin)
-  - `organization.credits` - Organization's pool (distributed by Reseller)
-  - `credit_transactions` - Audit trail of organization-level usage
+**Credit Modes** (Owner configurable):
+| Mode | Description | Credit Source |
+|------|-------------|---------------|
+| `shared` (default) | All members share organization pool | `organization.credits` |
+| `individual` | Credits distributed to members individually | `user_credits.balance` |
+
+**Organization-Level Credits** (both modes):
+- `organization.credits` - Organization's pool
+- `organization.creditMode` - 'shared' or 'individual'
+- `credit_transactions` - Audit trail of organization-level usage
 - **Organization Methods**: `hasEnoughCredits(amount)`, `deductCredits(amount, description, userId, audioId?)`, `addCredits(amount, type, description, userId)`
-- **Reseller Methods**: `hasEnoughCredits(amount)`, `distributeCredits(amount, orgId, description, userId)`, `addCredits(amount, description, userId)`
+
+**User-Level Credits** (individual mode only):
+- `user_credits` table - Per-user balances with auto-refill config
+- `user_credit_transactions` - User-level audit trail
+- **UserCredit model methods**: `hasEnoughCredits()`, `canReceiveCredits()`, `getCreditsNeededForRefill()`
+
+**CreditService Methods**:
+- `switchCreditMode()` - Change between shared/individual (recovers credits when switching to shared)
+- `distributeToUser()` - Owner distributes credits to member
+- `recoverFromUser()` - Owner recovers credits from member
+- `configureAutoRefill()` / `disableAutoRefill()` - Per-user auto-refill config
+- `enableGlobalAutoRefill()` / `disableGlobalAutoRefill()` - Org-level auto-refill settings
+- `processAutoRefill()` - Called by CRON for monthly refills
+- `hasEnoughCreditsForProcessing()` / `deductForAudioProcessing()` - Audio integration (handles both modes)
+
+**Reseller Methods**: `hasEnoughCredits(amount)`, `distributeCredits(amount, orgId, description, userId)`, `addCredits(amount, description, userId)`
 
 ### Role-Based Access Control (RBAC)
 
@@ -242,8 +260,9 @@ const data = await authenticatedFetch('/protected-endpoint')
   - Admin: `app/controllers/admin/` - `ResellersController`, `ResellerCreditsController`, `AdminStatsController`
   - Reseller: `app/controllers/reseller/` - `ResellerProfileController`, `ResellerCreditsController`, `ResellerOrganizationsController`, `ResellerUsersController`
 - **Validators**: VineJS schemas in `app/validators/` - always validate user input
-- **Models**: Lucid models in `app/models/` (User, Organization, Reseller, ResellerTransaction, CreditTransaction, Audio)
-- **Policies**: Bouncer policies in `app/policies/` for authorization logic (OrganizationPolicy, InvitationPolicy, MemberPolicy)
+- **Models**: Lucid models in `app/models/` (User, Organization, Reseller, ResellerTransaction, CreditTransaction, UserCredit, UserCreditTransaction, Audio)
+- **Services**: Business logic in `app/services/` (CreditService for credit mode management and distribution)
+- **Policies**: Bouncer policies in `app/policies/` for authorization logic (OrganizationPolicy, InvitationPolicy, MemberPolicy, CreditPolicy)
 - **Middleware**: Custom middleware in `app/middleware/`:
   - `auth` - Token validation
   - `superAdmin` - Super Admin access check
@@ -257,13 +276,15 @@ const data = await authenticatedFetch('/protected-endpoint')
 
 ### Core Tables
 
-- **resellers** (NEW): Reseller entities with `name`, `email`, `company`, `siret`, `creditBalance`, `isActive`
-- **reseller_transactions** (NEW): Reseller credit transactions (`resellerId`, `amount`, `type`, `targetOrganizationId`, `performedByUserId`)
+- **resellers**: Reseller entities with `name`, `email`, `company`, `siret`, `creditBalance`, `isActive`
+- **reseller_transactions**: Reseller credit transactions (`resellerId`, `amount`, `type`, `targetOrganizationId`, `performedByUserId`)
 - **users**: Users with `currentOrganizationId`, `isSuperAdmin` (boolean), `resellerId` (FK for reseller admins)
-- **organizations**: Organization entities with `name`, `logo`, `email`, `resellerId` (FK), `credits` (moved from users)
+- **organizations**: Organization entities with `name`, `logo`, `email`, `resellerId` (FK), `credits`, `creditMode` ('shared'|'individual'), `autoRefillEnabled`, `autoRefillAmount`, `autoRefillDay`
 - **organization_user**: Pivot table linking users to organizations with `role` per organization (1=Owner, 2=Administrator, 3=Member)
 - **invitations**: Pending invitations with `identifier` (UUID), `organizationId`, `role`, `expiresAt`
 - **credit_transactions**: Credit usage history (`userId`, `organizationId`, `amount`, `balanceAfter`, `type`, `audioId`)
+- **user_credits**: Per-user credit balances for individual mode (`userId`, `organizationId`, `balance`, `creditCap`, `autoRefillEnabled`, `autoRefillAmount`, `autoRefillDay`, `lastRefillAt`)
+- **user_credit_transactions**: User-level credit transaction history (`userId`, `organizationId`, `performedByUserId`, `amount`, `balanceAfter`, `type`, `audioId`)
 - **audios**: Audio files with transcription and analysis data
 - **access_tokens**: API authentication tokens managed by AdonisJS Auth
 
@@ -275,8 +296,11 @@ const data = await authenticatedFetch('/protected-endpoint')
 - User ↔ Organization (many-to-many via `organization_user` pivot)
 - User → Current Organization (belongs to via `currentOrganizationId`)
 - User → Reseller (belongs to via `resellerId` for reseller admins)
+- User → UserCredits (has many, one per organization in individual mode)
 - Organization → Reseller (belongs to via `resellerId`)
 - Organization → CreditTransactions (has many)
+- Organization → UserCredits (has many, for individual credit mode)
+- UserCredit → UserCreditTransactions (has many)
 - Invitation → Organization (many-to-one)
 - Audio → Organization (belongs to, multi-tenant)
 - Access Token → User (tokenable polymorphic)
@@ -416,10 +440,15 @@ const org = await Organization.query()
 
 ### Credits System
 
-- **Credit Check**: Credits are verified only at audio processing time (`transcription_job.ts`)
-- **Organization-Level**: Use `organization.hasEnoughCredits(amount)` before processing, `organization.deductCredits(...)` after
-- **Insufficient Credits**: Returns error with `code: 'INSUFFICIENT_CREDITS'` when organization doesn't have enough credits
-- **Frontend Handling**: Credits page at `/dashboard/credits` shows organization balance and transaction history
+- **Credit Modes**: Organizations can use `shared` (pool) or `individual` (per-user) credit modes
+- **Credit Check**: Use `CreditService.hasEnoughCreditsForProcessing(user, org)` - handles both modes automatically
+- **Credit Deduction**: Use `CreditService.deductForAudioProcessing(...)` - deducts from correct source based on mode
+- **Insufficient Credits**: Returns error with `code: 'INSUFFICIENT_CREDITS'` when credits are insufficient
+- **Frontend Handling**: Credits page at `/dashboard/credits` shows:
+  - **Owner**: Organization pool + all member transactions
+  - **Member (shared mode)**: Organization pool balance
+  - **Member (individual mode)**: Personal balance from `user_credits`
+- **Auto-Refill**: Individual mode supports per-user auto-refill config (monthly top-up to target balance)
 - **Reseller Credit Distribution**: Resellers must have enough credits in their pool before distributing to organizations
 
 ## Feature: Audio Analysis with Mistral AI

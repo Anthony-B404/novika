@@ -1,0 +1,48 @@
+meta {
+  name: List Member Credits
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/credits/members
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return member credits list", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('data');
+    expect(data.data).to.be.an('array');
+  });
+
+  test("should return current credit mode", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('mode');
+    expect(['shared', 'individual']).to.include(data.mode);
+  });
+
+  test("each member should have required fields", function() {
+    const data = res.getBody();
+    if (data.data.length > 0) {
+      const member = data.data[0];
+      expect(member).to.have.property('userId');
+      expect(member).to.have.property('balance');
+      expect(member).to.have.property('user');
+    }
+  });
+}

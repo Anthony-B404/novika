@@ -11,6 +11,7 @@ import {
   createResellerOrgUserValidator,
   listResellerOrgUsersValidator,
 } from '#validators/reseller_api'
+import creditService from '#services/credit_service'
 
 export default class ResellerUsersController {
   /**
@@ -134,6 +135,13 @@ export default class ResellerUsersController {
           [existingUser.id]: { role: payload.role },
         })
 
+        // Initialize credits for new member if global auto-refill is active
+        await creditService.initializeNewMemberCredits(
+          existingUser.id,
+          organization.id,
+          null // System action (reseller)
+        )
+
         // If user doesn't have a current organization, set this one
         if (!existingUser.currentOrganizationId) {
           existingUser.currentOrganizationId = organization.id
@@ -203,6 +211,13 @@ export default class ResellerUsersController {
 
         return user
       })
+
+      // Initialize credits for new member if global auto-refill is active
+      await creditService.initializeNewMemberCredits(
+        newUser.id,
+        organization.id,
+        null // System action (reseller)
+      )
 
       // Send invitation email
       const frontendUrl = env.get('FRONTEND_URL', 'http://localhost:3000')
@@ -301,6 +316,11 @@ export default class ResellerUsersController {
         message: i18n.t('messages.reseller_api.cannot_remove_owner'),
       })
     }
+
+    // Clean up member credits before removal:
+    // - Recover any remaining credits back to the organization pool
+    // - Delete the UserCredit record (including auto-refill configuration)
+    await creditService.cleanupMemberCredits(user.id, organization.id, null)
 
     // Remove from organization
     await organization.related('users').detach([user.id])

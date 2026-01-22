@@ -1,7 +1,7 @@
 # PRD: Améliorations du Dashboard Utilisateur
 
-**Version**: 1.1
-**Date**: 20 janvier 2026
+**Version**: 1.2
+**Date**: 22 janvier 2026
 **Auteur**: DH-Echo Product Team
 **Statut**: Draft
 
@@ -86,10 +86,13 @@ Permettre aux Owners de distribuer des crédits du pool organisation vers les me
    - Transaction enregistrée avec type `distribution`
 
 3. **Recharge automatique (top-up)** (mode individuel uniquement) :
-   - Configuration : montant plafond + date de recharge (1er du mois ou anniversaire)
-   - Le système ramène le solde utilisateur au plafond configuré
+   - Configuration : cible de balance (`autoRefillAmount`) + date de recharge (1er du mois ou anniversaire)
+   - Le système ramène le solde utilisateur à la cible configurée
+   - **Calcul** : `crédits à transférer = max(0, cible - balance actuelle)`
    - Seule la différence est déduite du pool organisation
-   - **Exemple** : Membre a 20 crédits, plafond = 100 → recharge de 80 crédits
+   - **Protection d'idempotence** : `lastRefillAt` empêche les doubles exécutions si le cron tourne plusieurs fois le même jour
+   - **Exemple** : Membre a 20 crédits, cible = 100 → recharge de 80 crédits
+   - **Exemple 2** : Membre a 120 crédits, cible = 100 → pas de recharge (déjà au-dessus de la cible)
 
 4. **Récupération de crédits** (mode individuel uniquement) :
    - L'Owner peut récupérer tout ou partie des crédits non utilisés
@@ -124,8 +127,9 @@ CREATE TABLE user_credits (
   balance INTEGER NOT NULL DEFAULT 0,
   credit_cap INTEGER NULL, -- Plafond (null = illimité)
   auto_refill_enabled BOOLEAN DEFAULT false,
-  auto_refill_amount INTEGER NULL, -- Montant du plafond pour top-up
+  auto_refill_amount INTEGER NULL, -- Cible de balance pour top-up (comme monthlyCreditsTarget des organisations)
   auto_refill_day INTEGER NULL, -- Jour du mois (1-28) ou 0 pour anniversaire
+  last_refill_at TIMESTAMP NULL, -- Protection d'idempotence (évite doubles exécutions si cron tourne plusieurs fois)
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id, organization_id)
@@ -193,6 +197,9 @@ export default class UserCredit extends BaseModel {
   @column()
   declare autoRefillDay: number | null
 
+  @column.dateTime()
+  declare lastRefillAt: DateTime | null
+
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 
@@ -201,6 +208,9 @@ export default class UserCredit extends BaseModel {
 
   // Méthodes
   hasEnoughCredits(amount: number): boolean
+  canReceiveCredits(amount: number): boolean
+  getMaxReceivableCredits(): number | null
+  getCreditsNeededForRefill(): number // Calcule la différence pour atteindre autoRefillAmount (cible)
   async deductCredits(amount: number, performedBy: User, audioId?: number): Promise<UserCreditTransaction>
   async addCredits(amount: number, type: string, performedBy: User): Promise<UserCreditTransaction>
 }
@@ -258,28 +268,28 @@ export default class UserCredit extends BaseModel {
 ### 2.6 Critères d'acceptation
 
 **Mode de gestion :**
-- [ ] L'Owner peut choisir le mode de gestion des crédits (pool commun ou distribution individuelle)
-- [ ] Le mode par défaut est "pool commun" pour les nouvelles organisations
-- [ ] L'Owner peut basculer d'un mode à l'autre avec confirmation
-- [ ] Le changement Individual → Shared récupère automatiquement les crédits des membres vers le pool
+- [x] L'Owner peut choisir le mode de gestion des crédits (pool commun ou distribution individuelle)
+- [x] Le mode par défaut est "pool commun" pour les nouvelles organisations
+- [x] L'Owner peut basculer d'un mode à l'autre avec confirmation
+- [x] Le changement Individual → Shared récupère automatiquement les crédits des membres vers le pool
 
 **Mode Pool commun :**
-- [ ] Tous les membres consomment directement depuis le pool organisation
-- [ ] L'Owner voit la consommation par membre dans l'historique
+- [x] Tous les membres consomment directement depuis le pool organisation
+- [x] L'Owner voit la consommation par membre dans l'historique
 
 **Mode Distribution individuelle :**
-- [ ] L'Owner peut distribuer des crédits ponctuels à un membre
-- [ ] Les crédits sont correctement déduits du pool organisation
-- [ ] L'Owner peut configurer une recharge automatique pour un membre
-- [ ] Le job CRON de recharge automatique fonctionne correctement
-- [ ] L'Owner peut récupérer des crédits non utilisés
+- [x] L'Owner peut distribuer des crédits ponctuels à un membre
+- [x] Les crédits sont correctement déduits du pool organisation
+- [x] L'Owner peut configurer une recharge automatique pour un membre
+- [x] Le job CRON de recharge automatique fonctionne correctement
+- [x] L'Owner peut récupérer des crédits non utilisés
 
 **Affichage :**
-- [ ] Chaque membre voit le bon solde dans le header (pool ou perso selon le mode)
-- [ ] L'historique des transactions utilisateur est visible
-- [ ] Les transactions sont auditables avec qui/quand/combien
-- [ ] La page `/dashboard/credits` affiche les consommations globales pour l'Owner
-- [ ] La page `/dashboard/credits` affiche uniquement les transactions personnelles pour un Member
+- [x] Chaque membre voit le bon solde dans le header (pool ou perso selon le mode)
+- [x] L'historique des transactions utilisateur est visible
+- [x] Les transactions sont auditables avec qui/quand/combien
+- [x] La page `/dashboard/credits` affiche les consommations globales pour l'Owner
+- [x] La page `/dashboard/credits` affiche uniquement les transactions personnelles pour un Member
 
 ---
 
@@ -1177,3 +1187,4 @@ export default class TranscriptionVersionService {
 |------|---------|--------|---------------|
 | 2026-01-20 | 1.0 | Product Team | Création initiale |
 | 2026-01-20 | 1.1 | Product Team | Ajout décisions: pas de découvert crédits, pas de partage externe dossiers, historique versions illimité |
+| 2026-01-22 | 1.2 | Product Team | Alignement auto-refill users sur comportement organizations: ajout `last_refill_at` (idempotence), `autoRefillAmount` devient une CIBLE (pas un montant fixe), ajout méthodes helper au modèle |

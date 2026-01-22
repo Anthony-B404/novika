@@ -7,6 +7,12 @@ import Organization from '#models/organization'
 import Reseller from '#models/reseller'
 import ResellerTransaction, { ResellerTransactionType } from '#models/reseller_transaction'
 import CreditTransaction, { CreditTransactionType } from '#models/credit_transaction'
+import UserCredit from '#models/user_credit'
+import creditService, { type AutoRefillResult } from '#services/credit_service'
+
+// NOTE: Global auto-refill has been simplified.
+// When global auto-refill is enabled, it now directly creates/updates user_credit records
+// with autoRefillEnabled=true, so all users are processed in the individual phase only.
 
 export interface SubscriptionRenewalJobData {
   organizationId: number
@@ -32,6 +38,19 @@ export interface SubscriptionRenewalBatchResult {
     creditsTransferred?: number
     reason?: string
   }[]
+}
+
+export interface UserAutoRefillBatchResult {
+  processed: number
+  successful: number
+  skipped: number
+  failed: number
+  details: AutoRefillResult[]
+}
+
+export interface CombinedRenewalResult {
+  organizationRenewals: SubscriptionRenewalBatchResult
+  userAutoRefills: UserAutoRefillBatchResult
 }
 
 /**
@@ -337,6 +356,85 @@ export async function processSubscriptionRenewals(): Promise<SubscriptionRenewal
 }
 
 /**
+ * Process all user auto-refills that are due today.
+ * Processes all user_credit records with autoRefillEnabled=true and autoRefillDay=today.
+ *
+ * NOTE: Global auto-refill now directly sets autoRefillEnabled on user_credit records,
+ * so all users (both individual and global) are processed uniformly here.
+ *
+ * Should be called AFTER organization subscription renewals.
+ */
+export async function processUserAutoRefills(): Promise<UserAutoRefillBatchResult> {
+  const today = DateTime.now().day
+
+  logger.info(`[UserAutoRefillScheduler] Starting user auto-refill process for day ${today}`)
+
+  const result: UserAutoRefillBatchResult = {
+    processed: 0,
+    successful: 0,
+    skipped: 0,
+    failed: 0,
+    details: [],
+  }
+
+  // Find all user credits with auto-refill enabled for today
+  // This includes both individual settings and those set via global auto-refill
+  const userCredits = await UserCredit.query()
+    .where('autoRefillEnabled', true)
+    .where('autoRefillDay', today)
+    .preload('user')
+    .preload('organization')
+
+  logger.info(
+    `[UserAutoRefillScheduler] Found ${userCredits.length} user(s) with auto-refill for today`
+  )
+
+  for (const userCredit of userCredits) {
+    const refillResult = await creditService.processAutoRefill(userCredit)
+
+    result.processed++
+    if (refillResult.status === 'success') {
+      result.successful++
+    } else if (refillResult.status === 'skipped') {
+      result.skipped++
+    } else {
+      result.failed++
+    }
+
+    result.details.push(refillResult)
+
+    if (refillResult.status === 'success') {
+      logger.info(
+        `[UserAutoRefillScheduler] Refill ${refillResult.userName}: ${refillResult.creditsTransferred} credits`
+      )
+    }
+  }
+
+  logger.info(
+    `[UserAutoRefillScheduler] Completed. ` +
+      `Processed: ${result.processed}, Successful: ${result.successful}, Skipped: ${result.skipped}, Failed: ${result.failed}`
+  )
+
+  return result
+}
+
+/**
+ * Process all pending renewals: organizations first, then users.
+ */
+export async function processAllRenewals(): Promise<CombinedRenewalResult> {
+  // Phase 1: Organization subscription renewals
+  const organizationRenewals = await processSubscriptionRenewals()
+
+  // Phase 2: User auto-refills
+  const userAutoRefills = await processUserAutoRefills()
+
+  return {
+    organizationRenewals,
+    userAutoRefills,
+  }
+}
+
+/**
  * Queue all pending subscription renewals for async processing.
  * Alternative to processSubscriptionRenewals for distributed processing.
  */
@@ -382,5 +480,7 @@ export async function queuePendingSubscriptionRenewals(): Promise<number> {
 export default {
   createSubscriptionRenewalWorker,
   processSubscriptionRenewals,
+  processUserAutoRefills,
+  processAllRenewals,
   queuePendingSubscriptionRenewals,
 }

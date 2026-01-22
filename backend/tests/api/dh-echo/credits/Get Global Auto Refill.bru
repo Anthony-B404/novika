@@ -1,0 +1,58 @@
+meta {
+  name: Get Global Auto Refill
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/credits/auto-refill
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return global auto-refill settings", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('enabled');
+    expect(data).to.have.property('defaultAmount');
+    expect(data).to.have.property('defaultDay');
+    expect(data).to.have.property('creditMode');
+  });
+
+  test("enabled should be a boolean", function() {
+    const data = res.getBody();
+    expect(data.enabled).to.be.a('boolean');
+  });
+
+  test("creditMode should be shared or individual", function() {
+    const data = res.getBody();
+    expect(['shared', 'individual']).to.include(data.creditMode);
+  });
+
+  test("defaultAmount and defaultDay should be numbers or null", function() {
+    const data = res.getBody();
+    if (data.enabled) {
+      expect(data.defaultAmount).to.be.a('number');
+      expect(data.defaultDay).to.be.a('number');
+      expect(data.defaultDay).to.be.at.least(1);
+      expect(data.defaultDay).to.be.at.most(28);
+    } else {
+      // When disabled, values may be null
+      expect(data.defaultAmount === null || typeof data.defaultAmount === 'number').to.be.true;
+      expect(data.defaultDay === null || typeof data.defaultDay === 'number').to.be.true;
+    }
+  });
+}

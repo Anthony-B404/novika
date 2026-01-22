@@ -16,6 +16,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import fs from 'node:fs/promises'
 import { errors } from '@vinejs/vine'
+import creditService from '#services/credit_service'
 
 export default class InvitationsController {
   private readonly AVATAR_DIRECTORY = app.makePath('storage/users/avatars')
@@ -196,6 +197,13 @@ export default class InvitationsController {
           [existingUser.id]: { role: invitation.role },
         })
 
+        // Initialize credits for new member if global auto-refill is active
+        await creditService.initializeNewMemberCredits(
+          existingUser.id,
+          organization.id,
+          null // System action
+        )
+
         // Si le user n'a pas d'organisation courante, définir celle-ci
         if (!existingUser.currentOrganizationId) {
           existingUser.currentOrganizationId = invitation.organizationId
@@ -247,6 +255,13 @@ export default class InvitationsController {
         await organization.related('users').attach({
           [newUser.id]: { role: invitation.role },
         })
+
+        // Initialize credits for new member if global auto-refill is active
+        await creditService.initializeNewMemberCredits(
+          newUser.id,
+          organization.id,
+          null // System action
+        )
 
         // Supprimer l'invitation (acceptée)
         await invitation.delete()

@@ -1,0 +1,54 @@
+meta {
+  name: Recover Credits
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/credits/recover
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept-Language: en
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "userId": {{targetUserId}},
+    "amount": 25,
+    "description": "Unused credits recovery"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should recover credits successfully", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+    expect(data).to.have.property('transaction');
+    expect(data).to.have.property('userBalance');
+    expect(data).to.have.property('organizationCredits');
+  });
+
+  test("should create recovery transaction", function() {
+    const data = res.getBody();
+    expect(data.transaction.type).to.equal('recovery');
+    expect(data.transaction.amount).to.equal(-25);
+  });
+
+  test("balances should be numbers", function() {
+    const data = res.getBody();
+    expect(data.userBalance).to.be.a('number');
+    expect(data.organizationCredits).to.be.a('number');
+  });
+}

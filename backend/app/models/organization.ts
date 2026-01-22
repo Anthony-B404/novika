@@ -4,7 +4,11 @@ import User, { UserRole } from './user.js'
 import Invitation from './invitation.js'
 import Reseller from './reseller.js'
 import CreditTransaction, { CreditTransactionType } from './credit_transaction.js'
+import UserCredit from './user_credit.js'
+import UserCreditTransaction from './user_credit_transaction.js'
 import type { ManyToMany, HasMany, BelongsTo } from '@adonisjs/lucid/types/relations'
+
+export type CreditMode = 'shared' | 'individual'
 
 export type RenewalType = 'first_of_month' | 'anniversary'
 
@@ -42,6 +46,9 @@ export default class Organization extends BaseModel {
   @column()
   declare credits: number
 
+  @column()
+  declare creditMode: CreditMode
+
   // Subscription fields
   @column()
   declare subscriptionEnabled: boolean
@@ -66,6 +73,18 @@ export default class Organization extends BaseModel {
 
   @column.dateTime()
   declare nextRenewalAt: DateTime | null
+
+  // Global auto-refill toggle (for individual credit mode)
+  // When enabled, creates/updates user_credit records for all members
+  @column()
+  declare autoRefillEnabled: boolean
+
+  // Default amount and day for new members when global auto-refill is active
+  @column()
+  declare autoRefillDefaultAmount: number | null
+
+  @column()
+  declare autoRefillDefaultDay: number | null
 
   // Status fields
   @column()
@@ -106,7 +125,46 @@ export default class Organization extends BaseModel {
   @belongsTo(() => Reseller)
   declare reseller: BelongsTo<typeof Reseller>
 
+  @hasMany(() => UserCredit)
+  declare userCredits: HasMany<typeof UserCredit>
+
+  @hasMany(() => UserCreditTransaction)
+  declare userCreditTransactions: HasMany<typeof UserCreditTransaction>
+
+  @hasMany(() => CreditTransaction)
+  declare creditTransactions: HasMany<typeof CreditTransaction>
+
   // Methods
+
+  /**
+   * Check if organization uses shared credit mode (pool commun)
+   */
+  isSharedMode(): boolean {
+    return this.creditMode === 'shared'
+  }
+
+  /**
+   * Check if organization uses individual credit mode (distribution individuelle)
+   */
+  isIndividualMode(): boolean {
+    return this.creditMode === 'individual'
+  }
+
+  /**
+   * Check if global auto-refill is fully configured and active
+   * Returns true only if:
+   * - Organization is in individual mode
+   * - autoRefillEnabled is true
+   * - Both defaultAmount and defaultDay are set
+   */
+  get isGlobalAutoRefillActive(): boolean {
+    return (
+      this.isIndividualMode() &&
+      this.autoRefillEnabled &&
+      this.autoRefillDefaultAmount !== null &&
+      this.autoRefillDefaultDay !== null
+    )
+  }
 
   /**
    * Get the owner of this organization

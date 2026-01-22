@@ -166,6 +166,20 @@ router
     // Credits routes
     router.get('/credits', [CreditsController, 'balance'])
     router.get('/credits/history', [CreditsController, 'history'])
+    router.get('/credits/mode', [CreditsController, 'getMode'])
+    router.put('/credits/mode', [CreditsController, 'updateMode'])
+    router.get('/credits/members', [CreditsController, 'listMembers'])
+    router.post('/credits/distribute', [CreditsController, 'distribute'])
+    router.post('/credits/recover', [CreditsController, 'recover'])
+    router.get('/credits/members/:userId', [CreditsController, 'getMemberCredits'])
+    router.get('/credits/members/:userId/history', [CreditsController, 'getMemberHistory'])
+    router.put('/credits/members/:userId/auto-refill', [CreditsController, 'configureAutoRefill'])
+    router.delete('/credits/members/:userId/auto-refill', [CreditsController, 'disableAutoRefill'])
+
+    // Global auto-refill settings (organization-level)
+    router.get('/credits/auto-refill', [CreditsController, 'getGlobalAutoRefill'])
+    router.put('/credits/auto-refill', [CreditsController, 'configureGlobalAutoRefill'])
+    router.delete('/credits/auto-refill', [CreditsController, 'disableGlobalAutoRefill'])
 
     // Contact support route
     router.post('/contact', [ContactController, 'send'])
