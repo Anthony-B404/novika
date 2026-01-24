@@ -791,6 +791,16 @@
         "systemAction": "Action système",
         "insufficientCredits": "Crédits insuffisants",
         "insufficientCreditsMessage": "Crédits insuffisants. Requis : {required}, disponibles : {available}. Veuillez recharger votre compte pour continuer.",
+        "insufficientCreditsModal": {
+          "title": "Crédits insuffisants",
+          "message": "Vous n'avez pas assez de crédits pour analyser ce fichier audio.",
+          "required": "Requis",
+          "available": "Disponible",
+          "requestToOwner": "Demander au propriétaire",
+          "requestToReseller": "Demander au revendeur",
+          "requestToOwnerHint": "Envoyez une demande de crédits au propriétaire de votre organisation.",
+          "requestToResellerHint": "Envoyez une demande de crédits à votre revendeur."
+        },
         "creditInfo": "1 crédit = 1 minute d'audio",
         "mode": {
           "title": "Mode de gestion des crédits",

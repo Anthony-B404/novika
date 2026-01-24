@@ -77,6 +77,11 @@ const deleteModalOpen = ref(false)
 const audioToDelete = ref<Audio | null>(null)
 const initialLoadDone = ref(false)
 
+// Insufficient credits modal state
+const insufficientCreditsModalOpen = ref(false)
+const creditsRequired = ref(0)
+const creditsAvailable = ref(0)
+
 // Computed: Only show 5 most recent audios on dashboard
 const recentAudios = computed(() => audioStore.audios.slice(0, 5))
 const hasMoreAudios = computed(() => audioStore.pagination.total > 5)
@@ -129,14 +134,10 @@ async function handleUpload () {
     const creditsNeeded = Math.max(1, Math.ceil(duration / 60))
 
     if (creditsStore.credits < creditsNeeded) {
-      toast.add({
-        title: t('pages.dashboard.credits.insufficientCredits'),
-        description: t('pages.dashboard.credits.insufficientCreditsMessage', {
-          required: creditsNeeded,
-          available: creditsStore.credits
-        }),
-        color: 'error'
-      })
+      // Open insufficient credits modal instead of toast
+      creditsRequired.value = creditsNeeded
+      creditsAvailable.value = creditsStore.credits
+      insufficientCreditsModalOpen.value = true
       return
     }
   } catch (error) {
@@ -348,6 +349,13 @@ const tabItems = computed(() => [
       v-model:open="deleteModalOpen"
       :audio="audioToDelete"
       @confirm="handleDeleteConfirm"
+    />
+
+    <!-- Insufficient credits modal -->
+    <CreditsInsufficientCreditsModal
+      v-model:open="insufficientCreditsModalOpen"
+      :credits-required="creditsRequired"
+      :credits-available="creditsAvailable"
     />
   </div>
 </template>

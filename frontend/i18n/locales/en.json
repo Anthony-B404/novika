@@ -789,6 +789,16 @@
         "systemAction": "System action",
         "insufficientCredits": "Insufficient Credits",
         "insufficientCreditsMessage": "Insufficient credits. Required: {required}, available: {available}. Please purchase more credits to continue.",
+        "insufficientCreditsModal": {
+          "title": "Insufficient Credits",
+          "message": "You don't have enough credits to analyze this audio file.",
+          "required": "Required",
+          "available": "Available",
+          "requestToOwner": "Request from Owner",
+          "requestToReseller": "Request from Reseller",
+          "requestToOwnerHint": "Submit a credit request to your organization's owner.",
+          "requestToResellerHint": "Submit a credit request to your reseller."
+        },
         "creditInfo": "1 credit = 1 minute of audio",
         "mode": {
           "title": "Credit Management Mode",
