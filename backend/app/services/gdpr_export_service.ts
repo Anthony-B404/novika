@@ -152,13 +152,13 @@ class GdprExportService {
       createdAt: audio.createdAt.toISO() || '',
       transcription: audio.transcription
         ? {
-            id: audio.transcription.id,
-            rawText: audio.transcription.rawText,
-            language: audio.transcription.language,
-            confidence: audio.transcription.confidence,
-            analysis: audio.transcription.analysis,
-            createdAt: audio.transcription.createdAt.toISO() || '',
-          }
+          id: audio.transcription.id,
+          rawText: audio.transcription.rawText,
+          language: audio.transcription.language,
+          confidence: audio.transcription.confidence,
+          analysis: audio.transcription.analysis,
+          createdAt: audio.transcription.createdAt.toISO() || '',
+        }
         : null,
       documents: audio.documents.map((doc) => ({
         id: doc.id,
@@ -269,7 +269,7 @@ NOTES:
 - All dates are in ISO 8601 format.
 - This export was generated in compliance with GDPR Article 20.
 
-For questions about your data, please contact: support@dh-echo.app
+For questions about your data, please contact: informatique@dhsolutionsgroup.com
 `
   }
 

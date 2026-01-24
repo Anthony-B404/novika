@@ -149,7 +149,7 @@ async function handleLogout () {
         size="lg"
         block
         tag="a"
-        href="mailto:support@dh-echo.app"
+        href="mailto:informatique@dhsolutionsgroup.com"
       />
 
       <!-- Logout -->
