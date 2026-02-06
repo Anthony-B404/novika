@@ -46,14 +46,14 @@ export default class AuthController {
           await mail.send((message) => {
             message
               .to(existingUser.email)
-              .from('DH-Echo <contact@dh-echo.cloud>')
+              .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
               .subject(i18n.t('emails.registration_magic_link.subject'))
               .htmlView('emails/registration_magic_link', {
                 token: existingUser.magicLinkToken,
                 locale: i18n.locale,
                 i18n: i18n,
                 frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-                apiUrl: 'https://api.dh-echo.cloud',
+                apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
               })
           })
 
@@ -76,14 +76,14 @@ export default class AuthController {
         await mail.send((message) => {
           message
             .to(existingUser.email)
-            .from('DH-Echo <contact@dh-echo.cloud>')
+            .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
             .subject(i18n.t('emails.registration_magic_link.subject'))
             .htmlView('emails/registration_magic_link', {
               token: existingUser.magicLinkToken,
               locale: i18n.locale,
               i18n: i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-              apiUrl: 'https://api.dh-echo.cloud',
+              apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
             })
         })
 
@@ -122,14 +122,14 @@ export default class AuthController {
       await mail.send((message) => {
         message
           .to(user.email)
-          .from('DH-Echo <contact@dh-echo.cloud>')
+          .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
           .subject(i18n.t('emails.registration_magic_link.subject'))
           .htmlView('emails/registration_magic_link', {
             token: magicLinkToken,
             locale: i18n.locale,
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-            apiUrl: 'https://api.dh-echo.cloud',
+            apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
           })
       })
 
@@ -387,14 +387,14 @@ export default class AuthController {
       await mail.send((message) => {
         message
           .to(user.email)
-          .from('DH-Echo <contact@dh-echo.cloud>')
+          .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
           .subject(i18n.t('emails.login_magic_link.subject'))
           .htmlView('emails/login_magic_link', {
             token: user.magicLinkToken,
             locale: i18n.locale,
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-            apiUrl: 'https://api.dh-echo.cloud',
+            apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
           })
       })
 

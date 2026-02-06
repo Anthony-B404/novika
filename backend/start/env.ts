@@ -43,6 +43,8 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   FRONTEND_URL: Env.schema.string.optional(),
+  API_URL: Env.schema.string.optional(),
+  MAIL_FROM: Env.schema.string.optional(),
 
   /*
   |----------------------------------------------------------

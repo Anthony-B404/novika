@@ -240,7 +240,7 @@ export default class ResellerOrganizationsController {
       await mail.send((message) => {
         message
           .to(result.ownerUser.email)
-          .from(env.get('MAIL_FROM', 'DH-Echo <contact@dh-echo.cloud>'))
+          .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
           .subject(
             i18n.t('emails.reseller_org_welcome.subject', {
               organization: result.organization.name,

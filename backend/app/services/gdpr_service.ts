@@ -496,14 +496,14 @@ class GdprService {
     await mail.send((message) => {
       message
         .to(user.email)
-        .from('DH-Echo <contact@dh-echo.cloud>')
+        .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
         .subject(i18n.t('emails.gdpr_deletion_requested.subject'))
         .htmlView('emails/gdpr_deletion_requested', {
           user,
           scheduledDate,
           cancelUrl,
           i18n,
-          apiUrl: 'https://api.dh-echo.cloud',
+          apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
         })
     })
   }
@@ -519,12 +519,12 @@ class GdprService {
     await mail.send((message) => {
       message
         .to(email)
-        .from('DH-Echo <contact@dh-echo.cloud>')
+        .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
         .subject(i18n.t('emails.gdpr_deletion_completed.subject'))
         .htmlView('emails/gdpr_deletion_completed', {
           summary,
           i18n,
-          apiUrl: 'https://api.dh-echo.cloud',
+          apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
           frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
         })
     })
@@ -548,7 +548,7 @@ class GdprService {
     await mail.send((message) => {
       message
         .to(user.email)
-        .from('DH-Echo <contact@dh-echo.cloud>')
+        .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
         .subject(
           i18n.t('emails.gdpr_deletion_reminder.subject', {
             daysRemaining: daysRemaining.toString(),
@@ -560,7 +560,7 @@ class GdprService {
           daysRemaining,
           cancelUrl,
           i18n,
-          apiUrl: 'https://api.dh-echo.cloud',
+          apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
         })
     })
   }

@@ -76,14 +76,14 @@ class ShareService {
     await mail.send((message) => {
       message
         .to(email)
-        .from('DH-Echo <contact@dh-echo.cloud>')
+        .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
         .subject(i18n.t('emails.audio_share.subject', { senderName }))
         .htmlView('emails/audio_share', {
           senderName,
           audioTitle,
           shareUrl,
           i18n,
-          apiUrl: 'https://api.dh-echo.cloud',
+          apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
         })
         .attachData(exportResult.buffer, {
           filename: exportResult.filename,

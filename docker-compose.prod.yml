@@ -70,10 +70,10 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: https://api.dh-echo.cloud
-      FRONTEND_URL: https://dh-echo.cloud
+      API_URL: https://api.dh-echo.com
+      FRONTEND_URL: https://dh-echo.com
       # CORS
-      ALLOWED_ORIGINS: https://dh-echo.cloud
+      ALLOWED_ORIGINS: https://dh-echo.com
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -103,10 +103,19 @@ services:
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dh-echo-api.rule=Host(`api.dh-echo.cloud`)"
+      # API principal
+      - "traefik.http.routers.dh-echo-api.rule=Host(`api.dh-echo.com`)"
       - "traefik.http.routers.dh-echo-api.entrypoints=websecure"
       - "traefik.http.routers.dh-echo-api.tls.certresolver=mytlschallenge"
       - "traefik.http.services.dh-echo-api.loadbalancer.server.port=3333"
+      # Redirect api.cloud → api.com (301)
+      - "traefik.http.routers.dh-echo-api-cloud-redirect.rule=Host(`api.dh-echo.cloud`)"
+      - "traefik.http.routers.dh-echo-api-cloud-redirect.entrypoints=websecure"
+      - "traefik.http.routers.dh-echo-api-cloud-redirect.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.dh-echo-api-cloud-redirect.middlewares=redirect-api-cloud-to-com"
+      - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.regex=^https://api\\.dh-echo\\.cloud(.*)"
+      - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.replacement=https://api.dh-echo.com$${1}"
+      - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.permanent=true"
     deploy:
       resources:
         limits:
@@ -145,8 +154,8 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: https://api.dh-echo.cloud
-      FRONTEND_URL: https://dh-echo.cloud
+      API_URL: https://api.dh-echo.com
+      FRONTEND_URL: https://dh-echo.com
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -192,8 +201,8 @@ services:
       # External APIs
       RESEND_API_KEY: ${RESEND_API_KEY}
       # URLs
-      API_URL: https://api.dh-echo.cloud
-      FRONTEND_URL: https://dh-echo.cloud
+      API_URL: https://api.dh-echo.com
+      FRONTEND_URL: https://dh-echo.com
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -240,10 +249,27 @@ services:
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dh-echo-frontend.rule=Host(`dh-echo.cloud`) || Host(`www.dh-echo.cloud`)"
+      # Frontend principal
+      - "traefik.http.routers.dh-echo-frontend.rule=Host(`dh-echo.com`) || Host(`www.dh-echo.com`)"
       - "traefik.http.routers.dh-echo-frontend.entrypoints=websecure"
       - "traefik.http.routers.dh-echo-frontend.tls.certresolver=mytlschallenge"
       - "traefik.http.services.dh-echo-frontend.loadbalancer.server.port=80"
+      # Redirect .cloud → .com (301)
+      - "traefik.http.routers.dh-echo-cloud-redirect.rule=Host(`dh-echo.cloud`) || Host(`www.dh-echo.cloud`)"
+      - "traefik.http.routers.dh-echo-cloud-redirect.entrypoints=websecure"
+      - "traefik.http.routers.dh-echo-cloud-redirect.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.dh-echo-cloud-redirect.middlewares=redirect-cloud-to-com"
+      - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.regex=^https://(?:www\\.)?dh-echo\\.cloud(.*)"
+      - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.replacement=https://dh-echo.com$${1}"
+      - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.permanent=true"
+      # Redirect .fr → .com (301)
+      - "traefik.http.routers.dh-echo-fr-redirect.rule=Host(`dh-echo.fr`) || Host(`www.dh-echo.fr`)"
+      - "traefik.http.routers.dh-echo-fr-redirect.entrypoints=websecure"
+      - "traefik.http.routers.dh-echo-fr-redirect.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.dh-echo-fr-redirect.middlewares=redirect-fr-to-com"
+      - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.regex=^https://(?:www\\.)?dh-echo\\.fr(.*)"
+      - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.replacement=https://dh-echo.com$${1}"
+      - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.permanent=true"
     deploy:
       resources:
         limits:

@@ -27,7 +27,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build argument for API URL (injected at build time)
-ARG API_URL=https://api.dh-echo.cloud
+ARG API_URL=https://api.dh-echo.com
 ENV API_URL=$API_URL
 
 # Build the Nuxt application

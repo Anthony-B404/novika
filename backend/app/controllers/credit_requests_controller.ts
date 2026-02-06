@@ -69,7 +69,7 @@ export default class CreditRequestsController {
         await mail.send((message) => {
           message
             .to(owner.email)
-            .from('DH-Echo <contact@dh-echo.cloud>')
+            .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
             .subject(i18n.t('emails.credit_request_created.subject'))
             .htmlView('emails/credit_request_created', {
               requesterName: user.fullName || user.email,
@@ -77,7 +77,7 @@ export default class CreditRequestsController {
               justification,
               i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-              apiUrl: 'https://api.dh-echo.cloud',
+              apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
             })
         })
 
@@ -152,7 +152,7 @@ export default class CreditRequestsController {
           await mail.send((message) => {
             message
               .to(admin.email)
-              .from('DH-Echo <contact@dh-echo.cloud>')
+              .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
               .subject(
                 i18n.t('emails.credit_request_owner_created.subject', {
                   organizationName: organization.name,
@@ -164,7 +164,7 @@ export default class CreditRequestsController {
                 justification,
                 i18n,
                 frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-                apiUrl: 'https://api.dh-echo.cloud',
+                apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
               })
           })
         }
@@ -319,13 +319,13 @@ export default class CreditRequestsController {
         await mail.send((message) => {
           message
             .to(requester.email)
-            .from('DH-Echo <contact@dh-echo.cloud>')
+            .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
             .subject(i18n.t('emails.credit_request_approved.subject'))
             .htmlView('emails/credit_request_approved', {
               amount: result.creditsDistributed,
               i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-              apiUrl: 'https://api.dh-echo.cloud',
+              apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
             })
         })
 
@@ -402,14 +402,14 @@ export default class CreditRequestsController {
         await mail.send((message) => {
           message
             .to(requester.email)
-            .from('DH-Echo <contact@dh-echo.cloud>')
+            .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
             .subject(i18n.t('emails.credit_request_rejected.subject'))
             .htmlView('emails/credit_request_rejected', {
               amount: creditRequest.amount,
               reason,
               i18n,
               frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-              apiUrl: 'https://api.dh-echo.cloud',
+              apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
             })
         })
       }
