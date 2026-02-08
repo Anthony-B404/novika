@@ -22,24 +22,28 @@ export default class MistralService {
   }
 
   /**
-   * Transcribe audio file using Voxtral model with timestamps
+   * Transcribe audio file using Voxtral model with timestamps and speaker diarization
    */
   async transcribe(filePath: string, fileName: string): Promise<TranscriptionResult> {
     const fileBuffer = await readFile(filePath)
     const blob = new Blob([fileBuffer], { type: 'audio/mpeg' })
     const file = new File([blob], fileName)
 
+    // Note: diarize parameter is supported by API but SDK types may not be updated yet
     const result = await this.client.audio.transcriptions.complete({
       model: 'voxtral-mini-latest',
       file: file,
       timestampGranularities: ['segment'],
-    })
+      diarize: true,
+    } as Parameters<typeof this.client.audio.transcriptions.complete>[0])
 
     // Map Mistral segments to our TranscriptionTimestamp format
+    // Speaker field comes from diarization (SDK types may not include it yet)
     const segments: TranscriptionTimestamp[] = (result.segments || []).map((seg) => ({
       start: seg.start,
       end: seg.end,
       text: seg.text,
+      speaker: (seg as { speaker?: string }).speaker || undefined,
     }))
 
     return {
