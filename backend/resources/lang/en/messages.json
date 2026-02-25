@@ -192,7 +192,9 @@
       "confidence": "Confidence",
       "exported_on": "Exported on",
       "filename": "Source file"
-    }
+    },
+    "speaker": "Speaker",
+    "unknown_speaker": "Unknown Speaker"
   },
   "prompt": {
     "created": "Prompt created successfully",

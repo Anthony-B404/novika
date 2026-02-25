@@ -1,5 +1,7 @@
 import PDFDocument from 'pdfkit'
+import app from '@adonisjs/core/services/app'
 import type Audio from '#models/audio'
+import type { TranscriptionTimestamp } from '#models/transcription'
 import type { I18n } from '@adonisjs/i18n'
 
 export interface PdfGenerateOptions {
@@ -13,6 +15,29 @@ export interface PdfGenerateOptions {
  * Creates professional-looking PDFs with metadata, transcription, and analysis sections.
  */
 class PdfGeneratorService {
+  /**
+   * Register Noto Sans fonts for full Unicode support
+   */
+  private registerFonts(doc: PDFKit.PDFDocument): void {
+    const regularPath = app.makePath('resources', 'fonts', 'NotoSans-Regular.ttf')
+    const boldPath = app.makePath('resources', 'fonts', 'NotoSans-Bold.ttf')
+    doc.registerFont('NotoSans', regularPath)
+    doc.registerFont('NotoSans-Bold', boldPath)
+  }
+
+  /**
+   * Format seconds into MM:SS or HH:MM:SS
+   */
+  private formatTimestamp(seconds: number): string {
+    const h = Math.floor(seconds / 3600)
+    const m = Math.floor((seconds % 3600) / 60)
+    const s = Math.floor(seconds % 60)
+    if (h > 0) {
+      return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+    }
+    return `${m}:${s.toString().padStart(2, '0')}`
+  }
+
   /**
    * Generate a PDF buffer from audio transcription data
    */
@@ -36,6 +61,9 @@ class PdfGeneratorService {
       doc.on('data', (chunk: Buffer) => chunks.push(chunk))
       doc.on('end', () => resolve(Buffer.concat(chunks)))
       doc.on('error', reject)
+
+      // Register Unicode fonts
+      this.registerFonts(doc)
 
       // Generate PDF content
       this.generateHeader(doc, audio, i18n)
@@ -64,7 +92,7 @@ class PdfGeneratorService {
     const title = audio.title || audio.fileName
 
     // Title
-    doc.fontSize(24).font('Helvetica-Bold').text(title, { align: 'center' })
+    doc.fontSize(24).font('NotoSans-Bold').text(title, { align: 'center' })
 
     doc.moveDown(0.5)
 
@@ -79,7 +107,7 @@ class PdfGeneratorService {
 
     doc
       .fontSize(10)
-      .font('Helvetica')
+      .font('NotoSans')
       .fillColor('#666666')
       .text(`${i18n.t('messages.export.metadata.exported_on')}: ${exportDate}`, { align: 'center' })
 
@@ -91,7 +119,7 @@ class PdfGeneratorService {
    * Generate metadata section with audio information
    */
   private generateMetadata(doc: PDFKit.PDFDocument, audio: Audio, i18n: I18n): void {
-    doc.fontSize(10).font('Helvetica').fillColor('#666666')
+    doc.fontSize(10).font('NotoSans').fillColor('#666666')
 
     const metadata: string[] = []
 
@@ -100,9 +128,7 @@ class PdfGeneratorService {
 
     // Duration
     if (audio.duration) {
-      const minutes = Math.floor(audio.duration / 60)
-      const seconds = Math.round(audio.duration % 60)
-      const durationStr = `${minutes}:${seconds.toString().padStart(2, '0')}`
+      const durationStr = this.formatTimestamp(audio.duration)
       metadata.push(`${i18n.t('messages.export.metadata.duration')}: ${durationStr}`)
     }
 
@@ -135,7 +161,10 @@ class PdfGeneratorService {
   }
 
   /**
-   * Generate transcription section
+   * Generate transcription section with 3 scenarios:
+   * A) Timestamps with speakers (diarization)
+   * B) Timestamps without speakers
+   * C) Fallback rawText (no timestamps)
    */
   private generateTranscriptionSection(doc: PDFKit.PDFDocument, audio: Audio, i18n: I18n): void {
     if (!audio.transcription?.rawText) return
@@ -143,18 +172,123 @@ class PdfGeneratorService {
     // Section header
     doc
       .fontSize(14)
-      .font('Helvetica-Bold')
+      .font('NotoSans-Bold')
       .text(i18n.t('messages.export.transcription_section'), { underline: false })
 
     doc.moveDown(0.5)
 
-    // Transcription content
-    doc.fontSize(11).font('Helvetica').text(audio.transcription.rawText, {
-      align: 'justify',
-      lineGap: 4,
-    })
+    const timestamps = audio.transcription.timestamps
+    const hasTimestamps = Array.isArray(timestamps) && timestamps.length > 0
+
+    if (hasTimestamps) {
+      const hasSpeakers = timestamps!.some((seg) => seg.speaker)
+
+      if (hasSpeakers) {
+        this.renderDiarizedTranscription(doc, timestamps!, i18n)
+      } else {
+        this.renderTimestampedTranscription(doc, timestamps!)
+      }
+    } else {
+      this.renderRawTextTranscription(doc, audio.transcription.rawText)
+    }
 
     doc.moveDown(1.5)
+  }
+
+  /**
+   * Scenario A: Timestamps with speakers (diarization)
+   * Groups consecutive segments from the same speaker.
+   */
+  private renderDiarizedTranscription(
+    doc: PDFKit.PDFDocument,
+    timestamps: TranscriptionTimestamp[],
+    i18n: I18n
+  ): void {
+    const contentWidth = doc.page.width - 100 // margins
+
+    let lastSpeaker: string | null = null
+
+    for (const segment of timestamps) {
+      const speaker = segment.speaker || i18n.t('messages.export.unknown_speaker')
+      const isNewSpeaker = speaker !== lastSpeaker
+
+      if (isNewSpeaker) {
+        // Extra spacing between speaker changes
+        if (lastSpeaker !== null) {
+          doc.moveDown(0.6)
+        }
+
+        // Speaker name in bold
+        const timeStr = `[${this.formatTimestamp(segment.start)}]`
+        doc
+          .fontSize(9)
+          .font('NotoSans')
+          .fillColor('#888888')
+          .text(timeStr, { continued: true, width: contentWidth })
+        doc
+          .fontSize(11)
+          .font('NotoSans-Bold')
+          .fillColor('#000000')
+          .text(`  ${speaker}`, { width: contentWidth })
+
+        lastSpeaker = speaker
+      }
+
+      // Segment text
+      doc.fontSize(11).font('NotoSans').fillColor('#333333').text(segment.text, {
+        align: 'justify',
+        lineGap: 3,
+        width: contentWidth,
+      })
+    }
+
+    doc.fillColor('#000000')
+  }
+
+  /**
+   * Scenario B: Timestamps without speakers
+   */
+  private renderTimestampedTranscription(
+    doc: PDFKit.PDFDocument,
+    timestamps: TranscriptionTimestamp[]
+  ): void {
+    const contentWidth = doc.page.width - 100
+
+    for (const segment of timestamps) {
+      const timeStr = `[${this.formatTimestamp(segment.start)}]`
+
+      doc
+        .fontSize(9)
+        .font('NotoSans')
+        .fillColor('#888888')
+        .text(timeStr, { continued: true, width: contentWidth })
+
+      doc.fontSize(11).font('NotoSans').fillColor('#333333').text(`  ${segment.text}`, {
+        align: 'justify',
+        lineGap: 3,
+        width: contentWidth,
+      })
+    }
+
+    doc.fillColor('#000000')
+  }
+
+  /**
+   * Scenario C: Fallback rawText split into paragraphs
+   */
+  private renderRawTextTranscription(doc: PDFKit.PDFDocument, rawText: string): void {
+    const paragraphs = rawText.split(/\n\n+/)
+
+    for (const paragraph of paragraphs) {
+      const trimmed = paragraph.trim()
+      if (trimmed) {
+        doc.fontSize(11).font('NotoSans').text(trimmed, {
+          align: 'justify',
+          lineGap: 4,
+        })
+        doc.moveDown(0.5)
+      }
+    }
   }
 
   /**
@@ -166,7 +300,7 @@ class PdfGeneratorService {
     // Section header
     doc
       .fontSize(14)
-      .font('Helvetica-Bold')
+      .font('NotoSans-Bold')
       .text(i18n.t('messages.export.analysis_section'), { underline: false })
 
     doc.moveDown(0.5)
@@ -174,7 +308,7 @@ class PdfGeneratorService {
     // Analysis content (may contain markdown, render as plain text for now)
     const analysisText = this.stripMarkdown(audio.transcription.analysis)
 
-    doc.fontSize(11).font('Helvetica').text(analysisText, {
+    doc.fontSize(11).font('NotoSans').text(analysisText, {
       align: 'justify',
       lineGap: 4,
     })
@@ -192,11 +326,10 @@ class PdfGeneratorService {
     for (let i = 0; i < pages.count; i++) {
       doc.switchToPage(pages.start + i)
 
-      // Use low-level text positioning to avoid triggering page breaks
       const pageNumText = `${i + 1} / ${pages.count}`
 
       doc.save()
-      doc.fontSize(9).font('Helvetica').fillColor('#999999')
+      doc.fontSize(9).font('NotoSans').fillColor('#999999')
 
       const textWidth = doc.widthOfString(pageNumText)
       const xPos = (doc.page.width - textWidth) / 2

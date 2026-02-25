@@ -97,6 +97,10 @@ export default defineConfig({
       reloadServer: false,
     },
     {
+      pattern: 'resources/fonts/**/*.ttf',
+      reloadServer: false,
+    },
+    {
       pattern: 'public/**/*',
       reloadServer: false,
     },
