@@ -76,6 +76,32 @@ export const OPUS_PRESETS = {
 export type OpusPreset = keyof typeof OPUS_PRESETS
 
 /**
+ * AAC encoding presets — universally supported (Safari, iOS, Chrome, Firefox)
+ */
+export const AAC_PRESETS = {
+  /** Voice/speech — good quality, small files */
+  voice: {
+    bitrate: '64k',
+    channels: 1,
+    sampleRate: 44100,
+  },
+  /** Voice with higher quality */
+  voiceHq: {
+    bitrate: '96k',
+    channels: 1,
+    sampleRate: 44100,
+  },
+  /** Music/podcast quality */
+  music: {
+    bitrate: '128k',
+    channels: 2,
+    sampleRate: 44100,
+  },
+} as const
+
+export type AacPreset = keyof typeof AAC_PRESETS
+
+/**
  * Service for converting audio files to Opus format.
  * Uses ffmpeg-static for portable ffmpeg binary.
  */
@@ -142,6 +168,59 @@ export default class AudioConverterService {
       inputPath,
       '-acodec',
       'libopus',
+      '-b:a',
+      settings.bitrate,
+      '-ac',
+      settings.channels.toString(),
+      '-ar',
+      settings.sampleRate.toString(),
+      '-vn', // No video
+      '-y', // Overwrite output
+      outputPath,
+    ]
+
+    await execFileAsync(ffmpegPath, args)
+
+    // Get converted file size
+    const convertedSize = await this.getFileSize(outputPath)
+    const compressionRatio = originalSize > 0 ? convertedSize / originalSize : 1
+
+    return {
+      path: outputPath,
+      originalSize,
+      convertedSize,
+      duration,
+      compressionRatio,
+    }
+  }
+
+  /**
+   * Convert audio file to AAC/M4A format (universally supported by all browsers)
+   *
+   * @param inputPath - Path to source audio file
+   * @param preset - AAC encoding preset (default: 'voice')
+   * @returns Conversion result with paths and size info
+   */
+  async convertToAac(inputPath: string, preset: AacPreset = 'voice'): Promise<ConversionResult> {
+    if (!ffmpegPath) {
+      throw new Error('ffmpeg-static path not found')
+    }
+
+    const settings = AAC_PRESETS[preset]
+    const outputPath = join(app.tmpPath(), `${randomUUID()}.m4a`)
+
+    // Get original file info
+    const [originalSize, duration] = await Promise.all([
+      this.getFileSize(inputPath),
+      this.getDuration(inputPath),
+    ])
+
+    // Build ffmpeg arguments for AAC conversion
+    const args = [
+      '-i',
+      inputPath,
+      '-acodec',
+      'aac',
       '-b:a',
       settings.bitrate,
       '-ac',

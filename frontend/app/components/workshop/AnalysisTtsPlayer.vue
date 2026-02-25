@@ -205,6 +205,24 @@ async function streamWithMediaSource() {
 }
 
 async function fetchFullBlob() {
+  // Create and "unlock" the Audio element synchronously in the user gesture context.
+  // iOS Safari blocks programmatic playback unless the first play() is within a
+  // user-initiated event handler. Playing a tiny silent WAV satisfies the requirement.
+  const audio = new Audio()
+  audioEl.value = audio
+  attachAudioListeners(audio)
+
+  // Silent WAV (44 bytes) to unlock the audio element on iOS
+  audio.src =
+    'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
+  try {
+    await audio.play()
+  } catch {
+    // Ignore — some browsers reject the silent clip; the unlock still takes effect
+  }
+  audio.pause()
+
+  // Now fetch the real TTS audio
   const response = await fetch(
     `${config.public.apiUrl}/audios/${props.audioId}/tts`,
     { headers: getAuthHeaders() as HeadersInit }
@@ -216,12 +234,8 @@ async function fetchFullBlob() {
   const url = URL.createObjectURL(blob)
   objectUrl.value = url
 
-  const audio = new Audio(url)
+  audio.src = url
   audio.playbackRate = playbackRate.value
-  audioEl.value = audio
-
-  attachAudioListeners(audio)
-
   await audio.play()
 }
 

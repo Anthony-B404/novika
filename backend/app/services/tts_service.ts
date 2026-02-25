@@ -16,6 +16,8 @@ export default class TtsService {
   stripMarkdown(text: string): string {
     return (
       text
+        // Unescape backslash-escaped markdown characters (\### → ###, \- → -, etc.)
+        .replace(/\\([#*_\-\[\]()>~`!|])/g, '$1')
         // Remove code blocks (```...```)
         .replace(/```[\s\S]*?```/g, '')
         // Remove inline code (`...`)
@@ -50,43 +52,118 @@ export default class TtsService {
 
   /**
    * Split text into chunks that fit within the Inworld character limit.
-   * Splits on sentence boundaries to preserve natural speech flow.
+   * Uses a multi-level splitting strategy to preserve natural speech flow:
+   * 1. Paragraph boundaries (double newlines)
+   * 2. French-aware sentence boundaries (handles abbreviations, guillemets, ellipsis)
+   * 3. Comma/semicolon/colon boundaries
+   * 4. Word boundaries (final fallback)
    */
   splitIntoChunks(text: string, maxChars = 1900): string[] {
     if (text.length <= maxChars) {
       return [text]
     }
 
+    // Level 1: Split on paragraph boundaries
+    const paragraphs = text.split(/\n\n+/)
     const chunks: string[] = []
-    // Split on sentence-ending punctuation followed by whitespace
-    const sentences = text.split(/(?<=[.!?])\s+/)
+
+    for (const paragraph of paragraphs) {
+      const trimmed = paragraph.trim()
+      if (!trimmed) continue
+      this.addTextToChunks(trimmed, chunks, maxChars)
+    }
+
+    return chunks
+  }
+
+  /**
+   * Add text to chunks array, splitting on sentence boundaries if needed.
+   */
+  private addTextToChunks(text: string, chunks: string[], maxChars: number): void {
+    if (!text) return
+
+    // If the last chunk can absorb this text, merge them
+    if (chunks.length > 0) {
+      const merged = `${chunks[chunks.length - 1]} ${text}`
+      if (merged.length <= maxChars) {
+        chunks[chunks.length - 1] = merged
+        return
+      }
+    }
+
+    if (text.length <= maxChars) {
+      chunks.push(text)
+      return
+    }
+
+    // Level 2: Split on sentence boundaries (French-aware)
+    const sentences = this.splitIntoSentences(text)
+    if (sentences.length > 1) {
+      for (const sentence of sentences) {
+        this.addTextToChunks(sentence, chunks, maxChars)
+      }
+      return
+    }
+
+    // Level 3: Split on comma/semicolon/colon boundaries
+    const clauses = text.split(/(?<=[,;:])\s+/)
+    if (clauses.length > 1) {
+      for (const clause of clauses) {
+        this.addTextToChunks(clause, chunks, maxChars)
+      }
+      return
+    }
+
+    // Level 4: Word boundary fallback
+    this.splitOnWordBoundary(text, chunks, maxChars)
+  }
+
+  /**
+   * Split text into sentences using French-aware rules.
+   * Avoids splitting on common abbreviations (M., Dr., etc.) and decimal numbers.
+   */
+  private splitIntoSentences(text: string): string[] {
+    // Match sentence-ending punctuation: . ! ? » …
+    // But NOT abbreviations like M. Dr. etc. or decimals like 1.5
+    // Strategy: split on punctuation followed by whitespace and an uppercase letter or quote
+    const sentenceEndPattern =
+      /(?<!\b(?:M|Dr|Pr|Me|Mme|Mlle|Jr|Sr|St|etc|vol|fig|p|ch|art|no|réf|cf|approx|env|min|max|ex))(?<!\d)([.!?…»])\s+(?=[A-ZÀ-ÖØ-Þ«"\d-])/g
+
+    const sentences: string[] = []
+    let lastIndex = 0
+
+    for (const match of text.matchAll(sentenceEndPattern)) {
+      const endIndex = match.index! + match[0].indexOf(match[1]) + match[1].length
+      sentences.push(text.slice(lastIndex, endIndex).trim())
+      lastIndex = endIndex
+      // Skip the whitespace
+      while (lastIndex < text.length && /\s/.test(text[lastIndex])) {
+        lastIndex++
+      }
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      const remaining = text.slice(lastIndex).trim()
+      if (remaining) sentences.push(remaining)
+    }
+
+    return sentences.length > 0 ? sentences : [text]
+  }
+
+  /**
+   * Split text on word boundaries as a last resort.
+   */
+  private splitOnWordBoundary(text: string, chunks: string[], maxChars: number): void {
+    const words = text.split(/\s+/)
     let current = ''
 
-    for (const sentence of sentences) {
-      const candidate = current ? `${current} ${sentence}` : sentence
-
+    for (const word of words) {
+      const candidate = current ? `${current} ${word}` : word
       if (candidate.length > maxChars) {
-        if (current) {
-          chunks.push(current)
-        }
-        // If a single sentence exceeds maxChars, split on word boundaries
-        if (sentence.length > maxChars) {
-          const words = sentence.split(/\s+/)
-          let wordChunk = ''
-          for (const word of words) {
-            const wordCandidate = wordChunk ? `${wordChunk} ${word}` : word
-            if (wordCandidate.length > maxChars) {
-              if (wordChunk) chunks.push(wordChunk)
-              wordChunk = word
-            } else {
-              wordChunk = wordCandidate
-            }
-          }
-          if (wordChunk) current = wordChunk
-          else current = ''
-        } else {
-          current = sentence
-        }
+        if (current) chunks.push(current)
+        // If a single word exceeds maxChars, push it as-is (shouldn't happen)
+        current = word
       } else {
         current = candidate
       }
@@ -95,13 +172,12 @@ export default class TtsService {
     if (current) {
       chunks.push(current)
     }
-
-    return chunks
   }
 
   /**
    * Stream a single text chunk from Inworld directly to the HTTP response.
-   * Reads the Inworld streaming JSON response line by line and writes decoded audio bytes.
+   * Audio bytes are written as they arrive to keep the connection alive
+   * and avoid timeout gaps between chunks.
    */
   private async streamChunkToResponse(
     text: string,
@@ -133,51 +209,64 @@ export default class TtsService {
 
     const reader = response.body!.getReader()
     const decoder = new TextDecoder()
-    let buffer = ''
+    let jsonBuffer = ''
+    let totalAudioBytes = 0
 
     while (true) {
       const { value, done } = await reader.read()
       if (done) break
 
-      buffer += decoder.decode(value, { stream: true })
+      jsonBuffer += decoder.decode(value, { stream: true })
 
       // Process complete lines
-      const lines = buffer.split('\n')
-      buffer = lines.pop()! // Keep incomplete last line
+      const lines = jsonBuffer.split('\n')
+      jsonBuffer = lines.pop()! // Keep incomplete last line
 
       for (const line of lines) {
-        this.writeAudioLine(line, res)
+        const audio = this.extractAudioFromLine(line)
+        if (audio) {
+          totalAudioBytes += audio.length
+          res.write(audio)
+        }
       }
     }
 
     // Process remaining buffer
-    if (buffer.trim()) {
-      this.writeAudioLine(buffer, res)
+    if (jsonBuffer.trim()) {
+      const audio = this.extractAudioFromLine(jsonBuffer)
+      if (audio) {
+        totalAudioBytes += audio.length
+        res.write(audio)
+      }
     }
+
+    console.log(`[TTS]   → Inworld returned ${totalAudioBytes} audio bytes`)
   }
 
   /**
-   * Parse a JSON line and write decoded audio bytes to the response.
+   * Parse a JSON line and extract decoded audio bytes.
    */
-  private writeAudioLine(line: string, res: ServerResponse): void {
+  private extractAudioFromLine(line: string): Buffer | null {
     const trimmed = line.trim()
-    if (!trimmed) return
+    if (!trimmed) return null
 
     try {
       const parsed = JSON.parse(trimmed)
       const audioData = parsed.result?.audioContent || parsed.audioContent || parsed.audio
       if (audioData) {
-        res.write(Buffer.from(audioData, 'base64'))
+        return Buffer.from(audioData, 'base64')
       }
     } catch {
       // Skip non-JSON lines
     }
+
+    return null
   }
 
   /**
    * Stream TTS audio directly to the HTTP response.
-   * Processes text chunks sequentially so audio plays in order,
-   * but each chunk's audio bytes are piped as they arrive from Inworld.
+   * Processes text chunks sequentially so audio plays in order.
+   * If a single chunk fails, logs the error and continues with remaining chunks.
    */
   async streamSpeech(
     analysisText: string,
@@ -187,8 +276,22 @@ export default class TtsService {
     const plainText = this.stripMarkdown(analysisText)
     const chunks = this.splitIntoChunks(plainText)
 
-    for (const chunk of chunks) {
-      await this.streamChunkToResponse(chunk, res, voiceId)
+    console.log(`[TTS] ${chunks.length} chunk(s), total ${plainText.length} chars`)
+
+    for (let i = 0; i < chunks.length; i++) {
+      try {
+        // Collapse newlines to spaces for clean TTS input
+        const cleanChunk = chunks[i].replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim()
+        if (!cleanChunk) continue
+        console.log(`[TTS] Chunk ${i + 1}/${chunks.length}: ${cleanChunk.length} chars — "${cleanChunk.slice(0, 60)}..."`)
+        await this.streamChunkToResponse(cleanChunk, res, voiceId)
+        console.log(`[TTS] Chunk ${i + 1}/${chunks.length}: done`)
+      } catch (error) {
+        console.error(`[TTS] Chunk ${i + 1}/${chunks.length} FAILED:`, error)
+        // Continue with remaining chunks — don't let one failure kill the stream
+      }
     }
+
+    console.log('[TTS] All chunks processed')
   }
 }

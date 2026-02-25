@@ -108,7 +108,7 @@ function mergeChunkTranscription(
  *
  * Progress stages:
  * - 0-2%: Downloading file from storage
- * - 2-12%: Converting audio to Opus format
+ * - 2-12%: Converting audio to AAC/M4A format
  * - 12-17%: Getting metadata and chunking if needed
  * - 17-72%: Transcribing audio chunks with Mistral
  * - 72-92%: Analyzing with AI
@@ -146,7 +146,7 @@ async function processTranscriptionJob(
 
     await job.updateProgress(2)
 
-    // Stage 2: Convert to Opus format (2-12%)
+    // Stage 2: Convert to AAC/M4A format for universal browser playback (2-12%)
     // Use simulated progress during ffmpeg conversion
     await job.updateProgress(3)
 
@@ -161,7 +161,7 @@ async function processTranscriptionJob(
 
     let conversionResult
     try {
-      conversionResult = await converter.convertToOpus(tempOriginalPath, 'voice')
+      conversionResult = await converter.convertToAac(tempOriginalPath, 'voice')
     } finally {
       clearInterval(conversionInterval)
     }
@@ -174,8 +174,8 @@ async function processTranscriptionJob(
       conversionResult.path,
       job.data.organizationId,
       {
-        originalName: audioFileName.replace(/\.[^/.]+$/, '.opus'),
-        mimeType: 'audio/opus',
+        originalName: audioFileName.replace(/\.[^/.]+$/, '.m4a'),
+        mimeType: 'audio/mp4',
       }
     )
 
@@ -184,7 +184,7 @@ async function processTranscriptionJob(
     if (audio) {
       audio.filePath = convertedFile.path
       audio.fileSize = convertedFile.size
-      audio.mimeType = 'audio/opus'
+      audio.mimeType = 'audio/mp4'
       audio.duration = Math.round(conversionResult.duration)
       await audio.save()
     }
@@ -199,7 +199,7 @@ async function processTranscriptionJob(
     await converter.cleanup(conversionResult.path)
 
     // Write converted file to temp for subsequent processing
-    tempPath = join(tempDir, `${randomUUID()}-converted.opus`)
+    tempPath = join(tempDir, `${randomUUID()}-converted.m4a`)
     const convertedBuffer = await storageService.getFileBuffer(convertedFile.path)
     await writeFile(tempPath, convertedBuffer)
 
