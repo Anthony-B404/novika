@@ -18,17 +18,12 @@ const ALLOWED_TYPES = [
   'audio/mp4',
   'audio/ogg',
   'audio/flac',
-  'audio/x-flac',
-  'video/mp4',
-  'video/quicktime',
-  'video/webm',
-  'video/x-msvideo',
-  'video/x-matroska'
+  'audio/x-flac'
 ]
 
-const ALLOWED_EXTENSIONS = /\.(mp3|wav|m4a|ogg|flac|mp4|mov|webm|avi|mkv)$/i
+const ALLOWED_EXTENSIONS = /\.(mp3|wav|m4a|ogg|flac)$/i
 
-const MAX_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
+const MAX_SIZE = 512 * 1024 * 1024 // 512MB
 
 export function useAudioUpload (options: UseAudioUploadOptions = {}) {
   const { authenticatedFetch } = useAuth()
@@ -46,7 +41,7 @@ export function useAudioUpload (options: UseAudioUploadOptions = {}) {
     if (!isValidType) {
       return {
         valid: false,
-        error: 'Invalid file type. Supported formats: MP3, WAV, M4A, OGG, FLAC, MP4, MOV, WebM, AVI, MKV'
+        error: 'Invalid file type. Supported formats: MP3, WAV, M4A, OGG, FLAC'
       }
     }
 
