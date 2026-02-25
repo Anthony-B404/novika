@@ -7,21 +7,27 @@ export interface UseAudioUploadOptions {
   onError?: (error: Error) => void
 }
 
-const ALLOWED_TYPES = [
-  'audio/mpeg',
-  'audio/mp3',
-  'audio/wav',
-  'audio/wave',
-  'audio/x-wav',
-  'audio/m4a',
-  'audio/x-m4a',
-  'audio/mp4',
-  'audio/ogg',
-  'audio/flac',
-  'audio/x-flac'
-]
+/**
+ * Check if a file is an audio file by MIME type or extension.
+ */
+function isAudioFile (file: File): boolean {
+  if (file.type.startsWith('audio/')) {
+    return true
+  }
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  return !!ext && ALLOWED_AUDIO_EXTENSIONS.has(ext)
+}
 
-const ALLOWED_EXTENSIONS = /\.(mp3|wav|m4a|ogg|flac)$/i
+/**
+ * Broad set of audio file extensions — matches backend validator.
+ * ffmpeg handles conversion to AAC before transcription/storage.
+ */
+const ALLOWED_AUDIO_EXTENSIONS = new Set([
+  'mp3', 'wav', 'm4a', 'ogg', 'flac', 'opus', 'webm', 'aac', 'wma',
+  'aiff', 'aif', 'amr', 'ape', 'caf', 'au', 'ra', 'rm', 'mka',
+  'ac3', 'dts', 'mp2', 'mpc', 'oga', 'spx', 'tta', 'voc', 'wv',
+  'w64', 'gsm', 'sln', '3gp'
+])
 
 const MAX_SIZE = 512 * 1024 * 1024 // 512MB
 
@@ -36,12 +42,10 @@ export function useAudioUpload (options: UseAudioUploadOptions = {}) {
    * Validate file type and size
    */
   function validateFile (file: File): { valid: boolean; error?: string } {
-    const isValidType = ALLOWED_TYPES.includes(file.type) || ALLOWED_EXTENSIONS.test(file.name)
-
-    if (!isValidType) {
+    if (!isAudioFile(file)) {
       return {
         valid: false,
-        error: 'Invalid file type. Supported formats: MP3, WAV, M4A, OGG, FLAC'
+        error: 'Invalid file type. All audio formats are accepted.'
       }
     }
 
@@ -154,7 +158,6 @@ export function useAudioUpload (options: UseAudioUploadOptions = {}) {
     formatMaxSize,
 
     // Constants
-    ALLOWED_TYPES,
     MAX_SIZE
   }
 }

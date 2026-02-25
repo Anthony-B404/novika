@@ -10,27 +10,13 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { validateFile: validateAudioFile, formatFileSize } = useAudioUpload()
 
 const isDragging = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 
-const ALLOWED_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/wave', 'audio/x-wav', 'audio/m4a', 'audio/x-m4a', 'audio/mp4', 'audio/ogg', 'audio/flac', 'audio/x-flac']
-const MAX_SIZE = 512 * 1024 * 1024 // 512MB
-
-function formatFileSize (bytes: number): string {
-  if (bytes < 1024) { return `${bytes} B` }
-  if (bytes < 1024 * 1024) { return `${(bytes / 1024).toFixed(1)} KB` }
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
 function validateFile (file: File): boolean {
-  if (!ALLOWED_TYPES.includes(file.type) && !file.name.match(/\.(mp3|wav|m4a|ogg|flac)$/i)) {
-    return false
-  }
-  if (file.size > MAX_SIZE) {
-    return false
-  }
-  return true
+  return validateAudioFile(file).valid
 }
 
 function handleFiles (files: FileList | null) {
@@ -95,7 +81,7 @@ function removeFile () {
       <input
         ref="fileInput"
         type="file"
-        accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
+        accept="audio/*"
         class="hidden"
         :disabled="disabled"
         @change="handleInputChange"

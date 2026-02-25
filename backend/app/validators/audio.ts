@@ -10,26 +10,50 @@ export const audioProcessValidator = vine.compile(
 )
 
 /**
- * Allowed audio mime types
+ * Check if a MIME type is an audio type.
+ * Accepts any type starting with "audio/".
  */
-export const ALLOWED_AUDIO_TYPES = [
-  'audio/mpeg',
-  'audio/mp3',
-  'audio/wav',
-  'audio/wave',
-  'audio/x-wav',
-  'audio/m4a',
-  'audio/x-m4a',
-  'audio/mp4',
-  'audio/ogg',
-  'audio/flac',
-  'audio/x-flac',
-]
+export function isAudioMimeType(type: string): boolean {
+  return type.startsWith('audio/')
+}
 
 /**
- * Allowed audio file extensions
+ * Allowed audio file extensions — broad list covering all common formats.
+ * ffmpeg handles conversion to AAC before transcription/storage.
  */
-export const ALLOWED_AUDIO_EXTENSIONS = ['mp3', 'wav', 'm4a', 'ogg', 'flac']
+export const ALLOWED_AUDIO_EXTENSIONS = [
+  'mp3',
+  'wav',
+  'm4a',
+  'ogg',
+  'flac',
+  'opus',
+  'webm',
+  'aac',
+  'wma',
+  'aiff',
+  'aif',
+  'amr',
+  'ape',
+  'caf',
+  'au',
+  'ra',
+  'rm',
+  'mka',
+  'ac3',
+  'dts',
+  'mp2',
+  'mpc',
+  'oga',
+  'spx',
+  'tta',
+  'voc',
+  'wv',
+  'w64',
+  'gsm',
+  'sln',
+  '3gp',
+]
 
 /**
  * Maximum file size in bytes (512MB)

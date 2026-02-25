@@ -80,7 +80,7 @@ function handleInputChange (event: Event) {
       <input
         ref="fileInput"
         type="file"
-        accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
+        accept="audio/*"
         class="hidden"
         :disabled="disabled || loading"
         @change="handleInputChange"
