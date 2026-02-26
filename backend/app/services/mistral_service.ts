@@ -212,6 +212,45 @@ ${diarizedTranscription}
   }
 
   /**
+   * Reformulate analysis text for natural oral reading (TTS).
+   * Transforms lists, formatting, and structure into fluid spoken prose.
+   */
+  async reformulateForSpeech(analysisText: string): Promise<ChatResult> {
+    const systemPrompt = `Tu es un convertisseur texte-vers-oral. Ta SEULE tâche est de réécrire le texte d'entrée pour qu'il sonne naturellement à l'oral.
+
+RÈGLES STRICTES :
+- Réponds UNIQUEMENT avec le texte reformulé, rien d'autre
+- JAMAIS de préambule ("Voici le texte reformulé", "Bien sûr", etc.)
+- JAMAIS de commentaire ou d'explication
+- Transforme les listes à puces en phrases enchaînées
+- Supprime tout formatage markdown
+- Utilise des transitions naturelles entre les idées
+- Garde toutes les informations importantes
+- Le résultat doit être du texte brut, prêt à être lu à voix haute
+- Réponds dans la même langue que le texte d'entrée`
+
+    const response = await this.client.chat.complete({
+      model: 'mistral-small-2506',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: analysisText },
+      ],
+      maxTokens: 8192,
+    })
+
+    const content = response.choices?.[0]?.message?.content
+    const reply = typeof content === 'string' ? content : ''
+
+    return {
+      reply,
+      usage: {
+        promptTokens: response.usage?.promptTokens ?? 0,
+        completionTokens: response.usage?.completionTokens ?? 0,
+      },
+    }
+  }
+
+  /**
    * Extract a string field value from truncated JSON.
    * Handles cases where Mistral response was cut off mid-JSON.
    */

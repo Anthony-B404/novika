@@ -741,6 +741,7 @@
           },
           "tts": {
             "button": "Listen to analysis",
+            "preparing": "Preparing…",
             "error": "Error generating audio",
             "speed": "Speed",
             "skipBack": "Back 10s",

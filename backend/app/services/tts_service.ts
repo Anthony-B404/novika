@@ -178,12 +178,13 @@ export default class TtsService {
    * Stream a single text chunk from Inworld directly to the HTTP response.
    * Audio bytes are written as they arrive to keep the connection alive
    * and avoid timeout gaps between chunks.
+   * Returns false if the client disconnected mid-stream.
    */
   private async streamChunkToResponse(
     text: string,
     res: ServerResponse,
     voiceId: string
-  ): Promise<void> {
+  ): Promise<boolean> {
     const response = await fetch(INWORLD_TTS_URL, {
       method: 'POST',
       headers: {
@@ -198,7 +199,7 @@ export default class TtsService {
           speaking_rate: 1.25,
         },
         temperature: 1.15,
-        model_id: 'inworld-tts-1.5-max',
+        model_id: 'inworld-tts-1.5-mini',
       }),
     })
 
@@ -213,6 +214,12 @@ export default class TtsService {
     let totalAudioBytes = 0
 
     while (true) {
+      if (res.destroyed) {
+        console.log('[TTS]   Client disconnected, cancelling Inworld stream')
+        await reader.cancel()
+        return false
+      }
+
       const { value, done } = await reader.read()
       if (done) break
 
@@ -223,6 +230,10 @@ export default class TtsService {
       jsonBuffer = lines.pop()! // Keep incomplete last line
 
       for (const line of lines) {
+        if (res.destroyed) {
+          await reader.cancel()
+          return false
+        }
         const audio = this.extractAudioFromLine(line)
         if (audio) {
           totalAudioBytes += audio.length
@@ -232,7 +243,7 @@ export default class TtsService {
     }
 
     // Process remaining buffer
-    if (jsonBuffer.trim()) {
+    if (jsonBuffer.trim() && !res.destroyed) {
       const audio = this.extractAudioFromLine(jsonBuffer)
       if (audio) {
         totalAudioBytes += audio.length
@@ -241,6 +252,7 @@ export default class TtsService {
     }
 
     console.log(`[TTS]   → Inworld returned ${totalAudioBytes} audio bytes`)
+    return true
   }
 
   /**
@@ -267,31 +279,43 @@ export default class TtsService {
    * Stream TTS audio directly to the HTTP response.
    * Processes text chunks sequentially so audio plays in order.
    * If a single chunk fails, logs the error and continues with remaining chunks.
+   * Returns the total number of characters sent to Inworld for billing.
    */
   async streamSpeech(
-    analysisText: string,
+    text: string,
     res: ServerResponse,
     voiceId = 'Alain'
-  ): Promise<void> {
-    const plainText = this.stripMarkdown(analysisText)
-    const chunks = this.splitIntoChunks(plainText)
+  ): Promise<{ totalChars: number }> {
+    const chunks = this.splitIntoChunks(text)
+    let totalChars = 0
 
-    console.log(`[TTS] ${chunks.length} chunk(s), total ${plainText.length} chars`)
+    console.log(`[TTS] ${chunks.length} chunk(s), total ${text.length} chars`)
 
     for (let i = 0; i < chunks.length; i++) {
+      if (res.destroyed) {
+        console.log(`[TTS] Client disconnected, stopping at chunk ${i + 1}/${chunks.length}`)
+        break
+      }
+
       try {
         // Collapse newlines to spaces for clean TTS input
         const cleanChunk = chunks[i].replace(/\n+/g, ' ').replace(/\s{2,}/g, ' ').trim()
         if (!cleanChunk) continue
         console.log(`[TTS] Chunk ${i + 1}/${chunks.length}: ${cleanChunk.length} chars — "${cleanChunk.slice(0, 60)}..."`)
-        await this.streamChunkToResponse(cleanChunk, res, voiceId)
+        const clientConnected = await this.streamChunkToResponse(cleanChunk, res, voiceId)
+        totalChars += cleanChunk.length
         console.log(`[TTS] Chunk ${i + 1}/${chunks.length}: done`)
+        if (!clientConnected) {
+          console.log(`[TTS] Client disconnected during chunk ${i + 1}, stopping`)
+          break
+        }
       } catch (error) {
         console.error(`[TTS] Chunk ${i + 1}/${chunks.length} FAILED:`, error)
         // Continue with remaining chunks — don't let one failure kill the stream
       }
     }
 
-    console.log('[TTS] All chunks processed')
+    console.log(`[TTS] All chunks processed, ${totalChars} chars billed`)
+    return { totalChars }
   }
 }

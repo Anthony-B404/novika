@@ -8,6 +8,7 @@ const { t } = useI18n()
 const toast = useToast()
 const { getAuthHeaders } = useAuth()
 const config = useRuntimeConfig()
+const creditsStore = useCreditsStore()
 
 const smBreakpoint = 640
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : smBreakpoint)
@@ -26,6 +27,7 @@ const audioEl = ref<HTMLAudioElement | null>(null)
 const currentTime = ref(0)
 const duration = ref(0)
 const playbackRate = ref(1)
+let abortController: AbortController | null = null
 
 const hasAudio = computed(() => !!objectUrl.value)
 const currentSpeedLabel = computed(() => `${playbackRate.value}x`)
@@ -113,6 +115,8 @@ async function loadAndPlay() {
     } else {
       await fetchFullBlob()
     }
+    // Refresh credits after TTS consumption
+    creditsStore.refresh()
   } catch {
     toast.add({
       title: t('pages.dashboard.workshop.detail.tts.error'),
@@ -140,9 +144,10 @@ async function streamWithMediaSource() {
       const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg')
 
       try {
+        abortController = new AbortController()
         const response = await fetch(
           `${config.public.apiUrl}/audios/${props.audioId}/tts`,
-          { headers: getAuthHeaders() as HeadersInit }
+          { headers: getAuthHeaders() as HeadersInit, signal: abortController.signal }
         )
 
         if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
@@ -174,6 +179,10 @@ async function streamWithMediaSource() {
           }
         }
       } catch (err) {
+        if ((err as Error).name === 'AbortError') {
+          resolve()
+          return
+        }
         // If audio never started, reject so the toast is shown
         if (!started) {
           reject(err)
@@ -223,9 +232,10 @@ async function fetchFullBlob() {
   audio.pause()
 
   // Now fetch the real TTS audio
+  abortController = new AbortController()
   const response = await fetch(
     `${config.public.apiUrl}/audios/${props.audioId}/tts`,
-    { headers: getAuthHeaders() as HeadersInit }
+    { headers: getAuthHeaders() as HeadersInit, signal: abortController.signal }
   )
 
   if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
@@ -255,6 +265,8 @@ function togglePlay() {
 }
 
 onUnmounted(() => {
+  abortController?.abort()
+  abortController = null
   audioEl.value?.pause()
   if (objectUrl.value) {
     URL.revokeObjectURL(objectUrl.value)
@@ -263,9 +275,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- Initial: just the play button -->
+  <!-- Initial: just the play button (stay visible while loading even if objectUrl is already set) -->
   <UButton
-    v-if="!hasAudio"
+    v-if="!hasAudio || loading"
     :icon="isPlaying ? 'i-lucide-square' : 'i-lucide-volume-2'"
     :loading="loading"
     loading-icon="i-lucide-loader-2"
@@ -273,13 +285,13 @@ onUnmounted(() => {
     variant="ghost"
     size="sm"
     class=""
-    :label="t('pages.dashboard.workshop.detail.tts.button')"
+    :label="loading ? t('pages.dashboard.workshop.detail.tts.preparing') : t('pages.dashboard.workshop.detail.tts.button')"
     :disabled="disabled"
     @click="togglePlay"
   />
 
   <!-- Loaded: inline control bar -->
-  <div v-else class="flex items-center gap-3">
+  <div v-else-if="hasAudio && !loading" class="flex items-center gap-3">
     <!-- Transport controls -->
     <div class="flex items-center gap-2 sm:gap-1">
       <UButton

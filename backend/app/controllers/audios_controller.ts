@@ -434,7 +434,7 @@ export default class AudiosController {
           user,
           organization,
           creditsToDeduct,
-          `Chat IA: ${audio.title || audio.originalFileName}`,
+          `Chat IA: ${audio.title || audio.fileName}`,
           audio.id
         )
       }
@@ -451,10 +451,12 @@ export default class AudiosController {
 
   /**
    * Generate TTS audio from the analysis text.
+   * Reformulates the analysis for oral delivery via Mistral, then streams TTS audio.
+   * Bills both Mistral tokens (via chatCostAccumulated) and Inworld TTS chars (via ttsCostAccumulated).
    *
    * GET /api/audios/:id/tts
    */
-  async tts({ request, params, response, bouncer, i18n }: HttpContext) {
+  async tts({ request, params, response, auth, bouncer, i18n }: HttpContext) {
     // Validate ID parameter
     const id = Number(params.id)
     if (!Number.isInteger(id) || id <= 0) {
@@ -487,6 +489,52 @@ export default class AudiosController {
       })
     }
 
+    const user = auth.user!
+    const organization = await Organization.findOrFail(user.currentOrganizationId)
+    const COST_PER_CREDIT = 0.003
+
+    // Reformulate analysis for oral delivery via Mistral
+    const mistralService = new MistralService()
+    const { reply: oralText, usage } = await mistralService.reformulateForSpeech(
+      audio.transcription.analysis
+    )
+
+    console.log(
+      `[TTS] Mistral reformulation: ${usage.promptTokens} input + ${usage.completionTokens} output tokens`
+    )
+
+    // Bill Mistral tokens (same pricing as chat: $0.1/M input, $0.3/M output)
+    const mistralInputCost = (usage.promptTokens / 1_000_000) * 0.1
+    const mistralOutputCost = (usage.completionTokens / 1_000_000) * 0.3
+    const mistralTotalCost = mistralInputCost + mistralOutputCost
+
+    const chatAccumulated = Number(audio.chatCostAccumulated || 0) + mistralTotalCost
+    const chatCreditsToDeduct = Math.floor(chatAccumulated / COST_PER_CREDIT)
+    audio.chatCostAccumulated = chatAccumulated - chatCreditsToDeduct * COST_PER_CREDIT
+    await audio.save()
+
+    if (chatCreditsToDeduct > 0) {
+      const hasCredits = await creditService.hasEnoughCreditsForProcessing(
+        user,
+        organization,
+        chatCreditsToDeduct
+      )
+      if (!hasCredits) {
+        return response.paymentRequired({
+          code: 'INSUFFICIENT_CREDITS',
+          message: i18n.t('messages.audio.tts_insufficient_credits'),
+          creditsNeeded: chatCreditsToDeduct,
+        })
+      }
+      await creditService.deductForAudioProcessing(
+        user,
+        organization,
+        chatCreditsToDeduct,
+        `TTS Mistral: ${audio.title || audio.fileName}`,
+        audio.id
+      )
+    }
+
     // Stream MP3 directly to the client as it arrives from Inworld
     const origin = request.header('origin')
     const nodeRes = response.response
@@ -499,7 +547,32 @@ export default class AudiosController {
 
     try {
       const ttsService = new TtsService()
-      await ttsService.streamSpeech(audio.transcription.analysis, nodeRes)
+      const { totalChars } = await ttsService.streamSpeech(oralText, nodeRes)
+
+      // Bill Inworld TTS chars: $5/1M chars = $0.000005/char
+      const ttsCost = totalChars * 0.000005
+      const ttsAccumulated = Number(audio.ttsCostAccumulated || 0) + ttsCost
+      const ttsCreditsToDeduct = Math.floor(ttsAccumulated / COST_PER_CREDIT)
+      audio.ttsCostAccumulated = ttsAccumulated - ttsCreditsToDeduct * COST_PER_CREDIT
+      await audio.save()
+
+      if (ttsCreditsToDeduct > 0) {
+        const hasCredits = await creditService.hasEnoughCreditsForProcessing(
+          user,
+          organization,
+          ttsCreditsToDeduct
+        )
+        if (hasCredits) {
+          await creditService.deductForAudioProcessing(
+            user,
+            organization,
+            ttsCreditsToDeduct,
+            `TTS Inworld: ${audio.title || audio.fileName}`,
+            audio.id
+          )
+        }
+      }
+
       nodeRes.end()
     } catch (error) {
       console.error('TTS generation failed:', error)
