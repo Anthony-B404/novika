@@ -47,8 +47,15 @@ const speedMenuItems = computed(() => [
   })),
 ])
 
+const isIOS =
+  typeof navigator !== 'undefined' &&
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+
 const supportsMediaSource =
-  typeof MediaSource !== 'undefined' && MediaSource.isTypeSupported('audio/mpeg')
+  !isIOS &&
+  typeof MediaSource !== 'undefined' &&
+  MediaSource.isTypeSupported('audio/mpeg')
 
 function formatTime(s: number): string {
   if (!isFinite(s)) return '--:--'
@@ -57,11 +64,15 @@ function formatTime(s: number): string {
   return `${m}:${sec.toString().padStart(2, '0')}`
 }
 
+/** Guard: when true, audio error events are ignored (during unlock / src switch) */
+let ignoreAudioErrors = false
+
 function attachAudioListeners(audio: HTMLAudioElement) {
   audio.addEventListener('play', () => { isPlaying.value = true })
   audio.addEventListener('pause', () => { isPlaying.value = false })
   audio.addEventListener('ended', () => { isPlaying.value = false })
   audio.addEventListener('error', () => {
+    if (ignoreAudioErrors) return
     isPlaying.value = false
     loading.value = false
   })
@@ -214,24 +225,13 @@ async function streamWithMediaSource() {
 }
 
 async function fetchFullBlob() {
-  // Create and "unlock" the Audio element synchronously in the user gesture context.
-  // iOS Safari blocks programmatic playback unless the first play() is within a
-  // user-initiated event handler. Playing a tiny silent WAV satisfies the requirement.
-  const audio = new Audio()
-  audioEl.value = audio
-  attachAudioListeners(audio)
-
-  // Silent WAV (44 bytes) to unlock the audio element on iOS
-  audio.src =
+  // Dedicated unlock element for iOS — never reused, avoids interfering with the real player.
+  const unlock = new Audio()
+  unlock.src =
     'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
-  try {
-    await audio.play()
-  } catch {
-    // Ignore — some browsers reject the silent clip; the unlock still takes effect
-  }
-  audio.pause()
+  unlock.play().catch(() => {})
 
-  // Now fetch the real TTS audio
+  // Fetch TTS stream
   abortController = new AbortController()
   const response = await fetch(
     `${config.public.apiUrl}/audios/${props.audioId}/tts`,
@@ -240,13 +240,93 @@ async function fetchFullBlob() {
 
   if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
 
-  const blob = await response.blob()
-  const url = URL.createObjectURL(blob)
-  objectUrl.value = url
+  const reader = response.body!.getReader()
+  const chunks: Uint8Array[] = []
+  let totalBytes = 0
+  let started = false
 
-  audio.src = url
-  audio.playbackRate = playbackRate.value
-  await audio.play()
+  const audio = new Audio()
+  audioEl.value = audio
+  attachAudioListeners(audio)
+
+  // Read stream progressively — start playback early from a partial blob,
+  // then swap to the complete blob once the stream ends.
+  while (true) {
+    const { value, done } = await reader.read()
+    if (value) {
+      chunks.push(value)
+      totalBytes += value.length
+    }
+
+    // Start playing as soon as we have enough MP3 data (~1min at 128kbps)
+    if (!started && totalBytes >= 1_000_000) {
+      const blob = new Blob(chunks, { type: 'audio/mpeg' })
+      const blobUrl = URL.createObjectURL(blob)
+      objectUrl.value = blobUrl
+      audio.src = blobUrl
+
+      await new Promise<void>((resolve) => {
+        if (audio.readyState >= 3) { resolve(); return }
+        audio.addEventListener('canplay', () => resolve(), { once: true })
+        setTimeout(resolve, 5000)
+      })
+
+      audio.playbackRate = playbackRate.value
+      await audio.play()
+      started = true
+      loading.value = false
+    }
+
+    if (done) break
+  }
+
+  // Build final complete blob with all data
+  const finalBlob = new Blob(chunks, { type: 'audio/mpeg' })
+  const finalUrl = URL.createObjectURL(finalBlob)
+
+  if (started) {
+    // Swap to complete audio seamlessly — preserves playback position.
+    // Always resume playback: the partial blob may have ended naturally
+    // (reached end of partial data), which puts the audio in "ended" state.
+    try {
+      ignoreAudioErrors = true
+      const pos = audio.currentTime
+      audio.pause()
+
+      if (objectUrl.value) URL.revokeObjectURL(objectUrl.value)
+      objectUrl.value = finalUrl
+      audio.src = finalUrl
+      audio.load()
+
+      await new Promise<void>((resolve) => {
+        if (audio.readyState >= 4) { resolve(); return }
+        audio.addEventListener('canplaythrough', () => resolve(), { once: true })
+        setTimeout(resolve, 5000)
+      })
+
+      ignoreAudioErrors = false
+      audio.currentTime = pos
+      audio.playbackRate = playbackRate.value
+      await audio.play()
+    } catch {
+      // Swap failed — partial audio continues, not critical
+      ignoreAudioErrors = false
+    }
+  } else {
+    // Stream was very short or slow — play the complete blob directly
+    objectUrl.value = finalUrl
+    audio.src = finalUrl
+
+    await new Promise<void>((resolve, reject) => {
+      if (audio.readyState >= 4) { resolve(); return }
+      audio.addEventListener('canplaythrough', () => resolve(), { once: true })
+      audio.addEventListener('error', () => reject(new Error('Audio load failed')), { once: true })
+      setTimeout(resolve, 5000)
+    })
+
+    audio.playbackRate = playbackRate.value
+    await audio.play()
+  }
 }
 
 function togglePlay() {
