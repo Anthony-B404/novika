@@ -117,21 +117,17 @@ function getMessageText(parts: { type: string; text?: string }[]): string {
         />
       </div>
 
-      <div class="relative">
-        <UChatPrompt
-          v-model="input"
-          :placeholder="t('pages.dashboard.workshop.detail.chat.placeholder')"
-          :disabled="status === 'submitted'"
-          autoresize
-          :rows="1"
-          :maxrows="4"
-          :ui="{ root: 'pr-12' }"
-          @submit="handleSubmit"
-        />
-        <div class="absolute right-2 top-1/2 -translate-y-1/2">
-          <UChatPromptSubmit :status="status" />
-        </div>
-      </div>
+      <UChatPrompt
+        v-model="input"
+        :placeholder="t('pages.dashboard.workshop.detail.chat.placeholder')"
+        :disabled="status === 'submitted'"
+        autoresize
+        :rows="1"
+        :maxrows="4"
+        @submit="handleSubmit"
+      >
+        <UChatPromptSubmit :status="status" />
+      </UChatPrompt>
     </div>
   </div>
 </template>

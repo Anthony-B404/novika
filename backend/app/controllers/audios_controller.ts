@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Audio from '#models/audio'
+import Organization from '#models/organization'
 import AudioPolicy from '#policies/audio_policy'
 import storageService from '#services/storage_service'
 import exportService from '#services/export_service'
+import creditService from '#services/credit_service'
 import {
   audioIndexValidator,
   audioBatchDeleteValidator,
@@ -354,7 +356,7 @@ export default class AudiosController {
    *
    * POST /api/audios/:id/chat
    */
-  async chat({ params, request, response, bouncer, i18n }: HttpContext) {
+  async chat({ params, request, response, auth, bouncer, i18n }: HttpContext) {
     // Validate ID parameter
     const id = Number(params.id)
     if (!Number.isInteger(id) || id <= 0) {
@@ -392,14 +394,54 @@ export default class AudiosController {
 
     try {
       const mistralService = new MistralService()
-      const reply = await mistralService.chat(
+      const { reply, usage } = await mistralService.chat(
         audio.transcription.rawText,
         messages,
         audio.transcription.timestamps || []
       )
 
-      return response.ok({ reply })
+      // Calculate cost: Mistral Small pricing $0.1/M input, $0.3/M output
+      const COST_PER_CREDIT = 0.003 // 1 credit = $0.003 (same as 1 min Voxtral)
+      const inputCost = (usage.promptTokens / 1_000_000) * 0.1
+      const outputCost = (usage.completionTokens / 1_000_000) * 0.3
+      const totalCost = inputCost + outputCost
+
+      // Accumulate cost on the audio, only deduct when threshold is crossed
+      const accumulated = Number(audio.chatCostAccumulated || 0) + totalCost
+      const creditsToDeduct = Math.floor(accumulated / COST_PER_CREDIT)
+      audio.chatCostAccumulated = accumulated - creditsToDeduct * COST_PER_CREDIT
+      await audio.save()
+
+      if (creditsToDeduct > 0) {
+        const user = auth.user!
+        const organization = await Organization.findOrFail(user.currentOrganizationId)
+
+        const hasCredits = await creditService.hasEnoughCreditsForProcessing(
+          user,
+          organization,
+          creditsToDeduct
+        )
+
+        if (!hasCredits) {
+          return response.paymentRequired({
+            code: 'INSUFFICIENT_CREDITS',
+            message: i18n.t('messages.audio.insufficient_credits'),
+            creditsNeeded: creditsToDeduct,
+          })
+        }
+
+        await creditService.deductForAudioProcessing(
+          user,
+          organization,
+          creditsToDeduct,
+          `Chat IA: ${audio.title || audio.originalFileName}`,
+          audio.id
+        )
+      }
+
+      return response.ok({ reply, creditsUsed: creditsToDeduct })
     } catch (error) {
+      if ((error as any)?.status === 402) throw error
       console.error('Chat processing failed:', error)
       return response.internalServerError({
         message: i18n.t('messages.audio.chat_error'),

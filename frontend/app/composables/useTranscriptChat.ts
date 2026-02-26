@@ -7,6 +7,7 @@ interface ChatMessage {
 
 export function useTranscriptChat(audioId: Ref<number>) {
   const { authenticatedFetch } = useAuth()
+  const creditsStore = useCreditsStore()
 
   const messages = ref<UIMessage[]>([])
   const status = ref<'ready' | 'submitted' | 'error'>('ready')
@@ -52,7 +53,7 @@ export function useTranscriptChat(audioId: Ref<number>) {
       const response = await authenticatedFetch(`/audios/${audioId.value}/chat`, {
         method: 'POST',
         body: { messages: apiMessages },
-      }) as { reply: string }
+      }) as { reply: string; creditsUsed: number }
 
       // Add assistant message
       const assistantMessage: UIMessage = {
@@ -61,6 +62,10 @@ export function useTranscriptChat(audioId: Ref<number>) {
         parts: [{ type: 'text', text: response.reply }],
       }
       messages.value = [...messages.value, assistantMessage]
+
+      if (response.creditsUsed > 0) {
+        creditsStore.refresh()
+      }
 
       status.value = 'ready'
     } catch {

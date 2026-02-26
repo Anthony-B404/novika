@@ -52,6 +52,9 @@ export default class Audio extends BaseModel {
   @column()
   declare currentJobId: string | null
 
+  @column()
+  declare chatCostAccumulated: number
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

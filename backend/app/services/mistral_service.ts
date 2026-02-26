@@ -12,6 +12,17 @@ export interface ChatMessage {
 }
 
 /**
+ * Chat result with token usage for credit calculation
+ */
+export interface ChatResult {
+  reply: string
+  usage: {
+    promptTokens: number
+    completionTokens: number
+  }
+}
+
+/**
  * Result of audio transcription with timestamps
  */
 export interface TranscriptionResult {
@@ -157,7 +168,7 @@ ${prompt}`
     transcription: string,
     messages: ChatMessage[],
     segments: TranscriptionTimestamp[] = []
-  ): Promise<string> {
+  ): Promise<ChatResult> {
     const hasSpeakers = segments.some((seg) => seg.speaker)
 
     let diarizedTranscription = transcription
@@ -189,7 +200,15 @@ ${diarizedTranscription}
     })
 
     const content = response.choices?.[0]?.message?.content
-    return typeof content === 'string' ? content : ''
+    const reply = typeof content === 'string' ? content : ''
+
+    return {
+      reply,
+      usage: {
+        promptTokens: response.usage?.promptTokens ?? 0,
+        completionTokens: response.usage?.completionTokens ?? 0,
+      },
+    }
   }
 
   /**
