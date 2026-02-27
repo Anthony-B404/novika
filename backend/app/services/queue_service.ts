@@ -11,7 +11,7 @@ export interface TranscriptionJobData {
   audioId: number
   audioFilePath: string
   audioFileName: string
-  prompt: string
+  prompt: string | null
   locale: string
 }
 

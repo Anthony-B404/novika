@@ -404,54 +404,60 @@ async function processTranscriptionJob(
       analysisTranscriptionResult = transcriptionResult
     }
 
-    // Stage: Analyze with AI (75-92%) — asymptotic progress
-    const analysisMistralService = new MistralService()
-    await job.updateProgress(77)
+    // Stage: Analyze with AI (75-92%) — skip if no prompt
+    let analysisText: string | null = null
 
-    let analysisProgress = 77
-    const ANALYSIS_CAP = 91
-    const analysisInterval = setInterval(async () => {
-      const increment = (ANALYSIS_CAP - analysisProgress) * 0.04
-      if (increment > 0.3) {
-        analysisProgress = Math.round(analysisProgress + increment)
-        await job.updateProgress(analysisProgress).catch(() => {})
+    if (prompt) {
+      const analysisMistralService = new MistralService()
+      await job.updateProgress(77)
+
+      let analysisProgress = 77
+      const ANALYSIS_CAP = 91
+      const analysisInterval = setInterval(async () => {
+        const increment = (ANALYSIS_CAP - analysisProgress) * 0.04
+        if (increment > 0.3) {
+          analysisProgress = Math.round(analysisProgress + increment)
+          await job.updateProgress(analysisProgress).catch(() => {})
+        }
+      }, 1000)
+
+      let analysisResult
+      try {
+        analysisResult = await analysisMistralService.analyze(
+          analysisTranscriptionResult.text,
+          prompt,
+          analysisTranscriptionResult.segments
+        )
+      } finally {
+        clearInterval(analysisInterval)
       }
-    }, 1000)
 
-    let analysisResult
-    try {
-      analysisResult = await analysisMistralService.analyze(
-        analysisTranscriptionResult.text,
-        prompt,
-        analysisTranscriptionResult.segments
-      )
-    } finally {
-      clearInterval(analysisInterval)
-    }
-
-    // Apply speaker name mapping to segments
-    if (Object.keys(analysisResult.speakers).length > 0) {
-      for (const seg of analysisTranscriptionResult.segments) {
-        if (seg.speaker && analysisResult.speakers[seg.speaker]) {
-          seg.speaker = analysisResult.speakers[seg.speaker]
+      // Apply speaker name mapping to segments
+      if (Object.keys(analysisResult.speakers).length > 0) {
+        for (const seg of analysisTranscriptionResult.segments) {
+          if (seg.speaker && analysisResult.speakers[seg.speaker]) {
+            seg.speaker = analysisResult.speakers[seg.speaker]
+          }
         }
       }
+
+      analysisText = analysisResult.analysis
     }
 
     await job.updateProgress(92)
 
-    // Save transcription AND analysis to database
+    // Save transcription (and analysis if prompt was provided) to database
     if (audio) {
       const transcription = await Transcription.create({
         audioId: audio.id,
         rawText: analysisTranscriptionResult.text,
         timestamps: analysisTranscriptionResult.segments,
         language: analysisTranscriptionResult.language || 'fr',
-        analysis: analysisResult.analysis,
+        analysis: analysisText,
       })
 
       // Create initial version entries (v1) for version history
-      await transcriptionVersionService.createInitialVersions(transcription, audio.userId)
+      await transcriptionVersionService.createInitialVersions(transcription, audio.userId, prompt)
     }
 
     // Stage: Cleanup and finalize (92-100%)
@@ -479,7 +485,7 @@ async function processTranscriptionJob(
 
     return {
       transcription: analysisTranscriptionResult.text,
-      analysis: analysisResult.analysis,
+      analysis: analysisText || '',
     }
   } catch (error) {
     const retriable = isRetriableError(error)

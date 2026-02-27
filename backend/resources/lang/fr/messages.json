@@ -170,7 +170,11 @@
     "chat_error": "Une erreur est survenue lors du traitement de votre question",
     "tts_no_analysis": "Aucune analyse disponible pour la synthèse vocale",
     "tts_generation_failed": "Erreur lors de la génération de la synthèse vocale",
-    "tts_insufficient_credits": "Crédits insuffisants pour la synthèse vocale"
+    "tts_insufficient_credits": "Crédits insuffisants pour la synthèse vocale",
+    "analysis_generated": "Analyse générée avec succès",
+    "analysis_error": "Une erreur est survenue lors de la génération de l'analyse",
+    "no_transcription": "Aucune transcription disponible pour cet audio",
+    "analysis_credit_description": "Analyse IA : {title}"
   },
   "transcription": {
     "not_found": "Transcription introuvable",

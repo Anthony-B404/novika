@@ -170,6 +170,7 @@ export default class TranscriptionsController {
         versionNumber: version.versionNumber,
         fieldName: version.fieldName,
         changeSummary: version.changeSummary,
+        prompt: version.prompt,
         preview: version.getPreview(100),
         wordCount: version.getWordCount(),
         createdAt: version.createdAt.toISO(),
@@ -250,6 +251,7 @@ export default class TranscriptionsController {
       fieldName: version.fieldName,
       content: version.content,
       changeSummary: version.changeSummary,
+      prompt: version.prompt,
       wordCount: version.getWordCount(),
       createdAt: version.createdAt.toISO(),
       user: {

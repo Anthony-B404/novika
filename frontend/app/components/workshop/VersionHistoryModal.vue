@@ -176,6 +176,16 @@ const fieldLabel = computed(() =>
                 {{ version.changeSummary }}
               </p>
 
+              <div v-if="version.prompt" class="flex items-center gap-1.5 mb-1">
+                <UBadge
+                  label="IA"
+                  color="primary"
+                  variant="subtle"
+                  size="xs"
+                />
+                <span class="text-xs text-muted truncate">{{ version.prompt }}</span>
+              </div>
+
               <p v-if="version.preview" class="text-sm text-muted line-clamp-2">
                 {{ version.preview }}
               </p>

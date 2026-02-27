@@ -117,12 +117,15 @@ function removeFile () {
   prompt.value = ''
 }
 
+// Computed: has a prompt been entered
+const hasPrompt = computed(() => prompt.value.trim().length > 0)
+
 // Handle upload
 async function handleUpload () {
-  if (!selectedFile.value || !prompt.value.trim()) {
+  if (!selectedFile.value) {
     toast.add({
       title: t('pages.dashboard.workshop.validationError'),
-      description: t('pages.dashboard.workshop.fileAndPromptRequired'),
+      description: t('pages.dashboard.workshop.fileRequired'),
       color: 'error'
     })
     return
@@ -146,7 +149,7 @@ async function handleUpload () {
     // Continue with upload if check fails (backend will handle it)
   }
 
-  const response = await upload(selectedFile.value, prompt.value)
+  const response = await upload(selectedFile.value, hasPrompt.value ? prompt.value : undefined)
 
   if (response) {
     // Reset form on success - immediately ready for next upload
@@ -298,13 +301,12 @@ const tabItems = computed(() => [
 
             <!-- Submit button -->
             <UButton
-              :label="t('pages.dashboard.workshop.processButton')"
-              icon="i-lucide-sparkles"
+              :label="hasPrompt ? t('pages.dashboard.workshop.processWithAnalysis') : t('pages.dashboard.workshop.processTranscriptionOnly')"
+              :icon="hasPrompt ? 'i-lucide-sparkles' : 'i-lucide-file-text'"
               color="primary"
               size="lg"
               block
               :loading="uploading"
-              :disabled="!prompt.trim()"
               class="rounded-xl shadow-md hover:shadow-lg transition-shadow"
               @click="handleUpload"
             />

@@ -16,7 +16,7 @@ export default class AudioController {
    */
   async process({ request, response, auth, i18n }: HttpContext) {
     try {
-      // Validate prompt
+      // Validate prompt (optional)
       const { prompt } = await request.validateUsing(audioProcessValidator)
 
       // Get uploaded file
@@ -78,7 +78,7 @@ export default class AudioController {
         audioId: audio.id,
         audioFilePath: storedFile.path,
         audioFileName: storedFile.originalName,
-        prompt,
+        prompt: prompt || null,
         locale: i18n.locale,
       })
 

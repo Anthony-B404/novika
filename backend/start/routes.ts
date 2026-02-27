@@ -141,6 +141,7 @@ router
     router.put('/audios/:id', [AudiosController, 'update'])
     router.post('/audios/:id/export', [AudiosController, 'export'])
     router.post('/audios/:id/chat', [AudiosController, 'chat'])
+    router.post('/audios/:id/analyze', [AudiosController, 'analyze'])
     router.get('/audios/:id/tts', [AudiosController, 'tts'])
     router.delete('/audios/batch', [AudiosController, 'destroyMultiple'])
     router.delete('/audios/:id', [AudiosController, 'destroy'])

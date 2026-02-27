@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { unlink, stat } from 'node:fs/promises'
+import { unlink, stat, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
@@ -154,7 +154,9 @@ export default class AudioConverterService {
     }
 
     const settings = OPUS_PRESETS[preset]
-    const outputPath = join(app.tmpPath(), `${randomUUID()}.opus`)
+    const tmpDir = app.tmpPath()
+    await mkdir(tmpDir, { recursive: true })
+    const outputPath = join(tmpDir, `${randomUUID()}.opus`)
 
     // Get original file info
     const [originalSize, duration] = await Promise.all([
@@ -207,7 +209,9 @@ export default class AudioConverterService {
     }
 
     const settings = AAC_PRESETS[preset]
-    const outputPath = join(app.tmpPath(), `${randomUUID()}.m4a`)
+    const tmpDir = app.tmpPath()
+    await mkdir(tmpDir, { recursive: true })
+    const outputPath = join(tmpDir, `${randomUUID()}.m4a`)
 
     // Get original file info
     const [originalSize, duration] = await Promise.all([

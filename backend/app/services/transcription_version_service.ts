@@ -70,7 +70,8 @@ class TranscriptionVersionService {
     content: string,
     expectedVersion: number,
     user: User,
-    changeSummary?: string
+    changeSummary?: string,
+    prompt?: string | null
   ): Promise<EditResult> {
     // Get current version number for this field
     const currentVersion =
@@ -110,6 +111,7 @@ class TranscriptionVersionService {
           fieldName,
           content,
           changeSummary,
+          prompt: prompt || null,
         },
         { client: trx }
       )
@@ -338,7 +340,11 @@ class TranscriptionVersionService {
    * @param transcription - The transcription to create initial versions for
    * @param userId - The user who created/owns the transcription
    */
-  async createInitialVersions(transcription: Transcription, userId: number): Promise<void> {
+  async createInitialVersions(
+    transcription: Transcription,
+    userId: number,
+    prompt?: string | null
+  ): Promise<void> {
     const versions: Partial<TranscriptionVersion>[] = []
 
     // Create version for raw_text if it exists
@@ -362,6 +368,7 @@ class TranscriptionVersionService {
         fieldName: TranscriptionVersionField.Analysis,
         content: transcription.analysis,
         changeSummary: 'Initial analysis',
+        prompt: prompt || null,
       })
     }
 

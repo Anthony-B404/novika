@@ -170,7 +170,11 @@
     "chat_error": "An error occurred while processing your question",
     "tts_no_analysis": "No analysis available for text-to-speech",
     "tts_generation_failed": "Error generating text-to-speech audio",
-    "tts_insufficient_credits": "Insufficient credits for text-to-speech"
+    "tts_insufficient_credits": "Insufficient credits for text-to-speech",
+    "analysis_generated": "Analysis generated successfully",
+    "analysis_error": "An error occurred while generating the analysis",
+    "no_transcription": "No transcription available for this audio",
+    "analysis_credit_description": "AI Analysis: {title}"
   },
   "transcription": {
     "not_found": "Transcription not found",

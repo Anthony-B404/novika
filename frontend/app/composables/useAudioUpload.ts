@@ -67,9 +67,9 @@ export function useAudioUpload (options: UseAudioUploadOptions = {}) {
   }
 
   /**
-   * Upload audio file with prompt
+   * Upload audio file with optional prompt
    */
-  async function upload (file: File, prompt: string): Promise<ProcessJobResponse | null> {
+  async function upload (file: File, prompt?: string): Promise<ProcessJobResponse | null> {
     // Validate file
     const validation = validateFile(file)
     if (!validation.valid) {
@@ -78,17 +78,18 @@ export function useAudioUpload (options: UseAudioUploadOptions = {}) {
       return null
     }
 
-    // Validate prompt
-    if (!prompt || prompt.trim().length < 5) {
-      error.value = 'Prompt must be at least 5 characters'
-      options.onError?.(new Error(error.value))
-      return null
-    }
-
-    if (prompt.trim().length > 5000) {
-      error.value = 'Prompt must be less than 5000 characters'
-      options.onError?.(new Error(error.value))
-      return null
+    // Validate prompt if provided
+    if (prompt && prompt.trim().length > 0) {
+      if (prompt.trim().length < 5) {
+        error.value = 'Prompt must be at least 5 characters'
+        options.onError?.(new Error(error.value))
+        return null
+      }
+      if (prompt.trim().length > 5000) {
+        error.value = 'Prompt must be less than 5000 characters'
+        options.onError?.(new Error(error.value))
+        return null
+      }
     }
 
     uploading.value = true
@@ -98,7 +99,9 @@ export function useAudioUpload (options: UseAudioUploadOptions = {}) {
     try {
       const formData = new FormData()
       formData.append('audio', file)
-      formData.append('prompt', prompt.trim())
+      if (prompt?.trim()) {
+        formData.append('prompt', prompt.trim())
+      }
 
       const response = await authenticatedFetch<ProcessJobResponse>('/audio/process', {
         method: 'POST',

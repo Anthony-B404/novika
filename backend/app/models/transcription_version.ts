@@ -36,6 +36,9 @@ export default class TranscriptionVersion extends BaseModel {
   @column()
   declare changeSummary: string | null
 
+  @column()
+  declare prompt: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -21,6 +21,7 @@ export interface TranscriptionVersion {
   fieldName: TranscriptionVersionField
   content?: string
   changeSummary: string | null
+  prompt?: string | null
   preview?: string
   wordCount?: number
   createdAt: string
@@ -92,6 +93,7 @@ export interface VersionContentResponse {
   fieldName: TranscriptionVersionField
   content: string
   changeSummary: string | null
+  prompt?: string | null
   wordCount: number
   createdAt: string
   user: VersionUser

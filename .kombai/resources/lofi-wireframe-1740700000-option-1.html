@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Option 1: Polished Top Nav — Novika Wireframe</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Comic Sans MS','Chalkboard SE',cursive; background:#fff; color:#333; font-size:13px; }
+
+/* === OPTION HEADER === */
+.option-banner { background:#f5f5f5; border-bottom:3px solid #333; padding:16px 24px; }
+.option-banner h1 { font-size:20px; font-weight:bold; }
+.option-banner p { margin-top:4px; color:#666; font-size:12px; }
+.legend { display:flex; gap:16px; margin-top:10px; flex-wrap:wrap; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:11px; }
+.badge-reuse { background:#4CAF50; color:#fff; padding:2px 7px; border-radius:3px; font-size:10px; font-weight:bold; }
+.badge-new   { background:#FF9800; color:#fff; padding:2px 7px; border-radius:3px; font-size:10px; font-weight:bold; }
+.badge-fix   { background:#2196F3; color:#fff; padding:2px 7px; border-radius:3px; font-size:10px; font-weight:bold; }
+
+/* === PAGE TABS === */
+.page-tabs { display:flex; gap:0; border-bottom:2px solid #333; background:#fff; position:sticky; top:0; z-index:100; }
+.page-tab { padding:10px 18px; cursor:pointer; border:none; background:#f5f5f5; border-right:1px solid #ccc; font-family:inherit; font-size:12px; font-weight:bold; color:#666; }
+.page-tab.active { background:#333; color:#fff; }
+.page-tab:hover:not(.active) { background:#e0e0e0; }
+
+/* === APP SHELL === */
+.app { display:flex; flex-direction:column; min-height:100vh; border:2px solid #999; margin:16px; }
+.page-content { display:none; }
+.page-content.active { display:flex; flex-direction:column; flex:1; }
+
+/* === TOP NAV === */
+.topnav { display:grid; grid-template-columns:auto 1fr auto; align-items:center; height:56px; border-bottom:2px solid #333; padding:0 24px; background:#fff; gap:16px; position:relative; }
+.topnav-logo { display:flex; align-items:center; gap:8px; font-weight:bold; font-size:14px; }
+.logo-blob { width:28px; height:28px; border-radius:50%; background:#ccc; border:2px solid #333; display:flex; align-items:center; justify-content:center; font-size:10px; }
+.topnav-nav { display:flex; justify-content:center; gap:0; }
+.nav-item { padding:8px 16px; border:1px solid transparent; border-radius:4px; cursor:pointer; font-size:12px; display:flex; align-items:center; gap:6px; color:#666; }
+.nav-item.active { border-color:#333; background:#f5f5f5; color:#333; font-weight:bold; }
+.nav-item:hover:not(.active) { background:#f5f5f5; }
+.topnav-actions { display:flex; align-items:center; gap:8px; }
+.icon-btn { width:32px; height:32px; border:2px solid #999; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#fff; position:relative; font-size:14px; }
+.notif-badge { position:absolute; top:-6px; right:-6px; background:#333; color:#fff; border-radius:50%; width:16px; height:16px; font-size:9px; display:flex; align-items:center; justify-content:center; border:1px solid #fff; }
+.credits-pill { border:2px solid #999; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:bold; display:flex; align-items:center; gap:5px; cursor:pointer; }
+.credits-pill:hover { background:#f5f5f5; }
+.avatar-btn { width:32px; height:32px; border:2px solid #999; border-radius:50%; background:#ccc; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; cursor:pointer; }
+
+/* FIX TAG */
+.fix-tag { display:inline-flex; align-items:center; }
+
+/* === PAGE CONTENT AREA === */
+.main-content { flex:1; padding:24px; max-width:1200px; width:100%; margin:0 auto; }
+.page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; }
+.page-header-left h1 { font-size:24px; font-weight:bold; }
+.page-header-left p { color:#666; margin-top:4px; font-size:12px; }
+.page-header-actions { display:flex; gap:8px; align-items:center; }
+
+/* === COMPONENTS === */
+.btn { border:2px solid #333; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:inherit; font-size:12px; display:inline-flex; align-items:center; gap:6px; }
+.btn-primary { background:#333; color:#fff; }
+.btn-ghost { background:transparent; border-color:#999; color:#666; }
+.btn-danger { background:#fff; border-color:#999; color:#333; }
+
+.card { border:2px solid #333; border-radius:8px; padding:16px; background:#fff; position:relative; }
+.card-header { border-bottom:1px solid #ccc; padding-bottom:10px; margin-bottom:12px; font-weight:bold; display:flex; align-items:center; gap:6px; }
+
+.input { border:2px solid #999; border-radius:6px; padding:7px 10px; font-family:inherit; font-size:12px; width:100%; }
+.select { border:2px solid #999; border-radius:6px; padding:7px 10px; font-family:inherit; font-size:12px; }
+.label { font-size:11px; font-weight:bold; margin-bottom:4px; display:block; }
+
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.grid-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; }
+
+/* Empty state */
+.empty-state { text-align:center; padding:48px 16px; border:2px dashed #ccc; border-radius:8px; }
+.empty-icon { width:48px; height:48px; background:#f5f5f5; border:2px solid #ccc; border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+
+/* Stats cards */
+.stat-card { border:2px solid #ccc; border-radius:8px; padding:16px; display:flex; align-items:center; gap:12px; }
+.stat-icon { width:44px; height:44px; border:2px solid #ccc; border-radius:10px; background:#f5f5f5; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.stat-value { font-size:22px; font-weight:bold; }
+.stat-label { font-size:11px; color:#666; }
+
+/* Table */
+.table { width:100%; border-collapse:collapse; }
+.table th { border-bottom:2px solid #333; padding:8px 12px; text-align:left; font-size:12px; font-weight:bold; background:#f5f5f5; }
+.table td { border-bottom:1px solid #e0e0e0; padding:10px 12px; font-size:12px; }
+.table tr:hover td { background:#f9f9f9; }
+
+/* Tabs */
+.tabs { display:flex; border-bottom:2px solid #333; margin-bottom:16px; }
+.tab { padding:8px 16px; cursor:pointer; border:2px solid transparent; border-bottom:none; font-size:12px; font-weight:bold; color:#666; display:flex; align-items:center; gap:5px; }
+.tab.active { border-color:#333; border-bottom:2px solid #fff; color:#333; margin-bottom:-2px; background:#fff; }
+
+/* Upload zone */
+.upload-zone { border:2px dashed #999; border-radius:8px; padding:40px 24px; text-align:center; background:#fafafa; cursor:pointer; }
+.upload-zone:hover { border-color:#333; background:#f5f5f5; }
+.upload-icon { font-size:32px; margin-bottom:8px; }
+
+/* Filter bar */
+.filter-bar { display:flex; gap:8px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+
+/* Tags/Badges */
+.tag { border:1px solid #ccc; border-radius:20px; padding:3px 10px; font-size:11px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+.tag.active { background:#333; color:#fff; border-color:#333; }
+.tag-dot { width:8px; height:8px; border-radius:50%; background:#999; }
+
+/* Settings sidebar */
+.settings-layout { display:grid; grid-template-columns:200px 1fr; gap:20px; }
+.settings-nav { border:2px solid #ccc; border-radius:8px; padding:8px; }
+.settings-nav-item { padding:8px 12px; border-radius:6px; cursor:pointer; font-size:12px; display:flex; align-items:center; gap:8px; }
+.settings-nav-item.active { background:#333; color:#fff; }
+.settings-nav-item:hover:not(.active) { background:#f5f5f5; }
+
+/* Component tags */
+.ctag { position:absolute; top:-8px; right:8px; z-index:10; }
+
+/* Breadcrumb */
+.breadcrumb { display:flex; align-items:center; gap:6px; font-size:11px; color:#999; margin-bottom:16px; }
+.breadcrumb a { color:#666; text-decoration:underline; cursor:pointer; }
+.breadcrumb-sep { color:#ccc; }
+
+/* Footer */
+.app-footer { border-top:1px solid #ccc; padding:12px 24px; display:flex; justify-content:space-between; align-items:center; background:#fafafa; font-size:11px; color:#999; }
+
+/* Form field */
+.form-row { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:16px 0; border-bottom:1px solid #e0e0e0; }
+.form-row:last-child { border-bottom:none; }
+.form-label-group { flex:1; }
+.form-label-group .label { font-size:12px; font-weight:bold; }
+.form-label-group .desc { font-size:11px; color:#999; margin-top:2px; }
+.form-field-right { min-width:200px; }
+
+/* Highlight fix box */
+.fix-note { background:#fffde7; border:2px solid #FFD600; border-radius:6px; padding:6px 10px; font-size:11px; display:flex; align-items:center; gap:6px; margin-bottom:12px; }
+
+/* Prompt card */
+.prompt-card { border:2px solid #ccc; border-radius:8px; padding:12px; cursor:pointer; position:relative; }
+.prompt-card:hover { border-color:#333; }
+.prompt-title { font-weight:bold; font-size:12px; margin-bottom:4px; }
+.prompt-cat { font-size:10px; display:flex; align-items:center; gap:4px; margin-bottom:6px; }
+.prompt-preview { font-size:11px; color:#666; line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.prompt-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid #e0e0e0; }
+
+/* Audio list item */
+.audio-item { display:flex; align-items:center; gap:10px; padding:10px; border:1px solid #e0e0e0; border-radius:6px; cursor:pointer; margin-bottom:8px; }
+.audio-item:hover { border-color:#999; background:#f9f9f9; }
+.audio-thumb { width:40px; height:40px; border:1px solid #ccc; border-radius:6px; background:#f5f5f5; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.audio-title { font-weight:bold; font-size:12px; }
+.audio-meta { font-size:10px; color:#999; }
+.audio-status { font-size:10px; border:1px solid #ccc; border-radius:20px; padding:2px 8px; }
+
+/* Transaction item */
+.tx-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f0f0; }
+.tx-left { display:flex; align-items:center; gap:10px; }
+.tx-icon { width:36px; height:36px; border:1px solid #ccc; border-radius:8px; background:#f5f5f5; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.tx-amount { font-weight:bold; font-size:16px; }
+.tx-date { font-size:10px; color:#999; }
+
+/* Improvement note */
+.improvement { background:#e8f5e9; border-left:4px solid #4CAF50; padding:8px 12px; margin-bottom:12px; font-size:11px; border-radius:0 4px 4px 0; }
+.improvement strong { color:#2e7d32; }
+</style>
+</head>
+<body>
+
+<!-- OPTION HEADER -->
+<div class="option-banner">
+  <h1>Option 1: Polished Top Nav — Conservative Approach</h1>
+  <p>Refines the existing top navigation structure. Removes redundant "back" buttons, adds Credits to main nav, improves information hierarchy and settings layout with a sidebar. Maximum component reuse.</p>
+  <div class="legend">
+    <div class="legend-item"><span class="badge-reuse">REUSE</span> Existing component reused as-is</div>
+    <div class="legend-item"><span class="badge-new">NEW</span> New component to create</div>
+    <div class="legend-item"><span class="badge-fix">FIX</span> Existing component with changes</div>
+  </div>
+</div>
+
+<!-- PAGE SELECTOR TABS -->
+<div class="page-tabs">
+  <button class="page-tab active" onclick="showPage('workshop', this)">🏠 Workshop</button>
+  <button class="page-tab" onclick="showPage('library', this)">📚 Library</button>
+  <button class="page-tab" onclick="showPage('prompts', this)">🔖 Prompts</button>
+  <button class="page-tab" onclick="showPage('credits', this)">💰 Crédits</button>
+  <button class="page-tab" onclick="showPage('settings-general', this)">⚙️ Paramètres Général</button>
+  <button class="page-tab" onclick="showPage('settings-members', this)">👥 Membres</button>
+  <button class="page-tab" onclick="showPage('settings-org', this)">🏢 Organisation</button>
+</div>
+
+<!-- ══════════════════════════════════ WORKSHOP ══════════════════════════════════ -->
+<div id="page-workshop" class="page-content active">
+<div class="app">
+  <!-- TOP NAV -->
+  <!-- REUSE: AppHeader layout (default.vue) with FIX: add Crédits nav item, rename "Accueil"→"Atelier" -->
+  <div style="position:relative;">
+    <span class="badge-fix" style="position:absolute;top:4px;left:4px;z-index:20;font-size:9px;">FIX AppHeader</span>
+    <div class="topnav">
+      <div class="topnav-logo">
+        <div class="logo-blob">[●]</div>
+        <span>Novika</span>
+      </div>
+      <nav class="topnav-nav">
+        <div class="nav-item active">🏠 Atelier</div>
+        <div class="nav-item">📚 Bibliothèque</div>
+        <div class="nav-item">🔖 Prompts</div>
+        <div class="nav-item">💰 Crédits <span class="badge-fix" style="font-size:9px;">NEW item</span></div>
+      </nav>
+      <div class="topnav-actions">
+        <div class="improvement" style="margin:0; font-size:9px; padding:2px 6px;">UBadge replaces custom span</div>
+        <!-- REUSE: UButton notifications -->
+        <div class="icon-btn">🔔
+          <span class="notif-badge">3</span>
+        </div>
+        <!-- FIX: Use UBadge instead of custom NuxtLink div -->
+        <div class="credits-pill">🪙 1 000 000</div>
+        <!-- REUSE: UserMenu (collapsed=true) -->
+        <div class="avatar-btn">AB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="fix-note">
+      <span class="badge-fix">FIX</span>
+      <strong>Removed:</strong> "Retour à l'atelier" button — Atelier is already in top nav. No duplicate navigation needed.
+    </div>
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>✨ Atelier Audio</h1>
+        <p>Gérez vos fichiers audio et générez des analyses.</p>
+      </div>
+    </div>
+
+    <!-- Quick stats row (NEW) -->
+    <div class="grid-3" style="margin-bottom:20px; position:relative;">
+      <span class="badge-new" style="position:absolute;top:-8px;left:0;font-size:9px;">NEW StatsRow component</span>
+      <div class="stat-card">
+        <div class="stat-icon">🎵</div>
+        <div>
+          <div class="stat-value">12</div>
+          <div class="stat-label">Audios traités</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div>
+          <div class="stat-value">3h 24m</div>
+          <div class="stat-label">Temps total analysé</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🪙</div>
+        <div>
+          <div class="stat-value">1 000 000</div>
+          <div class="stat-label">Crédits disponibles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main 2-col grid -->
+    <div class="grid-2">
+      <!-- Left: Upload / Record Card -->
+      <div class="card" style="position:relative;">
+        <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE UCard</span>
+        <div class="card-header">✨ Nouveau fichier audio</div>
+        <!-- REUSE: UTabs -->
+        <div class="tabs" style="margin-bottom:16px;">
+          <div class="tab active">⬆️ Importer</div>
+          <div class="tab">🎙️ Enregistrer</div>
+        </div>
+        <!-- REUSE: WorkshopAudioUploadZone -->
+        <div class="upload-zone" style="position:relative;">
+          <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE WorkshopAudioUploadZone</span>
+          <div class="upload-icon">☁️⬆️</div>
+          <p style="font-weight:bold;margin-bottom:4px;">Glissez-déposez votre fichier audio ici</p>
+          <p style="font-size:11px;color:#999;">ou cliquez pour sélectionner</p>
+          <p style="font-size:10px;color:#ccc;margin-top:8px;">Tous les formats audio acceptés — Max 512 MB</p>
+        </div>
+        <div style="margin-top:12px; padding:10px; border:1px solid #e0e0e0; border-radius:6px; background:#f9f9f9; font-size:11px; color:#999; text-align:center;">
+          💡 Sélectionnez un fichier pour afficher le champ de prompt
+        </div>
+      </div>
+
+      <!-- Right: Recent Audio List -->
+      <div style="position:relative;">
+        <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE WorkshopAudioList</span>
+        <div style="font-weight:bold;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+          <span>📋 Mes audios récents</span>
+          <span style="font-size:11px;color:#999;">5 derniers</span>
+        </div>
+        <!-- Audio items (when populated) -->
+        <div class="audio-item">
+          <div class="audio-thumb">🎵</div>
+          <div style="flex:1;">
+            <div class="audio-title">Réunion équipe commerciale — 27 fév</div>
+            <div class="audio-meta">45 min • 3 crédits utilisés</div>
+          </div>
+          <div class="audio-status" style="background:#e8f5e9;border-color:#ccc;">✅ Terminé</div>
+        </div>
+        <div class="audio-item">
+          <div class="audio-thumb">🎵</div>
+          <div style="flex:1;">
+            <div class="audio-title">Interview candidat — Marketing</div>
+            <div class="audio-meta">28 min • 1 crédit utilisé</div>
+          </div>
+          <div class="audio-status" style="background:#fff3e0;border-color:#ccc;">⏳ En cours</div>
+        </div>
+        <div class="audio-item" style="opacity:0.5;">
+          <div class="audio-thumb">🎵</div>
+          <div style="flex:1;">
+            <div class="audio-title">Podcast — Épisode 12</div>
+            <div class="audio-meta">1h 12 min • 2 crédits utilisés</div>
+          </div>
+          <div class="audio-status">✅ Terminé</div>
+        </div>
+        <div style="text-align:center;margin-top:12px;">
+          <!-- FIX: Link to Library page (Bibliothèque nav item replaces this) -->
+          <button class="btn btn-ghost" style="font-size:11px;">📚 Voir tous les audios <span style="background:#ccc;border-radius:20px;padding:1px 6px;font-size:10px;">12</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-footer">
+    <span>© 2026 Novika. Tous droits réservés.</span>
+    <div style="display:flex;gap:12px;">CGU · Confidentialité · Cookies · Mentions légales</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════ LIBRARY ══════════════════════════════════ -->
+<div id="page-library" class="page-content">
+<div class="app">
+  <div style="position:relative;">
+    <span class="badge-fix" style="position:absolute;top:4px;left:4px;z-index:20;font-size:9px;">FIX AppHeader</span>
+    <div class="topnav">
+      <div class="topnav-logo"><div class="logo-blob">[●]</div><span>Novika</span></div>
+      <nav class="topnav-nav">
+        <div class="nav-item">🏠 Atelier</div>
+        <div class="nav-item active">📚 Bibliothèque</div>
+        <div class="nav-item">🔖 Prompts</div>
+        <div class="nav-item">💰 Crédits</div>
+      </nav>
+      <div class="topnav-actions">
+        <div class="icon-btn">🔔<span class="notif-badge">3</span></div>
+        <div class="credits-pill">🪙 1 000 000</div>
+        <div class="avatar-btn">AB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="fix-note">
+      <span class="badge-fix">FIX</span>
+      <strong>Removed:</strong> "Retour à l'atelier" button — "Atelier" in top nav is sufficient.
+    </div>
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Bibliothèque Audio</h1>
+        <p>Gérez tous vos fichiers audio en un seul endroit.</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-primary">⬆️ Nouvel audio</button>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="card" style="margin-bottom:16px;position:relative;">
+      <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE UCard + UInput + USelect</span>
+      <div class="filter-bar">
+        <div style="flex:1;min-width:200px;"><div class="input" style="display:flex;align-items:center;gap:6px;"><span>🔍</span> Rechercher par nom...</div></div>
+        <select class="select"><option>Date ↓</option><option>Titre</option><option>Durée</option></select>
+        <div class="icon-btn" style="border-radius:6px;">↓</div>
+        <select class="select"><option>Tous les statuts</option><option>✅ Terminé</option><option>⏳ En cours</option><option>❌ Échoué</option></select>
+      </div>
+    </div>
+
+    <!-- Bulk actions bar (conditional, shown when items selected) -->
+    <div style="background:#f5f5f5;border:2px solid #ccc;border-radius:6px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:12px;">
+      <span>☑️ <strong>3 éléments sélectionnés</strong></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-danger">🗑️ Supprimer la sélection</button>
+        <button class="btn btn-ghost">✕ Désélectionner</button>
+      </div>
+    </div>
+
+    <!-- Audio Table -->
+    <div class="card" style="position:relative;padding:0;overflow:hidden;">
+      <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE LibraryAudioTable</span>
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" /></th>
+            <th>Titre ↕</th>
+            <th>Durée ↕</th>
+            <th>Statut</th>
+            <th>Date ↓</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" checked /></td>
+            <td><strong>Réunion équipe commerciale</strong></td>
+            <td>45 min</td>
+            <td><span style="background:#e8f5e9;border:1px solid #ccc;border-radius:20px;padding:2px 8px;font-size:10px;">✅ Terminé</span></td>
+            <td style="color:#999;">27 fév 2026</td>
+            <td style="text-align:right;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">✏️</button> <button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">🗑️</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" checked /></td>
+            <td><strong>Interview candidat Marketing</strong></td>
+            <td>28 min</td>
+            <td><span style="background:#fff3e0;border:1px solid #ccc;border-radius:20px;padding:2px 8px;font-size:10px;">⏳ En cours</span></td>
+            <td style="color:#999;">26 fév 2026</td>
+            <td style="text-align:right;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">✏️</button> <button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">🗑️</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" checked /></td>
+            <td><strong>Podcast — Épisode 12</strong></td>
+            <td>1h 12 min</td>
+            <td><span style="background:#e8f5e9;border:1px solid #ccc;border-radius:20px;padding:2px 8px;font-size:10px;">✅ Terminé</span></td>
+            <td style="color:#999;">24 fév 2026</td>
+            <td style="text-align:right;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">✏️</button> <button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">🗑️</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><strong>Séminaire annuel RH</strong></td>
+            <td>2h 05 min</td>
+            <td><span style="background:#e8f5e9;border:1px solid #ccc;border-radius:20px;padding:2px 8px;font-size:10px;">✅ Terminé</span></td>
+            <td style="color:#999;">20 fév 2026</td>
+            <td style="text-align:right;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">✏️</button> <button class="btn btn-ghost" style="padding:3px 8px;font-size:10px;">🗑️</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="padding:12px 16px;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#999;">
+        <span>Affichage de 4 sur 12</span>
+        <button class="btn btn-ghost" style="font-size:11px;">Charger plus</button>
+      </div>
+    </div>
+  </div>
+  <div class="app-footer"><span>© 2026 Novika. Tous droits réservés.</span><div style="display:flex;gap:12px;">CGU · Confidentialité · Cookies · Mentions légales</div></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════ PROMPTS ══════════════════════════════════ -->
+<div id="page-prompts" class="page-content">
+<div class="app">
+  <div style="position:relative;">
+    <span class="badge-fix" style="position:absolute;top:4px;left:4px;z-index:20;font-size:9px;">FIX AppHeader</span>
+    <div class="topnav">
+      <div class="topnav-logo"><div class="logo-blob">[●]</div><span>Novika</span></div>
+      <nav class="topnav-nav">
+        <div class="nav-item">🏠 Atelier</div>
+        <div class="nav-item">📚 Bibliothèque</div>
+        <div class="nav-item active">🔖 Prompts</div>
+        <div class="nav-item">💰 Crédits</div>
+      </nav>
+      <div class="topnav-actions">
+        <div class="icon-btn">🔔<span class="notif-badge">3</span></div>
+        <div class="credits-pill">🪙 1 000 000</div>
+        <div class="avatar-btn">AB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="fix-note"><span class="badge-fix">FIX</span><strong>Removed:</strong> "Retour à l'atelier" button.</div>
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Bibliothèque de prompts</h1>
+        <p>Gérez vos prompts d'analyse audio</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-primary">＋ Nouveau prompt</button>
+        <button class="btn btn-ghost">⚙️ Gérer les catégories</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;position:relative;">
+      <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE UCard + UInput + CategoryTabs</span>
+      <div class="input" style="display:flex;align-items:center;gap:6px;margin-bottom:12px;"><span>🔍</span> Rechercher un prompt...</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding-top:12px;border-top:1px solid #e0e0e0;">
+        <span class="tag active">Tous</span>
+        <span class="tag">⭐ Favoris</span>
+        <span class="tag"><span class="tag-dot"></span> Général</span>
+        <span class="tag"><span class="tag-dot" style="background:#e91e63;"></span> Ressources humaines</span>
+        <span class="tag"><span class="tag-dot" style="background:#4caf50;"></span> Vente &amp; Commerce</span>
+        <span class="tag"><span class="tag-dot" style="background:#9c27b0;"></span> Droit &amp; Affaires</span>
+        <span class="tag"><span class="tag-dot" style="background:#ff9800;"></span> Finance &amp; Comptabilité</span>
+        <span class="tag"><span class="tag-dot" style="background:#f44336;"></span> Psychologie</span>
+      </div>
+    </div>
+
+    <div class="grid-4" style="position:relative;">
+      <span class="badge-reuse" style="position:absolute;top:-8px;left:0;font-size:9px;">REUSE PromptCard</span>
+      <div class="prompt-card"><div class="prompt-title">Résumé général d'entretien</div><div class="prompt-cat"><span class="tag-dot"></span> Général</div><div class="prompt-preview">Tu es un assistant professionnel expert en synthèse de conversations. À partir de cette transcription...</div><div class="prompt-footer"><span style="font-size:10px;color:#999;">Système</span><span>···</span></div></div>
+      <div class="prompt-card"><div class="prompt-title">Résumé Exécutif (simple)</div><div class="prompt-cat"><span class="tag-dot"></span> Général</div><div class="prompt-preview">Fais un résumé exécutif de cette conversation en 3-5 points clés. Mets en avant les décisions...</div><div class="prompt-footer"><span style="font-size:10px;color:#999;">Système</span><span>···</span></div></div>
+      <div class="prompt-card"><div class="prompt-title">Analyse d'entretien de recrutement</div><div class="prompt-cat"><span class="tag-dot" style="background:#e91e63;"></span> RH</div><div class="prompt-preview">Tu es un recruteur senior expérimenté avec 15 ans d'expérience en recrutement tech...</div><div class="prompt-footer"><span style="font-size:10px;color:#999;">Système</span><span>⭐</span></div></div>
+      <div class="prompt-card"><div class="prompt-title">Analyse d'appel de vente</div><div class="prompt-cat"><span class="tag-dot" style="background:#4caf50;"></span> Vente</div><div class="prompt-preview">Tu es un Head of Sales senior avec 12 ans d'expérience en B2B et solutions complexes...</div><div class="prompt-footer"><span style="font-size:10px;color:#999;">Système</span><span>···</span></div></div>
+      <div class="prompt-card"><div class="prompt-title">Analyse consultation client</div><div class="prompt-cat"><span class="tag-dot" style="background:#9c27b0;"></span> Droit</div><div class="prompt-preview">Tu es un avocat senior spécialisé en droit des affaires avec 18 ans d'expérience...</div><div class="prompt-footer"><span style="font-size:10px;color:#999;">Système</span><span>···</span></div></div>
+      <div class="prompt-card"><div class="prompt-title">Note de session standard</div><div class="prompt-cat"><span class="tag-dot" style="background:#f44336;"></span> Psy.</div><div class="prompt-preview">Tu es un psychologue clinicien senior avec 15 ans d'expérience en thérapie individuelle...</div><div class="prompt-footer"><span style="font-size:10px;color:#999;">Système</span><span>⭐</span></div></div>
+      <div class="prompt-card"><div class="prompt-title">Revue budgétaire</div><div class="prompt-cat"><span class="tag-dot" style="background:#ff9800;"></span> Finance</div><div class="prompt-preview">Tu es un Directeur Financier expert en pilotage budgétaire et contrôle de gestion...</div><div class="prompt-footer"><span style="font-size:10px;color:#999;">Système</span><span>···</span></div></div>
+      <div class="prompt-card" style="border:2px dashed #ccc;display:flex;align-items:center;justify-content:center;cursor:pointer;min-height:120px;">
+        <div style="text-align:center;color:#999;"><div style="font-size:24px;margin-bottom:6px;">＋</div><div style="font-size:11px;">Nouveau prompt</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="app-footer"><span>© 2026 Novika. Tous droits réservés.</span><div>CGU · Confidentialité · Cookies · Mentions légales</div></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════ CREDITS ══════════════════════════════════ -->
+<div id="page-credits" class="page-content">
+<div class="app">
+  <div style="position:relative;">
+    <span class="badge-fix" style="position:absolute;top:4px;left:4px;z-index:20;font-size:9px;">FIX AppHeader</span>
+    <div class="topnav">
+      <div class="topnav-logo"><div class="logo-blob">[●]</div><span>Novika</span></div>
+      <nav class="topnav-nav">
+        <div class="nav-item">🏠 Atelier</div>
+        <div class="nav-item">📚 Bibliothèque</div>
+        <div class="nav-item">🔖 Prompts</div>
+        <div class="nav-item active">💰 Crédits</div>
+      </nav>
+      <div class="topnav-actions">
+        <div class="icon-btn">🔔<span class="notif-badge">3</span></div>
+        <div class="credits-pill">🪙 1 000 000</div>
+        <div class="avatar-btn">AB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="fix-note"><span class="badge-fix">FIX</span><strong>Removed:</strong> "Retour à l'atelier" button — Crédits is now in main nav.</div>
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Mes crédits <span style="border:1px solid #ccc;border-radius:20px;padding:2px 10px;font-size:12px;margin-left:8px;">Pool commun</span></h1>
+        <p>Gérez vos crédits d'analyse audio</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-primary">🤝 Demander au revendeur</button>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px;position:relative;">
+      <span class="badge-reuse" style="position:absolute;top:-8px;left:0;font-size:9px;">REUSE UCard balance cards</span>
+      <div class="stat-card" style="border:2px solid #333;">
+        <div class="stat-icon">🏢</div>
+        <div>
+          <div class="stat-label">Pool organisation</div>
+          <div class="stat-value">1 000 000</div>
+          <div class="stat-label">crédits</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div>
+          <div class="stat-label">Consommés ce mois</div>
+          <div class="stat-value">248</div>
+          <div class="stat-label">crédits utilisés</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active">⏱️ Historique</div>
+      <div class="tab">📬 Demandes en attente</div>
+      <div class="tab">⚙️ Configuration</div>
+    </div>
+
+    <div class="card" style="position:relative;">
+      <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE UTabs + transaction list</span>
+      <div class="tx-item">
+        <div class="tx-left">
+          <div class="tx-icon">💳</div>
+          <div>
+            <div style="font-weight:bold;font-size:12px;">Achat</div>
+            <div style="font-size:11px;color:#999;">Crédits initiaux du revendeur · par Anthony Bette</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="tx-amount" style="color:#666;">+1 000 000</div>
+          <div class="tx-date">27 févr. 2026, 12:42</div>
+        </div>
+      </div>
+      <div class="tx-item">
+        <div class="tx-left">
+          <div class="tx-icon">📊</div>
+          <div>
+            <div style="font-weight:bold;font-size:12px;">Utilisation</div>
+            <div style="font-size:11px;color:#999;">Analyse audio — Réunion commerciale · par Marie D.</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="tx-amount" style="color:#666;">-3</div>
+          <div class="tx-date">26 févr. 2026, 14:30</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-footer"><span>© 2026 Novika. Tous droits réservés.</span><div>CGU · Confidentialité · Cookies · Mentions légales</div></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════ SETTINGS GENERAL ══════════════════════════════════ -->
+<div id="page-settings-general" class="page-content">
+<div class="app">
+  <div style="position:relative;">
+    <span class="badge-fix" style="position:absolute;top:4px;left:4px;z-index:20;font-size:9px;">FIX AppHeader</span>
+    <div class="topnav">
+      <div class="topnav-logo"><div class="logo-blob">[●]</div><span>Novika</span></div>
+      <nav class="topnav-nav">
+        <div class="nav-item">🏠 Atelier</div>
+        <div class="nav-item">📚 Bibliothèque</div>
+        <div class="nav-item">🔖 Prompts</div>
+        <div class="nav-item">💰 Crédits</div>
+      </nav>
+      <div class="topnav-actions">
+        <div class="icon-btn">🔔<span class="notif-badge">3</span></div>
+        <div class="credits-pill">🪙 1 000 000</div>
+        <div class="avatar-btn">AB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="breadcrumb">
+      <a>Accueil</a><span class="breadcrumb-sep">›</span>
+      <span style="background:#f5f5f5;padding:2px 8px;border-radius:4px;font-weight:bold;">⚙️ Paramètres › Général</span>
+      <span class="badge-new" style="font-size:9px;">NEW breadcrumb</span>
+    </div>
+
+    <div class="page-header" style="margin-bottom:20px;">
+      <div class="page-header-left">
+        <h1>⚙️ Paramètres</h1>
+      </div>
+    </div>
+
+    <!-- Settings layout: sidebar + content -->
+    <div class="settings-layout" style="position:relative;">
+      <span class="badge-new" style="position:absolute;top:-8px;left:0;font-size:9px;">NEW SettingsSidebar (replaces horizontal tabs)</span>
+      <!-- Sidebar nav -->
+      <div class="settings-nav">
+        <div class="settings-nav-item active">👤 Général</div>
+        <div class="settings-nav-item">🏢 Organisation</div>
+        <div class="settings-nav-item">👥 Membres</div>
+        <div class="settings-nav-item">🛡️ Données personnelles</div>
+      </div>
+
+      <!-- Content -->
+      <div style="position:relative;">
+        <span class="badge-reuse" style="position:absolute;top:-8px;right:0;font-size:9px;">REUSE UForm + UPageCard + UFormField</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div><h2 style="font-size:16px;font-weight:bold;">Général</h2><p style="font-size:11px;color:#999;">Gérez vos informations personnelles.</p></div>
+          <button class="btn btn-primary">💾 Enregistrer</button>
+        </div>
+        <div class="card">
+          <div class="form-row">
+            <div class="form-label-group"><div class="label">Prénom <span style="color:red;">*</span></div><div class="desc">Votre prénom.</div></div>
+            <div class="form-field-right"><input class="input" value="Anthony" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label-group"><div class="label">Nom <span style="color:red;">*</span></div><div class="desc">Votre nom de famille.</div></div>
+            <div class="form-field-right"><input class="input" value="Bette" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label-group"><div class="label">Email <span style="color:red;">*</span></div><div class="desc">Votre adresse email de connexion.</div></div>
+            <div class="form-field-right"><input class="input" type="email" value="sangohan.anthony@gmail.com" /></div>
+          </div>
+          <div class="form-row" style="border-bottom:none;">
+            <div class="form-label-group"><div class="label">Avatar</div><div class="desc">JPG, PNG ou GIF. 1 Mo max.</div></div>
+            <div class="form-field-right">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:40px;height:40px;border-radius:50%;background:#ccc;border:2px solid #999;display:flex;align-items:center;justify-content:center;font-weight:bold;">AB</div>
+                <button class="btn btn-ghost">Choisir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-footer"><span>© 2026 Novika. Tous droits réservés.</span><div>CGU · Confidentialité · Cookies · Mentions légales</div></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════ SETTINGS MEMBERS ══════════════════════════════════ -->
+<div id="page-settings-members" class="page-content">
+<div class="app">
+  <div class="topnav">
+    <div class="topnav-logo"><div class="logo-blob">[●]</div><span>Novika</span></div>
+    <nav class="topnav-nav">
+      <div class="nav-item">🏠 Atelier</div><div class="nav-item">📚 Bibliothèque</div>
+      <div class="nav-item">🔖 Prompts</div><div class="nav-item">💰 Crédits</div>
+    </nav>
+    <div class="topnav-actions">
+      <div class="icon-btn">🔔<span class="notif-badge">3</span></div>
+      <div class="credits-pill">🪙 1 000 000</div>
+      <div class="avatar-btn">AB</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="breadcrumb"><a>Accueil</a><span class="breadcrumb-sep">›</span><span style="background:#f5f5f5;padding:2px 8px;border-radius:4px;font-weight:bold;">⚙️ Paramètres › Membres</span></div>
+    <div class="page-header"><div class="page-header-left"><h1>⚙️ Paramètres</h1></div></div>
+
+    <div class="settings-layout">
+      <div class="settings-nav">
+        <div class="settings-nav-item">👤 Général</div>
+        <div class="settings-nav-item">🏢 Organisation</div>
+        <div class="settings-nav-item active">👥 Membres</div>
+        <div class="settings-nav-item">🛡️ Données personnelles</div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div><h2 style="font-size:16px;font-weight:bold;">Membres</h2><p style="font-size:11px;color:#999;">Invitez de nouveaux membres par adresse email.</p></div>
+          <button class="btn btn-primary">＋ Inviter des personnes</button>
+        </div>
+
+        <!-- Invitations collapsible -->
+        <div class="card" style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
+            <div><strong>Invitations en cours</strong> <span style="border:1px solid #ccc;border-radius:20px;padding:1px 6px;font-size:10px;">2</span><p style="font-size:11px;color:#999;margin-top:2px;">Gérez les invitations envoyées</p></div>
+            <span>▼</span>
+          </div>
+        </div>
+
+        <!-- Member list -->
+        <div class="card" style="padding:0;overflow:hidden;position:relative;">
+          <span class="badge-reuse" style="position:absolute;top:-8px;right:8px;font-size:9px;">REUSE SettingsMembersList + SettingsInvitationsList</span>
+          <div style="padding:12px 16px;border-bottom:1px solid #e0e0e0;">
+            <input class="input" placeholder="🔍 Rechercher des membres..." />
+          </div>
+          <div style="padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #e0e0e0;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#ccc;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;">AB</div>
+            <div style="flex:1;"><div style="font-weight:bold;font-size:12px;">Anthony Bette</div><div style="font-size:11px;color:#999;">sangohan.anthony@gmail.com</div></div>
+            <select class="select" style="font-size:11px;"><option>Propriétaire</option></select>
+          </div>
+          <div style="padding:12px 16px;display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;">MD</div>
+            <div style="flex:1;"><div style="font-weight:bold;font-size:12px;">Marie Dupont</div><div style="font-size:11px;color:#999;">marie.dupont@novika.io</div></div>
+            <select class="select" style="font-size:11px;"><option>Membre</option><option>Administrateur</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-footer"><span>© 2026 Novika. Tous droits réservés.</span><div>CGU · Confidentialité · Cookies · Mentions légales</div></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════ SETTINGS ORGANIZATION ══════════════════════════════════ -->
+<div id="page-settings-org" class="page-content">
+<div class="app">
+  <div class="topnav">
+    <div class="topnav-logo"><div class="logo-blob">[●]</div><span>Novika</span></div>
+    <nav class="topnav-nav">
+      <div class="nav-item">🏠 Atelier</div><div class="nav-item">📚 Bibliothèque</div>
+      <div class="nav-item">🔖 Prompts</div><div class="nav-item">💰 Crédits</div>
+    </nav>
+    <div class="topnav-actions">
+      <div class="icon-btn">🔔<span class="notif-badge">3</span></div>
+      <div class="credits-pill">🪙 1 000 000</div>
+      <div class="avatar-btn">AB</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="breadcrumb"><a>Accueil</a><span class="breadcrumb-sep">›</span><span style="background:#f5f5f5;padding:2px 8px;border-radius:4px;font-weight:bold;">⚙️ Paramètres › Organisation</span></div>
+    <div class="page-header"><div class="page-header-left"><h1>⚙️ Paramètres</h1></div></div>
+
+    <div class="settings-layout">
+      <div class="settings-nav">
+        <div class="settings-nav-item">👤 Général</div>
+        <div class="settings-nav-item active">🏢 Organisation</div>
+        <div class="settings-nav-item">👥 Membres</div>
+        <div class="settings-nav-item">🛡️ Données personnelles</div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div><h2 style="font-size:16px;font-weight:bold;">Organisation</h2><p style="font-size:11px;color:#999;">Gérez les paramètres de votre organisation.</p></div>
+          <button class="btn btn-primary">💾 Enregistrer</button>
+        </div>
+        <div class="card">
+          <div class="form-row">
+            <div class="form-label-group"><div class="label">Nom de l'organisation <span style="color:red;">*</span></div><div class="desc">Le nom de votre organisation.</div></div>
+            <div class="form-field-right"><input class="input" value="Test Antho" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label-group"><div class="label">Email de l'organisation <span style="color:red;">*</span></div><div class="desc">Email de contact de l'organisation.</div></div>
+            <div class="form-field-right"><input class="input" type="email" value="sangohan.anthony@gmail.com" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label-group"><div class="label">Logo</div><div class="desc">JPG, GIF ou PNG. 1 Mo max.</div></div>
+            <div class="form-field-right"><div style="display:flex;align-items:center;gap:8px;"><div style="width:40px;height:40px;border-radius:8px;background:#ccc;border:2px solid #999;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;">TA</div><button class="btn btn-ghost">Choisir</button></div></div>
+          </div>
+          <div class="form-row" style="border-bottom:none;">
+            <div class="form-label-group"><div class="label">Secteurs d'activité</div><div class="desc">Les prompts correspondant à vos secteurs seront affichés en priorité.</div></div>
+            <div class="form-field-right"><select class="select" style="width:100%;"><option>Sélectionnez vos secteurs...</option></select></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-footer"><span>© 2026 Novika. Tous droits réservés.</span><div>CGU · Confidentialité · Cookies · Mentions légales</div></div>
+</div>
+</div>
+
+<script>
+function showPage(id, tab) {
+  document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  tab.classList.add('active');
+}
+</script>
+</body>
+</html>

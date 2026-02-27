@@ -11,9 +11,12 @@ import {
   audioUpdateValidator,
   audioExportValidator,
   audioChatValidator,
+  audioAnalyzeValidator,
 } from '#validators/audio'
 import MistralService from '#services/mistral_service'
 import TtsService from '#services/tts_service'
+import transcriptionVersionService from '#services/transcription_version_service'
+import { TranscriptionVersionField } from '#models/transcription_version'
 
 export default class AudiosController {
   /**
@@ -578,6 +581,134 @@ export default class AudiosController {
       console.error('TTS generation failed:', error)
       // If streaming already started, just close the connection
       nodeRes.end()
+    }
+  }
+
+  /**
+   * Generate or re-generate AI analysis on an existing audio transcription.
+   * Costs credits proportional to audio duration (same formula as initial transcription).
+   *
+   * POST /api/audios/:id/analyze
+   */
+  async analyze({ params, request, response, auth, bouncer, i18n }: HttpContext) {
+    // Validate ID parameter
+    const id = Number(params.id)
+    if (!Number.isInteger(id) || id <= 0) {
+      return response.badRequest({
+        message: i18n.t('messages.errors.invalid_id'),
+      })
+    }
+
+    const audio = await Audio.find(id)
+
+    if (!audio) {
+      return response.notFound({
+        message: i18n.t('messages.audio.not_found'),
+      })
+    }
+
+    // Check authorization
+    if (await bouncer.with(AudioPolicy).denies('viewAudio', audio)) {
+      return response.forbidden({
+        message: i18n.t('messages.audio.access_denied'),
+      })
+    }
+
+    // Load transcription
+    await audio.load('transcription')
+
+    if (!audio.transcription?.rawText) {
+      return response.badRequest({
+        message: i18n.t('messages.audio.no_transcription'),
+      })
+    }
+
+    // Validate request body
+    const { prompt } = await request.validateUsing(audioAnalyzeValidator)
+
+    // Credit check: same formula as initial transcription
+    const creditsNeeded = Math.max(1, Math.ceil((audio.duration || 0) / 60))
+
+    const user = auth.user!
+    const organization = await Organization.findOrFail(user.currentOrganizationId)
+
+    const hasCredits = await creditService.hasEnoughCreditsForProcessing(
+      user,
+      organization,
+      creditsNeeded
+    )
+
+    if (!hasCredits) {
+      const effectiveBalance = await creditService.getEffectiveBalance(user, organization)
+      return response.paymentRequired({
+        code: 'INSUFFICIENT_CREDITS',
+        message: i18n.t('messages.audio.insufficient_credits_details', {
+          creditsNeeded,
+          creditsAvailable: effectiveBalance,
+        }),
+        creditsNeeded,
+        creditsAvailable: effectiveBalance,
+      })
+    }
+
+    try {
+      // Deduct credits
+      await creditService.deductForAudioProcessing(
+        user,
+        organization,
+        creditsNeeded,
+        i18n.t('messages.audio.analysis_credit_description', {
+          title: audio.title || audio.fileName,
+        }),
+        audio.id
+      )
+
+      // Run analysis
+      const mistralService = new MistralService()
+      const analysisResult = await mistralService.analyze(
+        audio.transcription.rawText,
+        prompt,
+        audio.transcription.timestamps || []
+      )
+
+      // Apply speaker name mapping to segments if applicable
+      if (Object.keys(analysisResult.speakers).length > 0) {
+        for (const seg of audio.transcription.timestamps || []) {
+          if (seg.speaker && analysisResult.speakers[seg.speaker]) {
+            seg.speaker = analysisResult.speakers[seg.speaker]
+          }
+        }
+        audio.transcription.timestamps = [...audio.transcription.timestamps!]
+        await audio.transcription.save()
+      }
+
+      // Use editField to update analysis with optimistic locking + version history
+      const currentVersion = audio.transcription.analysisVersion || 0
+      await transcriptionVersionService.editField(
+        audio.transcription,
+        TranscriptionVersionField.Analysis,
+        analysisResult.analysis,
+        currentVersion,
+        user,
+        'AI analysis',
+        prompt
+      )
+
+      // Reload audio with updated transcription
+      await audio.refresh()
+      await audio.load('transcription', (transcriptionQuery) => {
+        transcriptionQuery.preload('lastEditedByUser')
+      })
+
+      return response.ok({
+        message: i18n.t('messages.audio.analysis_generated'),
+        audio,
+      })
+    } catch (error) {
+      console.error('Analysis generation failed:', error)
+      return response.internalServerError({
+        message: i18n.t('messages.audio.analysis_error'),
+      })
     }
   }
 }

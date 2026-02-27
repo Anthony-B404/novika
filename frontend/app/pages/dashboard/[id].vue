@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AudioStatus } from '~/types/audio'
-import type { TranscriptionVersionField } from '~/types/transcription'
+import type { TranscriptionVersionField, TranscriptionVersion } from '~/types/transcription'
 
 definePageMeta({
   middleware: ['auth', 'pending-deletion', 'organization-status']
@@ -85,11 +85,25 @@ const {
   loading: editLoading,
   error: editError,
   conflict: editConflict,
+  history: versionHistory,
   saveEdit,
+  fetchHistory,
+  fetchVersion,
   restoreVersion,
   clearConflict,
   clearError: clearEditError
 } = useTranscriptionEdit(audioId)
+
+// Analysis generation composable
+const { analyzing, error: analysisError, generateAnalysis } = useAudioAnalysis(audioId)
+const showAnalysisPrompt = ref(false)
+const analysisPrompt = ref('')
+const selectedVersionId = ref<number | null>(null) // null = current version
+const selectedVersionContent = ref<string | null>(null)
+const analysisVersions = ref<TranscriptionVersion[]>([])
+
+// Credits store for insufficient credits modal
+const creditsStore = useCreditsStore()
 
 // Check if timestamps are available
 const hasTimestamps = computed(
@@ -100,8 +114,8 @@ const hasTimestamps = computed(
 const currentTranscriptionVersion = computed(() => audio.value?.transcription?.rawTextVersion ?? 1)
 const currentAnalysisVersion = computed(() => audio.value?.transcription?.analysisVersion ?? 1)
 
-// Check if currently editing
-const isEditing = computed(() => isEditingAnalysis.value)
+// Check if currently editing or in analysis prompt mode
+const isEditing = computed(() => isEditingAnalysis.value || showAnalysisPrompt.value)
 
 // Get current field being edited (only analysis is editable)
 const currentEditField = computed<TranscriptionVersionField | null>(() => {
@@ -371,6 +385,103 @@ async function handleRefreshAfterConflict () {
   await audioStore.fetchAudio(audioId.value)
   clearConflict()
 }
+
+// Analysis generation functions
+function openAnalysisPrompt () {
+  showAnalysisPrompt.value = true
+  analysisPrompt.value = ''
+}
+
+function cancelAnalysisPrompt () {
+  showAnalysisPrompt.value = false
+  analysisPrompt.value = ''
+}
+
+async function handleGenerateAnalysis () {
+  if (!analysisPrompt.value.trim()) return
+
+  const result = await generateAnalysis(analysisPrompt.value)
+
+  if (result) {
+    audioStore.updateCurrentAudio(result.audio)
+    showAnalysisPrompt.value = false
+    analysisPrompt.value = ''
+    selectedVersionId.value = null
+    selectedVersionContent.value = null
+    creditsStore.refresh()
+    // Refresh analysis versions
+    await loadAnalysisVersions()
+    toast.add({
+      title: t('pages.dashboard.workshop.detail.analysisGenerated'),
+      color: 'success'
+    })
+  } else if (analysisError.value) {
+    toast.add({
+      title: t('pages.dashboard.workshop.detail.analysisError'),
+      description: analysisError.value,
+      color: 'error'
+    })
+  }
+}
+
+// Load analysis versions for the dropdown
+async function loadAnalysisVersions () {
+  const response = await fetchHistory('analysis', 1, 50)
+  if (response) {
+    analysisVersions.value = response.data
+  }
+}
+
+// Handle version selection from dropdown (0 = current version)
+async function handleVersionSelect (versionId: number) {
+  if (versionId === 0) {
+    // Current version
+    selectedVersionId.value = null
+    selectedVersionContent.value = null
+    return
+  }
+
+  selectedVersionId.value = versionId
+  const version = await fetchVersion(versionId)
+  if (version) {
+    selectedVersionContent.value = version.content
+  }
+}
+
+// Dropdown items for analysis versions (0 = current version)
+const analysisVersionItems = computed(() => {
+  const items: { label: string; value: number }[] = [
+    {
+      label: `v${currentAnalysisVersion.value} - ${t('pages.dashboard.workshop.detail.versionCurrent')}`,
+      value: 0
+    }
+  ]
+
+  for (const version of analysisVersions.value) {
+    if (version.versionNumber === currentAnalysisVersion.value) continue
+    const label = version.prompt
+      ? `v${version.versionNumber} - ${version.prompt.substring(0, 40)}${version.prompt.length > 40 ? '...' : ''}`
+      : `v${version.versionNumber} - ${version.changeSummary || t('pages.dashboard.workshop.detail.versionManual')}`
+    items.push({ label, value: version.id })
+  }
+
+  return items
+})
+
+// Rendered analysis for selected version or current
+const renderedSelectedAnalysis = computed(() => {
+  if (selectedVersionContent.value !== null) {
+    return renderMarkdown(selectedVersionContent.value)
+  }
+  return renderedAnalysis.value
+})
+
+// Load analysis versions when tab switches to analysis
+watch(activeTab, async (tab) => {
+  if (tab === 'analysis' && audio.value?.transcription?.analysis) {
+    await loadAnalysisVersions()
+  }
+})
 
 function openHistory (field: TranscriptionVersionField) {
   historyModalField.value = field
@@ -769,31 +880,89 @@ const tabItems = computed(() => [
               @dismiss-conflict="clearConflict"
             />
 
-            <!-- View mode -->
-            <template v-else>
-              <!-- Analysis available -->
-              <div
-                v-if="audio.transcription?.analysis"
-                class="markdown-content text-sm"
-                v-html="renderedAnalysis"
+            <!-- Prompt mode (generate / re-generate) -->
+            <div v-else-if="showAnalysisPrompt" class="space-y-4">
+              <AudioPromptInput
+                v-model="analysisPrompt"
+                :disabled="analyzing"
               />
-
-              <!-- No analysis -->
-              <div v-else class="text-center py-8">
-                <WorkshopEmptyState
-                  :title="t('pages.dashboard.workshop.detail.noAnalysis')"
-                  :description="t('pages.dashboard.workshop.detail.noAnalysisDescription')"
+              <div class="flex items-center gap-2">
+                <UButton
+                  :label="t('pages.dashboard.workshop.detail.generateAnalysis')"
                   icon="i-lucide-sparkles"
+                  color="primary"
+                  :loading="analyzing"
+                  :disabled="!analysisPrompt.trim() || analysisPrompt.trim().length < 5"
+                  @click="handleGenerateAnalysis"
+                />
+                <UButton
+                  v-if="audio.transcription?.analysis"
+                  :label="t('common.buttons.cancel')"
+                  color="neutral"
+                  variant="ghost"
+                  :disabled="analyzing"
+                  @click="cancelAnalysisPrompt"
                 />
               </div>
+            </div>
 
-              <!-- Version info -->
-              <div
-                v-if="audio.transcription?.analysis && audio.transcription?.analysisVersion"
-                class="mt-4 pt-4 border-t border-default text-sm text-muted"
-              >
-                <span>v{{ audio.transcription.analysisVersion }}</span>
+            <!-- View mode -->
+            <template v-else>
+              <!-- No analysis at all -->
+              <div v-if="!audio.transcription?.analysis" class="text-center py-8">
+                <WorkshopEmptyState
+                  :title="t('pages.dashboard.workshop.detail.noAnalysis')"
+                  :description="t('pages.dashboard.workshop.detail.noAnalysisGenerate')"
+                  icon="i-lucide-sparkles"
+                >
+                  <UButton
+                    :label="t('pages.dashboard.workshop.detail.generateAnalysis')"
+                    icon="i-lucide-sparkles"
+                    color="primary"
+                    class="mt-4"
+                    @click="openAnalysisPrompt"
+                  />
+                </WorkshopEmptyState>
               </div>
+
+              <!-- Analysis available -->
+              <template v-else>
+                <!-- Version dropdown + re-analyze button -->
+                <div class="flex items-center gap-2 mb-4">
+                  <USelect
+                    v-if="analysisVersions.length > 1"
+                    :model-value="selectedVersionId ?? 0"
+                    :items="analysisVersionItems"
+                    value-key="value"
+                    label-key="label"
+                    class="w-72"
+                    @update:model-value="handleVersionSelect"
+                  />
+
+                  <UButton
+                    :label="t('pages.dashboard.workshop.detail.reanalyze')"
+                    icon="i-lucide-refresh-cw"
+                    color="neutral"
+                    variant="soft"
+                    size="sm"
+                    @click="openAnalysisPrompt"
+                  />
+                </div>
+
+                <!-- Analysis content -->
+                <div
+                  class="markdown-content text-sm"
+                  v-html="renderedSelectedAnalysis"
+                />
+
+                <!-- Version info -->
+                <div
+                  v-if="audio.transcription?.analysisVersion"
+                  class="mt-4 pt-4 border-t border-default text-sm text-muted"
+                >
+                  <span>v{{ !selectedVersionId ? audio.transcription.analysisVersion : analysisVersions.find(v => v.id === selectedVersionId)?.versionNumber }}</span>
+                </div>
+              </template>
             </template>
           </div>
 
