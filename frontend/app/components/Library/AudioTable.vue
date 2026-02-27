@@ -301,12 +301,16 @@ function handleTitleKeydown (event: KeyboardEvent, audio: Audio) {
       >
       <!-- Header checkbox -->
       <template #select-header>
-        <UCheckbox
-          :model-value="allSelected"
-          :indeterminate="someSelected"
-          @update:model-value="toggleAll"
-          @click.stop
-        />
+        <div
+          class="flex items-center justify-center -m-4 p-4 cursor-pointer"
+          @click.stop="toggleAll"
+        >
+          <UCheckbox
+            :model-value="allSelected"
+            :indeterminate="someSelected"
+            class="pointer-events-none"
+          />
+        </div>
       </template>
 
       <!-- Row checkbox -->
@@ -317,7 +321,7 @@ function handleTitleKeydown (event: KeyboardEvent, audio: Audio) {
         >
           <UCheckbox
             :model-value="selectedIds.includes(row.original.id)"
-            @update:model-value="toggleItem(row.original.id)"
+            class="pointer-events-none"
           />
         </div>
       </template>
