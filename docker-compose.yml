@@ -1,4 +1,4 @@
-name: dh-echo-dev
+name: novika-dev
 
 services:
   # ===========================================
@@ -6,12 +6,12 @@ services:
   # ===========================================
   postgres:
     image: postgres:16-alpine
-    container_name: dh-echo-postgres
+    container_name: novika-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: ${DB_DATABASE:-dh_echo_db}
+      POSTGRES_DB: ${DB_DATABASE:-novika_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -22,14 +22,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - dh-echo-network
+      - novika-network
 
   # ===========================================
   # Redis (BullMQ)
   # ===========================================
   redis:
     image: redis:7-alpine
-    container_name: dh-echo-redis
+    container_name: novika-redis
     restart: unless-stopped
     command: redis-server --appendonly yes
     volumes:
@@ -42,7 +42,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - dh-echo-network
+      - novika-network
 
   # ===========================================
   # Backend API (Development - mounted source)
@@ -52,7 +52,7 @@ services:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
       target: deps
-    container_name: dh-echo-backend
+    container_name: novika-backend
     restart: unless-stopped
     working_dir: /app
     command: sh -c "pnpm install && node ace serve --hmr"
@@ -68,7 +68,7 @@ services:
       DB_PORT: 5432
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_DATABASE: ${DB_DATABASE:-dh_echo_db}
+      DB_DATABASE: ${DB_DATABASE:-novika_db}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       FRONTEND_URL: http://localhost:3000
@@ -87,7 +87,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - dh-echo-network
+      - novika-network
 
   # Worker is included in backend via preload (adonisrc.ts)
   # No separate container needed for development
@@ -100,7 +100,7 @@ services:
       context: ./frontend
       dockerfile: ../docker/frontend/Dockerfile
       target: deps
-    container_name: dh-echo-frontend
+    container_name: novika-frontend
     restart: unless-stopped
     working_dir: /app
     command: sh -c "pnpm install && pnpm dev --host 0.0.0.0"
@@ -118,7 +118,7 @@ services:
     depends_on:
       - backend
     networks:
-      - dh-echo-network
+      - novika-network
 
 volumes:
   postgres_data:
@@ -126,5 +126,5 @@ volumes:
   backend_storage:
 
 networks:
-  dh-echo-network:
+  novika-network:
     driver: bridge

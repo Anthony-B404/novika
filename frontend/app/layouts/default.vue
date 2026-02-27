@@ -121,12 +121,12 @@ const notificationAriaLabel = computed(() =>
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden hidden sm:block">
       <!-- Top Left Blob -->
       <div
-        class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full opacity-20 blur-3xl bg-gradient-to-br from-indigo-400 to-blue-500 animate-pulse"
+        class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full opacity-20 blur-3xl bg-gradient-to-br from-violet-400 to-fuchsia-500 animate-pulse"
         style="animation-duration: 8s;"
       />
       <!-- Bottom Right Blob -->
       <div
-        class="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full opacity-15 blur-3xl bg-gradient-to-tl from-indigo-500 to-purple-500 animate-pulse"
+        class="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full opacity-15 blur-3xl bg-gradient-to-tl from-violet-500 to-cyan-500 animate-pulse"
         style="animation-duration: 12s;"
       />
     </div>
@@ -138,9 +138,9 @@ const notificationAriaLabel = computed(() =>
           <!-- Left: Logo -->
           <div class="flex items-center">
             <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2">
-              <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8">
-              <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                DH-Echo
+              <img src="/logo.png" alt="Novika" class="w-8 h-8">
+              <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                Novika
               </span>
             </NuxtLink>
             <TeamsMenu v-else />
@@ -175,9 +175,9 @@ const notificationAriaLabel = computed(() =>
             </UButton>
 
             <!-- Credits Badge -->
-            <NuxtLink :to="localePath('/dashboard/credits')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
-              <UIcon name="i-lucide-coins" class="w-4 h-4 text-indigo-500" />
-              <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">{{ credits }}</span>
+            <NuxtLink :to="localePath('/dashboard/credits')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 dark:bg-violet-900/30 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors">
+              <UIcon name="i-lucide-coins" class="w-4 h-4 text-violet-500" />
+              <span class="text-sm font-medium text-violet-600 dark:text-violet-400">{{ credits }}</span>
             </NuxtLink>
 
             <UserMenu :collapsed="true" />
@@ -209,9 +209,9 @@ const notificationAriaLabel = computed(() =>
       <template #body>
         <div class="flex flex-col gap-4 h-full">
           <NuxtLink v-if="hasSingleOrganization" :to="localePath('/dashboard')" class="group flex items-center gap-2 px-2">
-            <img src="/favicon.svg" alt="DH-Echo" class="w-8 h-8">
-            <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-              DH-Echo
+            <img src="/logo.png" alt="Novika" class="w-8 h-8">
+            <span class="text-lg font-semibold text-slate-800 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+              Novika
             </span>
           </NuxtLink>
           <TeamsMenu v-else />
@@ -244,8 +244,8 @@ const notificationAriaLabel = computed(() =>
             class="flex items-center gap-3 px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
             @click="open = false"
           >
-            <UIcon name="i-lucide-coins" class="w-5 h-5 text-indigo-500" />
-            <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">{{ credits }} {{ t('pages.dashboard.credits.creditsUnit') }}</span>
+            <UIcon name="i-lucide-coins" class="w-5 h-5 text-violet-500" />
+            <span class="text-sm font-medium text-violet-600 dark:text-violet-400">{{ credits }} {{ t('pages.dashboard.credits.creditsUnit') }}</span>
           </NuxtLink>
 
           <!-- Mobile Notifications Button -->

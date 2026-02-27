@@ -56,7 +56,7 @@ class DocxGeneratorService {
     }
 
     const doc = new Document({
-      creator: 'DH-Echo',
+      creator: 'Novika',
       title: audio.title || audio.fileName,
       description: i18n.t('messages.export.document_title'),
       sections: [

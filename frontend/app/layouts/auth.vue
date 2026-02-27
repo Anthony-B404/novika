@@ -4,8 +4,8 @@
       <div class="max-w-lg w-full">
         <div class="mb-8 flex justify-center">
           <NuxtLink to="/" class="flex items-center gap-2">
-            <img src="/favicon.svg" alt="DH-Echo" class="h-10 w-10">
-            <span class="text-2xl font-bold text-highlighted">DH-Echo</span>
+            <img src="/logo.png" alt="Novika" class="h-10 w-10">
+            <span class="text-2xl font-bold text-highlighted">Novika</span>
           </NuxtLink>
         </div>
         <UPageCard variant="subtle" class="w-full">

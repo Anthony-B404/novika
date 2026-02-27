@@ -75,7 +75,7 @@ node ace generate:key               # Generate APP_KEY
 The system implements a B2B2B model with four tiers:
 
 ```
-Super Admin (DH-Echo staff)
+Super Admin (Novika staff)
     │ Access: /admin/*
     │ Can: Create resellers, add credits to resellers
     ▼
@@ -275,7 +275,7 @@ export type UserRoleType = 'super_admin' | 'reseller_admin' | 'organization_user
 // - otherwise → 'organization_user'
 ```
 
-- **Super Admin** (`isSuperAdmin = true`): DH-Echo staff with access to `/admin/*` routes
+- **Super Admin** (`isSuperAdmin = true`): Novika staff with access to `/admin/*` routes
   - Can manage all resellers
   - Can add/remove credits to reseller pools
   - Can view global statistics
@@ -1053,7 +1053,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=
-DB_DATABASE=dh_echo_db
+DB_DATABASE=novika_db
 
 # Email
 RESEND_API_KEY=            # From resend.com

@@ -117,7 +117,7 @@ export default class User extends BaseModel {
 
   /**
    * Get the role type of the user in the system hierarchy
-   * - super_admin: System administrator (DH-Echo)
+   * - super_admin: System administrator (Novika)
    * - reseller_admin: Reseller administrator
    * - organization_user: Regular organization member
    */

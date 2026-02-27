@@ -1,19 +1,19 @@
-# DH-Echo
+# Novika
 
 > Transformez vos enregistrements audio en documents structurés grâce à l'IA.
 
 ## Concept
 
-DH-Echo est une application web B2B2B qui transforme des enregistrements audio (réunions, dictées, appels) en documents écrits parfaitement structurés. Ce n'est pas juste un transcripteur, c'est un rédacteur intelligent capable de s'adapter au métier de l'utilisateur (Avocat, Médecin, Commercial).
+Novika est une application web B2B2B qui transforme des enregistrements audio (réunions, dictées, appels) en documents écrits parfaitement structurés. Ce n'est pas juste un transcripteur, c'est un rédacteur intelligent capable de s'adapter au métier de l'utilisateur (Avocat, Médecin, Commercial).
 
 **L'objectif** : L'utilisateur dépose un audio de 1 heure en désordre, et récupère en 2 minutes un document de synthèse clair et prêt à être envoyé.
 
 ## Modèle de Distribution (B2B2B)
 
-DH-Echo utilise un modèle de distribution via revendeurs :
+Novika utilise un modèle de distribution via revendeurs :
 
 ```
-DH-Echo (Super Admin)
+Novika (Super Admin)
     ↓ Gestion des revendeurs, attribution de crédits
 Revendeur (Reseller)
     ↓ Création d'organisations, distribution de crédits, gestion des utilisateurs
@@ -161,7 +161,7 @@ Super Admin → Reseller Pool → Organization Pool → Consommation
 
 ```bash
 git clone <your-repo-url>
-cd DH-Echo
+cd Novika
 ```
 
 2. **Configurer le Backend**
@@ -202,7 +202,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=your_password
-DB_DATABASE=dh_echo_db
+DB_DATABASE=novika_db
 
 # Mail (Resend)
 RESEND_API_KEY=re_your_resend_api_key
@@ -252,7 +252,7 @@ Vérifier l'installation : `redis-cli ping` → doit répondre `PONG`
 cd backend
 
 # Créer la base de données
-createdb dh_echo_db
+createdb novika_db
 
 # Exécuter les migrations
 node ace migration:run
@@ -331,7 +331,7 @@ pnpm typecheck       # TypeScript type checking
 
 ## Architecture Multi-Tenant
 
-DH-Echo utilise une architecture multi-tenant hiérarchique :
+Novika utilise une architecture multi-tenant hiérarchique :
 
 ### Hiérarchie des Données
 
@@ -368,7 +368,7 @@ Les crédits sont gérés au niveau **Organisation** (et non au niveau utilisate
 
 ## Jobs en Arrière-Plan (Redis & BullMQ)
 
-DH-Echo utilise **BullMQ** avec **Redis** pour gérer les tâches asynchrones :
+Novika utilise **BullMQ** avec **Redis** pour gérer les tâches asynchrones :
 
 ### Queues disponibles
 
@@ -409,7 +409,7 @@ node ace gdpr:scheduler
 ```bash
 # Ajouter à crontab (crontab -e)
 # Exécution quotidienne à 2h du matin
-0 2 * * * cd /path/to/dh-echo/backend && node ace gdpr:scheduler >> /var/log/dh-echo-gdpr.log 2>&1
+0 2 * * * cd /path/to/novika/backend && node ace gdpr:scheduler >> /var/log/novika-gdpr.log 2>&1
 ```
 
 #### Ce que fait le scheduler

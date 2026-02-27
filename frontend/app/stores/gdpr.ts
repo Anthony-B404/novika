@@ -156,7 +156,7 @@ export const useGdprStore = defineStore('gdpr', {
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.download = `dh-echo_export_${new Date().toISOString().split('T')[0]}.zip`
+        link.download = `novika_export_${new Date().toISOString().split('T')[0]}.zip`
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)

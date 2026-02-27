@@ -29,7 +29,7 @@ export default class ContactController {
     await mail.send((msg) => {
       msg
         .to('betteanthony73@gmail.com')
-        .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
+        .from(env.get('MAIL_FROM', 'Novika <noreply@novika.com>'))
         .replyTo(user.email)
         .subject(i18n.t('emails.contact_support.subject', { subject }))
         .htmlView('emails/contact_support', {
@@ -38,7 +38,7 @@ export default class ContactController {
           subject,
           message,
           i18n,
-          apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
+          apiUrl: env.get('API_URL', 'https://api.novika.com'),
         })
     })
 

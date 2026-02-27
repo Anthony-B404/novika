@@ -4,7 +4,7 @@
 @source "../../../content/**/*";
 
 @theme {
-  --font-sans: "Public Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
 }
 
 /* Markdown content styling */

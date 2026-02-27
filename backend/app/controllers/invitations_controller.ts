@@ -67,7 +67,7 @@ export default class InvitationsController {
       await mail.send((message) => {
         message
           .to(payload.email)
-          .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
+          .from(env.get('MAIL_FROM', 'Novika <noreply@novika.com>'))
           .subject(i18n.t('emails.invitation.subject', { organization: organization.name }))
           .htmlView('emails/invitation', {
             identifier: invitation.identifier,
@@ -78,7 +78,7 @@ export default class InvitationsController {
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-            apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
+            apiUrl: env.get('API_URL', 'https://api.novika.com'),
           })
       })
 
@@ -387,7 +387,7 @@ export default class InvitationsController {
       await mail.send((message) => {
         message
           .to(invitation.email)
-          .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
+          .from(env.get('MAIL_FROM', 'Novika <noreply@novika.com>'))
           .subject(i18n.t('emails.invitation.subject', { organization: organization.name }))
           .htmlView('emails/invitation', {
             identifier: invitation.identifier,
@@ -398,7 +398,7 @@ export default class InvitationsController {
             expiresAt: invitation.expiresAt.toFormat('dd/MM/yyyy'),
             i18n: i18n,
             frontendUrl: env.get('FRONTEND_URL', 'http://localhost:3000'),
-            apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
+            apiUrl: env.get('API_URL', 'https://api.novika.com'),
           })
       })
 

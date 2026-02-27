@@ -172,7 +172,7 @@ export default class ResellersController {
       await mail.send((message) => {
         message
           .to(result.adminUser.email)
-          .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
+          .from(env.get('MAIL_FROM', 'Novika <noreply@novika.com>'))
           .subject(i18n.t('emails.reseller_welcome.subject'))
           .htmlView('emails/reseller_welcome', {
             resellerName: result.reseller.name,

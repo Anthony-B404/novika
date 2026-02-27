@@ -110,7 +110,7 @@
     "data_credits": "Votre historique de crédits",
     "cancel_intro": "Vous avez changé d'avis ? Vous pouvez annuler cette demande à tout moment avant le {scheduledDate}.",
     "button": "Annuler la suppression",
-    "closing": "Cordialement,\nL'équipe DH-Echo",
+    "closing": "Cordialement,\nL'équipe Novika",
     "footer": "Si vous n'êtes pas à l'origine de cette demande, veuillez annuler immédiatement et contacter notre support."
   },
   "gdpr_deletion_reminder": {
@@ -122,7 +122,7 @@
     "reminder_text": "Après cette date, toutes vos données seront définitivement effacées et ne pourront pas être récupérées.",
     "cancel_intro": "Si vous souhaitez conserver votre compte, vous pouvez annuler cette demande en cliquant sur le bouton ci-dessous.",
     "button": "Annuler la suppression",
-    "closing": "Cordialement,\nL'équipe DH-Echo",
+    "closing": "Cordialement,\nL'équipe Novika",
     "footer": "Cet email est envoyé automatiquement dans le cadre de notre processus de suppression de compte."
   },
   "gdpr_deletion_completed": {
@@ -139,13 +139,13 @@
     "summary_credits": "Historique des crédits",
     "thanks": "Nous vous remercions d'avoir utilisé nos services.",
     "reregister": "Si vous souhaitez utiliser à nouveau nos services à l'avenir, vous êtes libre de créer un nouveau compte.",
-    "closing": "Cordialement,\nL'équipe DH-Echo",
+    "closing": "Cordialement,\nL'équipe Novika",
     "footer": "Cet email est la confirmation finale de la suppression de votre compte."
   },
   "reseller_welcome": {
-    "subject": "Bienvenue sur DH-Echo - Configurez votre compte revendeur",
+    "subject": "Bienvenue sur Novika - Configurez votre compte revendeur",
     "preview": "Votre compte revendeur {company} est prêt à être configuré",
-    "title": "Bienvenue sur DH-Echo !",
+    "title": "Bienvenue sur Novika !",
     "greeting": "Bonjour {name}",
     "intro": "Votre compte revendeur pour {company} a été créé avec succès. Vous pouvez maintenant commencer à gérer vos clients et distribuer des crédits.",
     "features_intro": "En tant que revendeur, vous avez accès à :",
@@ -154,20 +154,20 @@
     "feature_3": "Suivi des utilisations et statistiques",
     "button": "Configurer mon compte",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo",
+    "team": "L'équipe Novika",
     "expires": "Ce lien expire le {date}.",
     "footer": "Si vous n'avez pas demandé ce compte, vous pouvez ignorer cet email."
   },
   "reseller_org_welcome": {
-    "subject": "Bienvenue sur DH-Echo - Configurez votre compte",
+    "subject": "Bienvenue sur Novika - Configurez votre compte",
     "preview": "Votre organisation {organization} a été créée",
-    "title": "Bienvenue sur DH-Echo !",
+    "title": "Bienvenue sur Novika !",
     "greeting": "Bonjour {name}",
     "intro": "Votre organisation {organization} a été créée par votre revendeur. Vous pouvez maintenant configurer votre compte et commencer à utiliser nos services.",
     "credits_info": "Vous disposez de {credits} crédits pour démarrer.",
     "button": "Configurer mon compte",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo",
+    "team": "L'équipe Novika",
     "expires": "Ce lien expire le {date}.",
     "footer": "Si vous n'attendiez pas cet email, vous pouvez l'ignorer."
   },
@@ -179,7 +179,7 @@
     "intro": "Vous avez été invité à rejoindre l'organisation {organization} en tant que {role}.",
     "button": "Accepter et configurer mon compte",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo",
+    "team": "L'équipe Novika",
     "expires": "Ce lien expire le {date}.",
     "footer": "Si vous n'attendiez pas cette invitation, vous pouvez l'ignorer."
   },
@@ -191,7 +191,7 @@
     "intro": "Vous avez été ajouté à l'organisation {organization} en tant que {role}. Vous pouvez maintenant y accéder depuis votre compte.",
     "button": "Se connecter",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo",
+    "team": "L'équipe Novika",
     "footer": "Si vous n'attendiez pas cet ajout, veuillez contacter votre administrateur."
   },
   "credit_request_created": {
@@ -203,7 +203,7 @@
     "justification_label": "Justification :",
     "button": "Examiner la demande",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo",
+    "team": "L'équipe Novika",
     "footer": "Cet email vous a été envoyé car un membre de votre équipe a demandé des crédits."
   },
   "credit_request_approved": {
@@ -215,7 +215,7 @@
     "credits": "crédits",
     "button": "Voir mes crédits",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo"
+    "team": "L'équipe Novika"
   },
   "credit_request_rejected": {
     "subject": "Votre demande de crédits a été refusée",
@@ -227,7 +227,7 @@
     "outro": "Vous pouvez soumettre une nouvelle demande avec une justification supplémentaire si nécessaire.",
     "button": "Faire une nouvelle demande",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo"
+    "team": "L'équipe Novika"
   },
   "credit_request_owner_created": {
     "subject": "Nouvelle demande de crédits de {organizationName}",
@@ -238,7 +238,7 @@
     "justification_label": "Justification :",
     "button": "Examiner la demande",
     "closing": "Cordialement",
-    "team": "L'équipe DH-Echo",
+    "team": "L'équipe Novika",
     "footer": "Cet email vous a été envoyé car une organisation a demandé des crédits."
   }
 }

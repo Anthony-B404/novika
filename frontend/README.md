@@ -1,6 +1,6 @@
-# DH-Echo Frontend
+# Novika Frontend
 
-Application Nuxt 4 pour DH-Echo - Transformation audio en documents structurés.
+Application Nuxt 4 pour Novika - Transformation audio en documents structurés.
 
 ## Stack Technique
 

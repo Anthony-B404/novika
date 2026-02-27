@@ -212,7 +212,7 @@ function getTransactionColor(type: string) {
     case 'refund':
     case 'distribution':
     case 'refill':
-      return 'text-indigo-500 dark:text-indigo-400'
+      return 'text-violet-500 dark:text-violet-400'
     default:
       return 'text-gray-500'
   }
@@ -228,7 +228,7 @@ function getTransactionBg(type: string) {
     case 'refund':
     case 'distribution':
     case 'refill':
-      return 'bg-indigo-50 dark:bg-indigo-900/30'
+      return 'bg-violet-50 dark:bg-violet-900/30'
     default:
       return 'bg-gray-100 dark:bg-gray-800'
   }
@@ -314,7 +314,7 @@ function getPerformedByName(tx: (typeof transactions.value)[0]) {
       >
         <div class="relative z-10 flex items-center gap-4 sm:gap-5">
           <div
-            class="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl border border-gray-100 bg-white text-indigo-500 shadow-sm dark:border-gray-800 dark:bg-slate-900"
+            class="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl border border-gray-100 bg-white text-violet-500 shadow-sm dark:border-gray-800 dark:bg-slate-900"
           >
             <UIcon name="i-lucide-building" class="h-6 w-6 sm:h-8 sm:w-8" />
           </div>
@@ -390,7 +390,7 @@ function getPerformedByName(tx: (typeof transactions.value)[0]) {
       >
         <div class="relative z-10 flex items-center gap-4 sm:gap-5">
           <div
-            class="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl border border-gray-100 bg-white text-indigo-500 shadow-sm dark:border-gray-800 dark:bg-slate-900"
+            class="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl border border-gray-100 bg-white text-violet-500 shadow-sm dark:border-gray-800 dark:bg-slate-900"
           >
             <UIcon name="i-lucide-coins" class="h-6 w-6 sm:h-8 sm:w-8" />
           </div>
@@ -488,7 +488,7 @@ function getPerformedByName(tx: (typeof transactions.value)[0]) {
                   :class="[
                     'text-lg font-bold',
                     tx.amount > 0
-                      ? 'text-indigo-600 dark:text-indigo-400'
+                      ? 'text-violet-600 dark:text-violet-400'
                       : 'text-slate-700 dark:text-slate-300',
                   ]"
                 >

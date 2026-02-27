@@ -76,14 +76,14 @@ class ShareService {
     await mail.send((message) => {
       message
         .to(email)
-        .from(env.get('MAIL_FROM', 'DH-Echo <noreply@dh-echo.com>'))
+        .from(env.get('MAIL_FROM', 'Novika <noreply@novika.com>'))
         .subject(i18n.t('emails.audio_share.subject', { senderName }))
         .htmlView('emails/audio_share', {
           senderName,
           audioTitle,
           shareUrl,
           i18n,
-          apiUrl: env.get('API_URL', 'https://api.dh-echo.com'),
+          apiUrl: env.get('API_URL', 'https://api.novika.com'),
         })
         .attachData(exportResult.buffer, {
           filename: exportResult.filename,

@@ -104,9 +104,9 @@ async function handleLogout () {
           :class="isCollapsed ? 'justify-center' : 'justify-between pr-1 pl-2'"
         >
           <div class="flex items-center gap-2">
-            <img src="/favicon.svg" alt="DH-Echo" class="h-8 w-8 shrink-0">
+            <img src="/logo.png" alt="Novika" class="h-8 w-8 shrink-0">
             <span v-if="!isCollapsed" class="text-lg font-semibold text-slate-800 dark:text-white">
-              DH-Echo
+              Novika
             </span>
           </div>
           <UDashboardSidebarCollapse v-if="!isCollapsed" />

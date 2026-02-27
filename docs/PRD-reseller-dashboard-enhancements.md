@@ -2,7 +2,7 @@
 
 **Version**: 1.2
 **Date**: 17 janvier 2026
-**Auteur**: DH-Echo Product Team
+**Auteur**: Novika Product Team
 **Statut**: Draft
 
 ---

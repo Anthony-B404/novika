@@ -35,7 +35,6 @@ const colorOptions = [
   '#F59E0B', // amber
   '#EF4444', // red
   '#EC4899', // pink
-  '#6366F1', // indigo
   '#14B8A6' // teal
 ]
 

@@ -1,4 +1,4 @@
-name: dh-echo-prod
+name: novika-prod
 
 services:
   # ===========================================
@@ -6,7 +6,7 @@ services:
   # ===========================================
   postgres:
     image: postgres:16-alpine
-    container_name: dh-echo-postgres
+    container_name: novika-postgres
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -20,14 +20,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - dh-echo-internal
+      - novika-internal
 
   # ===========================================
   # Redis (BullMQ)
   # ===========================================
   redis:
     image: redis:7-alpine
-    container_name: dh-echo-redis
+    container_name: novika-redis
     restart: always
     command: redis-server --appendonly yes ${REDIS_PASSWORD:+--requirepass $REDIS_PASSWORD}
     volumes:
@@ -38,14 +38,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - dh-echo-internal
+      - novika-internal
 
   # ===========================================
   # Backend API (Production)
   # ===========================================
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/dh-echo}/backend:${TAG:-latest}
-    container_name: dh-echo-backend
+    image: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/novika}/backend:${TAG:-latest}
+    container_name: novika-backend
     restart: always
     environment:
       NODE_ENV: production
@@ -71,10 +71,10 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: https://api.dh-echo.com
-      FRONTEND_URL: https://dh-echo.com
+      API_URL: https://api.novika.com
+      FRONTEND_URL: https://novika.com
       # CORS
-      ALLOWED_ORIGINS: https://dh-echo.com
+      ALLOWED_ORIGINS: https://novika.com
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -99,23 +99,23 @@ services:
       start_period: 40s
       retries: 3
     networks:
-      - dh-echo-internal
-      - dh-echo-public
+      - novika-internal
+      - novika-public
       - traefik-public
     labels:
       - "traefik.enable=true"
       # API principal
-      - "traefik.http.routers.dh-echo-api.rule=Host(`api.dh-echo.com`)"
-      - "traefik.http.routers.dh-echo-api.entrypoints=websecure"
-      - "traefik.http.routers.dh-echo-api.tls.certresolver=mytlschallenge"
-      - "traefik.http.services.dh-echo-api.loadbalancer.server.port=3333"
+      - "traefik.http.routers.novika-api.rule=Host(`api.novika.com`)"
+      - "traefik.http.routers.novika-api.entrypoints=websecure"
+      - "traefik.http.routers.novika-api.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.novika-api.loadbalancer.server.port=3333"
       # Redirect api.cloud → api.com (301)
-      - "traefik.http.routers.dh-echo-api-cloud-redirect.rule=Host(`api.dh-echo.cloud`)"
-      - "traefik.http.routers.dh-echo-api-cloud-redirect.entrypoints=websecure"
-      - "traefik.http.routers.dh-echo-api-cloud-redirect.tls.certresolver=mytlschallenge"
-      - "traefik.http.routers.dh-echo-api-cloud-redirect.middlewares=redirect-api-cloud-to-com"
-      - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.regex=^https://api\\.dh-echo\\.cloud(.*)"
-      - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.replacement=https://api.dh-echo.com$${1}"
+      - "traefik.http.routers.novika-api-cloud-redirect.rule=Host(`api.novika.cloud`)"
+      - "traefik.http.routers.novika-api-cloud-redirect.entrypoints=websecure"
+      - "traefik.http.routers.novika-api-cloud-redirect.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.novika-api-cloud-redirect.middlewares=redirect-api-cloud-to-com"
+      - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.regex=^https://api\\.novika\\.cloud(.*)"
+      - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.replacement=https://api.novika.com$${1}"
       - "traefik.http.middlewares.redirect-api-cloud-to-com.redirectregex.permanent=true"
     deploy:
       resources:
@@ -128,8 +128,8 @@ services:
   # Backend Worker (Production)
   # ===========================================
   worker:
-    image: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/dh-echo}/backend:${TAG:-latest}
-    container_name: dh-echo-worker
+    image: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/novika}/backend:${TAG:-latest}
+    container_name: novika-worker
     restart: always
     command: ["node", "bin/worker.js"]
     environment:
@@ -156,8 +156,8 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: https://api.dh-echo.com
-      FRONTEND_URL: https://dh-echo.com
+      API_URL: https://api.novika.com
+      FRONTEND_URL: https://novika.com
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -168,7 +168,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - dh-echo-internal
+      - novika-internal
     deploy:
       resources:
         limits:
@@ -183,8 +183,8 @@ services:
     build:
       context: ./docker/scheduler
       args:
-        BACKEND_IMAGE: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/dh-echo}/backend:${TAG:-latest}
-    container_name: dh-echo-scheduler
+        BACKEND_IMAGE: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/novika}/backend:${TAG:-latest}
+    container_name: novika-scheduler
     restart: always
     environment:
       NODE_ENV: production
@@ -208,8 +208,8 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: https://api.dh-echo.com
-      FRONTEND_URL: https://dh-echo.com
+      API_URL: https://api.novika.com
+      FRONTEND_URL: https://novika.com
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -220,7 +220,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - dh-echo-internal
+      - novika-internal
     deploy:
       resources:
         limits:
@@ -232,8 +232,8 @@ services:
   # Frontend (Production)
   # ===========================================
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/dh-echo}/frontend:${TAG:-latest}
-    container_name: dh-echo-frontend
+    image: ghcr.io/${GITHUB_REPOSITORY:-anthonybette/novika}/frontend:${TAG:-latest}
+    container_name: novika-frontend
     restart: always
     expose:
       - "80"
@@ -252,30 +252,30 @@ services:
       start_period: 10s
       retries: 3
     networks:
-      - dh-echo-public
+      - novika-public
       - traefik-public
     labels:
       - "traefik.enable=true"
       # Frontend principal
-      - "traefik.http.routers.dh-echo-frontend.rule=Host(`dh-echo.com`) || Host(`www.dh-echo.com`)"
-      - "traefik.http.routers.dh-echo-frontend.entrypoints=websecure"
-      - "traefik.http.routers.dh-echo-frontend.tls.certresolver=mytlschallenge"
-      - "traefik.http.services.dh-echo-frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.novika-frontend.rule=Host(`novika.com`) || Host(`www.novika.com`)"
+      - "traefik.http.routers.novika-frontend.entrypoints=websecure"
+      - "traefik.http.routers.novika-frontend.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.novika-frontend.loadbalancer.server.port=80"
       # Redirect .cloud → .com (301)
-      - "traefik.http.routers.dh-echo-cloud-redirect.rule=Host(`dh-echo.cloud`) || Host(`www.dh-echo.cloud`)"
-      - "traefik.http.routers.dh-echo-cloud-redirect.entrypoints=websecure"
-      - "traefik.http.routers.dh-echo-cloud-redirect.tls.certresolver=mytlschallenge"
-      - "traefik.http.routers.dh-echo-cloud-redirect.middlewares=redirect-cloud-to-com"
-      - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.regex=^https://(?:www\\.)?dh-echo\\.cloud(.*)"
-      - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.replacement=https://dh-echo.com$${1}"
+      - "traefik.http.routers.novika-cloud-redirect.rule=Host(`novika.cloud`) || Host(`www.novika.cloud`)"
+      - "traefik.http.routers.novika-cloud-redirect.entrypoints=websecure"
+      - "traefik.http.routers.novika-cloud-redirect.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.novika-cloud-redirect.middlewares=redirect-cloud-to-com"
+      - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.regex=^https://(?:www\\.)?novika\\.cloud(.*)"
+      - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.replacement=https://novika.com$${1}"
       - "traefik.http.middlewares.redirect-cloud-to-com.redirectregex.permanent=true"
       # Redirect .fr → .com (301)
-      - "traefik.http.routers.dh-echo-fr-redirect.rule=Host(`dh-echo.fr`) || Host(`www.dh-echo.fr`)"
-      - "traefik.http.routers.dh-echo-fr-redirect.entrypoints=websecure"
-      - "traefik.http.routers.dh-echo-fr-redirect.tls.certresolver=mytlschallenge"
-      - "traefik.http.routers.dh-echo-fr-redirect.middlewares=redirect-fr-to-com"
-      - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.regex=^https://(?:www\\.)?dh-echo\\.fr(.*)"
-      - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.replacement=https://dh-echo.com$${1}"
+      - "traefik.http.routers.novika-fr-redirect.rule=Host(`novika.fr`) || Host(`www.novika.fr`)"
+      - "traefik.http.routers.novika-fr-redirect.entrypoints=websecure"
+      - "traefik.http.routers.novika-fr-redirect.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.novika-fr-redirect.middlewares=redirect-fr-to-com"
+      - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.regex=^https://(?:www\\.)?novika\\.fr(.*)"
+      - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.replacement=https://novika.com$${1}"
       - "traefik.http.middlewares.redirect-fr-to-com.redirectregex.permanent=true"
     deploy:
       resources:
@@ -290,10 +290,10 @@ volumes:
   backend_storage:
 
 networks:
-  dh-echo-internal:
+  novika-internal:
     driver: bridge
     # Removed 'internal: true' - was blocking outbound connections for OAuth
-  dh-echo-public:
+  novika-public:
     driver: bridge
   traefik-public:
     external: true

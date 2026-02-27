@@ -7,7 +7,15 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   app: {
     head: {
-      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]
+      meta: [
+        { name: 'theme-color', content: '#7c3aed' },
+        { property: 'og:site_name', content: 'Novika' },
+        { property: 'og:type', content: 'website' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+      ],
     }
   },
   devtools: { enabled: true },

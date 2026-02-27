@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DH-Echo is a B2B2B SaaS application that transforms audio recordings (meetings, dictations, calls) into structured written documents using AI. Built with Nuxt 4 frontend and AdonisJS v6 backend with multi-tenant architecture and a reseller distribution model.
+Novika is a B2B2B SaaS application that transforms audio recordings (meetings, dictations, calls) into structured written documents using AI. Built with Nuxt 4 frontend and AdonisJS v6 backend with multi-tenant architecture and a reseller distribution model.
 
 ### Core Features (MVP)
 - **Audio Workshop**: Upload (MP3, WAV) or record via microphone
@@ -13,7 +13,7 @@ DH-Echo is a B2B2B SaaS application that transforms audio recordings (meetings, 
 - **Dashboard & Export**: Audio library with PDF/Word export
 
 ### Business Context
-- **Business Model**: B2B2B (DH-Echo → Resellers → Client Organizations → Users)
+- **Business Model**: B2B2B (Novika → Resellers → Client Organizations → Users)
 - **Target users**: Professionals (Lawyers, Doctors, Salespeople) via reseller partners
 - **Value proposition**: "1-hour messy audio → 2-minute structured document"
 - **UX principles**: Minimalist, reassuring, "Drag, Drop, Done"
@@ -86,7 +86,7 @@ node ace check:auto-refill          # Check auto-refills due tomorrow, warn if i
 
 **System Hierarchy (B2B2B Model)**:
 ```
-Super Admin (DH-Echo staff)    → Access: /admin/*
+Super Admin (Novika staff)    → Access: /admin/*
     ↓
 Reseller (Business partner)    → Access: /reseller/*
     ↓
@@ -451,7 +451,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=
-DB_DATABASE=dh_echo_db
+DB_DATABASE=novika_db
 
 # Email (Resend)
 RESEND_API_KEY=            # From resend.com for emails

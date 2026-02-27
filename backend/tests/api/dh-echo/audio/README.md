@@ -16,7 +16,7 @@ cp /path/to/your/audio.mp3 ./sample.mp3
 ### 2. Redis en cours d'execution
 
 ```bash
-docker run -d -p 6379:6379 --name dh-echo-redis redis:alpine
+docker run -d -p 6379:6379 --name novika-redis redis:alpine
 ```
 
 ### 3. Token d'authentification

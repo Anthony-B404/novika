@@ -1,5 +1,5 @@
 # Scheduler container with supercronic for cron jobs
-ARG BACKEND_IMAGE=ghcr.io/anthonybette/dh-echo/backend:latest
+ARG BACKEND_IMAGE=ghcr.io/anthonybette/novika/backend:latest
 FROM ${BACKEND_IMAGE}
 
 # Install supercronic (lightweight cron for containers)

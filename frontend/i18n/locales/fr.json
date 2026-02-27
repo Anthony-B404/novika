@@ -117,7 +117,7 @@
     },
     "resellerSetup": {
       "title": "Activez votre compte revendeur",
-      "subtitle": "Bienvenue chez DH-Echo ! Complétez vos informations pour accéder à votre espace revendeur.",
+      "subtitle": "Bienvenue chez Novika ! Complétez vos informations pour accéder à votre espace revendeur.",
       "firstName": "Prénom",
       "firstNamePlaceholder": "Entrez votre prénom",
       "lastName": "Nom",
@@ -130,9 +130,9 @@
       "verifying": "Vérification du lien",
       "pleaseWait": "Veuillez patienter...",
       "tokenInvalid": "Ce lien n'est pas valide",
-      "tokenInvalidDescription": "Le lien que vous avez utilisé est invalide. Veuillez contacter l'administrateur DH-Echo.",
+      "tokenInvalidDescription": "Le lien que vous avez utilisé est invalide. Veuillez contacter l'administrateur Novika.",
       "tokenExpired": "Ce lien a expiré",
-      "tokenExpiredDescription": "Le lien d'activation a expiré. Veuillez contacter l'administrateur DH-Echo pour obtenir un nouveau lien.",
+      "tokenExpiredDescription": "Le lien d'activation a expiré. Veuillez contacter l'administrateur Novika pour obtenir un nouveau lien.",
       "alreadyCompleted": "Compte déjà activé",
       "alreadyCompletedDescription": "Votre compte est déjà activé. Vous pouvez vous connecter.",
       "success": "Compte revendeur activé !",
@@ -231,14 +231,14 @@
     },
     "setup": {
       "title": "Finalisez votre compte",
-      "description": "Complétez votre inscription pour accéder à DH-Echo"
+      "description": "Complétez votre inscription pour accéder à Novika"
     },
     "resellerSetup": {
       "title": "Activez votre compte revendeur",
-      "description": "Complétez votre inscription pour accéder à votre espace revendeur DH-Echo"
+      "description": "Complétez votre inscription pour accéder à votre espace revendeur Novika"
     },
     "dashboard": {
-      "title": "DH-Echo",
+      "title": "Novika",
       "description": "Votre tableau de bord d'application"
     },
     "error": {
@@ -683,7 +683,7 @@
         "privacy": "Confidentialité",
         "cookies": "Cookies",
         "legalNotice": "Mentions légales",
-        "copyright": "© {year} DH-Echo. Tous droits réservés."
+        "copyright": "© {year} Novika. Tous droits réservés."
       }
     }
   },
@@ -1186,7 +1186,7 @@
       "notFound": "Lien de partage introuvable",
       "notFoundDescription": "Ce lien de partage n'existe pas ou a été révoqué.",
       "sharedBy": "Partagé par {name}",
-      "sharedVia": "Partagé via DH-Echo",
+      "sharedVia": "Partagé via Novika",
       "downloadPdf": "Télécharger le PDF",
       "transcriptionCopied": "Transcription copiée dans le presse-papiers",
       "analysisCopied": "Analyse copiée dans le presse-papiers",
@@ -1319,7 +1319,7 @@
     "sections": {
       "publisher": {
         "title": "Éditeur du site",
-        "content": "DH-Echo est un service de transcription et d'analyse audio par intelligence artificielle. Le service est édité par DH solutions, SARL, au capital de 10 000 euros. Siège social : 20 Chemin des burnet, 73100 Aix-les-bains. RCS : 751 862 905. TVA intracommunautaire : FR03751862905."
+        "content": "Novika est un service de transcription et d'analyse audio par intelligence artificielle. Le service est édité par DH solutions, SARL, au capital de 10 000 euros. Siège social : 20 Chemin des burnet, 73100 Aix-les-bains. RCS : 751 862 905. TVA intracommunautaire : FR03751862905."
       },
       "hosting": {
         "title": "Hébergement",

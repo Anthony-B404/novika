@@ -34,7 +34,7 @@ export default class GdprController {
     try {
       const zipBuffer = await gdprExportService.generateExport(user)
 
-      const filename = `dh-echo_export_${DateTime.now().toFormat('yyyy-MM-dd_HHmmss')}.zip`
+      const filename = `novika_export_${DateTime.now().toFormat('yyyy-MM-dd_HHmmss')}.zip`
 
       response.header('Content-Type', 'application/zip')
       response.header('Content-Disposition', `attachment; filename="${filename}"`)

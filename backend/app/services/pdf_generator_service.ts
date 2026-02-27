@@ -52,7 +52,7 @@ class PdfGeneratorService {
         bufferPages: true,
         info: {
           Title: audio.title || audio.fileName,
-          Author: 'DH-Echo',
+          Author: 'Novika',
           Subject: i18n.t('messages.export.document_title'),
           CreationDate: new Date(),
         },
