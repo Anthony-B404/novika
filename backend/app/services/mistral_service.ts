@@ -1,7 +1,25 @@
-import { Mistral } from '@mistralai/mistralai'
+import { Mistral, HTTPClient } from '@mistralai/mistralai'
+import { Agent } from 'undici'
 import env from '#start/env'
 import { readFile } from 'node:fs/promises'
 import type { TranscriptionTimestamp } from '#models/transcription'
+
+/**
+ * Custom HTTP client with extended headersTimeout for large audio transcriptions.
+ * Node.js fetch (undici) defaults to 5min headersTimeout — too short for long audio files
+ * where Mistral may take 10-30min to process before sending response headers.
+ */
+const longTimeoutAgent = new Agent({
+  headersTimeout: 60 * 60 * 1000, // 60 minutes
+  bodyTimeout: 60 * 60 * 1000,
+})
+
+const transcriptionHttpClient = new HTTPClient({
+  fetcher: (input, init) => {
+    // Use global fetch (Node.js undici) with custom dispatcher for extended timeouts
+    return globalThis.fetch(input, { ...init, dispatcher: longTimeoutAgent } as any)
+  },
+})
 
 /**
  * Chat message for multi-turn conversation
@@ -37,13 +55,15 @@ export default class MistralService {
   constructor() {
     this.client = new Mistral({
       apiKey: env.get('MISTRAL_API_KEY'),
-      timeoutMs: 10 * 60 * 1000, // 10 minutes for large audio uploads
+      httpClient: transcriptionHttpClient,
+      timeoutMs: 10 * 60 * 1000, // 10 minutes default (overridden per-call for transcription)
     })
   }
 
   /**
    * Transcribe audio file using Voxtral model with timestamps and speaker diarization.
-   * Timeout scales with audio duration to handle large files (upload + server processing).
+   * Uses Mistral's upload → signed URL → transcribe flow for reliable large file handling.
+   * Timeout scales with audio duration to handle server-side processing time.
    */
   async transcribe(
     filePath: string,
@@ -56,35 +76,62 @@ export default class MistralService {
       ? Math.max(MIN_TIMEOUT_MS, Math.round(audioDurationSeconds * 1.5) * 1000)
       : MIN_TIMEOUT_MS
 
+    // Sanitize filename to avoid encoding issues with emojis/special chars
+    const sanitizedName = fileName.replace(/[^\w\s.()-]/g, '_').replace(/__+/g, '_')
+
+    // Step 1: Upload file to Mistral cloud
     console.log(
-      `[Transcription] Mistral transcribe: file=${fileName}, duration=${audioDurationSeconds ?? 'unknown'}s, timeout=${Math.round(timeoutMs / 1000)}s`
+      `[Transcription] Mistral upload: file=${fileName}, duration=${audioDurationSeconds ?? 'unknown'}s`
     )
 
     const fileBuffer = await readFile(filePath)
     const blob = new Blob([fileBuffer], { type: mimeType })
-    const file = new File([blob], fileName)
+    const file = new File([blob], sanitizedName)
 
-    const result = await this.client.audio.transcriptions.complete(
-      {
-        model: 'voxtral-mini-latest',
-        file: file,
-        timestampGranularities: ['segment'],
-        diarize: true,
-      },
-      { timeoutMs }
+    const uploaded = await this.client.files.upload(
+      { file, purpose: 'audio' as any },
+      { timeoutMs: 30 * 60 * 1000 } // 30 min for upload
     )
 
-    const segments: TranscriptionTimestamp[] = (result.segments || []).map((seg) => ({
-      start: seg.start,
-      end: seg.end,
-      text: seg.text,
-      speaker: seg.speakerId || undefined,
-    }))
+    let fileUrl: string
+    try {
+      // Step 2: Get signed URL
+      const signed = await this.client.files.getSignedUrl({
+        fileId: uploaded.id,
+        expiry: 24,
+      })
+      fileUrl = signed.url
 
-    return {
-      text: result.text || '',
-      segments,
-      language: result.language || null,
+      console.log(
+        `[Transcription] Mistral transcribe via signed URL: fileId=${uploaded.id}, timeout=${Math.round(timeoutMs / 1000)}s`
+      )
+
+      // Step 3: Transcribe via signed URL (no multipart upload needed)
+      const result = await this.client.audio.transcriptions.complete(
+        {
+          model: 'voxtral-mini-latest',
+          fileUrl,
+          timestampGranularities: ['segment'],
+          diarize: true,
+        },
+        { timeoutMs }
+      )
+
+      const segments: TranscriptionTimestamp[] = (result.segments || []).map((seg) => ({
+        start: seg.start,
+        end: seg.end,
+        text: seg.text,
+        speaker: seg.speakerId || undefined,
+      }))
+
+      return {
+        text: result.text || '',
+        segments,
+        language: result.language || null,
+      }
+    } finally {
+      // Step 4: Cleanup uploaded file from Mistral cloud
+      this.client.files.delete({ fileId: uploaded.id }).catch(() => {})
     }
   }
 

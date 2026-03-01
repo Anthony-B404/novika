@@ -275,6 +275,44 @@ export default class AudioConverterService {
   }
 
   /**
+   * Speed up audio file for transcription cost optimization.
+   * Uses ffmpeg atempo filter. Output is a lightweight AAC file.
+   *
+   * @param inputPath - Path to source audio file
+   * @param factor - Speed multiplier (e.g. 1.75)
+   * @returns Path to sped-up temp file
+   */
+  async speedUp(inputPath: string, factor: number): Promise<string> {
+    if (!ffmpegPath) {
+      throw new Error('ffmpeg-static path not found')
+    }
+
+    const tmpDir = app.tmpPath()
+    await mkdir(tmpDir, { recursive: true })
+    const outputPath = join(tmpDir, `${randomUUID()}-speedup.m4a`)
+
+    const args = [
+      '-i',
+      inputPath,
+      '-filter:a',
+      `atempo=${factor}`,
+      '-acodec',
+      'aac',
+      '-b:a',
+      '64k',
+      '-ac',
+      '1',
+      '-vn',
+      '-y',
+      outputPath,
+    ]
+
+    await execFileAsync(ffmpegPath, args, { maxBuffer: 10 * 1024 * 1024 })
+
+    return outputPath
+  }
+
+  /**
    * Check if file is already in Opus format
    */
   isOpusFile(filePath: string): boolean {

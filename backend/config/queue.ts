@@ -17,8 +17,8 @@ export interface QueueConfig {
       type: 'exponential' | 'fixed'
       delay: number
     }
-    removeOnComplete: boolean
-    removeOnFail: boolean
+    removeOnComplete: { age: number; count: number }
+    removeOnFail: { age: number; count: number }
   }
   queues: {
     transcription: {
@@ -59,8 +59,8 @@ const queueConfig: QueueConfig = {
       type: 'exponential',
       delay: 30_000, // 30 seconds initial delay (handles Mistral 429 capacity limits)
     },
-    removeOnComplete: false, // Keep for status tracking
-    removeOnFail: false, // Keep for debugging
+    removeOnComplete: { age: 3600, count: 200 }, // Keep for 1h (SSE tracking), max 200
+    removeOnFail: { age: 86_400, count: 50 }, // Keep for 24h (debugging), max 50
   },
 
   /**

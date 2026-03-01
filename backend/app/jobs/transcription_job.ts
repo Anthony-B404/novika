@@ -21,6 +21,13 @@ import { RequestTimeoutError, ConnectionError } from '@mistralai/mistralai/model
 import { SDKError } from '@mistralai/mistralai/models/errors/sdkerror.js'
 
 /**
+ * Speed factor applied to audio before transcription.
+ * Reduces Mistral API cost by ~43% with no measurable quality loss.
+ * Timestamps are corrected back to original speed after transcription.
+ */
+const TRANSCRIPTION_SPEED_FACTOR = 1.75
+
+/**
  * Classify whether an error is retriable by BullMQ.
  * Non-retriable errors are wrapped in UnrecoverableError to skip remaining attempts.
  */
@@ -102,6 +109,7 @@ async function processTranscriptionJob(
   const tempDir = tmpdir()
   let tempOriginalPath: string | null = null
   let tempPath: string | null = null
+  let tempSpeedUpPath: string | null = null
   const converter = new AudioConverterService()
 
   // Detect retry: if Audio record's filePath differs from job data, conversion already happened
@@ -214,7 +222,7 @@ async function processTranscriptionJob(
 
       await job.updateProgress(10)
 
-      // Stage 4: Parallel conversion + transcription (10-75%)
+      // Stage 4: Speed up + parallel conversion + transcription (10-75%)
       // Guard to prevent progress going backward when two branches update concurrently
       let currentProgress = 10
       const safeUpdateProgress = async (value: number) => {
@@ -225,13 +233,16 @@ async function processTranscriptionJob(
       }
 
       const mistralService = new MistralService()
+      const spedUpDuration = audioDuration / TRANSCRIPTION_SPEED_FACTOR
 
-      // Determine MIME type for Mistral (use original file's MIME type)
-      const originalMimeType = audio?.mimeType || 'audio/mpeg'
+      // Speed up audio for cheaper/faster transcription (10-15%)
+      console.log(
+        `[Transcription] Job ${job.id} speeding up ${TRANSCRIPTION_SPEED_FACTOR}x (${Math.round(audioDuration)}s → ${Math.round(spedUpDuration)}s, audioId: ${audioId})`
+      )
+      tempSpeedUpPath = await converter.speedUp(tempOriginalPath, TRANSCRIPTION_SPEED_FACTOR)
+      await job.updateProgress(15)
 
-      // Asymptotic progress for parallel phase (10→70%)
-      // Formula: progress += (cap - progress) * factor
-      // Never stalls — always moves, just slower as it approaches the cap
+      // Asymptotic progress for parallel phase (15→70%)
       const PARALLEL_CAP = 70
       const parallelInterval = setInterval(async () => {
         const increment = (PARALLEL_CAP - currentProgress) * 0.035
@@ -247,14 +258,20 @@ async function processTranscriptionJob(
         ;[conversionResult, transcriptionResult] = await Promise.all([
           converter.convertToAac(tempOriginalPath, 'voice'),
           mistralService.transcribe(
-            tempOriginalPath,
+            tempSpeedUpPath,
             audioFileName,
-            audioDuration,
-            originalMimeType
+            spedUpDuration,
+            'audio/mp4'
           ),
         ])
       } finally {
         clearInterval(parallelInterval)
+      }
+
+      // Correct timestamps back to original speed
+      for (const seg of transcriptionResult.segments) {
+        seg.start = seg.start * TRANSCRIPTION_SPEED_FACTOR
+        seg.end = seg.end * TRANSCRIPTION_SPEED_FACTOR
       }
 
       console.log(
@@ -288,9 +305,11 @@ async function processTranscriptionJob(
       await unlink(tempOriginalPath).catch(() => {})
       tempOriginalPath = null
       await converter.cleanup(conversionResult.path)
+      if (tempSpeedUpPath) {
+        await unlink(tempSpeedUpPath).catch(() => {})
+        tempSpeedUpPath = null
+      }
 
-      // tempPath not needed — transcription already done on original file
-      // Set tempPath to null since we don't need a converted temp file anymore
       tempPath = null
 
       await job.updateProgress(75)
@@ -375,8 +394,16 @@ async function processTranscriptionJob(
         )
       }
 
-      // Transcribe on converted file (retry path) — asymptotic progress 15→70%
-      let retryProgress = 15
+      // Speed up converted file for transcription (retry path)
+      const spedUpDuration = audioDuration / TRANSCRIPTION_SPEED_FACTOR
+      console.log(
+        `[Transcription] Job ${job.id} retry: speeding up ${TRANSCRIPTION_SPEED_FACTOR}x (${Math.round(audioDuration)}s → ${Math.round(spedUpDuration)}s, audioId: ${audioId})`
+      )
+      tempSpeedUpPath = await converter.speedUp(tempPath!, TRANSCRIPTION_SPEED_FACTOR)
+      await job.updateProgress(18)
+
+      // Transcribe on sped-up file (retry path) — asymptotic progress 18→70%
+      let retryProgress = 18
       const RETRY_TRANSCRIPTION_CAP = 70
       const transcriptionInterval = setInterval(async () => {
         const increment = (RETRY_TRANSCRIPTION_CAP - retryProgress) * 0.035
@@ -388,14 +415,21 @@ async function processTranscriptionJob(
 
       try {
         transcriptionResult = await mistralService.transcribe(
-          tempPath!,
+          tempSpeedUpPath,
           audioFileName,
-          audioDuration
+          spedUpDuration,
+          'audio/mp4'
         )
       } finally {
         clearInterval(transcriptionInterval)
       }
       await job.updateProgress(72)
+
+      // Correct timestamps back to original speed
+      for (const seg of transcriptionResult.segments) {
+        seg.start = seg.start * TRANSCRIPTION_SPEED_FACTOR
+        seg.end = seg.end * TRANSCRIPTION_SPEED_FACTOR
+      }
 
       if (!transcriptionResult.text || transcriptionResult.text.trim() === '') {
         throw new Error('Transcription returned empty result')
@@ -491,8 +525,14 @@ async function processTranscriptionJob(
     const retriable = isRetriableError(error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
 
+    // Log cause chain for fetch errors (e.g. connection reset, DNS failure)
+    const cause = error instanceof Error && 'cause' in error ? (error as any).cause : undefined
+    const causeDetail = cause
+      ? ` | cause: ${cause instanceof Error ? `${cause.message}${cause.cause ? ` → ${(cause.cause as any).message || cause.cause}` : ''}` : cause}`
+      : ''
+
     console.log(
-      `[Transcription] Job ${job.id} failed (attempt ${job.attemptsMade + 1}/${maxAttempts}, retriable: ${retriable}, audioId: ${audioId}): ${errorMessage}`
+      `[Transcription] Job ${job.id} failed (attempt ${job.attemptsMade + 1}/${maxAttempts}, retriable: ${retriable}, audioId: ${audioId}): ${errorMessage}${causeDetail}`
     )
 
     // Update audio status to failed
@@ -514,6 +554,9 @@ async function processTranscriptionJob(
     if (tempPath) {
       await unlink(tempPath).catch(() => {})
     }
+    if (tempSpeedUpPath) {
+      await unlink(tempSpeedUpPath).catch(() => {})
+    }
 
     // Non-retriable: wrap in UnrecoverableError to skip remaining BullMQ attempts
     if (!retriable) {
@@ -534,6 +577,9 @@ export function createTranscriptionWorker(): Worker<TranscriptionJobData, Transc
     {
       connection: queueConfig.connection,
       concurrency: queueConfig.queues.transcription.concurrency,
+      lockDuration: 3_600_000, // 60 minutes — large audio uploads + Mistral processing
+      stalledInterval: 3_600_000, // Check for stalled jobs every 60 minutes
+      maxStalledCount: 3, // Allow 3 stall events before failing
     }
   )
 

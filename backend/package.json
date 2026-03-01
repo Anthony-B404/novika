@@ -79,7 +79,8 @@
     "mjml": "^4.16.1",
     "pdfkit": "^0.17.2",
     "pg": "^8.16.3",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "undici": "^7.22.0"
   },
   "hotHook": {
     "boundaries": [
