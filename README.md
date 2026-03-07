@@ -1,86 +1,118 @@
 # Novika
 
-> Transformez vos enregistrements audio en documents structurés grâce à l'IA.
+> Transformez vos enregistrements audio en documents structures grace a l'IA.
 
 ## Concept
 
-Novika est une application web B2B2B qui transforme des enregistrements audio (réunions, dictées, appels) en documents écrits parfaitement structurés. Ce n'est pas juste un transcripteur, c'est un rédacteur intelligent capable de s'adapter au métier de l'utilisateur (Avocat, Médecin, Commercial).
+Novika est une application web B2B2B qui transforme des enregistrements audio (reunions, dictees, appels) en documents ecrits parfaitement structures. Ce n'est pas juste un transcripteur, c'est un redacteur intelligent capable de s'adapter au metier de l'utilisateur (Avocat, Medecin, Commercial).
 
-**L'objectif** : L'utilisateur dépose un audio de 1 heure en désordre, et récupère en 2 minutes un document de synthèse clair et prêt à être envoyé.
+**L'objectif** : L'utilisateur depose un audio de 1 heure en desordre, et recupere en 2 minutes un document de synthese clair et pret a etre envoye.
 
-## Modèle de Distribution (B2B2B)
+## Modele de Distribution (B2B2B)
 
-Novika utilise un modèle de distribution via revendeurs :
+Novika utilise un modele de distribution via revendeurs :
 
 ```
 Novika (Super Admin)
-    ↓ Gestion des revendeurs, attribution de crédits
+    | Gestion des revendeurs, attribution de credits
 Revendeur (Reseller)
-    ↓ Création d'organisations, distribution de crédits, gestion des utilisateurs
+    | Creation d'organisations, distribution de credits, gestion des utilisateurs
 Organisation (Client)
-    ↓ Pool de crédits, utilisateurs
+    | Pool de credits, utilisateurs
 Utilisateur
-    → Consommation des crédits via traitement audio
+    -> Consommation des credits via traitement audio
 ```
 
-### Rôles Système
+### Roles Systeme
 
-| Rôle | Accès | Responsabilités |
+| Role | Acces | Responsabilites |
 |------|-------|-----------------|
-| **Super Admin** | `/admin/*` | Gestion des revendeurs, attribution des crédits au pool revendeur |
-| **Reseller Admin** | `/reseller/*` | Création d'organisations, distribution des crédits, gestion des utilisateurs |
+| **Super Admin** | `/admin/*` | Gestion des revendeurs, attribution des credits au pool revendeur |
+| **Reseller Admin** | `/reseller/*` | Creation d'organisations, distribution des credits, gestion des utilisateurs, abonnements |
 | **Utilisateur** | `/dashboard/*` | Utilisation du service de transformation audio |
 
-### Flux des Crédits
+### Flux des Credits
 
 ```
-Super Admin → Reseller Pool → Organization Pool → Consommation
+Super Admin -> Reseller Pool -> Organization Pool -> Consommation
 ```
 
-**Note** : L'inscription publique est désactivée. Tous les utilisateurs sont créés par les administrateurs revendeurs.
+**Note** : L'inscription publique est desactivee. Tous les utilisateurs sont crees par les administrateurs revendeurs.
 
-## Fonctionnalités
+## Fonctionnalites
 
 ### Atelier Audio
-- Upload de fichiers (MP3, WAV, M4A)
+- Upload de fichiers (27+ formats : MP3, WAV, M4A, OGG, FLAC, OPUS, WEBM, AAC, etc.)
 - Enregistrement direct via microphone
 - Interface drag & drop intuitive ("Drag, Drop, Done")
+- Traitement automatique des fichiers longs via chunking
 
 ### Moteur de Transformation
-- **Étape 1** : Transcription fidèle de l'audio en texte brut (avec distinction des interlocuteurs)
-- **Étape 2** : Restructuration intelligente via Templates IA
-- Adaptation au contexte métier de l'utilisateur
+- **Etape 1** : Transcription fidele de l'audio via Mistral AI `voxtral-mini-latest` (avec distinction des interlocuteurs via diarization)
+- **Etape 2** : Restructuration intelligente via prompts utilisateur avec `mistral-large-latest`
+- Adaptation au contexte metier de l'utilisateur
+- Suivi du statut de traitement en temps reel
 
-### Gestionnaire de Templates
-- Templates prédéfinis par métier :
-  - Compte rendu Médical
-  - Synthèse Juridique
-  - Liste d'actions commerciales
-- Création de templates personnalisés
-- Partage de templates au sein de l'organisation
+### Gestionnaire de Prompts
+- Prompts organises par categories
+- Creation de prompts personnalises
+- Reordonnancement par drag & drop
+- Prompts par defaut fournis a la creation d'organisation
+
+### Versioning des Transcriptions
+- Historique complet des versions d'analyse
+- Comparaison diff entre versions
+- Restauration de versions anterieures
+
+### Chat sur Transcription
+- Conversation multi-tour avec l'IA sur le contenu de la transcription
+- Credits debites automatiquement par message
+- Contexte conversationnel maintenu
+
+### Text-to-Speech (TTS)
+- Generation audio a partir du texte d'analyse via Inworld AI
+- Lecture en streaming directe
+- Cout suivi par audio
+
+### Partage Audio
+- Partage de transcriptions via liens publics UUID
+- Acces en lecture seule sans authentification
+- Export depuis la vue partagee
 
 ### Dashboard & Export
-- Bibliothèque d'enregistrements organisée
-- Export PDF et Word formatés professionnellement
+- Bibliotheque d'enregistrements organisee avec operations par lot
+- Export PDF et Word formates professionnellement
 - Historique et recherche
 
-### Demandes de Crédits
-- Membres peuvent demander des crédits à l'Owner
-- Owners peuvent demander des crédits au Reseller
-- Workflow d'approbation/rejet avec messages optionnels
-- Historique des demandes avec statuts
+### Systeme de Credits
+- Mode partage (pool organisation) ou individuel (par utilisateur)
+- Distribution de credits Owner -> Membres
+- Auto-refill mensuel configurable
+- Demandes de credits (Membre -> Owner, Owner -> Reseller)
+
+### Abonnements (Subscriptions)
+- Distribution recurrente de credits aux organisations
+- Types de renouvellement : premier du mois ou anniversaire
+- Pause/reprise des abonnements
+- Alertes pour les renouvellements a venir
 
 ### Notifications In-App
-- Icône cloche avec badge de compteur dans le header
-- Notifications temps réel (polling 60 secondes)
-- Types de notifications : demandes de crédits, crédits bas, distribution de crédits
+- Icone cloche avec badge de compteur dans le header
+- Notifications temps reel (polling 60 secondes)
+- Types : demandes de credits, credits bas, distribution, auto-refill insuffisant
 - Navigation contextuelle au clic sur la notification
 
-## Expérience Utilisateur
+### GDPR
+- Demande de suppression de compte avec delai de 30 jours
+- Rappels automatiques a J-7 et J-1
+- Export des donnees personnelles
+- Blocage des ecritures pendant la periode de suppression
+
+## Experience Utilisateur
 
 - Interface **minimaliste** et **rassurante**
-- Accent sur la **confidentialité** (sentiment de sécurité)
-- Focus sur la **productivité**
+- Accent sur la **confidentialite** (sentiment de securite)
+- Focus sur la **productivite**
 
 ---
 
@@ -89,11 +121,14 @@ Super Admin → Reseller Pool → Organization Pool → Consommation
 ### Frontend (Nuxt 4)
 
 - **Framework**: Nuxt 4.2.1 (SPA mode, SSR disabled)
-- **UI**: Nuxt UI 4.1.0
+- **UI**: Nuxt UI 4.4.0
 - **Styling**: Tailwind CSS 4.1.17 (via @tailwindcss/vite)
 - **State**: Pinia 3.0.4
 - **Validation**: Zod 4.1.12
-- **i18n**: @nuxtjs/i18n 10.2.0 (français par défaut)
+- **i18n**: @nuxtjs/i18n 10.2.0 (francais par defaut)
+- **AI**: Vercel AI SDK 6.0.78
+- **Markdown**: marked + DOMPurify + Turndown
+- **Utilities**: @vueuse/core, uuid
 
 ### Backend (AdonisJS v6)
 
@@ -103,8 +138,13 @@ Super Admin → Reseller Pool → Organization Pool → Consommation
 - **Mail**: @adonisjs/mail 9.2.2 + Resend
 - **Validation**: @vinejs/vine 4.1.0
 - **Authorization**: @adonisjs/bouncer 3.1.6
-- **i18n**: @adonisjs/i18n 2.2.3 (français et anglais)
-- **Billing**: Lemon Squeezy
+- **i18n**: @adonisjs/i18n 2.2.3 (francais et anglais)
+- **Job Queue**: BullMQ 5.66.2 + Redis (ioredis)
+- **AI**: @mistralai/mistralai 1.14.0 (transcription, analyse, chat)
+- **TTS**: Inworld AI API
+- **Audio**: ffmpeg-static + ffprobe-static
+- **Export**: pdfkit (PDF) + docx (Word) + archiver (ZIP)
+- **Storage**: @adonisjs/drive (local ou S3)
 
 ---
 
@@ -112,48 +152,62 @@ Super Admin → Reseller Pool → Organization Pool → Consommation
 
 ```
 .
-├── frontend/              # Application Nuxt 4
-│   ├── app/              # Nouvelle structure Nuxt 4
-│   │   ├── components/   # Components Vue auto-importés
-│   │   ├── layouts/      # Layouts Nuxt (default.vue, auth.vue, app.vue)
-│   │   ├── pages/        # Pages avec routing automatique
-│   │   └── assets/
-│   │       └── css/      # Styles globaux
-│   └── nuxt.config.ts
-│
-└── backend/              # API AdonisJS v6
-    ├── app/
-    │   ├── controllers/
-    │   ├── jobs/         # Workers BullMQ (transcription, GDPR)
-    │   ├── middleware/
-    │   ├── models/
-    │   ├── policies/
-    │   ├── services/     # Services métier (GDPR, queue, storage)
-    │   └── validators/
-    ├── commands/         # Commandes Ace (gdpr_scheduler)
-    ├── config/
-    │   └── queue.ts      # Configuration Redis/BullMQ
-    ├── database/
-    │   └── migrations/
-    ├── resources/
-    │   ├── lang/         # Fichiers de traduction
-    │   └── views/        # Templates Email Edge.js
-    └── start/
-        ├── routes.ts
-        ├── validator.ts
-        └── worker.ts     # Initialisation des workers BullMQ
+|-- frontend/              # Application Nuxt 4
+|   |-- app/              # Nouvelle structure Nuxt 4
+|   |   |-- components/   # Components Vue auto-importes
+|   |   |   |-- admin/    # Composants Super Admin
+|   |   |   |-- audio/    # Upload, prompt, resultat
+|   |   |   |-- credits/  # Gestion des credits
+|   |   |   |-- Library/  # Bibliotheque audio
+|   |   |   |-- prompt/   # Gestion des prompts
+|   |   |   |-- reseller/ # Composants Reseller
+|   |   |   |-- settings/ # Parametres organisation
+|   |   |   `-- workshop/ # Atelier audio (editeur, chat, TTS, export)
+|   |   |-- composables/  # 25 composables (useAuth, useApi, useTranscriptChat, etc.)
+|   |   |-- layouts/      # 5 layouts (app, admin, auth, default, reseller)
+|   |   |-- middleware/    # 5 middlewares (admin, auth, org-status, pending-deletion, reseller)
+|   |   |-- pages/        # Pages avec routing automatique
+|   |   |-- plugins/      # auth, config.client
+|   |   |-- stores/       # 9 stores Pinia (auth, audio, config, credits, etc.)
+|   |   |-- types/        # Definitions TypeScript par domaine
+|   |   |-- utils/        # Utilitaires (audio, errors)
+|   |   `-- assets/
+|   |       `-- css/      # Styles globaux
+|   `-- nuxt.config.ts
+|
+`-- backend/              # API AdonisJS v6
+    |-- app/
+    |   |-- controllers/  # 29 controllers (core, admin/, reseller/)
+    |   |-- jobs/         # 7 workers BullMQ (transcription, GDPR, subscription)
+    |   |-- middleware/   # 9 middlewares
+    |   |-- models/       # 20 modeles Lucid
+    |   |-- policies/     # 14 policies Bouncer
+    |   |-- services/     # 18 services metier (AI, audio, credits, export, GDPR)
+    |   `-- validators/   # 16 validators VineJS
+    |-- commands/         # 7 commandes Ace (CRON, migration)
+    |-- config/
+    |   `-- queue.ts      # Configuration Redis/BullMQ (4 queues)
+    |-- database/
+    |   `-- migrations/   # 66 migrations
+    |-- resources/
+    |   |-- lang/         # Fichiers de traduction (fr/, en/)
+    |   `-- views/        # Templates Email Edge.js + MJML
+    `-- start/
+        |-- routes.ts
+        |-- validator.ts
+        `-- worker.ts     # Initialisation des workers BullMQ
 ```
 
 ---
 
-## Démarrage Rapide
+## Demarrage Rapide
 
-### Prérequis
+### Prerequis
 
 - Node.js >= 18.x
 - PostgreSQL >= 14.x
-- Redis >= 6.x (pour les jobs en arrière-plan)
-- pnpm (recommandé) ou npm
+- Redis >= 6.x (pour les jobs en arriere-plan)
+- pnpm (recommande) ou npm
 
 ### Installation
 
@@ -172,7 +226,7 @@ pnpm install
 
 # Copier et configurer .env
 cp .env.example .env
-# Éditer .env avec vos configurations
+# Editer .env avec vos configurations
 ```
 
 3. **Configurer le Frontend**
@@ -183,7 +237,7 @@ pnpm install
 
 # Copier et configurer .env
 cp .env.example .env
-# Éditer .env avec votre URL API
+# Editer .env avec votre URL API
 ```
 
 ### Configuration des Variables d'Environnement
@@ -195,7 +249,7 @@ cp .env.example .env
 PORT=3333
 HOST=localhost
 NODE_ENV=development
-APP_KEY=<générer avec: node ace generate:key>
+APP_KEY=<generer avec: node ace generate:key>
 
 # Database
 DB_HOST=localhost
@@ -207,10 +261,22 @@ DB_DATABASE=novika_db
 # Mail (Resend)
 RESEND_API_KEY=re_your_resend_api_key
 
+# CORS
+ALLOWED_ORIGINS=http://localhost:3000
+
+# Mistral AI (transcription, analyse, chat)
+MISTRAL_API_KEY=your_mistral_api_key
+
+# Inworld TTS (text-to-speech)
+INWORLD_API_KEY=your_inworld_api_key
+
 # Redis (BullMQ)
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
+
+# File Storage
+DRIVE_DISK=local
 ```
 
 #### Frontend (.env)
@@ -244,23 +310,23 @@ sudo systemctl enable redis
 docker run -d --name redis -p 6379:6379 redis:alpine
 ```
 
-Vérifier l'installation : `redis-cli ping` → doit répondre `PONG`
+Verifier l'installation : `redis-cli ping` -> doit repondre `PONG`
 
-### Initialiser la Base de Données
+### Initialiser la Base de Donnees
 
 ```bash
 cd backend
 
-# Créer la base de données
+# Creer la base de donnees
 createdb novika_db
 
-# Exécuter les migrations
+# Executer les migrations
 node ace migration:run
 ```
 
-### Créer un Super Admin (Premier Accès)
+### Creer un Super Admin (Premier Acces)
 
-L'inscription publique étant désactivée, vous devez créer un Super Admin manuellement :
+L'inscription publique etant desactivee, vous devez creer un Super Admin manuellement :
 
 ```bash
 cd backend
@@ -272,10 +338,10 @@ node ace user:create-super-admin
 # INSERT INTO users (email, is_super_admin, ...) VALUES ('admin@example.com', true, ...);
 ```
 
-Une fois le Super Admin créé, vous pouvez :
-1. Vous connecter à `/admin`
-2. Créer des revendeurs
-3. Les revendeurs peuvent ensuite créer des organisations et des utilisateurs
+Une fois le Super Admin cree, vous pouvez :
+1. Vous connecter a `/admin`
+2. Creer des revendeurs
+3. Les revendeurs peuvent ensuite creer des organisations et des utilisateurs
 
 ### Lancer l'Application
 
@@ -285,6 +351,7 @@ Une fois le Super Admin créé, vous pouvez :
 cd backend
 pnpm dev
 # API disponible sur http://localhost:3333
+# Workers BullMQ demarrent automatiquement
 ```
 
 **Terminal 2 - Frontend:**
@@ -302,26 +369,26 @@ pnpm dev
 ### Backend
 
 ```bash
-pnpm dev             # Mode développement avec HMR
+pnpm dev             # Mode developpement avec HMR
 pnpm build           # Build pour production
-pnpm start           # Démarrer en production
-pnpm test            # Exécuter les tests
+pnpm start           # Demarrer en production
+pnpm test            # Executer les tests
 pnpm lint            # ESLint
 pnpm format          # Prettier
 pnpm typecheck       # TypeScript type checking
-node ace migration:run       # Exécuter les migrations
-node ace migration:rollback  # Rollback dernière migration
+node ace migration:run       # Executer les migrations
+node ace migration:rollback  # Rollback derniere migration
 node ace gdpr:scheduler      # Traiter les suppressions GDPR dues
 node ace subscription:renew  # Traiter les renouvellements d'abonnements
-node ace cleanup:credit-requests   # Nettoyage des demandes de crédits traitées (>90j)
+node ace cleanup:credit-requests   # Nettoyage des demandes de credits traitees (>90j)
 node ace cleanup:notifications     # Nettoyage des notifications lues (>30j)
-node ace check:auto-refill         # Vérifier les auto-refills du lendemain
+node ace check:auto-refill         # Verifier les auto-refills du lendemain
 ```
 
 ### Frontend
 
 ```bash
-pnpm dev             # Mode développement
+pnpm dev             # Mode developpement
 pnpm build           # Build pour production
 pnpm preview         # Preview du build
 pnpm typecheck       # TypeScript type checking
@@ -331,92 +398,71 @@ pnpm typecheck       # TypeScript type checking
 
 ## Architecture Multi-Tenant
 
-Novika utilise une architecture multi-tenant hiérarchique :
+Novika utilise une architecture multi-tenant hierarchique :
 
-### Hiérarchie des Données
+### Hierarchie des Donnees
 
 ```
 Reseller (revendeur)
-    └── Organizations (clients)
-            └── Users (utilisateurs)
-                    └── Audios (données)
+    `-- Organizations (clients)
+            `-- Users (utilisateurs)
+                    `-- Audios (donnees)
+                            |-- Transcriptions (avec versioning)
+                            |-- Documents (exports)
+                            `-- AudioShares (partages)
 ```
 
-### Isolation des Données
+### Isolation des Donnees
 
-- **Niveau Reseller** : Les revendeurs ne peuvent accéder qu'aux organisations qu'ils ont créées
-- **Niveau Organisation** : Les données sont isolées par `currentOrganizationId`
-- **Utilisateurs** : Chaque utilisateur peut appartenir à **plusieurs organisations**
+- **Niveau Reseller** : Les revendeurs ne peuvent acceder qu'aux organisations qu'ils ont creees
+- **Niveau Organisation** : Les donnees sont isolees par `currentOrganizationId`
+- **Utilisateurs** : Chaque utilisateur peut appartenir a **plusieurs organisations**
 
-### Rôles au Niveau Organisation
+### Roles au Niveau Organisation
 
-| Rôle | Permissions |
+| Role | Permissions |
 |------|-------------|
-| **Owner** | Contrôle total de l'organisation |
-| **Administrator** | Gestion des membres, certains paramètres |
-| **Member** | Accès basique aux ressources |
+| **Owner** | Controle total de l'organisation |
+| **Administrator** | Gestion des membres, certains parametres |
+| **Member** | Acces basique aux ressources |
 
-### Crédits
+### Credits
 
-Les crédits sont gérés au niveau **Organisation** (et non au niveau utilisateur) :
+Les credits sont geres au niveau **Organisation** (et non au niveau utilisateur) :
 
-1. Le Super Admin ajoute des crédits au pool du Reseller
-2. Le Reseller distribue des crédits aux Organisations
-3. Les utilisateurs consomment les crédits de leur organisation lors du traitement audio
+1. Le Super Admin ajoute des credits au pool du Reseller
+2. Le Reseller distribue des credits aux Organisations (manuellement ou via abonnement)
+3. Les utilisateurs consomment les credits de leur organisation lors du traitement audio
+
+**Modes de credits** :
+- **Partage** (defaut) : Tous les membres partagent le pool de l'organisation
+- **Individuel** : Credits distribues individuellement aux membres avec auto-refill optionnel
 
 ---
 
-## Jobs en Arrière-Plan (Redis & BullMQ)
+## Jobs en Arriere-Plan (Redis & BullMQ)
 
-Novika utilise **BullMQ** avec **Redis** pour gérer les tâches asynchrones :
+Novika utilise **BullMQ** avec **Redis** pour gerer les taches asynchrones :
 
 ### Queues disponibles
 
 | Queue | Description | Concurrence |
 |-------|-------------|-------------|
-| `audio-transcription` | Transcription audio via Mistral AI | 2 |
+| `audio-transcription` | Transcription et analyse audio via Mistral AI | 2 |
 | `gdpr-deletion` | Suppression de compte GDPR | 1 |
 | `gdpr-reminder` | Rappels avant suppression | 1 |
+| `subscription-renewal` | Renouvellement d'abonnements credits | 2 |
 
 ### Workers
 
-Les workers démarrent **automatiquement** avec le serveur backend (`pnpm dev` ou `pnpm start`).
+Les workers demarrent **automatiquement** avec le serveur backend (`pnpm dev` ou `pnpm start`).
 
-Pour vérifier que Redis fonctionne :
+Pour verifier que Redis fonctionne :
 
 ```bash
 redis-cli ping
-# Doit répondre: PONG
+# Doit repondre: PONG
 ```
-
-### Scheduler GDPR (CRON)
-
-Le système GDPR nécessite un **cron job** pour :
-- Exécuter les suppressions de compte programmées (après 30 jours)
-- Envoyer les emails de rappel (J-7 et J-1)
-
-#### Configuration du CRON
-
-**Développement** (exécution manuelle) :
-
-```bash
-cd backend
-node ace gdpr:scheduler
-```
-
-**Production** (cron automatique) :
-
-```bash
-# Ajouter à crontab (crontab -e)
-# Exécution quotidienne à 2h du matin
-0 2 * * * cd /path/to/novika/backend && node ace gdpr:scheduler >> /var/log/novika-gdpr.log 2>&1
-```
-
-#### Ce que fait le scheduler
-
-1. **Traite les suppressions dues** : demandes avec `scheduled_for <= now`
-2. **Envoie les rappels** : emails à J-7 et J-1 avant suppression
-3. **Ajoute les jobs à BullMQ** : les workers traitent ensuite automatiquement
 
 ### Tous les Jobs CRON (Production)
 
@@ -424,7 +470,7 @@ node ace gdpr:scheduler
 |---------|----------|-------------|
 | 0:05 | `node ace subscription:renew` | Renouvellements d'abonnements |
 | 2:00 | `node ace gdpr:scheduler` | Suppressions GDPR et rappels |
-| 3:00 | `node ace cleanup:credit-requests` | Nettoyage demandes de crédits (hebdo dimanche) |
+| 3:00 (dim) | `node ace cleanup:credit-requests` | Nettoyage demandes de credits (hebdo) |
 | 3:00 | `node ace cleanup:notifications` | Nettoyage notifications lues > 30 jours |
 | 18:00 | `node ace check:auto-refill` | Avertissement auto-refill insuffisant (24h avant) |
 
@@ -440,10 +486,10 @@ node ace gdpr:scheduler
 #### Flow de suppression GDPR
 
 ```
-Jour 0  → Demande de suppression + Email de confirmation
-Jour 23 → Email de rappel (J-7)
-Jour 29 → Email de rappel (J-1)
-Jour 30 → Suppression automatique + Email de confirmation finale
+Jour 0  -> Demande de suppression + Email de confirmation
+Jour 23 -> Email de rappel (J-7)
+Jour 29 -> Email de rappel (J-1)
+Jour 30 -> Suppression automatique + Email de confirmation finale
 ```
 
 ---
