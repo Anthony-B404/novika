@@ -71,10 +71,10 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: ${API_URL:-https://api-novika.dh-echo.cloud}
-      FRONTEND_URL: ${FRONTEND_URL:-https://novika.dh-echo.cloud}
+      API_URL: ${API_URL:-https://api.novika.fr}
+      FRONTEND_URL: ${FRONTEND_URL:-https://novika.fr}
       # CORS
-      ALLOWED_ORIGINS: ${FRONTEND_URL:-https://novika.dh-echo.cloud}
+      ALLOWED_ORIGINS: ${FRONTEND_URL:-https://novika.fr}
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -104,7 +104,7 @@ services:
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.novika-api.rule=Host(`api-novika.dh-echo.cloud`)"
+      - "traefik.http.routers.novika-api.rule=Host(`api.novika.fr`)"
       - "traefik.http.routers.novika-api.entrypoints=websecure"
       - "traefik.http.routers.novika-api.tls.certresolver=mytlschallenge"
       - "traefik.http.services.novika-api.loadbalancer.server.port=3333"
@@ -147,8 +147,8 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: ${API_URL:-https://api-novika.dh-echo.cloud}
-      FRONTEND_URL: ${FRONTEND_URL:-https://novika.dh-echo.cloud}
+      API_URL: ${API_URL:-https://api.novika.fr}
+      FRONTEND_URL: ${FRONTEND_URL:-https://novika.fr}
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -199,8 +199,8 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       # URLs
-      API_URL: ${API_URL:-https://api-novika.dh-echo.cloud}
-      FRONTEND_URL: ${FRONTEND_URL:-https://novika.dh-echo.cloud}
+      API_URL: ${API_URL:-https://api.novika.fr}
+      FRONTEND_URL: ${FRONTEND_URL:-https://novika.fr}
       # Drive
       DRIVE_DISK: local
     volumes:
@@ -247,7 +247,7 @@ services:
       - traefik-public
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.novika-frontend.rule=Host(`novika.dh-echo.cloud`)"
+      - "traefik.http.routers.novika-frontend.rule=Host(`novika.fr`)"
       - "traefik.http.routers.novika-frontend.entrypoints=websecure"
       - "traefik.http.routers.novika-frontend.tls.certresolver=mytlschallenge"
       - "traefik.http.services.novika-frontend.loadbalancer.server.port=80"

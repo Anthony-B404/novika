@@ -25,8 +25,12 @@ const { reveal } = useScrollReveal()
           </p>
 
           <a
-            href="mailto:contact@novika.app"
-            class="inline-flex items-center justify-center gap-3 bg-white text-slate-900 px-8 py-5 rounded-full text-lg font-bold hover:bg-slate-50 hover:scale-105 hover:shadow-xl transition-all duration-300 transform group"
+            href="#"
+            data-cal-link="anthony-bette-701koy/demo-novika"
+            data-cal-namespace="demo-novika"
+            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+            class="inline-flex items-center justify-center gap-3 bg-white text-slate-900 px-8 py-5 rounded-full text-lg font-bold hover:bg-slate-50 hover:scale-105 hover:shadow-xl transition-all duration-300 transform group cursor-pointer"
+            @click.prevent
           >
             <UIcon name="i-lucide-calendar-days" class="w-6 h-6 text-purple-600 group-hover:rotate-12 transition-transform" />
             Réserver votre démo personnalisée

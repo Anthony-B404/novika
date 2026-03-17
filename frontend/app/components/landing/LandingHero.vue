@@ -30,7 +30,10 @@
           <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-400">
             <a
               href="#contact"
-              class="inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-full text-base font-semibold hover:bg-slate-800 transition-all hover:shadow-xl hover:-translate-y-1"
+              data-cal-link="anthony-bette-701koy/demo-novika"
+              data-cal-namespace="demo-novika"
+              data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+              class="inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-full text-base font-semibold hover:bg-slate-800 transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer"
             >
               <UIcon name="i-lucide-calendar" class="w-5 h-5" />
               Réserver ma démo

@@ -22,7 +22,7 @@ export default defineNuxtConfig({
         },
         {
           property: "og:image",
-          content: "https://novika.dh-echo.cloud/og-image.png",
+          content: "https://novika.fr/og-image.png",
         },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },

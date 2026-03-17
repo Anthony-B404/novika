@@ -30,7 +30,10 @@ const navLinks = [
           </a>
           <a
             href="#contact"
-            class="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-800 transition-colors hover:shadow-lg hover:-translate-y-0.5 transform duration-200"
+            data-cal-link="anthony-bette-701koy/demo-novika"
+            data-cal-namespace="demo-novika"
+            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+            class="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-800 transition-colors hover:shadow-lg hover:-translate-y-0.5 transform duration-200 cursor-pointer"
           >
             Réserver une démo
           </a>
@@ -73,7 +76,10 @@ const navLinks = [
         <div class="pt-2">
           <a
             href="#contact"
-            class="block w-full text-center bg-slate-900 text-white px-5 py-3 rounded-xl text-base font-semibold hover:bg-slate-800 transition-colors"
+            data-cal-link="anthony-bette-701koy/demo-novika"
+            data-cal-namespace="demo-novika"
+            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+            class="block w-full text-center bg-slate-900 text-white px-5 py-3 rounded-xl text-base font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
             @click="mobileOpen = false"
           >
             Réserver une démo
