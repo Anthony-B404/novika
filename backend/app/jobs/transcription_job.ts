@@ -253,20 +253,11 @@ async function processTranscriptionJob(
 
   // Load audio record and set status to processing
   // Restore currentJobId on retry (cleared by error handler on previous attempt)
-  let audio: Audio | null = null
-  try {
-    audio = await Audio.find(audioId)
-    if (audio) {
-      audio.status = AudioStatus.Processing
-      audio.currentJobId = job.data.jobId
-      await audio.save()
-    }
-  } catch (e) {
-    console.log(
-      `[Transcription] Job ${job.id} pre-try error (audioId: ${audioId}):`,
-      e instanceof Error ? e.stack : e
-    )
-    throw e
+  const audio = await Audio.find(audioId)
+  if (audio) {
+    audio.status = AudioStatus.Processing
+    audio.currentJobId = job.data.jobId
+    await audio.save()
   }
 
   // Initialize tracking variables
@@ -288,11 +279,11 @@ async function processTranscriptionJob(
       console.log(`[Transcription] Job ${job.id} retry detected, skipping conversion (audioId: ${audioId})`)
       await job.updateProgress(12)
 
-      audioDuration = audio!.duration || 0
+      audioDuration = audio.duration || 0
 
       // Write already-converted file to temp for transcription
       tempPath = join(tempDir, `${randomUUID()}-converted.m4a`)
-      const convertedBuffer = await storageService.getFileBuffer(audio!.filePath)
+      const convertedBuffer = await storageService.getFileBuffer(audio.filePath)
       await writeFile(tempPath, convertedBuffer)
     } else {
       // First attempt: full pipeline with parallel conversion + transcription
