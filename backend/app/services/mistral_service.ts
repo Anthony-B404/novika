@@ -5,23 +5,6 @@ import { readFile } from 'node:fs/promises'
 import type { TranscriptionTimestamp } from '#models/transcription'
 
 /**
- * Custom HTTP client with extended headersTimeout for large audio transcriptions.
- * Node.js fetch (undici) defaults to 5min headersTimeout — too short for long audio files
- * where Mistral may take 10-30min to process before sending response headers.
- */
-const longTimeoutAgent = new Agent({
-  headersTimeout: 60 * 60 * 1000, // 60 minutes
-  bodyTimeout: 60 * 60 * 1000,
-})
-
-const transcriptionHttpClient = new HTTPClient({
-  fetcher: (input, init) => {
-    // Use global fetch (Node.js undici) with custom dispatcher for extended timeouts
-    return globalThis.fetch(input, { ...init, dispatcher: longTimeoutAgent } as any)
-  },
-})
-
-/**
  * Chat message for multi-turn conversation
  */
 export interface ChatMessage {
@@ -51,13 +34,35 @@ export interface TranscriptionResult {
 
 export default class MistralService {
   private client: Mistral
+  private agent: Agent
 
   constructor() {
+    // Per-instance undici Agent + HTTPClient: avoids races between concurrent jobs
+    // sharing dispatcher state. headersTimeout extended to 60min for long audio
+    // where Mistral may take 10-30min before sending response headers.
+    this.agent = new Agent({
+      headersTimeout: 60 * 60 * 1000,
+      bodyTimeout: 60 * 60 * 1000,
+    })
+
+    const httpClient = new HTTPClient({
+      fetcher: (input, init) => {
+        return globalThis.fetch(input, { ...init, dispatcher: this.agent } as any)
+      },
+    })
+
     this.client = new Mistral({
       apiKey: env.get('MISTRAL_API_KEY'),
-      httpClient: transcriptionHttpClient,
+      httpClient,
       timeoutMs: 10 * 60 * 1000, // 10 minutes default (overridden per-call for transcription)
     })
+  }
+
+  /**
+   * Release per-instance undici resources. Call after job completion.
+   */
+  async dispose(): Promise<void> {
+    await this.agent.close().catch(() => {})
   }
 
   /**

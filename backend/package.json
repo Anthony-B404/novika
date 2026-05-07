@@ -65,7 +65,7 @@
     "@adonisjs/i18n": "^2.2.3",
     "@adonisjs/lucid": "^21.8.1",
     "@adonisjs/mail": "^9.2.2",
-    "@mistralai/mistralai": "^1.14.0",
+    "@mistralai/mistralai": "^2.2.1",
     "@vinejs/vine": "^4.1.0",
     "archiver": "^7.0.1",
     "bullmq": "^5.66.2",
@@ -97,7 +97,12 @@
   "pnpm": {
     "overrides": {
       "strtok3": "8.0.1"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "ffmpeg-static",
+      "msgpackr-extract"
+    ]
   },
   "prettier": "@adonisjs/prettier-config"
 }

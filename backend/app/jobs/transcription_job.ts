@@ -19,8 +19,7 @@ import { join } from 'node:path'
 import { writeFile, unlink } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import i18nManager from '@adonisjs/i18n/services/main'
-import { RequestTimeoutError, ConnectionError } from '@mistralai/mistralai/models/errors/httpclienterrors.js'
-import { SDKError } from '@mistralai/mistralai/models/errors/sdkerror.js'
+import { RequestTimeoutError, ConnectionError, SDKError } from '@mistralai/mistralai/models/errors'
 
 /**
  * Speed factor applied to audio before transcription.
@@ -680,8 +679,9 @@ async function processTranscriptionJob(
       ? ` | cause: ${cause instanceof Error ? `${cause.message}${cause.cause ? ` → ${(cause.cause as any).message || cause.cause}` : ''}` : cause}`
       : ''
 
+    const stack = error instanceof Error && error.stack ? `\n${error.stack}` : ''
     console.log(
-      `[Transcription] Job ${job.id} failed (attempt ${job.attemptsMade + 1}/${maxAttempts}, retriable: ${retriable}, audioId: ${audioId}): ${errorMessage}${causeDetail}`
+      `[Transcription] Job ${job.id} failed (attempt ${job.attemptsMade + 1}/${maxAttempts}, retriable: ${retriable}, audioId: ${audioId}): ${errorMessage}${causeDetail}${stack}`
     )
 
     // Update audio status to failed
