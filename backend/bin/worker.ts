@@ -41,14 +41,16 @@ async function startWorker() {
   const app = await ignitor.createApp('console')
   await app.boot()
 
-  // Sanity check: Lucid's database_provider.boot() must have set BaseModel.$adapter.
-  // Without it, every Audio.find/query call throws
+  // In 'console' environment, the Lucid database_provider's boot() does not
+  // attach the adapter to BaseModel for some reason (works in 'web' env).
+  // Without an adapter, every Audio.query()/find() call throws
   // "Cannot read properties of undefined (reading 'query')".
-  const { BaseModel } = await import('@adonisjs/lucid/orm')
+  // Attach it manually using the same logic as the provider.
+  const { BaseModel, Adapter } = await import('@adonisjs/lucid/orm')
   if (!BaseModel.$adapter) {
-    console.error('[Worker] FATAL: BaseModel.$adapter not set after app.boot()')
-    process.exitCode = 1
-    return
+    console.warn('[Worker] BaseModel.$adapter not set by provider, attaching manually')
+    const db = await app.container.make('lucid.db')
+    BaseModel.$adapter = new Adapter(db)
   }
   console.log('[Worker] BaseModel.$adapter ready')
 
