@@ -4,7 +4,7 @@
 FROM node:20-alpine AS deps
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 # Install ffmpeg (includes ffprobe) for audio processing in development
 RUN apk add --no-cache ffmpeg
@@ -26,7 +26,7 @@ RUN pnpm install --frozen-lockfile
 # ===========================================
 FROM node:20-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 WORKDIR /app
 
@@ -43,7 +43,7 @@ RUN node ace build
 FROM node:20-alpine AS production
 
 # Install pnpm for production dependencies
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 # Install ffmpeg (includes ffprobe) for audio processing and su-exec for entrypoint
 RUN apk add --no-cache ffmpeg su-exec
