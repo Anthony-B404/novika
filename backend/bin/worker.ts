@@ -3,24 +3,18 @@
 | Worker entrypoint
 |--------------------------------------------------------------------------
 |
-| The "worker.ts" file is the entrypoint for starting the BullMQ workers.
-| This file boots the AdonisJS application and starts the queue workers.
+| Starts BullMQ workers via the Ace command "worker:start".
+| Going through Ace ensures the AdonisJS app is fully booted (container,
+| providers, services) before workers run — required for Lucid models to
+| resolve their adapter.
 |
 */
 
 import 'reflect-metadata'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'
 
-/**
- * URL to the application root. AdonisJS need it to resolve
- * paths to file and directories for scaffolding commands
- */
 const APP_ROOT = new URL('../', import.meta.url)
 
-/**
- * The importer is used to import files in context of the
- * application.
- */
 const IMPORTER = (filePath: string) => {
   if (filePath.startsWith('./') || filePath.startsWith('../')) {
     return import(new URL(filePath, APP_ROOT).href)
@@ -28,54 +22,17 @@ const IMPORTER = (filePath: string) => {
   return import(filePath)
 }
 
-async function startWorker() {
-  const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER }).tap((app) => {
+new Ignitor(APP_ROOT, { importer: IMPORTER })
+  .tap((app) => {
     app.booting(async () => {
       await import('#start/env')
     })
     app.listen('SIGTERM', () => app.terminate())
     app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
   })
-
-  // Create and boot the application without starting HTTP server
-  const app = await ignitor.createApp('console')
-  await app.boot()
-
-  // In 'console' environment, the Lucid database_provider's boot() does not
-  // attach the adapter to BaseModel for some reason (works in 'web' env).
-  // Without an adapter, every Audio.query()/find() call throws
-  // "Cannot read properties of undefined (reading 'query')".
-  // Attach it manually using the same logic as the provider.
-  const { BaseModel, Adapter } = await import('@adonisjs/lucid/orm')
-  if (!BaseModel.$adapter) {
-    console.warn('[Worker] BaseModel.$adapter not set by provider, attaching manually')
-    const db = await app.container.make('lucid.db')
-    BaseModel.$adapter = new Adapter(db)
-  }
-  console.log('[Worker] BaseModel.$adapter ready')
-
-  // Eager-load all models BEFORE workers start. Models loaded later via dynamic
-  // imports may, in some prod ESM resolution edge cases, end up extending a
-  // different BaseModel instance than the one the adapter was attached to.
-  await Promise.all([
-    import('#models/user'),
-    import('#models/organization'),
-    import('#models/audio'),
-    import('#models/transcription'),
-    import('#models/credit_transaction'),
-    import('#models/user_credit_transaction'),
-  ])
-  console.log('[Worker] Models eagerly loaded')
-
-  // Import and start workers after app is booted
-  await import('#start/worker')
-  console.log('[Worker] All workers started successfully')
-
-  // Keep the process running
-  await new Promise(() => {})
-}
-
-startWorker().catch((error: Error) => {
-  process.exitCode = 1
-  prettyPrintError(error)
-})
+  .ace()
+  .handle(['worker:start'])
+  .catch((error: Error) => {
+    process.exitCode = 1
+    prettyPrintError(error)
+  })
